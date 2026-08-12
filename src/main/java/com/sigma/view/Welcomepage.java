@@ -60,12 +60,20 @@ public class Welcomepage extends Application {
         BorderPane borderPane = new BorderPane();
         borderPane.setPadding( new Insets(30, 60, 30, 60) );
         // LOGO
-        var logoResource = getClass().getResource("/assets/logo/logo.png");
-        if (logoResource == null) {
-            System.out.println("ERROR: logo.png not found!");
-            return;
-        }
-        Image logoImage = new Image( logoResource.toExternalForm() );
+        var logoResource =
+    getClass().getResource(
+        "/assets/images/logo/logo.png"
+    );
+
+if (logoResource == null) {
+    System.out.println("ERROR: logo.png not found!");
+    return;
+}
+
+Image logoImage =
+    new Image(
+        logoResource.toExternalForm()
+    );
         ImageView logoView = new ImageView(logoImage);
         logoView.setPreserveRatio(true);
         logoView.setSmooth(true);
