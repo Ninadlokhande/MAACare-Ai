@@ -138,9 +138,9 @@ GetStartedbtn.setOnMouseExited(e ->
         logoShadow.setOffsetY(8);
         logoShadow.setColor( Color.web("#C94C91", 0.22) );
         logoView.setEffect(logoShadow); // MAIN TEXT 
-        Text text1 = new Text( "Your AI-Powered Companion for "); text1.setStyle( "-fx-fill: #24234F;" + "-fx-font-weight: bold;" + "-fx-font-size: 20px;"); Text pinkText = new Text( "Mother & Child"); pinkText.setStyle( "-fx-fill: #E84A87;" + "-fx-font-weight: bold;" + "-fx-font-size: 20px;"); Text text2 = new Text( " Healthcare"); text2.setStyle( "-fx-fill: #24234F;" + "-fx-font-weight: bold;" + "-fx-font-size: 20px;"); TextFlow annotation = new TextFlow( text1, pinkText, text2); annotation.setTextAlignment( TextAlignment.CENTER);
+        Text text1 = new Text( ""); text1.setStyle( "-fx-fill: #24234F;" + "-fx-font-weight: bold;" + "-fx-font-size: 20px;"); Text pinkText = new Text( "Smart Care for Every Mother & Baby"); pinkText.setStyle( "-fx-fill: #E84A87;" + "-fx-font-weight: bold;" + "-fx-font-size: 36px;"); Text text2 = new Text( ""); text2.setStyle( "-fx-fill: #24234F;" + "-fx-font-weight: bold;" + "-fx-font-size: 20px;"); TextFlow annotation = new TextFlow( text1, pinkText, text2); annotation.setTextAlignment( TextAlignment.CENTER);
         annotation.setMaxWidth(700); // EXTRA INFORMATION
-        Text extraInfo = new Text( "Track. Monitor. Get AI Guidance."); extraInfo.setStyle( "-fx-fill: #666680;" + "-fx-font-size: 16px;" + "-fx-font-weight: normal;"); Text smallInfo = new Text( "Because every mom and baby deserves the best care."); smallInfo.setStyle( "-fx-fill: #77778D;" + "-fx-font-size: 14px;"); // CONTENT BOX 
+        Text extraInfo = new Text( "Track Pregnency . AI  Heath Assistant . Hospital Booking ."); extraInfo.setStyle( "-fx-fill: #666680;" + "-fx-font-size: 20px;" + "-fx-font-weight: normal;"); Text smallInfo = new Text( "Mother Care . Baby Care . Goverment Schemes"); smallInfo.setStyle( "-fx-fill: #77778D;" + "-fx-font-size: 20px;"); // CONTENT BOX 
         VBox logoSideBox = new VBox( 14, logoView, annotation, extraInfo, smallInfo ,GetStartedbtn); logoSideBox.setAlignment( Pos.CENTER);
         logoSideBox.setPadding( new Insets(20) ); logoSideBox.setMaxWidth( 750); logoSideBox.setMaxHeight( Double.MAX_VALUE);
         // RESPONSIVE SPACING
