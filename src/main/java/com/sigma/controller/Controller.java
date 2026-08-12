@@ -8,7 +8,7 @@ public class Controller {
     
     private String API_KEY = "AIzaSyCMwA_qdCY2hTWCaV0EzStXGM3Hh8gpLEA";
 
-    public boolean signup(String email, String password) {
+    public  boolean signup(String email, String password) {
         JSONObject payload = new JSONObject()
                 .put("email", email)
                 .put("password", password);
@@ -42,7 +42,7 @@ public class Controller {
         return false;
     }
 
-    public boolean signin(String email, String password) {
+    public  boolean signin(String email, String password) {
         JSONObject payload = new JSONObject()
                 .put("email", email)
                 .put("password", password);
