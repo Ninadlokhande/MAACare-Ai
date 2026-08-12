@@ -1,2 +1,0 @@
-# PlaySphere
-java project 
