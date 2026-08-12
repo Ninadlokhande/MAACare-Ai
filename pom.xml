@@ -16,13 +16,17 @@
 
     
 <dependencies>
+
+
+      <!-- Source: https://mvnrepository.com/artifact/org.json/json -->
+<dependency>
+    <groupId>org.json</groupId>
+    <artifactId>json</artifactId>
+    <version>20250517</version>
+    <scope>compile</scope>
+</dependency>
             
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>3.18.0</version>
-            <scope>compile</scope>
-        </dependency>
+        
 
          <dependency>
             <groupId>org.openjfx</groupId>
