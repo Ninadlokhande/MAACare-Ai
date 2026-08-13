@@ -7,6 +7,7 @@ import org.json.JSONObject;
 public class Controller {
     
     private String API_KEY = "AIzaSyCMwA_qdCY2hTWCaV0EzStXGM3Hh8gpLEA";
+    public  int status_code;
 
     public  boolean signup(String email, String password) {
         JSONObject payload = new JSONObject()
@@ -29,6 +30,7 @@ public class Controller {
 
             System.out.println(response);
             System.out.println(response.statusCode());
+            status_code = response.statusCode();
             System.out.println(response.body());
             if (response.statusCode() == 200) {
                 return true;
@@ -63,6 +65,7 @@ public class Controller {
 
             System.out.println(response);
             System.out.println(response.statusCode());
+            status_code = response.statusCode();
             System.out.println(response.body());
             if (response.statusCode() == 200) {
                 return true;
