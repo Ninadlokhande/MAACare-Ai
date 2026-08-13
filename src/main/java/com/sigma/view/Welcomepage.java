@@ -7,6 +7,7 @@ import javafx.animation.TranslateTransition;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.effect.DropShadow;
@@ -25,9 +26,11 @@ import javafx.scene.shape.SVGPath;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 public class Welcomepage extends Application {
+
     public static final String Stage = null;
     public Stage stage;
     private Scene scene;
@@ -125,9 +128,6 @@ GetStartedbtn.setOnMouseExited(e ->
             loginpage.gotologinpage();
 
     primaryStage.setScene(scene);
-
-    primaryStage.setHeight(650);
-    primaryStage.setWidth(1000);
     primaryStage.setMaximized(true);
 });
 
@@ -187,14 +187,15 @@ GetStartedbtn.setOnMouseExited(e ->
         javafx.animation.PauseTransition delay = new javafx.animation.PauseTransition( Duration.seconds(0.8) );
         delay.setOnFinished( event -> { annotationFade.play(); javafx.animation.PauseTransition delay2 = new javafx.animation.PauseTransition( Duration.seconds(0.25) ); delay2.setOnFinished( event2 -> { infoFade.play(); smallFade.play(); }); delay2.play(); });
         delay.play();
-        // SCENE
-        Scene sc = new Scene(root);
-        scene = sc;
-         stage.setScene( sc); stage.setTitle( "MaaCare AI"); // WINDOW SETTINGS 
         
-        stage.setMinWidth( 1000); stage.setMinHeight( 650); stage.setMaximized( true);
-
-        stage.setMinWidth( 1000); stage.setMinHeight( 650); stage.setMaximized( true);
+        // SCENE
+        Scene sc = new Scene(root, scenesettings.rectanguler2d.getWidth(),scenesettings.rectanguler2d.getHeight());
+        
+         stage.setScene(sc); stage.setTitle( "MaaCare AI"); // WINDOW SETTINGS 
+        
+        stage.setMinWidth( 1500); stage.setMinHeight( 800); stage.setMaximized( true);
+        scene = sc;
+    
 
         
         stage.show();

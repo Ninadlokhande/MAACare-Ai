@@ -21,6 +21,7 @@ import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 
 public class Loginpage {
 
@@ -75,6 +76,10 @@ public class Loginpage {
         logoView.fitWidthProperty().bind(
             leftSide.widthProperty().multiply(0.75)
         );
+        Text logininfo = new Text("");
+        logininfo.setStyle( "-fx-fill: #13cee3;" +
+            "-fx-font-size: 16px;" +
+            "-fx-font-weight: bold;");
 
 
         // ---------------- TITLE ----------------
@@ -192,7 +197,8 @@ public class Loginpage {
             description,
             info,
             smallInfo,
-            features
+            features,
+            logininfo
         );
 
 
@@ -267,6 +273,14 @@ public class Loginpage {
             "-fx-font-weight: bold;"
         );
 
+         Text forgot =
+            new Text("");
+
+        forgot.setStyle(
+            "-fx-fill: #D82F82;" +
+            "-fx-font-size: 14px;" +
+            "-fx-font-weight: bold;"
+        );
 
         HBox roles =
             new HBox(12);
@@ -274,42 +288,87 @@ public class Loginpage {
         roles.setAlignment(Pos.CENTER);
 
         Button mother =
-            createRoleButton("Mother / Family");
+            createRoleButton("🤱\nMother\nFamily");
             mother.setOnAction(e->{
                 role = "mother";
 
             });
 
+            mother.setOnMouseClicked(e->{
+                forgot.setText("Role : Mother");
+
+                
+            }
+               
+            );
+
         Button doctor =
-            createRoleButton("Doctor");
+            createRoleButton("🧑‍⚕️\nDoctor");
 
             doctor.setOnAction(e->{
                 role= "doctor";
+
             });
 
+               doctor.setOnMouseClicked(e->{
+               forgot.setText("Role : Doctor");
+               }
+
+                
+            );
+
         Button hospital =
-            createRoleButton("Hospital");
+            createRoleButton("🏥\nHospital");
             hospital.setOnAction(e->{
                 role = "hospital";
             });
+               hospital.setOnMouseClicked(e->{ 
+                    forgot.setText("Role : Hospital");
+
+               }
+               
+            );
 
         Button asha =
-            createRoleButton("  ASHA         Worker");
+            createRoleButton("👩\nASHA Worker");
             asha.setOnAction(e->{
                 role ="asha";
             });
 
+              asha.setOnMouseClicked(e->{
+                    forgot.setText("Role : ASHA WORKER");
+
+              }
+               
+            );
+
         Button ambulance =
-            createRoleButton("Ambulance");
+            createRoleButton("🚑\nAmbulance");
             ambulance.setOnAction(e->{
                 role = "ambulance";
             });
 
+               ambulance.setOnMouseClicked(e->{
+
+                forgot.setText("Role : Ambulence / Hospital \n 🚑");
+               }
+                
+            );
+
         Button admin =
-            createRoleButton("Admin");
+            createRoleButton(" 🧑‍💻\nAdmin");
             admin.setOnAction(e->{
                 role="admin";
             });
+            admin.setOnMouseClicked(e->{
+            
+                forgot.setText("Role : ADMIN");
+            }
+
+
+                
+            );
+            
 
 
         roles.getChildren().addAll(
@@ -383,14 +442,7 @@ public class Loginpage {
         );
 
 
-        Text forgot =
-            new Text("");
-
-        forgot.setStyle(
-            "-fx-fill: #D82F82;" +
-            "-fx-font-size: 14px;" +
-            "-fx-font-weight: bold;"
-        );
+       
 
 
         HBox options =
@@ -401,8 +453,8 @@ public class Loginpage {
         HBox.setHgrow(remember, Priority.ALWAYS);
 
         options.getChildren().addAll(
-            remember,
-            forgot
+            remember
+            
         );
 
 
@@ -420,8 +472,20 @@ public class Loginpage {
                 if (!role.isBlank()
         && !email.getText().isBlank()
         && !password.getText().isBlank()) {
+            
 
     controller.signin(email.getText(),password.getText());
+
+     if(controller.status_code == 200){
+            logininfo.setText("Login sucessfull redirecting");
+            }
+            else {
+                 logininfo.setText("Invalid Credentials Try again");
+
+                 email.clear();
+               password.clear();
+
+            }
     }});
 
         login.setMaxWidth(Double.MAX_VALUE);
@@ -463,14 +527,28 @@ public class Loginpage {
             new Button("Sign Up");
         google.setOnAction(e->{
                 System.out.println(role);;
-                System.out.println("login button pressed");
+                System.out.println("sign up button pressed");
                 System.out.println(email);
                 System.out.println(password);
                 if (!role.isBlank()
         && !email.getText().isBlank()
         && !password.getText().isBlank()) {
 
-    controller.signup(email.getText(),password.getText());
+            controller.signup(email.getText(),password.getText());
+
+            if(controller.status_code == 200){
+            logininfo.setText("sign up sucessfull login to continue");
+            email.clear();
+            password.clear();
+
+            }
+            else if(controller.status_code ==400 ){
+                 logininfo.setText("Email exists sign up with another email / login");
+
+            }
+
+    
+    
 }
         }); 
 
@@ -532,17 +610,16 @@ public class Loginpage {
         loginCard.getChildren().addAll(
             welcome,
             loginInfo,
-            createSeparator(),
+            
 
             roleTitle,
             roles,
-
-            createSeparator(),
+            
+            forgot,
 
             email,
             password,
 
-            options,
 
             login,
 
@@ -576,7 +653,7 @@ public class Loginpage {
         // =========================================================
 
         loginpagScene =
-            new Scene(root);
+            new Scene(root, scenesettings.rectanguler2d.getWidth(),scenesettings.rectanguler2d.getHeight());
 
         return loginpagScene;
     }
@@ -696,6 +773,9 @@ public class Loginpage {
             );
 
         });
+
+        button.setWrapText(true);
+        button.setTextAlignment(TextAlignment.CENTER);
 
 
         return button;
