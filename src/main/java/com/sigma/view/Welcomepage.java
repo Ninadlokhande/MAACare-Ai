@@ -32,7 +32,7 @@ import javafx.util.Duration;
 public class Welcomepage extends Application {
 
     public static final String Stage = null;
-    public Stage stage;
+    public static Stage stage;
     private Scene scene;
     private SVGPath wave1;
     private SVGPath wave2;
