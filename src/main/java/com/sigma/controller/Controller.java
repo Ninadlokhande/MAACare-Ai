@@ -1,15 +1,17 @@
 package com.sigma.controller;
+
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import org.json.JSONObject;
-public class Controller {
-    
-    private String API_KEY = "AIzaSyCMwA_qdCY2hTWCaV0EzStXGM3Hh8gpLEA";
-    public  int status_code;
 
-    public  boolean signup(String email, String password) {
+public class Controller {
+
+    private String API_KEY = "AIzaSyCMwA_qdCY2hTWCaV0EzStXGM3Hh8gpLEA";
+    public int status_code;
+
+    public boolean signup(String email, String password) {
         JSONObject payload = new JSONObject()
                 .put("email", email)
                 .put("password", password);
@@ -44,7 +46,7 @@ public class Controller {
         return false;
     }
 
-    public  boolean signin(String email, String password) {
+    public boolean signin(String email, String password) {
         JSONObject payload = new JSONObject()
                 .put("email", email)
                 .put("password", password);
@@ -52,7 +54,8 @@ public class Controller {
         try {
             HttpClient client = HttpClient.newHttpClient();
 
-            URI uri = URI.create("https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=" + API_KEY);
+            URI uri = URI
+                    .create("https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=" + API_KEY);
 
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(uri)
