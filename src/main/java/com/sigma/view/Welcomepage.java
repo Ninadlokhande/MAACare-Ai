@@ -7,6 +7,7 @@ import javafx.animation.TranslateTransition;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.effect.DropShadow;
@@ -25,11 +26,13 @@ import javafx.scene.shape.SVGPath;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 public class Welcomepage extends Application {
+
     public static final String Stage = null;
-    public Stage stage;
+    public static Stage stage;
     private Scene scene;
     private SVGPath wave1;
     private SVGPath wave2;
@@ -125,9 +128,6 @@ GetStartedbtn.setOnMouseExited(e ->
             loginpage.gotologinpage();
 
     primaryStage.setScene(scene);
-
-    primaryStage.setHeight(650);
-    primaryStage.setWidth(1000);
     primaryStage.setMaximized(true);
 });
 
@@ -138,9 +138,9 @@ GetStartedbtn.setOnMouseExited(e ->
         logoShadow.setOffsetY(8);
         logoShadow.setColor( Color.web("#C94C91", 0.22) );
         logoView.setEffect(logoShadow); // MAIN TEXT 
-        Text text1 = new Text( "Your AI-Powered Companion for "); text1.setStyle( "-fx-fill: #24234F;" + "-fx-font-weight: bold;" + "-fx-font-size: 20px;"); Text pinkText = new Text( "Mother & Child"); pinkText.setStyle( "-fx-fill: #E84A87;" + "-fx-font-weight: bold;" + "-fx-font-size: 20px;"); Text text2 = new Text( " Healthcare"); text2.setStyle( "-fx-fill: #24234F;" + "-fx-font-weight: bold;" + "-fx-font-size: 20px;"); TextFlow annotation = new TextFlow( text1, pinkText, text2); annotation.setTextAlignment( TextAlignment.CENTER);
+        Text text1 = new Text( ""); text1.setStyle( "-fx-fill: #24234F;" + "-fx-font-weight: bold;" + "-fx-font-size: 20px;"); Text pinkText = new Text( "Smart Care for Every Mother & Baby"); pinkText.setStyle( "-fx-fill: #E84A87;" + "-fx-font-weight: bold;" + "-fx-font-size: 36px;"); Text text2 = new Text( ""); text2.setStyle( "-fx-fill: #24234F;" + "-fx-font-weight: bold;" + "-fx-font-size: 20px;"); TextFlow annotation = new TextFlow( text1, pinkText, text2); annotation.setTextAlignment( TextAlignment.CENTER);
         annotation.setMaxWidth(700); // EXTRA INFORMATION
-        Text extraInfo = new Text( "Track. Monitor. Get AI Guidance."); extraInfo.setStyle( "-fx-fill: #666680;" + "-fx-font-size: 16px;" + "-fx-font-weight: normal;"); Text smallInfo = new Text( "Because every mom and baby deserves the best care."); smallInfo.setStyle( "-fx-fill: #77778D;" + "-fx-font-size: 14px;"); // CONTENT BOX 
+        Text extraInfo = new Text( "Track Pregnency . AI  Heath Assistant . Hospital Booking ."); extraInfo.setStyle( "-fx-fill: #666680;" + "-fx-font-size: 20px;" + "-fx-font-weight: normal;"); Text smallInfo = new Text( "Mother Care . Baby Care . Goverment Schemes"); smallInfo.setStyle( "-fx-fill: #77778D;" + "-fx-font-size: 20px;"); // CONTENT BOX 
         VBox logoSideBox = new VBox( 14, logoView, annotation, extraInfo, smallInfo ,GetStartedbtn); logoSideBox.setAlignment( Pos.CENTER);
         logoSideBox.setPadding( new Insets(20) ); logoSideBox.setMaxWidth( 750); logoSideBox.setMaxHeight( Double.MAX_VALUE);
         // RESPONSIVE SPACING
@@ -187,14 +187,15 @@ GetStartedbtn.setOnMouseExited(e ->
         javafx.animation.PauseTransition delay = new javafx.animation.PauseTransition( Duration.seconds(0.8) );
         delay.setOnFinished( event -> { annotationFade.play(); javafx.animation.PauseTransition delay2 = new javafx.animation.PauseTransition( Duration.seconds(0.25) ); delay2.setOnFinished( event2 -> { infoFade.play(); smallFade.play(); }); delay2.play(); });
         delay.play();
-        // SCENE
-        Scene sc = new Scene(root);
-        scene = sc;
-         stage.setScene( sc); stage.setTitle( "MaaCare AI"); // WINDOW SETTINGS 
         
-        stage.setMinWidth( 1000); stage.setMinHeight( 650); stage.setMaximized( true);
-
-        stage.setMinWidth( 1000); stage.setMinHeight( 650); stage.setMaximized( true);
+        // SCENE
+        Scene sc = new Scene(root, scenesettings.rectanguler2d.getWidth(),scenesettings.rectanguler2d.getHeight());
+        
+         stage.setScene(sc); stage.setTitle( "MaaCare AI"); // WINDOW SETTINGS 
+        
+        stage.setMinWidth( 1500); stage.setMinHeight( 800); stage.setMaximized( true);
+        scene = sc;
+    
 
         
         stage.show();
