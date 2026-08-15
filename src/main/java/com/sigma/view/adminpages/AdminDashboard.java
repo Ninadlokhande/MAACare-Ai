@@ -1,5 +1,6 @@
 package com.sigma.view.adminpages;
 
+import com.sigma.view.Welcomepage;
 import com.sigma.view.scenesettings;
 
 import javafx.geometry.Insets;
@@ -164,21 +165,43 @@ public class AdminDashboard {
             );
 
 
+
         Button newMember =
             createSideButton(
                 "＋",
                 "New Member",
                 false
             );
+            
 
 
-        Button approvals =
-            createSideButton(
-                "✓",
-                "Approval Requests",
-                false
-            );
+       Button approvals =
+    createSideButton(
+        "✓",
+        "Approval Requests",
+        false
+    );
 
+approvals.setOnAction(e -> {
+
+    AdminRequestApproval adminRequestApproval =
+        new AdminRequestApproval();
+
+    Scene approvalScene =
+        adminRequestApproval.getAdminrequestApprovalScene();
+
+    Welcomepage.stage.setScene(
+        approvalScene
+    );
+
+    Welcomepage.stage.setMaximized(
+        true
+    );
+
+    System.out.println(
+        "[ADMIN] Approval Requests opened"
+    );
+});
 
         Button analytics =
             createSideButton(

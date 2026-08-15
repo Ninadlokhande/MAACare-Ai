@@ -1,4 +1,7 @@
 package com.sigma.view;
+import com.sigma.view.adminpages.AdminAnalytics;
+import com.sigma.view.adminpages.AdminRequestApproval;
+
 import javafx.animation.FadeTransition;
 import javafx.animation.Interpolator;
 import javafx.animation.ParallelTransition;
@@ -32,6 +35,7 @@ import javafx.util.Duration;
 public class Welcomepage extends Application {
 
     public static final String Stage = null;
+    private Scene testingScene;
     public static Stage stage;
     private Scene scene;
     private SVGPath wave1;
@@ -122,10 +126,15 @@ GetStartedbtn.setOnMouseExited(e ->
 
        GetStartedbtn.setOnAction(e -> {
 
-    Loginpage loginpage =
-            new Loginpage();
-    scene =
-            loginpage.gotologinpage();
+    // Loginpage loginpage =
+    //         new Loginpage();
+    // scene =
+    //         loginpage.gotologinpage();
+   // AdminRequestApproval adminRequestApproval = new AdminRequestApproval();
+    //testingScene = adminRequestApproval.getAdminrequestApprovalScene();
+    AdminAnalytics adminAnalytics = new AdminAnalytics();
+    testingScene = adminAnalytics.getAnalyticsScene();
+    scene = testingScene;
 
     primaryStage.setScene(scene);
     primaryStage.setMaximized(true);
