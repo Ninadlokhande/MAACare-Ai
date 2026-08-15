@@ -17,10 +17,10 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
+// import javafx.scene.paint.Color;
+// import javafx.scene.shape.Circle;
+// import javafx.scene.text.Font;
+// import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 
@@ -747,20 +747,5 @@ public class Loginpage {
         // SEPARATOR
         // =============================================================
 
-        private StackPane createSeparator() {
-
-                StackPane separator = new StackPane();
-
-                separator.setPrefHeight(15);
-
-                Text heart = new Text("♥");
-
-                heart.setStyle(
-                                "-fx-fill: #F39ABD;" +
-                                                "-fx-font-size: 14px;");
-
-                separator.getChildren().add(heart);
-
-                return separator;
-        }
+        
 }

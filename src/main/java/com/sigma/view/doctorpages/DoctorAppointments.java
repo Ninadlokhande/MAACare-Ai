@@ -1,4 +1,4 @@
-package com.sigma.view;
+package com.sigma.view.doctorpages;
 
 import com.sigma.controller.DoctorAppointmentsController;
 import com.sigma.model.Appointment;

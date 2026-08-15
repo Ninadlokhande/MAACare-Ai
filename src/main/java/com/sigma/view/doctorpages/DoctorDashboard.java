@@ -1,4 +1,4 @@
-package com.sigma.view;
+package com.sigma.view.doctorpages;
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
