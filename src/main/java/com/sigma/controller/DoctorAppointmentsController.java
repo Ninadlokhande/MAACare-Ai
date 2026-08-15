@@ -16,6 +16,10 @@ public class DoctorAppointmentsController {
         loadSampleAppointments();
     }
 
+    // =====================================================
+    // SAMPLE DATA
+    // =====================================================
+
     private void loadSampleAppointments() {
 
         appointments.add(
@@ -25,9 +29,8 @@ public class DoctorAppointmentsController {
                         "28 Y | 24 Weeks Pregnant",
                         "Consultation",
                         "Confirmed",
-                        "Paid"
-                )
-        );
+                        "Paid",
+                        "2026-08-14"));
 
         appointments.add(
                 new Appointment(
@@ -36,9 +39,8 @@ public class DoctorAppointmentsController {
                         "32 Y | Routine Checkup",
                         "Routine Checkup",
                         "Confirmed",
-                        "Paid"
-                )
-        );
+                        "Paid",
+                        "2026-08-14"));
 
         appointments.add(
                 new Appointment(
@@ -47,9 +49,8 @@ public class DoctorAppointmentsController {
                         "26 Y | First Consultation",
                         "Consultation",
                         "Confirmed",
-                        "Paid"
-                )
-        );
+                        "Paid",
+                        "2026-08-14"));
 
         appointments.add(
                 new Appointment(
@@ -58,21 +59,58 @@ public class DoctorAppointmentsController {
                         "30 Y | Ultrasound Follow-up",
                         "Ultrasound",
                         "Pending",
-                        "Pending"
-                )
-        );
+                        "Pending",
+                        "2026-08-14"));
     }
+
+    // =====================================================
+    // GET ALL APPOINTMENTS
+    // =====================================================
 
     public ObservableList<Appointment> getAppointments() {
         return appointments;
     }
 
-    public void addAppointment(Appointment appointment) {
+    // =====================================================
+    // ADD APPOINTMENT
+    // =====================================================
+
+    public void addAppointment(
+            String time,
+            String patient,
+            String details,
+            String type,
+            String status,
+            String payment,
+            String date) {
+
+        Appointment appointment = new Appointment(
+                time,
+                patient,
+                details,
+                type,
+                status,
+                payment,
+                date);
+
+        appointments.add(appointment);
+    }
+
+    // =====================================================
+    // ADD EXISTING OBJECT
+    // =====================================================
+
+    public void addAppointment(
+            Appointment appointment) {
 
         if (appointment != null) {
             appointments.add(appointment);
         }
     }
+
+    // =====================================================
+    // UPDATE STATUS
+    // =====================================================
 
     public void updateAppointmentStatus(
             Appointment appointment,
@@ -83,12 +121,28 @@ public class DoctorAppointmentsController {
         }
     }
 
+    // =====================================================
+    // UPDATE PAYMENT
+    // =====================================================
+
     public void updatePayment(
             Appointment appointment,
             String payment) {
 
         if (appointment != null) {
             appointment.setPayment(payment);
+        }
+    }
+
+    // =====================================================
+    // DELETE APPOINTMENT
+    // =====================================================
+
+    public void deleteAppointment(
+            Appointment appointment) {
+
+        if (appointment != null) {
+            appointments.remove(appointment);
         }
     }
 }

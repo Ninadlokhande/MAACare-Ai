@@ -11,6 +11,7 @@ public class Appointment {
     private final StringProperty type;
     private final StringProperty status;
     private final StringProperty payment;
+    private final StringProperty date;
 
     public Appointment(
             String time,
@@ -18,7 +19,8 @@ public class Appointment {
             String details,
             String type,
             String status,
-            String payment) {
+            String payment,
+            String date) {
 
         this.time = new SimpleStringProperty(time);
         this.patient = new SimpleStringProperty(patient);
@@ -26,6 +28,7 @@ public class Appointment {
         this.type = new SimpleStringProperty(type);
         this.status = new SimpleStringProperty(status);
         this.payment = new SimpleStringProperty(payment);
+        this.date = new SimpleStringProperty(date);
     }
 
     public StringProperty timeProperty() {
@@ -52,6 +55,10 @@ public class Appointment {
         return payment;
     }
 
+    public StringProperty dateProperty() {
+        return date;
+    }
+
     public String getTime() {
         return time.get();
     }
@@ -76,6 +83,10 @@ public class Appointment {
         return payment.get();
     }
 
+    public String getDate() {
+        return date.get();
+    }
+
     public void setTime(String value) {
         time.set(value);
     }
@@ -98,5 +109,14 @@ public class Appointment {
 
     public void setPayment(String value) {
         payment.set(value);
+    }
+
+    public void setDate(String value) {
+        date.set(value);
+    }
+
+    public String getDoctor() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getDoctor'");
     }
 }
