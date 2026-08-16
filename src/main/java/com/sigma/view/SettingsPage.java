@@ -62,21 +62,32 @@ public class SettingsPage {
                                                 Theme.BORDER + ";" +
                                                 "-fx-border-radius: 12;");
 
-                String[] options = {
-                                "♙   Account Settings",
-                                "♙   Profile Settings",
-                                "▣   Password & Security",
-                                "▱   Notification Preferences",
-                                "□   Appointment Reminders",
-                                "▱   Message Notifications",
-                                "◉   Appearance",
-                                "⚙   System Preferences",
-                                "▣   Data & Privacy"
+                String[] icons = {
+                                "♙",
+                                "♙",
+                                "▣",
+                                "▱",
+                                "□",
+                                "▱",
+                                "◉",
+                                "⚙",
+                                "▣"
                 };
 
+                String[] options = {
+                                "Account Settings",
+                                "Profile Settings",
+                                "Password & Security",
+                                "Notification Preferences",
+                                "Appointment Reminders",
+                                "Message Notifications",
+                                "Appearance",
+                                "System Preferences",
+                                "Data & Privacy"
+                };
                 for (int i = 0; i < options.length; i++) {
 
-                        Button b = new Button(options[i]);
+                        Button b = new Button();
 
                         b.setMaxWidth(
                                         Double.MAX_VALUE);
@@ -84,19 +95,60 @@ public class SettingsPage {
                         b.setAlignment(
                                         Pos.CENTER_LEFT);
 
-                        b.setFont(
+                        // ==============================
+                        // ICON
+                        // ==============================
+
+                        Label iconLabel = new Label(icons[i]);
+
+                        iconLabel.setFont(
                                         javafx.scene.text.Font.font(
                                                         Theme.FONT,
-                                                        i == 0
-                                                                        ? javafx.scene.text.FontWeight.BOLD
-                                                                        : javafx.scene.text.FontWeight.NORMAL,
-                                                        10));
+                                                        javafx.scene.text.FontWeight.BOLD,
+                                                        20));
 
-                        b.setTextFill(
+                        iconLabel.setTextFill(
                                         Color.web(
                                                         i == 0
                                                                         ? Theme.PRIMARY
                                                                         : Theme.TEXT));
+
+                        // ==============================
+                        // TEXT
+                        // ==============================
+
+                        Label textLabel = new Label(options[i]);
+
+                        textLabel.setFont(
+                                        javafx.scene.text.Font.font(
+                                                        Theme.FONT,
+                                                        javafx.scene.text.FontWeight.BOLD,
+                                                        13));
+
+                        textLabel.setTextFill(
+                                        Color.web(
+                                                        i == 0
+                                                                        ? Theme.PRIMARY
+                                                                        : Theme.TEXT));
+
+                        // ==============================
+                        // ICON + TEXT
+                        // ==============================
+
+                        HBox content = new HBox(10);
+
+                        content.setAlignment(
+                                        Pos.CENTER_LEFT);
+
+                        content.getChildren().addAll(
+                                        iconLabel,
+                                        textLabel);
+
+                        b.setGraphic(content);
+
+                        // ==============================
+                        // ACTIVE BUTTON
+                        // ==============================
 
                         if (i == 0) {
 
@@ -116,7 +168,6 @@ public class SettingsPage {
 
                         menu.getChildren().add(b);
                 }
-
                 // =================================================
                 // ACCOUNT FORM
                 // =================================================
@@ -274,19 +325,10 @@ public class SettingsPage {
                 // =================================================
 
                 Scene scene = new Scene(
-                                root,
-                                Theme.WIDTH,
-                                Theme.HEIGHT);
+                                root);
 
-                DoctorDashboard.dashboardStage.setScene(scene);
+                DoctorDashboard.changeScene(scene);
 
-                DoctorDashboard.dashboardStage.setWidth(
-                                Theme.WIDTH);
-
-                DoctorDashboard.dashboardStage.setHeight(
-                                Theme.HEIGHT);
-
-                DoctorDashboard.dashboardStage.centerOnScreen();
         }
 
         // =================================================

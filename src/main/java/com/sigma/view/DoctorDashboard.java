@@ -34,11 +34,10 @@ public class DoctorDashboard extends Application {
 
                 dashboardStage.setScene(dashboardScene);
 
-                dashboardStage.setWidth(Theme.WIDTH);
-                dashboardStage.setHeight(Theme.HEIGHT);
+                dashboardStage.setWidth(1200);
+                dashboardStage.setHeight(750);
 
-                dashboardStage.setMinWidth(Theme.WIDTH);
-                dashboardStage.setMinHeight(Theme.HEIGHT);
+                dashboardStage.setResizable(true);
 
                 dashboardStage.show();
         }
@@ -69,6 +68,10 @@ public class DoctorDashboard extends Application {
                                 Theme.HEIGHT);
         }
 
+        public static void changeScene(Scene scene) {
+                dashboardStage.setScene(scene);
+        }
+
         // =====================================================
         // SIDEBAR
         // =====================================================
@@ -85,10 +88,9 @@ public class DoctorDashboard extends Application {
                 sidebar.setSpacing(8);
 
                 sidebar.setStyle(
-                                "-fx-background-color: rgba(255,255,255,0.92);" +
+                                "-fx-background-color: #F2E1EA;" +
                                                 "-fx-border-color: " + Theme.BORDER + ";" +
                                                 "-fx-border-width: 0 1 0 0;");
-
                 // LOGO
                 sidebar.getChildren().add(
                                 Theme.logo());
@@ -101,7 +103,7 @@ public class DoctorDashboard extends Application {
 
                 Label doctor = new Label("Dr. Anjali Mehta");
 
-                doctor.setStyle("-fx-font-weight: BOLD; -fx-font-size: 20px");
+                doctor.setStyle("-fx-font-weight: BOLD; -fx-font-size: 13px");
 
                 doctor.setTextFill(Color.web(Theme.TEXT));
 
@@ -126,24 +128,15 @@ public class DoctorDashboard extends Application {
                 sidebar.getChildren().add(doctorBox);
 
                 // MENU
-                Button dashboard = createMenuButton("⌂   Dashboard", true);
-
-                Button appointments = createMenuButton("▣   Appointments", false);
-
-                Button patients = createMenuButton("♙   Patients", false);
-
-                Button reports = createMenuButton("▤   Patient Reports", false);
-
-                Button prescriptions = createMenuButton("♢   Prescriptions", false);
-
-                Button messages = createMenuButton("▱   Messages", false);
-
-                Button calendar = createMenuButton("□   Calendar", false);
-
-                Button profile = createMenuButton("♙   Profile", false);
-
-                Button settings = createMenuButton("⚙   Settings", false);
-
+                Button dashboard = createMenuButton("⌂", "Dashboard", true);
+                Button appointments = createMenuButton("▣", "Appointments", false);
+                Button patients = createMenuButton("♙", "Patients", false);
+                Button reports = createMenuButton("▤", "Patient Reports", false);
+                Button prescriptions = createMenuButton("♢", "Prescriptions", false);
+                Button messages = createMenuButton("▱", "Messages", false);
+                Button calendar = createMenuButton("□", "Calendar", false);
+                Button profile = createMenuButton("♙", "Profile", false);
+                Button settings = createMenuButton("⚙", "Settings", false);
                 // NAVIGATION
                 appointments.setOnAction(e -> DoctorAppointmentsPage.show());
 
@@ -173,8 +166,7 @@ public class DoctorDashboard extends Application {
 
                 sidebar.getChildren().add(spacer);
 
-                Button logout = createMenuButton("↪   Logout", false);
-
+                Button logout = createMenuButton("↪", "Logout", false);
                 sidebar.getChildren().add(logout);
 
                 return sidebar;
@@ -188,27 +180,81 @@ public class DoctorDashboard extends Application {
                         String text,
                         boolean active) {
 
-                Button button = new Button(text);
+                return createMenuButton("", text, active);
+        }
 
-                button.setMaxWidth(Double.MAX_VALUE);
+        private static Button createMenuButton(
+                        String icon,
+                        String text,
+                        boolean active) {
 
-                button.setAlignment(Pos.CENTER_LEFT);
+                Button button = new Button();
 
-                button.setStyle("-fx-font-size: 10px; -fx-font-weight: BOLD;");
+                button.setMaxWidth(
+                                Double.MAX_VALUE);
 
-                button.setTextFill(
-                                Color.web(
-                                                active
-                                                                ? Theme.PRIMARY
-                                                                : Theme.TEXT));
+                button.setAlignment(
+                                Pos.CENTER_LEFT);
+
+                // =================================================
+                // ICON
+                // =================================================
+
+                Label iconLabel = new Label(icon);
+
+                iconLabel.setStyle(
+                                "-fx-font-family: '" + Theme.FONT + "';" +
+                                                "-fx-font-size: 20px;" +
+                                                "-fx-font-weight: BOLD;");
+
+                // =================================================
+                // TEXT
+                // =================================================
+
+                Label textLabel = new Label(text);
+
+                textLabel.setStyle(
+                                "-fx-font-family: '" + Theme.FONT + "';" +
+                                                "-fx-font-size: 13px;" +
+                                                "-fx-font-weight: BOLD;");
+
+                // =================================================
+                // ICON + TEXT
+                // =================================================
+
+                HBox content = new HBox(10);
+
+                content.setAlignment(
+                                Pos.CENTER_LEFT);
+
+                content.getChildren().addAll(
+                                iconLabel,
+                                textLabel);
+
+                button.setGraphic(content);
+
+                button.setText("");
+
+                // =================================================
+                // ACTIVE BUTTON
+                // =================================================
 
                 if (active) {
 
                         button.setStyle(
-                                        "-fx-background-color: " +
-                                                        Theme.PRIMARY_LIGHT + ";" +
+                                        "-fx-background-color:" + Theme.PRIMARY_LIGHT + ";" +
                                                         "-fx-background-radius: 8;" +
                                                         "-fx-padding: 10 12 10 12;");
+
+                        iconLabel.setTextFill(
+                                        Color.web(Theme.PRIMARY));
+
+                        textLabel.setTextFill(
+                                        Color.web(Theme.PRIMARY));
+
+                        // =================================================
+                        // NORMAL BUTTON
+                        // =================================================
 
                 } else {
 
@@ -217,6 +263,15 @@ public class DoctorDashboard extends Application {
                                                         "-fx-background-radius: 8;" +
                                                         "-fx-padding: 10 12 10 12;" +
                                                         "-fx-cursor: hand;");
+
+                        iconLabel.setTextFill(Color.web("#18213D"));
+                        textLabel.setTextFill(Color.web("#18213D"));
+
+                        // iconLabel.setTextFill(
+                        // Color.web(Theme.TEXT));
+
+                        // textLabel.setTextFill(
+                        // Color.web(Theme.TEXT));
                 }
 
                 return button;
@@ -325,6 +380,7 @@ public class DoctorDashboard extends Application {
                 HBox middle = new HBox(18);
 
                 VBox appointments = Theme.card();
+                middle.setPrefHeight(400);
 
                 HBox.setHgrow(
                                 appointments,
@@ -336,7 +392,7 @@ public class DoctorDashboard extends Application {
                                 javafx.scene.text.Font.font(
                                                 Theme.FONT,
                                                 javafx.scene.text.FontWeight.BOLD,
-                                                14));
+                                                16));
 
                 appointmentTitle.setTextFill(
                                 Color.web(Theme.TEXT));
@@ -375,6 +431,7 @@ public class DoctorDashboard extends Application {
                 VBox schedule = Theme.card();
 
                 schedule.setPrefWidth(330);
+                schedule.setPrefHeight(400);
 
                 Label scheduleTitle = new Label("Today's Schedule");
 
@@ -382,33 +439,29 @@ public class DoctorDashboard extends Application {
                                 javafx.scene.text.Font.font(
                                                 Theme.FONT,
                                                 javafx.scene.text.FontWeight.BOLD,
-                                                14));
+                                                16));
 
                 scheduleTitle.setTextFill(
                                 Color.web(Theme.TEXT));
 
-                schedule.getChildren().add(
-                                scheduleTitle);
+                schedule.getChildren().add(scheduleTitle);
 
-                schedule.getChildren().add(
+                schedule.getChildren().addAll(
                                 scheduleRow(
                                                 "09:30 AM - 10:00 AM",
                                                 "Priya Sharma",
-                                                "Consultation"));
+                                                "Consultation"),
 
-                schedule.getChildren().add(
                                 scheduleRow(
                                                 "10:15 AM - 10:45 AM",
                                                 "Neha Kulkarni",
-                                                "Consultation"));
+                                                "Consultation"),
 
-                schedule.getChildren().add(
                                 scheduleRow(
                                                 "11:00 AM - 11:30 AM",
                                                 "Sneha Patil",
-                                                "Consultation"));
+                                                "Consultation"),
 
-                schedule.getChildren().add(
                                 scheduleRow(
                                                 "12:00 PM - 12:30 PM",
                                                 "Ritika Singh",
@@ -422,9 +475,10 @@ public class DoctorDashboard extends Application {
                 // QUICK ACTIONS
                 // =================================================
 
-                HBox bottom = new HBox(18);
+                HBox bottom = new HBox(20);
 
                 VBox quickActions = Theme.card();
+                // quickActions.setPrefHeight(50);
 
                 HBox.setHgrow(
                                 quickActions,
@@ -436,12 +490,12 @@ public class DoctorDashboard extends Application {
                                 javafx.scene.text.Font.font(
                                                 Theme.FONT,
                                                 javafx.scene.text.FontWeight.BOLD,
-                                                14));
+                                                16));
 
                 quickTitle.setTextFill(
                                 Color.web(Theme.TEXT));
 
-                HBox actions = new HBox(12);
+                HBox actions = new HBox(20);
 
                 actions.getChildren().addAll(
                                 quickAction("▣", "Add Appointment"),
@@ -464,7 +518,7 @@ public class DoctorDashboard extends Application {
                                 javafx.scene.text.Font.font(
                                                 Theme.FONT,
                                                 javafx.scene.text.FontWeight.BOLD,
-                                                13));
+                                                16));
 
                 feedbackTitle.setTextFill(
                                 Color.web(Theme.TEXT));
@@ -716,13 +770,13 @@ public class DoctorDashboard extends Application {
 
                 box.setAlignment(Pos.CENTER);
 
-                box.setPrefWidth(100);
+                box.setPrefWidth(115);
 
                 box.setPadding(
                                 new Insets(10));
 
                 box.setStyle(
-                                "-fx-background-color: #FFF8FC;" +
+                                "-fx-background-color: #ffffff;" +
                                                 "-fx-border-color: " + Theme.BORDER + ";" +
                                                 "-fx-border-radius: 8;" +
                                                 "-fx-background-radius: 8;");
@@ -733,7 +787,7 @@ public class DoctorDashboard extends Application {
                                 javafx.scene.text.Font.font(
                                                 Theme.FONT,
                                                 javafx.scene.text.FontWeight.BOLD,
-                                                20));
+                                                22));
 
                 i.setTextFill(
                                 Color.web(Theme.PRIMARY));
@@ -748,7 +802,7 @@ public class DoctorDashboard extends Application {
                                 javafx.scene.text.Font.font(
                                                 Theme.FONT,
                                                 javafx.scene.text.FontWeight.BOLD,
-                                                9));
+                                                13));
 
                 l.setTextFill(
                                 Color.web(Theme.TEXT));
@@ -766,18 +820,10 @@ public class DoctorDashboard extends Application {
 
         public static void showDashboard() {
 
-                if (dashboardStage != null) {
+                if (dashboardStage != null && dashboardScene != null) {
 
-                        dashboardStage.setScene(
-                                        dashboardScene);
+                        changeScene(dashboardScene);
 
-                        dashboardStage.setWidth(
-                                        Theme.WIDTH);
-
-                        dashboardStage.setHeight(
-                                        Theme.HEIGHT);
-
-                        dashboardStage.centerOnScreen();
                 }
         }
 

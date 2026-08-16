@@ -17,21 +17,20 @@ public class Theme {
 
         public static final String BACKGROUND = "linear-gradient(to bottom right, #FFF9FC, #FFF1F8)";
 
-        public static final String WHITE = "#FFFFFF";
-        public static final String PRIMARY = "#E92B83";
-        public static final String PRIMARY_LIGHT = "#FCE6F1";
-        public static final String TEXT = "#18213D";
-        public static final String SECONDARY_TEXT = "#6B7280";
-        public static final String BORDER = "#F0E7ED";
-        public static final String GREEN = "#21A366";
+        public static final String WHITE = "#FFFFFF"; // ffffff
+        public static final String PRIMARY = "#E92B83"; // E92B83
+        public static final String PRIMARY_LIGHT = "#FCE6F1"; // FCE6F1
+        public static final String TEXT = "#18213D"; // 18213D
+        public static final String SECONDARY_TEXT = "#6B7280"; // 6B7280
+        public static final String BORDER = "#F0E7ED"; // F0E7ED
+        public static final String GREEN = "#21A366"; //
         public static final String GREEN_LIGHT = "#E7F8EF";
         public static final String ORANGE = "#F59E0B";
         public static final String ORANGE_LIGHT = "#FFF4DE";
         public static final String RED = "#E74C78";
         public static final String RED_LIGHT = "#FDEAF1";
-
+        public static final String PURPLE = "#B94BFF";
         public static final String FONT = "Arial";
-
         public static final double WIDTH = 1200;
         public static final double HEIGHT = 750;
 
@@ -55,7 +54,7 @@ public class Theme {
                 label.setFont(javafx.scene.text.Font.font(
                                 FONT,
                                 javafx.scene.text.FontWeight.BOLD,
-                                22));
+                                26));
 
                 label.setTextFill(Color.web(TEXT));
 
@@ -91,11 +90,12 @@ public class Theme {
                 box.setPadding(new Insets(18));
 
                 box.setStyle(
-                                "-fx-background-color: #ecf1f7;" +
-                                                "-fx-background-radius: 12;" +
+                                "-fx-background-color: #FFFFFF;" +
+                                                "-fx-background-radius: 18;" +
                                                 "-fx-border-color: " + BORDER + ";" +
-                                                "-fx-border-radius: 12;" +
-                                                "-fx-border-width: 1;");
+                                                "-fx-border-radius: 18;" +
+                                                "-fx-border-width: 1;" +
+                                                "-fx-effect: dropshadow(gaussian, rgba(154,139,194,0.12), 18, 0.2, 0, 4);");
 
                 return box;
         }
@@ -116,10 +116,12 @@ public class Theme {
                 button.setTextFill(Color.WHITE);
 
                 button.setStyle(
-                                "-fx-background-color: " + PRIMARY + ";" +
-                                                "-fx-background-radius: 8;" +
-                                                "-fx-padding: 10 18 10 18;" +
-                                                "-fx-cursor: hand;");
+                                "-fx-background-color: linear-gradient(to right, " +
+                                                PRIMARY + ", " + PURPLE + ");" +
+                                                "-fx-background-radius: 12;" +
+                                                "-fx-padding: 11 20 11 20;" +
+                                                "-fx-cursor: hand;" +
+                                                "-fx-effect: dropshadow(gaussian, rgba(217,106,158,0.25), 10, 0.2, 0, 3);");
 
                 return button;
         }

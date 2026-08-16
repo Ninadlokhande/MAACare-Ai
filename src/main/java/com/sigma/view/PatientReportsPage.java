@@ -197,19 +197,10 @@ public class PatientReportsPage {
                                 table);
 
                 Scene scene = new Scene(
-                                root,
-                                Theme.WIDTH,
-                                Theme.HEIGHT);
+                                root);
 
-                DoctorDashboard.dashboardStage.setScene(scene);
+                DoctorDashboard.changeScene(scene);
 
-                DoctorDashboard.dashboardStage.setWidth(
-                                Theme.WIDTH);
-
-                DoctorDashboard.dashboardStage.setHeight(
-                                Theme.HEIGHT);
-
-                DoctorDashboard.dashboardStage.centerOnScreen();
         }
 
         public static class Report {

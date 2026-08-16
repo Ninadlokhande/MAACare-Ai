@@ -183,19 +183,9 @@ public class PatientsPage {
                                 table);
 
                 Scene scene = new Scene(
-                                root,
-                                Theme.WIDTH,
-                                Theme.HEIGHT);
+                                root);
 
-                DoctorDashboard.dashboardStage.setScene(scene);
-
-                DoctorDashboard.dashboardStage.setWidth(
-                                Theme.WIDTH);
-
-                DoctorDashboard.dashboardStage.setHeight(
-                                Theme.HEIGHT);
-
-                DoctorDashboard.dashboardStage.centerOnScreen();
+                DoctorDashboard.changeScene(scene);
         }
 
         public static class Patient {
