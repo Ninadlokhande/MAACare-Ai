@@ -1,11 +1,14 @@
 package com.sigma.view;
 
+import com.sigma.model.PatientReport;
+
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 
 public class PatientReportsPage {
 
@@ -14,11 +17,17 @@ public class PatientReportsPage {
                 VBox root = new VBox(20);
 
                 root.setPadding(
-                                new Insets(28, 35, 28, 35));
+                                new Insets(
+                                                28,
+                                                35,
+                                                28,
+                                                35));
 
                 Theme.applyBackground(root);
 
+                // =================================================
                 // HEADER
+                // =================================================
 
                 HBox header = new HBox();
 
@@ -38,10 +47,12 @@ public class PatientReportsPage {
                 Button upload = Theme.primaryButton(
                                 "↥  Upload Report");
 
+                Button back = Theme.backButton();
+
                 HBox right = new HBox(10);
 
                 right.getChildren().addAll(
-                                Theme.backButton(),
+                                back,
                                 upload);
 
                 header.getChildren().addAll(
@@ -49,7 +60,9 @@ public class PatientReportsPage {
                                 spacer,
                                 right);
 
+                // =================================================
                 // FILTERS
+                // =================================================
 
                 HBox filters = new HBox(10);
 
@@ -94,43 +107,46 @@ public class PatientReportsPage {
                                 "This Week",
                                 "This Month");
 
-                time.setValue("All Time");
+                time.setValue(
+                                "All Time");
 
                 filters.getChildren().addAll(
                                 search,
                                 reportType,
                                 time);
 
+                // =================================================
                 // TABLE
+                // =================================================
 
-                TableView<Report> table = new TableView<>();
+                TableView<PatientReport> table = new TableView<>();
 
                 table.setColumnResizePolicy(
                                 TableView.CONSTRAINED_RESIZE_POLICY);
 
-                TableColumn<Report, String> report = new TableColumn<>("Report");
+                TableColumn<PatientReport, String> report = new TableColumn<>("Report");
 
-                TableColumn<Report, String> patient = new TableColumn<>("Patient");
+                TableColumn<PatientReport, String> patient = new TableColumn<>("Patient");
 
-                TableColumn<Report, String> date = new TableColumn<>("Date");
+                TableColumn<PatientReport, String> date = new TableColumn<>("Date");
 
-                TableColumn<Report, String> source = new TableColumn<>("Source");
+                TableColumn<PatientReport, String> source = new TableColumn<>("Source");
 
-                TableColumn<Report, String> status = new TableColumn<>("Status");
+                TableColumn<PatientReport, String> status = new TableColumn<>("Status");
 
-                TableColumn<Report, String> action = new TableColumn<>("Action");
+                TableColumn<PatientReport, String> action = new TableColumn<>("Action");
 
                 report.setCellValueFactory(
-                                d -> d.getValue().reportProperty());
+                                d -> d.getValue().reportNameProperty());
 
                 patient.setCellValueFactory(
-                                d -> d.getValue().patientProperty());
+                                d -> d.getValue().patientNameProperty());
 
                 date.setCellValueFactory(
                                 d -> d.getValue().dateProperty());
 
                 source.setCellValueFactory(
-                                d -> d.getValue().sourceProperty());
+                                d -> d.getValue().reportTypeProperty());
 
                 status.setCellValueFactory(
                                 d -> d.getValue().statusProperty());
@@ -147,7 +163,8 @@ public class PatientReportsPage {
                                 action);
 
                 table.getItems().addAll(
-                                new Report(
+
+                                new PatientReport(
                                                 "Blood Test",
                                                 "Priya Sharma",
                                                 "07 May 2024\n10:30 AM",
@@ -155,7 +172,7 @@ public class PatientReportsPage {
                                                 "Normal",
                                                 "◉  ↓"),
 
-                                new Report(
+                                new PatientReport(
                                                 "Ultrasound",
                                                 "Neha Kulkarni",
                                                 "05 May 2024\n09:15 AM",
@@ -163,7 +180,7 @@ public class PatientReportsPage {
                                                 "Normal",
                                                 "◉  ↓"),
 
-                                new Report(
+                                new PatientReport(
                                                 "Urine Test",
                                                 "Sneha Patil",
                                                 "04 May 2024\n11:20 AM",
@@ -171,7 +188,7 @@ public class PatientReportsPage {
                                                 "Normal",
                                                 "◉  ↓"),
 
-                                new Report(
+                                new PatientReport(
                                                 "Thyroid Profile",
                                                 "Ayesha Khan",
                                                 "03 May 2024\n09:45 AM",
@@ -179,7 +196,7 @@ public class PatientReportsPage {
                                                 "Low",
                                                 "◉  ↓"),
 
-                                new Report(
+                                new PatientReport(
                                                 "Vitamin D Test",
                                                 "Pooja Iyer",
                                                 "02 May 2024\n02:30 PM",
@@ -196,65 +213,19 @@ public class PatientReportsPage {
                                 filters,
                                 table);
 
-                Scene scene = new Scene(
-                                root);
+                // =================================================
+                // NEW SCENE
+                // =================================================
 
-                DoctorDashboard.changeScene(scene);
+                Scene reportsScene = new Scene(root);
 
-        }
+                // =================================================
+                // RUNNABLE
+                // =================================================
 
-        public static class Report {
+                Runnable openReportsPage = () -> DoctorDashboard.changeScene(
+                                reportsScene);
 
-                private final javafx.beans.property.SimpleStringProperty report;
-                private final javafx.beans.property.SimpleStringProperty patient;
-                private final javafx.beans.property.SimpleStringProperty date;
-                private final javafx.beans.property.SimpleStringProperty source;
-                private final javafx.beans.property.SimpleStringProperty status;
-                private final javafx.beans.property.SimpleStringProperty action;
-
-                public Report(
-                                String report,
-                                String patient,
-                                String date,
-                                String source,
-                                String status,
-                                String action) {
-
-                        this.report = new javafx.beans.property.SimpleStringProperty(report);
-
-                        this.patient = new javafx.beans.property.SimpleStringProperty(patient);
-
-                        this.date = new javafx.beans.property.SimpleStringProperty(date);
-
-                        this.source = new javafx.beans.property.SimpleStringProperty(source);
-
-                        this.status = new javafx.beans.property.SimpleStringProperty(status);
-
-                        this.action = new javafx.beans.property.SimpleStringProperty(action);
-                }
-
-                public javafx.beans.property.StringProperty reportProperty() {
-                        return report;
-                }
-
-                public javafx.beans.property.StringProperty patientProperty() {
-                        return patient;
-                }
-
-                public javafx.beans.property.StringProperty dateProperty() {
-                        return date;
-                }
-
-                public javafx.beans.property.StringProperty sourceProperty() {
-                        return source;
-                }
-
-                public javafx.beans.property.StringProperty statusProperty() {
-                        return status;
-                }
-
-                public javafx.beans.property.StringProperty actionProperty() {
-                        return action;
-                }
+                openReportsPage.run();
         }
 }

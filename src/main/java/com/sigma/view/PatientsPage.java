@@ -1,5 +1,9 @@
 package com.sigma.view;
 
+import com.sigma.model.Patient;
+
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -13,11 +17,17 @@ public class PatientsPage {
                 VBox root = new VBox(20);
 
                 root.setPadding(
-                                new Insets(28, 35, 28, 35));
+                                new Insets(
+                                                28,
+                                                35,
+                                                28,
+                                                35));
 
                 Theme.applyBackground(root);
 
+                // =================================================
                 // HEADER
+                // =================================================
 
                 HBox header = new HBox();
 
@@ -34,12 +44,16 @@ public class PatientsPage {
                                 spacer,
                                 Priority.ALWAYS);
 
+                Button back = Theme.backButton();
+
                 header.getChildren().addAll(
                                 heading,
                                 spacer,
-                                Theme.backButton());
+                                back);
 
+                // =================================================
                 // FILTER
+                // =================================================
 
                 HBox filter = new HBox(10);
 
@@ -87,7 +101,9 @@ public class PatientsPage {
                                 filterSpacer,
                                 add);
 
+                // =================================================
                 // TABLE
+                // =================================================
 
                 TableView<Patient> table = new TableView<>();
 
@@ -133,6 +149,7 @@ public class PatientsPage {
                                 action);
 
                 table.getItems().addAll(
+
                                 new Patient(
                                                 "Priya Sharma",
                                                 "28 Y / Female",
@@ -182,64 +199,19 @@ public class PatientsPage {
                                 filter,
                                 table);
 
-                Scene scene = new Scene(
-                                root);
+                // =================================================
+                // NEW SCENE
+                // =================================================
 
-                DoctorDashboard.changeScene(scene);
-        }
+                Scene patientsScene = new Scene(root);
 
-        public static class Patient {
+                // =================================================
+                // RUNNABLE
+                // =================================================
 
-                private final javafx.beans.property.SimpleStringProperty name;
-                private final javafx.beans.property.SimpleStringProperty age;
-                private final javafx.beans.property.SimpleStringProperty contact;
-                private final javafx.beans.property.SimpleStringProperty lastVisit;
-                private final javafx.beans.property.SimpleStringProperty nextVisit;
-                private final javafx.beans.property.SimpleStringProperty action;
+                Runnable openPatientsPage = () -> DoctorDashboard.changeScene(
+                                patientsScene);
 
-                public Patient(
-                                String name,
-                                String age,
-                                String contact,
-                                String lastVisit,
-                                String nextVisit,
-                                String action) {
-
-                        this.name = new javafx.beans.property.SimpleStringProperty(name);
-
-                        this.age = new javafx.beans.property.SimpleStringProperty(age);
-
-                        this.contact = new javafx.beans.property.SimpleStringProperty(contact);
-
-                        this.lastVisit = new javafx.beans.property.SimpleStringProperty(lastVisit);
-
-                        this.nextVisit = new javafx.beans.property.SimpleStringProperty(nextVisit);
-
-                        this.action = new javafx.beans.property.SimpleStringProperty(action);
-                }
-
-                public javafx.beans.property.StringProperty nameProperty() {
-                        return name;
-                }
-
-                public javafx.beans.property.StringProperty ageProperty() {
-                        return age;
-                }
-
-                public javafx.beans.property.StringProperty contactProperty() {
-                        return contact;
-                }
-
-                public javafx.beans.property.StringProperty lastVisitProperty() {
-                        return lastVisit;
-                }
-
-                public javafx.beans.property.StringProperty nextVisitProperty() {
-                        return nextVisit;
-                }
-
-                public javafx.beans.property.StringProperty actionProperty() {
-                        return action;
-                }
+                openPatientsPage.run();
         }
 }

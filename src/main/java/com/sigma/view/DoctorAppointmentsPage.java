@@ -1,11 +1,12 @@
 package com.sigma.view;
 
+import com.sigma.model.Appointment;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 
 public class DoctorAppointmentsPage {
 
@@ -14,13 +15,17 @@ public class DoctorAppointmentsPage {
                 VBox root = new VBox(20);
 
                 root.setPadding(
-                                new Insets(28, 35, 28, 35));
+                                new Insets(
+                                                28,
+                                                35,
+                                                28,
+                                                35));
 
                 Theme.applyBackground(root);
 
-                // ==============================
+                // =================================================
                 // HEADER
-                // ==============================
+                // =================================================
 
                 HBox header = new HBox();
 
@@ -44,9 +49,9 @@ public class DoctorAppointmentsPage {
                                 spacer,
                                 back);
 
-                // ==============================
-                // FILTER BAR
-                // ==============================
+                // =================================================
+                // FILTERS
+                // =================================================
 
                 HBox filters = new HBox(10);
 
@@ -78,7 +83,8 @@ public class DoctorAppointmentsPage {
                                 "Pending",
                                 "Cancelled");
 
-                status.setValue("All Status");
+                status.setValue(
+                                "All Status");
 
                 ComboBox<String> type = new ComboBox<>();
 
@@ -101,9 +107,9 @@ public class DoctorAppointmentsPage {
                                 type,
                                 search);
 
-                // ==============================
+                // =================================================
                 // TABLE
-                // ==============================
+                // =================================================
 
                 TableView<Appointment> table = new TableView<>();
 
@@ -149,6 +155,7 @@ public class DoctorAppointmentsPage {
                                 action);
 
                 table.getItems().addAll(
+
                                 new Appointment(
                                                 "09:30 AM",
                                                 "Priya Sharma",
@@ -206,69 +213,19 @@ public class DoctorAppointmentsPage {
                                 filters,
                                 table);
 
-                Scene scene = new Scene(
-                                root);
+                // =================================================
+                // NEW SCENE
+                // =================================================
 
-                DoctorDashboard.changeScene(scene);
+                Scene appointmentsScene = new Scene(root);
 
-        }
+                // =================================================
+                // RUNNABLE
+                // =================================================
 
-        // =====================================================
-        // MODEL
-        // =====================================================
+                Runnable openAppointmentsPage = () -> DoctorDashboard.changeScene(
+                                appointmentsScene);
 
-        public static class Appointment {
-
-                private final javafx.beans.property.SimpleStringProperty time;
-                private final javafx.beans.property.SimpleStringProperty patient;
-                private final javafx.beans.property.SimpleStringProperty type;
-                private final javafx.beans.property.SimpleStringProperty status;
-                private final javafx.beans.property.SimpleStringProperty payment;
-                private final javafx.beans.property.SimpleStringProperty action;
-
-                public Appointment(
-                                String time,
-                                String patient,
-                                String type,
-                                String status,
-                                String payment,
-                                String action) {
-
-                        this.time = new javafx.beans.property.SimpleStringProperty(time);
-
-                        this.patient = new javafx.beans.property.SimpleStringProperty(patient);
-
-                        this.type = new javafx.beans.property.SimpleStringProperty(type);
-
-                        this.status = new javafx.beans.property.SimpleStringProperty(status);
-
-                        this.payment = new javafx.beans.property.SimpleStringProperty(payment);
-
-                        this.action = new javafx.beans.property.SimpleStringProperty(action);
-                }
-
-                public javafx.beans.property.StringProperty timeProperty() {
-                        return time;
-                }
-
-                public javafx.beans.property.StringProperty patientProperty() {
-                        return patient;
-                }
-
-                public javafx.beans.property.StringProperty typeProperty() {
-                        return type;
-                }
-
-                public javafx.beans.property.StringProperty statusProperty() {
-                        return status;
-                }
-
-                public javafx.beans.property.StringProperty paymentProperty() {
-                        return payment;
-                }
-
-                public javafx.beans.property.StringProperty actionProperty() {
-                        return action;
-                }
+                openAppointmentsPage.run();
         }
 }
