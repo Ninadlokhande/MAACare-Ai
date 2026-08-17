@@ -1,4 +1,4 @@
-package com.sigma.model;
+package com.sigma.model.DoctorModel;
 
 public class Settings {
 

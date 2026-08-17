@@ -1,7 +1,7 @@
-package com.sigma.view;
+package com.sigma.view.doctorpages;
 
-import com.sigma.controller.SettingsController;
-import com.sigma.model.Settings;
+import com.sigma.controller.doctorController.SettingsController;
+import com.sigma.model.DoctorModel.Settings;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -9,6 +9,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 
 public class SettingsPage {
 
@@ -57,9 +59,9 @@ public class SettingsPage {
 
                 VBox menu = new VBox(8);
 
-                menu.setPrefWidth(230);
-                menu.setMinWidth(230);
-                menu.setMaxWidth(230);
+                menu.setPrefWidth(250);
+                menu.setMinWidth(250);
+                menu.setMaxWidth(250);
 
                 menu.setPadding(
                                 new Insets(15));
@@ -71,19 +73,25 @@ public class SettingsPage {
                                                 Theme.BORDER + ";" +
                                                 "-fx-border-radius: 12;");
 
+                // =================================================
+                // UPDATED SETTINGS ICONS
+                // =================================================
+
                 String[] icons = {
-                                "♙",
-                                "♙",
-                                "▣",
-                                "▱",
-                                "□",
-                                "▱",
-                                "◉",
-                                "⚙",
-                                "▣"
+
+                                "👤", // Account Settings
+                                "🪪", // Profile Settings
+                                "🔐", // Password & Security
+                                "🔔", // Notification Preferences
+                                "⏰", // Appointment Reminders
+                                "💬", // Message Notifications
+                                "🎨", // Appearance
+                                "⚙", // System Preferences
+                                "🛡" // Data & Privacy
                 };
 
                 String[] options = {
+
                                 "Account Settings",
                                 "Profile Settings",
                                 "Password & Security",
@@ -105,14 +113,23 @@ public class SettingsPage {
                         b.setAlignment(
                                         Pos.CENTER_LEFT);
 
+                        // =================================================
+                        // ICON
+                        // =================================================
+
                         Label iconLabel = new Label(
                                         icons[i]);
 
                         iconLabel.setFont(
-                                        javafx.scene.text.Font.font(
-                                                        Theme.FONT,
-                                                        javafx.scene.text.FontWeight.BOLD,
-                                                        20));
+                                        Font.font(
+                                                        "Segoe UI Emoji",
+                                                        FontWeight.NORMAL,
+                                                        19));
+
+                        iconLabel.setMinWidth(28);
+
+                        iconLabel.setAlignment(
+                                        Pos.CENTER);
 
                         iconLabel.setTextFill(
                                         Color.web(
@@ -120,13 +137,17 @@ public class SettingsPage {
                                                                         ? Theme.PRIMARY
                                                                         : Theme.TEXT));
 
+                        // =================================================
+                        // TEXT
+                        // =================================================
+
                         Label textLabel = new Label(
                                         options[i]);
 
                         textLabel.setFont(
-                                        javafx.scene.text.Font.font(
+                                        Font.font(
                                                         Theme.FONT,
-                                                        javafx.scene.text.FontWeight.BOLD,
+                                                        FontWeight.BOLD,
                                                         13));
 
                         textLabel.setTextFill(
@@ -134,6 +155,10 @@ public class SettingsPage {
                                                         i == 0
                                                                         ? Theme.PRIMARY
                                                                         : Theme.TEXT));
+
+                        // =================================================
+                        // CONTENT
+                        // =================================================
 
                         HBox content = new HBox(10);
 
@@ -146,13 +171,18 @@ public class SettingsPage {
 
                         b.setGraphic(content);
 
+                        // =================================================
+                        // ACTIVE / INACTIVE STYLE
+                        // =================================================
+
                         if (i == 0) {
 
                                 b.setStyle(
                                                 "-fx-background-color: " +
                                                                 Theme.PRIMARY_LIGHT + ";" +
                                                                 "-fx-background-radius: 8;" +
-                                                                "-fx-padding: 10;");
+                                                                "-fx-padding: 10;" +
+                                                                "-fx-cursor: hand;");
 
                         } else {
 
@@ -161,6 +191,36 @@ public class SettingsPage {
                                                                 "-fx-padding: 10;" +
                                                                 "-fx-cursor: hand;");
                         }
+
+                        // =================================================
+                        // HOVER EFFECT
+                        // =================================================
+
+                        final int index = i;
+
+                        b.setOnMouseEntered(e -> {
+
+                                if (index != 0) {
+
+                                        b.setStyle(
+                                                        "-fx-background-color: " +
+                                                                        Theme.PRIMARY_LIGHT + ";" +
+                                                                        "-fx-background-radius: 8;" +
+                                                                        "-fx-padding: 10;" +
+                                                                        "-fx-cursor: hand;");
+                                }
+                        });
+
+                        b.setOnMouseExited(e -> {
+
+                                if (index != 0) {
+
+                                        b.setStyle(
+                                                        "-fx-background-color: transparent;" +
+                                                                        "-fx-padding: 10;" +
+                                                                        "-fx-cursor: hand;");
+                                }
+                        });
 
                         menu.getChildren().add(b);
                 }
@@ -184,25 +244,42 @@ public class SettingsPage {
                                 "Account Settings");
 
                 formTitle.setFont(
-                                javafx.scene.text.Font.font(
+                                Font.font(
                                                 Theme.FONT,
-                                                javafx.scene.text.FontWeight.BOLD,
+                                                FontWeight.BOLD,
                                                 16));
 
                 formTitle.setTextFill(
-                                Color.web(Theme.TEXT));
+                                Color.web(
+                                                Theme.TEXT));
+
+                // =================================================
+                // FULL NAME
+                // =================================================
 
                 TextField fullName = field(
                                 "Full Name",
                                 "Dr. Anjali Mehta");
 
+                // =================================================
+                // EMAIL
+                // =================================================
+
                 TextField email = field(
                                 "Email",
                                 "anjalimehta@maacare.com");
 
+                // =================================================
+                // PHONE
+                // =================================================
+
                 TextField phone = field(
                                 "Phone Number",
                                 "9876543210");
+
+                // =================================================
+                // SPECIALIZATION
+                // =================================================
 
                 ComboBox<String> specialization = new ComboBox<>();
 
@@ -219,12 +296,21 @@ public class SettingsPage {
 
                 specialization.setPrefHeight(38);
 
+                // =================================================
+                // LICENSE
+                // =================================================
+
                 TextField license = field(
                                 "License No.",
                                 "GYN/2020/12345");
 
+                // =================================================
+                // SAVE BUTTON
+                // =================================================
+
                 Button save = Theme.primaryButton(
                                 "Save Changes");
+
                 save.setOnAction(e -> {
 
                         new SettingsController().saveSettings(
@@ -237,8 +323,12 @@ public class SettingsPage {
                         Alert alert = new Alert(
                                         Alert.AlertType.INFORMATION);
 
-                        alert.setTitle("Settings");
-                        alert.setHeaderText(null);
+                        alert.setTitle(
+                                        "Settings");
+
+                        alert.setHeaderText(
+                                        null);
+
                         alert.setContentText(
                                         "Settings saved successfully!");
 
@@ -250,14 +340,27 @@ public class SettingsPage {
                 saveBox.setAlignment(
                                 Pos.CENTER_RIGHT);
 
+                // =================================================
+                // FORM CHILDREN
+                // =================================================
+
                 form.getChildren().addAll(
+
                                 formTitle,
+
                                 fullName,
+
                                 email,
+
                                 phone,
-                                label("Specialization"),
+
+                                label(
+                                                "Specialization"),
+
                                 specialization,
+
                                 license,
+
                                 saveBox);
 
                 // =================================================
@@ -281,6 +384,10 @@ public class SettingsPage {
                                 menu,
                                 form);
 
+                // =================================================
+                // ROOT
+                // =================================================
+
                 root.setTop(header);
 
                 BorderPane.setMargin(
@@ -300,7 +407,7 @@ public class SettingsPage {
                 Scene settingsScene = new Scene(root);
 
                 // =================================================
-                // RUNNABLE
+                // NAVIGATION
                 // =================================================
 
                 Runnable openSettingsPage = () -> DoctorDashboard.changeScene(
@@ -319,13 +426,14 @@ public class SettingsPage {
                 Label label = new Label(text);
 
                 label.setFont(
-                                javafx.scene.text.Font.font(
+                                Font.font(
                                                 Theme.FONT,
-                                                javafx.scene.text.FontWeight.BOLD,
+                                                FontWeight.BOLD,
                                                 10));
 
                 label.setTextFill(
-                                Color.web(Theme.TEXT));
+                                Color.web(
+                                                Theme.TEXT));
 
                 return label;
         }

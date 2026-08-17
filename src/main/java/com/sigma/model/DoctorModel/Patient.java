@@ -1,5 +1,5 @@
 
-package com.sigma.model;
+package com.sigma.model.DoctorModel;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
