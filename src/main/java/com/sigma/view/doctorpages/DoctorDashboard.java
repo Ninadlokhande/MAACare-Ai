@@ -1,4 +1,4 @@
-package com.sigma.view;
+package com.sigma.view.doctorpages;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
