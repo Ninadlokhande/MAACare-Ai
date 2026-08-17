@@ -137,8 +137,110 @@ public class PatientsPage {
                 nextVisit.setCellValueFactory(
                                 d -> d.getValue().nextVisitProperty());
 
-                action.setCellValueFactory(
-                                d -> d.getValue().actionProperty());
+                // =================================================
+                // ACTION BUTTONS
+                // =================================================
+
+                action.setCellFactory(column -> new TableCell<Patient, String>() {
+
+                        private final Button viewButton = new Button("👁");
+
+                        private final Button editButton = new Button("✏️");
+
+                        private final HBox buttons = new HBox(6);
+
+                        {
+
+                                // ==========================
+                                // VIEW BUTTON
+                                // ==========================
+
+                                viewButton.setStyle(
+                                                "-fx-background-color: #E0F2FE;" +
+                                                                "-fx-text-fill: #0284C7;" +
+                                                                "-fx-font-size: 14px;" +
+                                                                "-fx-background-radius: 7;" +
+                                                                "-fx-padding: 5 9 5 9;" +
+                                                                "-fx-cursor: hand;");
+
+                                viewButton.setTooltip(
+                                                new Tooltip("View Patient"));
+
+                                // ==========================
+                                // EDIT BUTTON
+                                // ==========================
+
+                                editButton.setStyle(
+                                                "-fx-background-color: #FFF4DE;" +
+                                                                "-fx-text-fill: #F59E0B;" +
+                                                                "-fx-font-size: 14px;" +
+                                                                "-fx-background-radius: 7;" +
+                                                                "-fx-padding: 5 9 5 9;" +
+                                                                "-fx-cursor: hand;");
+
+                                editButton.setTooltip(
+                                                new Tooltip("Edit Patient"));
+
+                                // ==========================
+                                // VIEW ACTION
+                                // ==========================
+
+                                viewButton.setOnAction(e -> {
+
+                                        Patient patient = getTableView()
+                                                        .getItems()
+                                                        .get(getIndex());
+
+                                        System.out.println(
+                                                        "Viewing Patient: " +
+                                                                        patient.nameProperty().get());
+                                });
+
+                                // ==========================
+                                // EDIT ACTION
+                                // ==========================
+
+                                editButton.setOnAction(e -> {
+
+                                        Patient patient = getTableView()
+                                                        .getItems()
+                                                        .get(getIndex());
+
+                                        System.out.println(
+                                                        "Editing Patient: " +
+                                                                        patient.nameProperty().get());
+                                });
+
+                                buttons.setAlignment(
+                                                Pos.CENTER);
+
+                                buttons.getChildren().addAll(
+                                                viewButton,
+                                                editButton);
+                        }
+
+                        @Override
+                        protected void updateItem(
+                                        String item,
+                                        boolean empty) {
+
+                                super.updateItem(
+                                                item,
+                                                empty);
+
+                                if (empty) {
+
+                                        setGraphic(null);
+
+                                } else {
+
+                                        setGraphic(buttons);
+
+                                        setAlignment(
+                                                        Pos.CENTER);
+                                }
+                        }
+                });
 
                 table.getColumns().addAll(
                                 name,

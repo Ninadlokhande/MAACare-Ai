@@ -151,8 +151,118 @@ public class PatientReportsPage {
                 status.setCellValueFactory(
                                 d -> d.getValue().statusProperty());
 
-                action.setCellValueFactory(
-                                d -> d.getValue().actionProperty());
+                // =================================================
+                // ACTION COLUMN - VIEW + DOWNLOAD
+                // =================================================
+
+                action.setCellFactory(column -> new TableCell<PatientReport, String>() {
+
+                        private final Button viewButton = new Button("👁");
+
+                        private final Button downloadButton = new Button("⬇");
+
+                        private final HBox buttons = new HBox(6);
+
+                        {
+
+                                // ==========================
+                                // VIEW BUTTON
+                                // ==========================
+
+                                viewButton.setStyle(
+                                                "-fx-background-color: #E0F2FE;" +
+                                                                "-fx-text-fill: #0284C7;" +
+                                                                "-fx-font-size: 14px;" +
+                                                                "-fx-background-radius: 7;" +
+                                                                "-fx-padding: 5 9 5 9;" +
+                                                                "-fx-cursor: hand;");
+
+                                viewButton.setTooltip(
+                                                new Tooltip("View Report"));
+
+                                // ==========================
+                                // DOWNLOAD BUTTON
+                                // ==========================
+
+                                downloadButton.setStyle(
+                                                "-fx-background-color: #F3ECFF;" +
+                                                                "-fx-text-fill: #8B5CF6;" +
+                                                                "-fx-font-size: 14px;" +
+                                                                "-fx-background-radius: 7;" +
+                                                                "-fx-padding: 5 9 5 9;" +
+                                                                "-fx-cursor: hand;");
+
+                                downloadButton.setTooltip(
+                                                new Tooltip("Download Report"));
+
+                                // ==========================
+                                // VIEW ACTION
+                                // ==========================
+
+                                viewButton.setOnAction(e -> {
+
+                                        PatientReport report = getTableView()
+                                                        .getItems()
+                                                        .get(getIndex());
+
+                                        System.out.println(
+                                                        "Viewing Report: " +
+                                                                        report.reportNameProperty().get() +
+                                                                        " | Patient: " +
+                                                                        report.patientNameProperty().get());
+                                });
+
+                                // ==========================
+                                // DOWNLOAD ACTION
+                                // ==========================
+
+                                downloadButton.setOnAction(e -> {
+
+                                        PatientReport report = getTableView()
+                                                        .getItems()
+                                                        .get(getIndex());
+
+                                        System.out.println(
+                                                        "Downloading Report: " +
+                                                                        report.reportNameProperty().get() +
+                                                                        " | Patient: " +
+                                                                        report.patientNameProperty().get());
+                                });
+
+                                // ==========================
+                                // BUTTON LAYOUT
+                                // ==========================
+
+                                buttons.setAlignment(
+                                                Pos.CENTER);
+
+                                buttons.getChildren().addAll(
+                                                viewButton,
+                                                downloadButton);
+                        }
+
+                        @Override
+                        protected void updateItem(
+                                        String item,
+                                        boolean empty) {
+
+                                super.updateItem(
+                                                item,
+                                                empty);
+
+                                if (empty) {
+
+                                        setGraphic(null);
+
+                                } else {
+
+                                        setGraphic(buttons);
+
+                                        setAlignment(
+                                                        Pos.CENTER);
+                                }
+                        }
+                });
 
                 table.getColumns().addAll(
                                 report,
