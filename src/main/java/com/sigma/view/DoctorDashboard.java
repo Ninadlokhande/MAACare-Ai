@@ -949,4 +949,8 @@ public class DoctorDashboard extends javafx.application.Application {
 
                 return box;
         }
+
+        public static void startDashboard(Stage stage) {
+
+        }
 }

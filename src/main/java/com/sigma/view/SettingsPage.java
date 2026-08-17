@@ -1,5 +1,8 @@
 package com.sigma.view;
 
+import com.sigma.controller.SettingsController;
+import com.sigma.model.Settings;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -222,6 +225,25 @@ public class SettingsPage {
 
                 Button save = Theme.primaryButton(
                                 "Save Changes");
+                save.setOnAction(e -> {
+
+                        new SettingsController().saveSettings(
+                                        fullName.getText(),
+                                        email.getText(),
+                                        phone.getText(),
+                                        specialization.getValue(),
+                                        license.getText());
+
+                        Alert alert = new Alert(
+                                        Alert.AlertType.INFORMATION);
+
+                        alert.setTitle("Settings");
+                        alert.setHeaderText(null);
+                        alert.setContentText(
+                                        "Settings saved successfully!");
+
+                        alert.showAndWait();
+                });
 
                 HBox saveBox = new HBox(save);
 

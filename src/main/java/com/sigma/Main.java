@@ -1,5 +1,6 @@
 package com.sigma;
 
+import com.sigma.view.DoctorBasicInformationPage;
 import com.sigma.view.DoctorDashboard;
 import javafx.application.Application;
 
