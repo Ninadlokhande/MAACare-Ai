@@ -1,459 +1,326 @@
 package com.sigma.view.doctorpages;
 
-import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
+import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.CycleMethod;
-import javafx.scene.paint.LinearGradient;
-import javafx.scene.paint.RadialGradient;
-import javafx.scene.paint.Stop;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.SVGPath;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
-public class DoctorDashboard extends Application {
+public class DoctorDashboard extends javafx.application.Application {
 
-        public static Stage DoctorDashboardStage;
+        // =====================================================
+        // ONE COMMON STAGE
+        // =====================================================
 
-        private Scene DoctorDashboardScene;
+        public static Stage dashboardStage;
 
-        private static final String PINK = "#D94A91";
-        private static final String LIGHT_PINK = "#FCEAF3";
-        private static final String PURPLE = "#8B5CF6";
+        // =====================================================
+        // DASHBOARD SCENE
+        // =====================================================
 
-        private static final String DARK_TEXT = "#172554";
-        private static final String SECONDARY_TEXT = "#64748B";
+        private static Scene dashboardScene;
 
-        private static final String BORDER = "#E8E8F0";
-        private static final String WHITE = "#FFFFFF";
-
-        private static final String FONT_FAMILY = "Arial";
-
-        private SVGPath wave1;
-        private SVGPath wave2;
+        // =====================================================
+        // START
+        // =====================================================
 
         @Override
         public void start(Stage stage) {
 
-                DoctorDashboardStage = stage;
+                dashboardStage = stage;
 
-                StackPane root = new StackPane();
+                dashboardStage.setTitle(
+                                "MaaCare AI - Doctor Dashboard");
 
-                root.setStyle(
-                                "-fx-background-color: linear-gradient(" +
-                                                "to bottom right," +
-                                                "#FFFFFF 0%," +
-                                                "#FFF9FC 55%," +
-                                                "#F8F4FF 100%);");
+                // Dashboard scene तयार
+                dashboardScene = createDashboardScene();
 
-                Circle glow1 = new Circle();
+                // Dashboard scene stage वर set
+                dashboardStage.setScene(
+                                dashboardScene);
 
-                glow1.radiusProperty().bind(root.heightProperty().multiply(0.25));
+                // =================================================
+                // STAGE SIZE - ONLY ONCE
+                // =================================================
 
-                glow1.setFill(new RadialGradient(0, 0, 0.5, 0.5, 1, true, CycleMethod.NO_CYCLE,
-                                new Stop(0, Color.web("#FFD8E9", 0.25)),
-                                new Stop(1, Color.TRANSPARENT)));
+                dashboardStage.setWidth(
+                                Theme.WIDTH);
 
-                StackPane.setAlignment(
-                                glow1,
-                                Pos.TOP_LEFT);
+                dashboardStage.setHeight(
+                                Theme.HEIGHT);
 
-                Circle glow2 = new Circle();
+                dashboardStage.centerOnScreen();
 
-                glow2.radiusProperty().bind(
-                                root.heightProperty().multiply(0.22));
+                dashboardStage.setResizable(true);
 
-                glow2.setFill(new RadialGradient(0, 0, 0.5, 0.5, 1, true, CycleMethod.NO_CYCLE,
-                                new Stop(0, Color.web("#E5D7FF", 0.20)),
-                                new Stop(1, Color.TRANSPARENT)));
-
-                StackPane.setAlignment(glow2, Pos.BOTTOM_RIGHT);
-
-                wave1 = new SVGPath();
-
-                wave1.setFill(new LinearGradient(0, 0, 1, 0, true,
-                                CycleMethod.NO_CYCLE,
-                                new Stop(
-                                                0,
-                                                Color.web("#F54B87", 0.10)),
-
-                                new Stop(
-                                                0.5,
-                                                Color.web("#E78BC0", 0.06)),
-
-                                new Stop(
-                                                1,
-                                                Color.web("#9B4DCC", 0.10))));
-
-                wave2 = new SVGPath();
-
-                wave2.setFill(
-                                new LinearGradient(
-                                                0,
-                                                0,
-                                                1,
-                                                0,
-                                                true,
-                                                CycleMethod.NO_CYCLE,
-
-                                                new Stop(
-                                                                0,
-                                                                Color.web("#FFB5D0", 0.08)),
-
-                                                new Stop(
-                                                                0.5,
-                                                                Color.web("#E4B8F0", 0.06)),
-
-                                                new Stop(
-                                                                1,
-                                                                Color.web("#B99BEA", 0.09))));
-
-                BorderPane borderPane = new BorderPane();
-
-                borderPane.setPadding(
-                                new Insets(
-                                                18,
-                                                25,
-                                                20,
-                                                20));
-
-                VBox sidebar = new VBox(8);
-
-                sidebar.setPrefWidth(245);
-
-                sidebar.setPadding(
-                                new Insets(
-                                                20,
-                                                15,
-                                                20,
-                                                15));
-
-                sidebar.setStyle(
-                                "-fx-background-color: white;" +
-                                                "-fx-background-radius: 0 22 22 0;" +
-                                                "-fx-border-color: #F0E9EF;" +
-                                                "-fx-border-width: 0 1 0 0;");
-
-                Image logo = new Image("/assets/images/logo/logo.png");
-
-                ImageView logoImageView = new ImageView(logo);
-
-                logoImageView.setFitWidth(175);
-                logoImageView.setFitHeight(125);
-
-                logoImageView.setPreserveRatio(true);
-                logoImageView.setSmooth(true);
-
-                VBox logoBox = new VBox(logoImageView);
-
-                logoBox.setAlignment(Pos.CENTER);
-
-                logoBox.setPadding(new Insets(0, 0, 15, 0));
-
-                Button dashboardBtn = createSideButton(
-                                "⌂",
-                                "Dashboard",
-                                true);
-
-                Button appointmentsBtn = createSideButton(
-                                "▣",
-                                "Appointments",
-                                false);
-
-                Button patientsBtn = createSideButton(
-                                "♙",
-                                "Patients",
-                                false);
-
-                Button reportsBtn = createSideButton(
-                                "▦",
-                                "Patient Reports",
-                                false);
-
-                /*
-                 * Button prescriptionsBtn = createSideButton(
-                 * "✎",
-                 * "Prescriptions",
-                 * false);
-                 * 
-                 * Button messagesBtn = createSideButton(
-                 * "✉",
-                 * "Messages",
-                 * false);
-                 * 
-                 * Button calendarBtn = createSideButton(
-                 * "▣",
-                 * "Calendar",
-                 * false);
-                 */
-                Button profileBtn = createSideButton(
-                                "♙",
-                                "Profile",
-                                false);
-
-                Button settingsBtn = createSideButton(
-                                "⚙",
-                                "Settings",
-                                false);
-
-                // =====================================================
-                // APPOINTMENTS NAVIGATION
-                // =====================================================
-
-                appointmentsBtn.setOnAction(event -> {
-
-                        try {
-
-                                DoctorAppointments appointmentPage = new DoctorAppointments();
-
-                                Scene appointmentScene = appointmentPage.getAppointmentPageScene(() -> {
-
-                                        // Back to Dashboard
-                                        DoctorDashboardStage.setScene(
-                                                        DoctorDashboardScene);
-
-                                        DoctorDashboardStage.show();
-                                });
-
-                                // Open Appointment Page
-                                DoctorDashboardStage.setScene(appointmentScene);
-                                DoctorDashboardStage.show();
-
-                        } catch (Exception ex) {
-
-                                ex.printStackTrace();
-
-                                javafx.scene.control.Alert errorAlert = new javafx.scene.control.Alert(
-                                                javafx.scene.control.Alert.AlertType.ERROR);
-
-                                errorAlert.setTitle("Navigation Error");
-                                errorAlert.setHeaderText("Appointment Page could not be opened");
-                                errorAlert.setContentText(
-                                                "Error: " + ex.getMessage());
-                                errorAlert.showAndWait();
-                        }
-                });
-
-                Region sidebarSpacer = new Region();
-
-                VBox.setVgrow(sidebarSpacer, Priority.ALWAYS);
-
-                VBox doctorBox = new VBox(4);
-
-                Label doctorName = new Label("👩🏻‍⚕  Dr. Priya Sharma");
-
-                doctorName.setFont(Font.font(FONT_FAMILY, FontWeight.BOLD, 14));
-
-                doctorName.setTextFill(Color.web(DARK_TEXT));
-
-                Label specialization = new Label("Gynecologist");
-
-                specialization.setFont(Font.font(FONT_FAMILY, 12));
-
-                specialization.setTextFill(Color.web(SECONDARY_TEXT));
-
-                Label online = new Label("●  Online");
-
-                online.setFont(Font.font(FONT_FAMILY, FontWeight.BOLD, 12));
-
-                online.setTextFill(Color.web("#22A06B"));
-
-                doctorBox.getChildren().addAll(doctorName, specialization, online);
-
-                doctorBox.setPadding(new Insets(13));
-
-                doctorBox.setStyle(
-                                "-fx-background-color: #FFF5F9; -fx-background-radius: 14; -fx-border-color: #F6DCE9; -fx-border-radius: 14;");
-
-                sidebar.getChildren().addAll(logoBox, dashboardBtn, appointmentsBtn, patientsBtn, reportsBtn,
-                                profileBtn, settingsBtn, sidebarSpacer, doctorBox);
-
-                borderPane.setLeft(sidebar);
-
-                VBox mainContent = new VBox(18);
-
-                mainContent.setPadding(new Insets(5, 10, 5, 25));
-
-                BorderPane header = new BorderPane();
-
-                VBox welcomeBox = new VBox(5);
-
-                Label welcome = new Label("Welcome back, Dr. Priya Sharma 👋");
-
-                welcome.setFont(Font.font(FONT_FAMILY, FontWeight.BOLD, 27));
-
-                welcome.setTextFill(Color.web(DARK_TEXT));
-
-                Label subtitle = new Label("Here's what's happening in your clinic today.");
-
-                subtitle.setFont(Font.font(FONT_FAMILY, 14));
-
-                subtitle.setTextFill(Color.web(SECONDARY_TEXT));
-
-                welcomeBox.getChildren().addAll(welcome, subtitle);
-
-                HBox rightHeader = new HBox(15);
-
-                rightHeader.setAlignment(Pos.CENTER_RIGHT);
-
-                Label date = new Label("13 August 2026, Thursday");
-
-                date.setFont(Font.font(FONT_FAMILY, FontWeight.BOLD, 13));
-
-                date.setTextFill(Color.web(DARK_TEXT));
-
-                Button notification = new Button("🔔");
-
-                notification.setStyle(
-                                "-fx-background-color: white; -fx-border-color: #E8E3EA;-fx-border-radius: 10;-fx-background-radius: 10;-fx-padding: 9 12;");
-
-                rightHeader.getChildren().addAll(date, notification);
-
-                header.setLeft(welcomeBox);
-
-                header.setRight(rightHeader);
-
-                HBox cards = new HBox(15);
-
-                VBox appointmentCard = createStatCard(
-                                "📅",
-                                "18",
-                                "Today's\nAppointments",
-                                "#FFF0F6",
-                                PINK);
-
-                VBox patientCard = createStatCard(
-                                "👥",
-                                "6",
-                                "New Patients\nThis Week",
-                                "#F4EEFF",
-                                PURPLE);
-
-                VBox reportsCard = createStatCard(
-                                "📄",
-                                "32",
-                                "Reports\nThis Week",
-                                "#EEF5FF",
-                                "#4285D4");
-
-                VBox ratingCard = createStatCard(
-                                "★",
-                                "4.8",
-                                "Average Rating\nThis Month",
-                                "#EEFAF4",
-                                "#25A66A");
-
-                cards.getChildren().addAll(
-                                appointmentCard,
-                                patientCard,
-                                reportsCard,
-                                ratingCard);
-
-                for (Node card : cards.getChildren()) {
-
-                        HBox.setHgrow(
-                                        card,
-                                        Priority.ALWAYS);
-                }
-
-                HBox middleSection = new HBox(18);
-
-                VBox appointmentsBox = createAppointmentsSection();
-
-                VBox scheduleBox = createSchedule();
-
-                HBox.setHgrow(appointmentsBox, Priority.SOMETIMES);
-
-                HBox.setHgrow(scheduleBox, Priority.ALWAYS);
-
-                middleSection.getChildren().addAll(
-                                appointmentsBox,
-                                scheduleBox);
-
-                VBox quickActions = createQuickActions();
-
-                mainContent.getChildren().addAll(
-                                header,
-                                cards,
-                                middleSection,
-                                quickActions);
-
-                VBox.setVgrow(
-                                middleSection,
-                                Priority.ALWAYS);
-
-                borderPane.setCenter(
-                                mainContent);
-
-                // IMPORTANT:
-                // Background first, waves second, UI last.
-                // त्यामुळे waves UI च्या मागे राहतील.
-
-                root.getChildren().addAll(
-                                glow1,
-                                glow2,
-                                wave1,
-                                wave2,
-                                borderPane);
-
-                root.widthProperty().addListener((obs, oldValue, newValue) -> {
-                        updateWaves(newValue.doubleValue(), root.getHeight());
-                });
-
-                root.heightProperty().addListener(
-                                (obs, oldValue, newValue) -> {
-
-                                        updateWaves(
-                                                        root.getWidth(),
-                                                        newValue.doubleValue());
-                                });
-
-                // =====================================================
-                // SCENE
-                // =====================================================
-
-                Scene scene = new Scene(root, 1400, 850);
-
-                DoctorDashboardScene = scene;
-
-                DoctorDashboardStage.setTitle("MaaCare AI - Doctor Dashboard");
-
-                DoctorDashboardStage.setScene(DoctorDashboardScene);
-
-                DoctorDashboardStage.setMinWidth(1100);
-
-                DoctorDashboardStage.setMinHeight(700);
-
-                DoctorDashboardStage.setMaximized(true);
-
-                DoctorDashboardStage.show();
-
-                updateWaves(
-                                root.getWidth(),
-                                root.getHeight());
+                dashboardStage.show();
         }
 
         // =====================================================
-        // SIDEBAR BUTTON
+        // CHANGE SCENE
         // =====================================================
 
-        private Button createSideButton(
+        public static void changeScene(
+                        Scene newScene) {
+
+                if (dashboardStage != null &&
+                                newScene != null) {
+
+                        // ONLY SCENE CHANGES
+
+                        dashboardStage.setScene(
+                                        newScene);
+
+                        /*
+                         * IMPORTANT:
+                         *
+                         * इथे setWidth()
+                         * setHeight()
+                         * centerOnScreen()
+                         *
+                         * काहीही करू नये.
+                         *
+                         * त्यामुळे existing Stage size
+                         * तसेच राहील.
+                         */
+                }
+        }
+
+        // =====================================================
+        // SHOW DASHBOARD
+        // =====================================================
+
+        public static void showDashboard() {
+
+                if (dashboardStage != null &&
+                                dashboardScene != null) {
+
+                        // फक्त Dashboard Scene
+                        dashboardStage.setScene(
+                                        dashboardScene);
+                }
+        }
+
+        // =====================================================
+        // DASHBOARD SCENE
+        // =====================================================
+
+        private static Scene createDashboardScene() {
+
+                BorderPane root = new BorderPane();
+
+                Theme.applyBackground(root);
+
+                VBox sidebar = createSidebar();
+
+                root.setLeft(sidebar);
+
+                VBox content = createDashboardContent();
+
+                root.setCenter(content);
+
+                /*
+                 * Scene ला width/height देत नाही.
+                 *
+                 * Stage चा existing size वापरला जाईल.
+                 */
+
+                return new Scene(root);
+        }
+
+        // =====================================================
+        // SIDEBAR
+        // =====================================================
+
+        private static VBox createSidebar() {
+
+                VBox sidebar = new VBox();
+
+                sidebar.setPrefWidth(205);
+
+                sidebar.setPadding(
+                                new Insets(
+                                                22,
+                                                18,
+                                                18,
+                                                18));
+
+                sidebar.setSpacing(8);
+
+                sidebar.setStyle(
+                                "-fx-background-color: #EEE7FF;" +
+                                                "-fx-border-color: " +
+                                                Theme.BORDER + ";" +
+                                                "-fx-border-width: 0 1 0 0;");
+
+                // =================================================
+                // LOGO
+                // =================================================
+
+                sidebar.getChildren().add(
+                                Theme.logo());
+
+                // =================================================
+                // DOCTOR
+                // =================================================
+
+                VBox doctorBox = new VBox(2);
+
+                doctorBox.setPadding(
+                                new Insets(
+                                                18,
+                                                5,
+                                                12,
+                                                5));
+
+                Label doctor = new Label(
+                                "Dr. Anjali Mehta");
+
+                doctor.setStyle(
+                                "-fx-font-weight: BOLD;" +
+                                                "-fx-font-size: 14px");
+
+                doctor.setTextFill(
+                                Color.web(Theme.TEXT));
+
+                Label specialist = new Label(
+                                "Obstetrician & Gynecologist");
+
+                specialist.setStyle(
+                                "-fx-font-weight: BOLD;" +
+                                                "-fx-font-size: 11px");
+
+                specialist.setTextFill(
+                                Color.web(
+                                                Theme.SECONDARY_TEXT));
+
+                Label online = new Label(
+                                "●  Online");
+
+                online.setStyle(
+                                "-fx-font-weight: BOLD;" +
+                                                "-fx-font-size: 11px");
+
+                online.setTextFill(
+                                Color.web(Theme.GREEN));
+
+                doctorBox.getChildren().addAll(
+                                doctor,
+                                specialist,
+                                online);
+
+                sidebar.getChildren().add(
+                                doctorBox);
+
+                // =================================================
+                // MENU
+                // =================================================
+                Button dashboard = createMenuButton(
+                                "🏠",
+                                "Dashboard",
+                                true);
+
+                Button appointments = createMenuButton(
+                                "📅",
+                                "Appointments",
+                                false);
+
+                Button patients = createMenuButton(
+                                "👩‍⚕️",
+                                "Patients",
+                                false);
+
+                Button reports = createMenuButton(
+                                "📋",
+                                "Patient Reports",
+                                false);
+
+                Button profile = createMenuButton(
+                                "👨🏻‍⚕️",
+                                "Doctor Profile",
+                                false);
+
+                Button settings = createMenuButton(
+                                "⚙️",
+                                "Settings",
+                                false);
+
+                // =================================================
+                // RUNNABLE NAVIGATION
+                // =================================================
+
+                Runnable openAppointments = () -> DoctorAppointmentsPage.show();
+
+                Runnable openPatients = () -> PatientsPage.show();
+
+                Runnable openReports = () -> PatientReportsPage.show();
+
+                Runnable openProfile = () -> DoctorProfilePage.show();
+
+                Runnable openSettings = () -> SettingsPage.show();
+
+                // =================================================
+                // SET ON ACTION
+                // =================================================
+
+                appointments.setOnAction(
+                                e -> openAppointments.run());
+
+                patients.setOnAction(
+                                e -> openPatients.run());
+
+                reports.setOnAction(
+                                e -> openReports.run());
+
+                profile.setOnAction(
+                                e -> openProfile.run());
+
+                settings.setOnAction(
+                                e -> openSettings.run());
+
+                sidebar.getChildren().addAll(
+                                dashboard,
+                                appointments,
+                                patients,
+                                reports,
+                                profile,
+                                settings);
+
+                // =================================================
+                // LOGOUT AT BOTTOM
+                // =================================================
+
+                Region spacer = new Region();
+
+                VBox.setVgrow(
+                                spacer,
+                                Priority.ALWAYS);
+
+                sidebar.getChildren().add(
+                                spacer);
+
+                Button logout = createMenuButton(
+                                "↪",
+                                "Logout",
+                                false);
+
+                sidebar.getChildren().add(
+                                logout);
+
+                return sidebar;
+        }
+
+        // =====================================================
+        // MENU BUTTON
+        // =====================================================
+        private static Button createMenuButton(
                         String icon,
                         String text,
                         boolean active) {
 
-                Button button = new Button(
-                                icon + "    " + text);
+                Button button = new Button();
 
                 button.setMaxWidth(
                                 Double.MAX_VALUE);
@@ -461,185 +328,134 @@ public class DoctorDashboard extends Application {
                 button.setAlignment(
                                 Pos.CENTER_LEFT);
 
-                button.setFont(
-                                Font.font(
-                                                FONT_FAMILY,
-                                                FontWeight.BOLD,
-                                                13));
+                // =================================================
+                // ICON
+                // =================================================
 
-                button.setPadding(
-                                new Insets(
-                                                12,
-                                                15,
-                                                12,
-                                                15));
+                Label iconLabel = new Label(icon);
+
+                iconLabel.setPrefWidth(35);
+                iconLabel.setMinWidth(35);
+                iconLabel.setMaxWidth(35);
+
+                iconLabel.setAlignment(
+                                Pos.CENTER);
+
+                iconLabel.setStyle(
+                                "-fx-font-family: 'Segoe UI Emoji';" +
+                                                "-fx-font-size: 18px;");
+
+                // =================================================
+                // TEXT
+                // =================================================
+
+                Label textLabel = new Label(text);
+
+                textLabel.setStyle(
+                                "-fx-font-family: '" +
+                                                Theme.FONT +
+                                                "';" +
+                                                "-fx-font-size: 15px;" +
+                                                "-fx-font-weight: BOLD;");
+
+                // =================================================
+                // ICON + TEXT
+                // =================================================
+
+                HBox content = new HBox(8);
+
+                content.setAlignment(
+                                Pos.CENTER_LEFT);
+
+                content.getChildren().addAll(
+                                iconLabel,
+                                textLabel);
+
+                button.setGraphic(content);
+                button.setText("");
+
+                // =================================================
+                // ACTIVE
+                // =================================================
 
                 if (active) {
 
                         button.setStyle(
-                                        "-fx-background-color: #FCE8F2;" +
-                                                        "-fx-background-radius: 10;" +
-                                                        "-fx-text-fill: " +
-                                                        PINK +
-                                                        ";" +
-                                                        "-fx-cursor: hand;");
+                                        "-fx-background-color:" +
+                                                        Theme.PRIMARY_LIGHT + ";" +
+                                                        "-fx-background-radius: 8;" +
+                                                        "-fx-padding: 10 12 10 12;");
+
+                        iconLabel.setTextFill(
+                                        Color.web(Theme.PRIMARY));
+
+                        textLabel.setTextFill(
+                                        Color.web(Theme.PRIMARY));
 
                 } else {
 
                         button.setStyle(
                                         "-fx-background-color: transparent;" +
-                                                        "-fx-text-fill: " +
-                                                        DARK_TEXT +
-                                                        ";" +
-                                                        "-fx-background-radius: 10;" +
+                                                        "-fx-background-radius: 8;" +
+                                                        "-fx-padding: 10 12 10 12;" +
                                                         "-fx-cursor: hand;");
 
-                        button.setOnMouseEntered(e -> {
+                        iconLabel.setTextFill(
+                                        Color.web(Theme.TEXT));
 
-                                button.setStyle(
-                                                "-fx-background-color: #FFF1F7;" +
-                                                                "-fx-background-radius: 10;" +
-                                                                "-fx-text-fill: " +
-                                                                PINK +
-                                                                ";" +
-                                                                "-fx-cursor: hand;");
-                        });
-
-                        button.setOnMouseExited(e -> {
-
-                                button.setStyle(
-                                                "-fx-background-color: transparent;" +
-                                                                "-fx-text-fill: " +
-                                                                DARK_TEXT +
-                                                                ";" +
-                                                                "-fx-background-radius: 10;" +
-                                                                "-fx-cursor: hand;");
-                        });
+                        textLabel.setTextFill(
+                                        Color.web(Theme.TEXT));
                 }
 
                 return button;
         }
 
         // =====================================================
-        // STAT CARD
+        // DASHBOARD CONTENT
         // =====================================================
 
-        private VBox createStatCard(
-                        String icon,
-                        String value,
-                        String title,
-                        String iconBackground,
-                        String iconColor) {
+        private static VBox createDashboardContent() {
 
-                VBox card = new VBox(7);
+                VBox content = new VBox(18);
 
-                card.setPadding(
-                                new Insets(17));
+                content.setPadding(
+                                new Insets(
+                                                25,
+                                                30,
+                                                25,
+                                                30));
 
-                card.setPrefHeight(
-                                125);
+                Theme.applyBackground(content);
 
-                card.setMinHeight(
-                                115);
+                // =================================================
+                // HEADER
+                // =================================================
 
-                card.setStyle(
-                                "-fx-background-color: white;" +
-                                                "-fx-background-radius: 16;" +
-                                                "-fx-border-color: " +
-                                                BORDER +
-                                                ";" +
-                                                "-fx-border-radius: 16;");
+                HBox header = new HBox();
 
-                HBox top = new HBox();
+                header.setAlignment(
+                                Pos.CENTER_LEFT);
 
-                Label iconLabel = new Label(icon);
-
-                iconLabel.setFont(
-                                Font.font(
-                                                FONT_FAMILY,
-                                                FontWeight.BOLD,
-                                                22));
-
-                iconLabel.setTextFill(
-                                Color.web(iconColor));
-
-                StackPane iconBox = new StackPane(
-                                iconLabel);
-
-                iconBox.setPrefSize(
-                                48,
-                                48);
-
-                iconBox.setStyle(
-                                "-fx-background-color: " +
-                                                iconBackground +
-                                                ";" +
-                                                "-fx-background-radius: 13;");
-
-                top.getChildren().add(
-                                iconBox);
-
-                Label valueLabel = new Label(value);
-
-                valueLabel.setFont(
-                                Font.font(
-                                                FONT_FAMILY,
-                                                FontWeight.BOLD,
-                                                27));
-
-                valueLabel.setTextFill(
-                                Color.web(DARK_TEXT));
-
-                Label titleLabel = new Label(title);
-
-                titleLabel.setFont(
-                                Font.font(
-                                                FONT_FAMILY,
-                                                12));
-
-                titleLabel.setTextFill(
-                                Color.web(SECONDARY_TEXT));
-
-                card.getChildren().addAll(
-                                top,
-                                valueLabel,
-                                titleLabel);
-
-                return card;
-        }
-
-        // =====================================================
-        // APPOINTMENTS SECTION
-        // =====================================================
-
-        private VBox createAppointmentsSection() {
-
-                VBox box = new VBox(12);
-
-                box.setPadding(
-                                new Insets(17));
-
-                box.setStyle(
-                                "-fx-background-color: white;" +
-                                                "-fx-background-radius: 16;" +
-                                                "-fx-border-color: " +
-                                                BORDER +
-                                                ";" +
-                                                "-fx-border-radius: 16;");
-
-                HBox heading = new HBox();
+                VBox welcome = new VBox(5);
 
                 Label title = new Label(
-                                "Today's Appointments");
+                                "Welcome back, Dr. Anjali! 👋");
 
                 title.setFont(
-                                Font.font(
-                                                FONT_FAMILY,
-                                                FontWeight.BOLD,
-                                                16));
+                                javafx.scene.text.Font.font(
+                                                Theme.FONT,
+                                                javafx.scene.text.FontWeight.BOLD,
+                                                20));
 
                 title.setTextFill(
-                                Color.web(DARK_TEXT));
+                                Color.web(Theme.TEXT));
+
+                Label sub = Theme.subtitle(
+                                "Here's what's happening in your clinic today.");
+
+                welcome.getChildren().addAll(
+                                title,
+                                sub);
 
                 Region spacer = new Region();
 
@@ -647,28 +463,72 @@ public class DoctorDashboard extends Application {
                                 spacer,
                                 Priority.ALWAYS);
 
-                Label viewAll = new Label(
-                                "View All →");
+                Label date = new Label(
+                                "08 May 2024   📅");
 
-                viewAll.setFont(
-                                Font.font(
-                                                FONT_FAMILY,
-                                                FontWeight.BOLD,
-                                                12));
+                date.setFont(
+                                javafx.scene.text.Font.font(
+                                                Theme.FONT,
+                                                javafx.scene.text.FontWeight.NORMAL,
+                                                11));
 
-                viewAll.setTextFill(
-                                Color.web(PURPLE));
+                date.setTextFill(
+                                Color.web(Theme.TEXT));
 
-                heading.getChildren().addAll(
-                                title,
+                date.setStyle(
+                                "-fx-background-color: white;" +
+                                                "-fx-border-color: " +
+                                                Theme.BORDER + ";" +
+                                                "-fx-border-radius: 8;" +
+                                                "-fx-background-radius: 8;" +
+                                                "-fx-padding: 10 14;");
+
+                header.getChildren().addAll(
+                                welcome,
                                 spacer,
-                                viewAll);
+                                date);
 
-                box.getChildren().add(
-                                heading);
+                // =================================================
+                // STAT CARDS
+                // =================================================
 
-                box.getChildren().addAll(
+                HBox stats = new HBox(15);
 
+                stats.getChildren().addAll(
+                                statCard("📅", "18", "Today's", "Appointments"),
+                                statCard("👥", "6", "New Patients", "This Week"),
+                                statCard("📋", "32", "Reports", "This Week"),
+                                statCard("⭐", "4.8", "Average Rating", "This Month"));
+                // =================================================
+                // MIDDLE
+                // =================================================
+
+                HBox middle = new HBox(18);
+
+                VBox appointments = Theme.card();
+
+                HBox.setHgrow(
+                                appointments,
+                                Priority.ALWAYS);
+                appointments.setPrefHeight(330);
+                appointments.setMinHeight(330);
+
+                Label appointmentTitle = new Label(
+                                "Today's Appointments");
+
+                appointmentTitle.setFont(
+                                javafx.scene.text.Font.font(
+                                                Theme.FONT,
+                                                javafx.scene.text.FontWeight.BOLD,
+                                                16));
+
+                appointmentTitle.setTextFill(
+                                Color.web(Theme.TEXT));
+
+                appointments.getChildren().add(
+                                appointmentTitle);
+
+                appointments.getChildren().addAll(
                                 appointmentRow(
                                                 "09:30 AM",
                                                 "Priya Sharma",
@@ -693,6 +553,191 @@ public class DoctorDashboard extends Application {
                                                 "30 Y | Ultrasound Follow-up",
                                                 "Pending"));
 
+                VBox schedule = Theme.card();
+
+                schedule.setPrefWidth(330);
+                schedule.setPrefHeight(330);
+                schedule.setMinHeight(330);
+
+                Label scheduleTitle = new Label(
+                                "Today's Schedule");
+
+                scheduleTitle.setFont(
+                                javafx.scene.text.Font.font(
+                                                Theme.FONT,
+                                                javafx.scene.text.FontWeight.BOLD,
+                                                16));
+
+                scheduleTitle.setTextFill(
+                                Color.web(Theme.TEXT));
+
+                schedule.getChildren().add(
+                                scheduleTitle);
+
+                schedule.getChildren().addAll(
+                                scheduleRow(
+                                                "09:30 AM - 10:00 AM",
+                                                "Priya Sharma",
+                                                "Consultation"),
+
+                                scheduleRow(
+                                                "10:15 AM - 10:45 AM",
+                                                "Neha Kulkarni",
+                                                "Consultation"),
+
+                                scheduleRow(
+                                                "11:00 AM - 11:30 AM",
+                                                "Sneha Patil",
+                                                "Consultation"),
+
+                                scheduleRow(
+                                                "12:00 PM - 12:30 PM",
+                                                "Ritika Singh",
+                                                "Follow-up"));
+
+                middle.getChildren().addAll(
+                                appointments,
+                                schedule);
+
+                // =================================================
+                // BOTTOM
+                // =================================================
+
+                HBox bottom = new HBox(20);
+
+                VBox quickActions = Theme.card();
+
+                HBox.setHgrow(
+                                quickActions,
+                                Priority.ALWAYS);
+
+                Label quickTitle = new Label(
+                                "Quick Actions");
+
+                quickTitle.setFont(
+                                javafx.scene.text.Font.font(
+                                                Theme.FONT,
+                                                javafx.scene.text.FontWeight.BOLD,
+                                                16));
+
+                quickTitle.setTextFill(
+                                Color.web(Theme.TEXT));
+
+                HBox actions = new HBox(20);
+
+                actions.getChildren().addAll(
+                                quickAction("📅", "Add Appointment"),
+                                quickAction("👤", "Add Patient"),
+                                quickAction("💊", "Write Prescription"),
+                                quickAction("📤", "Upload Report"),
+                                quickAction("💬", "Send Message"));
+
+                quickActions.getChildren().addAll(
+                                quickTitle,
+                                actions);
+
+                VBox feedback = Theme.card();
+
+                feedback.setPrefWidth(220);
+
+                Label feedbackTitle = new Label(
+                                "Patient Feedback");
+
+                feedbackTitle.setFont(
+                                javafx.scene.text.Font.font(
+                                                Theme.FONT,
+                                                javafx.scene.text.FontWeight.BOLD,
+                                                16));
+
+                feedbackTitle.setTextFill(
+                                Color.web(Theme.TEXT));
+
+                Label rating = new Label(
+                                "4.8  ★★★★★");
+
+                rating.setFont(
+                                javafx.scene.text.Font.font(
+                                                Theme.FONT,
+                                                javafx.scene.text.FontWeight.BOLD,
+                                                18));
+
+                rating.setTextFill(
+                                Color.web(Theme.PRIMARY));
+
+                Label based = Theme.subtitle(
+                                "Based on 156 reviews");
+
+                feedback.getChildren().addAll(
+                                feedbackTitle,
+                                rating,
+                                based);
+
+                bottom.getChildren().addAll(
+                                quickActions,
+                                feedback);
+
+                content.getChildren().addAll(
+                                header,
+                                stats,
+                                middle,
+                                bottom);
+
+                return content;
+        }
+
+        // =====================================================
+        // STAT CARD
+        // =====================================================
+
+        private static VBox statCard(
+                        String icon,
+                        String number,
+                        String line1,
+                        String line2) {
+
+                VBox box = Theme.card();
+
+                HBox.setHgrow(
+                                box,
+                                Priority.ALWAYS);
+
+                HBox row = new HBox(12);
+
+                Label iconLabel = new Label(icon);
+
+                iconLabel.setFont(
+                                javafx.scene.text.Font.font(
+                                                Theme.FONT,
+                                                javafx.scene.text.FontWeight.BOLD,
+                                                30));
+
+                iconLabel.setTextFill(
+                                Color.web(Theme.PRIMARY));
+
+                VBox text = new VBox(2);
+
+                Label num = new Label(number);
+
+                num.setFont(
+                                javafx.scene.text.Font.font(
+                                                Theme.FONT,
+                                                javafx.scene.text.FontWeight.BOLD,
+                                                20));
+
+                num.setTextFill(
+                                Color.web(Theme.TEXT));
+
+                text.getChildren().addAll(
+                                num,
+                                Theme.subtitle(line1),
+                                Theme.subtitle(line2));
+
+                row.getChildren().addAll(
+                                iconLabel,
+                                text);
+
+                box.getChildren().add(row);
+
                 return box;
         }
 
@@ -700,265 +745,137 @@ public class DoctorDashboard extends Application {
         // APPOINTMENT ROW
         // =====================================================
 
-        private HBox appointmentRow(
+        private static HBox appointmentRow(
                         String time,
-                        String name,
+                        String patient,
                         String details,
-                        String statusText) {
+                        String status) {
 
-                HBox row = new HBox(12);
+                HBox row = new HBox(10);
 
                 row.setAlignment(
                                 Pos.CENTER_LEFT);
 
                 row.setPadding(
                                 new Insets(
-                                                10,
-                                                5,
-                                                10,
-                                                5));
+                                                12,
+                                                0,
+                                                12,
+                                                0));
 
-                Label timeLabel = new Label(time);
+                Label t = new Label(time);
 
-                timeLabel.setPrefWidth(
-                                75);
+                t.setPrefWidth(65);
 
-                timeLabel.setFont(
-                                Font.font(
-                                                FONT_FAMILY,
-                                                FontWeight.BOLD,
+                t.setFont(
+                                javafx.scene.text.Font.font(
+                                                Theme.FONT,
+                                                javafx.scene.text.FontWeight.BOLD,
                                                 12));
 
-                timeLabel.setTextFill(
-                                Color.web(DARK_TEXT));
+                t.setTextFill(
+                                Color.web(Theme.TEXT));
 
-                Circle patientCircle = new Circle(
-                                20,
-                                Color.web("#FCE8F2"));
+                VBox patientBox = new VBox(2);
 
-                Label patientIcon = new Label("👩");
+                Label p = new Label(patient);
 
-                StackPane avatar = new StackPane(
-                                patientCircle,
-                                patientIcon);
+                p.setFont(
+                                javafx.scene.text.Font.font(
+                                                Theme.FONT,
+                                                javafx.scene.text.FontWeight.BOLD,
+                                                13));
 
-                VBox patient = new VBox(3);
+                p.setTextFill(
+                                Color.web(Theme.TEXT));
 
-                Label nameLabel = new Label(name);
-
-                nameLabel.setFont(
-                                Font.font(
-                                                FONT_FAMILY,
-                                                FontWeight.BOLD,
-                                                12));
-
-                nameLabel.setTextFill(
-                                Color.web(DARK_TEXT));
-
-                Label detailsLabel = new Label(details);
-
-                detailsLabel.setFont(
-                                Font.font(
-                                                FONT_FAMILY,
-                                                11));
-
-                detailsLabel.setTextFill(
-                                Color.web(SECONDARY_TEXT));
-
-                patient.getChildren().addAll(
-                                nameLabel,
-                                detailsLabel);
-
-                Region spacer = new Region();
+                patientBox.getChildren().addAll(
+                                p,
+                                Theme.subtitle(details));
 
                 HBox.setHgrow(
-                                spacer,
+                                patientBox,
                                 Priority.ALWAYS);
 
-                Label status = new Label(
-                                statusText);
+                Label s = new Label(status);
 
-                if (statusText.equals("Confirmed")) {
+                s.setFont(
+                                javafx.scene.text.Font.font(
+                                                Theme.FONT,
+                                                javafx.scene.text.FontWeight.BOLD,
+                                                9));
 
-                        status.setStyle(
-                                        "-fx-background-color: #E6F7EF;" +
-                                                        "-fx-text-fill: #20965F;" +
-                                                        "-fx-background-radius: 15;" +
-                                                        "-fx-padding: 6 12;" +
-                                                        "-fx-font-weight: bold;");
+                s.setPadding(
+                                new Insets(
+                                                5,
+                                                9,
+                                                5,
+                                                9));
+
+                if (status.equals("Pending")) {
+
+                        s.setTextFill(
+                                        Color.web(Theme.ORANGE));
+
+                        s.setStyle(
+                                        "-fx-background-color: " +
+                                                        Theme.ORANGE_LIGHT + ";" +
+                                                        "-fx-background-radius: 12;");
 
                 } else {
 
-                        status.setStyle(
-                                        "-fx-background-color: #FFF4E5;" +
-                                                        "-fx-text-fill: #D68A20;" +
-                                                        "-fx-background-radius: 15;" +
-                                                        "-fx-padding: 6 12;" +
-                                                        "-fx-font-weight: bold;");
+                        s.setTextFill(
+                                        Color.web(Theme.GREEN));
+
+                        s.setStyle(
+                                        "-fx-background-color: " +
+                                                        Theme.GREEN_LIGHT + ";" +
+                                                        "-fx-background-radius: 12;");
                 }
 
-                Label arrow = new Label("›");
-
-                arrow.setFont(
-                                Font.font(
-                                                FONT_FAMILY,
-                                                FontWeight.BOLD,
-                                                22));
-
-                arrow.setTextFill(
-                                Color.web(SECONDARY_TEXT));
-
                 row.getChildren().addAll(
-                                timeLabel,
-                                avatar,
-                                patient,
-                                spacer,
-                                status,
-                                arrow);
-
-                row.setStyle(
-                                "-fx-border-color: #F0EDF2;" +
-                                                "-fx-border-width: 0 0 1 0;");
+                                t,
+                                patientBox,
+                                s);
 
                 return row;
-        }
-
-        // =====================================================
-        // SCHEDULE
-        // =====================================================
-
-        private VBox createSchedule() {
-
-                VBox box = new VBox(12);
-
-                box.setPadding(
-                                new Insets(17));
-
-                box.setStyle(
-                                "-fx-background-color: white;" +
-                                                "-fx-background-radius: 16;" +
-                                                "-fx-border-color: " +
-                                                BORDER +
-                                                ";" +
-                                                "-fx-border-radius: 16;");
-
-                HBox heading = new HBox();
-
-                Label title = new Label(
-                                "Today's Schedule");
-
-                title.setFont(
-                                Font.font(
-                                                FONT_FAMILY,
-                                                FontWeight.BOLD,
-                                                16));
-
-                title.setTextFill(
-                                Color.web(DARK_TEXT));
-
-                Region spacer = new Region();
-
-                HBox.setHgrow(
-                                spacer,
-                                Priority.ALWAYS);
-
-                Label calendar = new Label(
-                                "View Calendar");
-
-                calendar.setFont(
-                                Font.font(
-                                                FONT_FAMILY,
-                                                FontWeight.BOLD,
-                                                12));
-
-                calendar.setTextFill(
-                                Color.web(PURPLE));
-
-                heading.getChildren().addAll(
-                                title,
-                                spacer,
-                                calendar);
-
-                box.getChildren().add(
-                                heading);
-
-                box.getChildren().addAll(
-
-                                scheduleRow(
-                                                "09:30 AM - 10:00 AM",
-                                                "Priya Sharma",
-                                                "Consultation",
-                                                PINK),
-
-                                scheduleRow(
-                                                "10:15 AM - 10:45 AM",
-                                                "Neha Kulkarni",
-                                                "Consultation",
-                                                "#4285D4"),
-
-                                scheduleRow(
-                                                "11:00 AM - 11:30 AM",
-                                                "Sneha Patil",
-                                                "Consultation",
-                                                "#36A269"),
-
-                                scheduleRow(
-                                                "12:00 PM - 12:30 PM",
-                                                "Ritika Singh",
-                                                "Follow-up",
-                                                "#D89028"));
-
-                return box;
         }
 
         // =====================================================
         // SCHEDULE ROW
         // =====================================================
 
-        private HBox scheduleRow(
+        private static HBox scheduleRow(
                         String time,
                         String name,
-                        String purpose,
-                        String accent) {
+                        String type) {
 
-                HBox row = new HBox(12);
-
-                row.setAlignment(
-                                Pos.CENTER_LEFT);
+                HBox row = new HBox(10);
 
                 row.setPadding(
                                 new Insets(
-                                                10,
-                                                5,
-                                                10,
-                                                8));
+                                                12,
+                                                0,
+                                                12,
+                                                0));
 
-                VBox timePatient = new VBox(4);
+                VBox details = new VBox(3);
 
-                Label timeLabel = new Label(time);
+                details.getChildren().addAll(
+                                Theme.subtitle(time));
 
-                timeLabel.setFont(
-                                Font.font(
-                                                FONT_FAMILY,
+                Label n = new Label(name);
+
+                n.setFont(
+                                javafx.scene.text.Font.font(
+                                                Theme.FONT,
+                                                javafx.scene.text.FontWeight.BOLD,
                                                 11));
 
-                timeLabel.setTextFill(
-                                Color.web(SECONDARY_TEXT));
+                n.setTextFill(
+                                Color.web(Theme.TEXT));
 
-                Label nameLabel = new Label(name);
-
-                nameLabel.setFont(
-                                Font.font(
-                                                FONT_FAMILY,
-                                                FontWeight.BOLD,
-                                                12));
-
-                nameLabel.setTextFill(
-                                Color.web(DARK_TEXT));
-
-                timePatient.getChildren().addAll(
-                                timeLabel,
-                                nameLabel);
+                details.getChildren().add(n);
 
                 Region spacer = new Region();
 
@@ -966,278 +883,74 @@ public class DoctorDashboard extends Application {
                                 spacer,
                                 Priority.ALWAYS);
 
-                Label purposeLabel = new Label(purpose);
-
-                purposeLabel.setFont(
-                                Font.font(
-                                                FONT_FAMILY,
-                                                12));
-
-                purposeLabel.setTextFill(
-                                Color.web(SECONDARY_TEXT));
-
-                Region accentLine = new Region();
-
-                accentLine.setPrefWidth(3);
-                accentLine.setPrefHeight(45);
-
-                accentLine.setStyle(
-                                "-fx-background-color: " +
-                                                accent +
-                                                ";" +
-                                                "-fx-background-radius: 5;");
-
                 row.getChildren().addAll(
-                                accentLine,
-                                timePatient,
+                                details,
                                 spacer,
-                                purposeLabel);
-
-                row.setStyle(
-                                "-fx-border-color: #F0EDF2;" +
-                                                "-fx-border-width: 0 0 1 0;");
+                                Theme.subtitle(type));
 
                 return row;
         }
 
         // =====================================================
-        // QUICK ACTIONS
+        // QUICK ACTION
         // =====================================================
 
-        private VBox createQuickActions() {
+        private static VBox quickAction(
+                        String icon,
+                        String text) {
 
-                VBox box = new VBox(10);
+                VBox box = new VBox(7);
+
+                box.setAlignment(
+                                Pos.CENTER);
+
+                box.setPrefWidth(115);
 
                 box.setPadding(
-                                new Insets(15));
+                                new Insets(10));
 
                 box.setStyle(
-                                "-fx-background-color: linear-gradient(" +
-                                                "to right," +
-                                                "#FFF5FA," +
-                                                "#FAF6FF" +
-                                                ");" +
-                                                "-fx-background-radius: 16;" +
-                                                "-fx-border-color: #F0E4F0;" +
-                                                "-fx-border-radius: 16;");
+                                "-fx-background-color: #ffffff;" +
+                                                "-fx-border-color: " +
+                                                Theme.BORDER + ";" +
+                                                "-fx-border-radius: 8;" +
+                                                "-fx-background-radius: 8;");
 
-                Label title = new Label(
-                                "Quick Actions");
+                Label i = new Label(icon);
 
-                title.setFont(
-                                Font.font(
-                                                FONT_FAMILY,
-                                                FontWeight.BOLD,
-                                                16));
+                i.setFont(
+                                javafx.scene.text.Font.font(
+                                                Theme.FONT,
+                                                javafx.scene.text.FontWeight.BOLD,
+                                                22));
 
-                title.setTextFill(
-                                Color.web(DARK_TEXT));
+                i.setTextFill(
+                                Color.web(Theme.PRIMARY));
 
-                HBox actions = new HBox(15);
+                Label l = new Label(text);
 
-                actions.getChildren().addAll(
+                l.setWrapText(true);
 
-                                createActionButton(
-                                                "📅",
-                                                "Add Appointment"),
+                l.setAlignment(
+                                Pos.CENTER);
 
-                                createActionButton(
-                                                "👤",
-                                                "Add Patient"),
+                l.setFont(
+                                javafx.scene.text.Font.font(
+                                                Theme.FONT,
+                                                javafx.scene.text.FontWeight.BOLD,
+                                                13));
 
-                                createActionButton(
-                                                "📄",
-                                                "Write Prescription"),
-
-                                createActionButton(
-                                                "⬆",
-                                                "Upload Report"),
-
-                                createActionButton(
-                                                "💬",
-                                                "Send Message"));
+                l.setTextFill(
+                                Color.web(Theme.TEXT));
 
                 box.getChildren().addAll(
-                                title,
-                                actions);
+                                i,
+                                l);
 
                 return box;
         }
 
-        // =====================================================
-        // QUICK ACTION BUTTON
-        // =====================================================
+        public static void startDashboard(Stage stage) {
 
-        private VBox createActionButton(
-                        String icon,
-                        String text) {
-
-                VBox button = new VBox(7);
-
-                button.setAlignment(
-                                Pos.CENTER);
-
-                button.setPrefWidth(
-                                145);
-
-                button.setPrefHeight(
-                                70);
-
-                button.setStyle(
-                                "-fx-background-color: white;" +
-                                                "-fx-background-radius: 12;" +
-                                                "-fx-border-color: #EEE5F0;" +
-                                                "-fx-border-radius: 12;" +
-                                                "-fx-cursor: hand;");
-
-                Label iconLabel = new Label(icon);
-
-                iconLabel.setFont(
-                                Font.font(
-                                                FONT_FAMILY,
-                                                20));
-
-                iconLabel.setTextFill(
-                                Color.web(PURPLE));
-
-                Label textLabel = new Label(text);
-
-                textLabel.setFont(
-                                Font.font(
-                                                FONT_FAMILY,
-                                                FontWeight.BOLD,
-                                                11));
-
-                textLabel.setTextFill(
-                                Color.web(DARK_TEXT));
-
-                button.getChildren().addAll(
-                                iconLabel,
-                                textLabel);
-
-                return button;
-        }
-
-        // =====================================================
-        // RESPONSIVE WAVES
-        // =====================================================
-
-        private void updateWaves(
-                        double width,
-                        double height) {
-
-                if (width <= 0 || height <= 0) {
-                        return;
-                }
-
-                // =================================================
-                // WAVE 1
-                // =================================================
-
-                double startY1 = height * 0.88;
-
-                wave1.setContent(
-
-                                "M 0 " + startY1 +
-
-                                                " C " +
-                                                (width * 0.16) +
-                                                " " +
-                                                (height * 0.82) +
-
-                                                ", " +
-                                                (width * 0.32) +
-                                                " " +
-                                                (height * 0.94) +
-
-                                                ", " +
-                                                (width * 0.50) +
-                                                " " +
-                                                (height * 0.87) +
-
-                                                " C " +
-                                                (width * 0.68) +
-                                                " " +
-                                                (height * 0.80) +
-
-                                                ", " +
-                                                (width * 0.85) +
-                                                " " +
-                                                (height * 0.93) +
-
-                                                ", " +
-                                                width +
-                                                " " +
-                                                (height * 0.85) +
-
-                                                " L " +
-                                                width +
-                                                " " +
-                                                height +
-
-                                                " L 0 " +
-                                                height +
-
-                                                " Z");
-
-                // =================================================
-                // WAVE 2
-                // =================================================
-
-                double startY2 = height * 0.92;
-
-                wave2.setContent(
-
-                                "M 0 " + startY2 +
-
-                                                " C " +
-                                                (width * 0.20) +
-                                                " " +
-                                                (height * 0.86) +
-
-                                                ", " +
-                                                (width * 0.38) +
-                                                " " +
-                                                (height * 0.97) +
-
-                                                ", " +
-                                                (width * 0.55) +
-                                                " " +
-                                                (height * 0.91) +
-
-                                                " C " +
-                                                (width * 0.72) +
-                                                " " +
-                                                (height * 0.85) +
-
-                                                ", " +
-                                                (width * 0.88) +
-                                                " " +
-                                                (height * 0.96) +
-
-                                                ", " +
-                                                width +
-                                                " " +
-                                                (height * 0.90) +
-
-                                                " L " +
-                                                width +
-                                                " " +
-                                                height +
-
-                                                " L 0 " +
-                                                height +
-
-                                                " Z");
-        }
-
-        // =====================================================
-        // MAIN
-        // =====================================================
-
-        public static void main(
-                        String[] args) {
-
-                launch(args);
         }
 }
