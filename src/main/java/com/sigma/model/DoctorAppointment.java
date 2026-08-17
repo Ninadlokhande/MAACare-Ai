@@ -3,7 +3,7 @@ package com.sigma.model;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-public class Appointment {
+public class DoctorAppointment {
 
     private final StringProperty time;
     private final StringProperty patient;
@@ -12,7 +12,7 @@ public class Appointment {
     private final StringProperty payment;
     private final StringProperty action;
 
-    public Appointment(
+    public DoctorAppointment(
             String time,
             String patient,
             String type,

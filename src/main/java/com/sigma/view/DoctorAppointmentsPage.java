@@ -1,6 +1,6 @@
 package com.sigma.view;
 
-import com.sigma.model.Appointment;
+import com.sigma.model.DoctorAppointment;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -111,22 +111,22 @@ public class DoctorAppointmentsPage {
                 // TABLE
                 // =================================================
 
-                TableView<Appointment> table = new TableView<>();
+                TableView<DoctorAppointment> table = new TableView<>();
 
                 table.setColumnResizePolicy(
                                 TableView.CONSTRAINED_RESIZE_POLICY);
 
-                TableColumn<Appointment, String> time = new TableColumn<>("Time");
+                TableColumn<DoctorAppointment, String> time = new TableColumn<>("Time");
 
-                TableColumn<Appointment, String> patient = new TableColumn<>("Patient");
+                TableColumn<DoctorAppointment, String> patient = new TableColumn<>("Patient");
 
-                TableColumn<Appointment, String> appointmentType = new TableColumn<>("Type");
+                TableColumn<DoctorAppointment, String> appointmentType = new TableColumn<>("Type");
 
-                TableColumn<Appointment, String> stat = new TableColumn<>("Status");
+                TableColumn<DoctorAppointment, String> stat = new TableColumn<>("Status");
 
-                TableColumn<Appointment, String> payment = new TableColumn<>("Payment");
+                TableColumn<DoctorAppointment, String> payment = new TableColumn<>("Payment");
 
-                TableColumn<Appointment, String> action = new TableColumn<>("Action");
+                TableColumn<DoctorAppointment, String> action = new TableColumn<>("Action");
 
                 time.setCellValueFactory(
                                 data -> data.getValue().timeProperty());
@@ -156,7 +156,7 @@ public class DoctorAppointmentsPage {
 
                 table.getItems().addAll(
 
-                                new Appointment(
+                                new DoctorAppointment(
                                                 "09:30 AM",
                                                 "Priya Sharma",
                                                 "Consultation",
@@ -164,7 +164,7 @@ public class DoctorAppointmentsPage {
                                                 "Paid",
                                                 "◉"),
 
-                                new Appointment(
+                                new DoctorAppointment(
                                                 "10:15 AM",
                                                 "Neha Kulkarni",
                                                 "Consultation",
@@ -172,7 +172,7 @@ public class DoctorAppointmentsPage {
                                                 "Paid",
                                                 "◉"),
 
-                                new Appointment(
+                                new DoctorAppointment(
                                                 "11:00 AM",
                                                 "Sneha Patil",
                                                 "Consultation",
@@ -180,7 +180,7 @@ public class DoctorAppointmentsPage {
                                                 "Paid",
                                                 "◉"),
 
-                                new Appointment(
+                                new DoctorAppointment(
                                                 "12:00 PM",
                                                 "Ritika Singh",
                                                 "Follow-up",
@@ -188,7 +188,7 @@ public class DoctorAppointmentsPage {
                                                 "Pending",
                                                 "◉"),
 
-                                new Appointment(
+                                new DoctorAppointment(
                                                 "02:00 PM",
                                                 "Ayesha Khan",
                                                 "Consultation",
@@ -196,7 +196,7 @@ public class DoctorAppointmentsPage {
                                                 "Paid",
                                                 "◉"),
 
-                                new Appointment(
+                                new DoctorAppointment(
                                                 "03:00 PM",
                                                 "Pooja Iyer",
                                                 "Consultation",

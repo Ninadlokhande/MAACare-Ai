@@ -16,25 +16,37 @@ public class Theme {
         // COMMON COLORS
         // =====================================================
 
-        public static final String BACKGROUND = "linear-gradient(to bottom right, #FFF9FC, #FFF1F8)";
+        // =====================================================
+        // COMMON COLORS - LAVENDER THEME
+        // =====================================================
+
+        public static final String BACKGROUND = "linear-gradient(to bottom right, #F9F7FF, #F1EBFF)";
 
         public static final String WHITE = "#FFFFFF";
-        public static final String PRIMARY = "#E92B83";
-        public static final String PRIMARY_LIGHT = "#FCE6F1";
-        public static final String TEXT = "#18213D";
-        public static final String SECONDARY_TEXT = "#6B7280";
-        public static final String BORDER = "#F0E7ED";
+
+        public static final String PRIMARY = "#8B5CF6";
+
+        public static final String PRIMARY_LIGHT = "#EEE7FF";
+
+        public static final String TEXT = "#29234D";
+
+        public static final String SECONDARY_TEXT = "#77718A";
+
+        public static final String BORDER = "#E5DDF3";
 
         public static final String GREEN = "#21A366";
+
         public static final String GREEN_LIGHT = "#E7F8EF";
 
         public static final String ORANGE = "#F59E0B";
+
         public static final String ORANGE_LIGHT = "#FFF4DE";
 
         public static final String RED = "#E74C78";
+
         public static final String RED_LIGHT = "#FDEAF1";
 
-        public static final String PURPLE = "#B94BFF";
+        public static final String PURPLE = "#A855F7";
 
         public static final String FONT = "Arial";
 

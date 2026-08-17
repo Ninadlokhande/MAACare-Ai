@@ -150,7 +150,7 @@ public class DoctorDashboard extends javafx.application.Application {
                 sidebar.setSpacing(8);
 
                 sidebar.setStyle(
-                                "-fx-background-color: #F2E1EA;" +
+                                "-fx-background-color: #EEE7FF;" +
                                                 "-fx-border-color: " +
                                                 Theme.BORDER + ";" +
                                                 "-fx-border-width: 0 1 0 0;");
@@ -180,7 +180,7 @@ public class DoctorDashboard extends javafx.application.Application {
 
                 doctor.setStyle(
                                 "-fx-font-weight: BOLD;" +
-                                                "-fx-font-size: 13px");
+                                                "-fx-font-size: 14px");
 
                 doctor.setTextFill(
                                 Color.web(Theme.TEXT));
@@ -190,7 +190,7 @@ public class DoctorDashboard extends javafx.application.Application {
 
                 specialist.setStyle(
                                 "-fx-font-weight: BOLD;" +
-                                                "-fx-font-size: 10px");
+                                                "-fx-font-size: 11px");
 
                 specialist.setTextFill(
                                 Color.web(
@@ -201,7 +201,7 @@ public class DoctorDashboard extends javafx.application.Application {
 
                 online.setStyle(
                                 "-fx-font-weight: BOLD;" +
-                                                "-fx-font-size: 10px");
+                                                "-fx-font-size: 11px");
 
                 online.setTextFill(
                                 Color.web(Theme.GREEN));
@@ -217,49 +217,33 @@ public class DoctorDashboard extends javafx.application.Application {
                 // =================================================
                 // MENU
                 // =================================================
-
                 Button dashboard = createMenuButton(
-                                "⌂",
+                                "🏠",
                                 "Dashboard",
                                 true);
 
                 Button appointments = createMenuButton(
-                                "▣",
+                                "📅",
                                 "Appointments",
                                 false);
 
                 Button patients = createMenuButton(
-                                "♙",
+                                "👩‍⚕️",
                                 "Patients",
                                 false);
 
                 Button reports = createMenuButton(
-                                "▤",
+                                "📋",
                                 "Patient Reports",
                                 false);
 
-                Button prescriptions = createMenuButton(
-                                "♢",
-                                "Prescriptions",
-                                false);
-
-                Button messages = createMenuButton(
-                                "▱",
-                                "Messages",
-                                false);
-
-                Button calendar = createMenuButton(
-                                "□",
-                                "Calendar",
-                                false);
-
                 Button profile = createMenuButton(
-                                "♙",
-                                "Profile",
+                                "👨🏻‍⚕️",
+                                "Doctor Profile",
                                 false);
 
                 Button settings = createMenuButton(
-                                "⚙",
+                                "⚙️",
                                 "Settings",
                                 false);
 
@@ -272,6 +256,8 @@ public class DoctorDashboard extends javafx.application.Application {
                 Runnable openPatients = () -> PatientsPage.show();
 
                 Runnable openReports = () -> PatientReportsPage.show();
+
+                Runnable openProfile = () -> DoctorProfilePage.show();
 
                 Runnable openSettings = () -> SettingsPage.show();
 
@@ -288,6 +274,9 @@ public class DoctorDashboard extends javafx.application.Application {
                 reports.setOnAction(
                                 e -> openReports.run());
 
+                profile.setOnAction(
+                                e -> openProfile.run());
+
                 settings.setOnAction(
                                 e -> openSettings.run());
 
@@ -296,9 +285,6 @@ public class DoctorDashboard extends javafx.application.Application {
                                 appointments,
                                 patients,
                                 reports,
-                                prescriptions,
-                                messages,
-                                calendar,
                                 profile,
                                 settings);
 
@@ -329,7 +315,6 @@ public class DoctorDashboard extends javafx.application.Application {
         // =====================================================
         // MENU BUTTON
         // =====================================================
-
         private static Button createMenuButton(
                         String icon,
                         String text,
@@ -343,14 +328,26 @@ public class DoctorDashboard extends javafx.application.Application {
                 button.setAlignment(
                                 Pos.CENTER_LEFT);
 
+                // =================================================
+                // ICON
+                // =================================================
+
                 Label iconLabel = new Label(icon);
 
+                iconLabel.setPrefWidth(35);
+                iconLabel.setMinWidth(35);
+                iconLabel.setMaxWidth(35);
+
+                iconLabel.setAlignment(
+                                Pos.CENTER);
+
                 iconLabel.setStyle(
-                                "-fx-font-family: '" +
-                                                Theme.FONT +
-                                                "';" +
-                                                "-fx-font-size: 20px;" +
-                                                "-fx-font-weight: BOLD;");
+                                "-fx-font-family: 'Segoe UI Emoji';" +
+                                                "-fx-font-size: 18px;");
+
+                // =================================================
+                // TEXT
+                // =================================================
 
                 Label textLabel = new Label(text);
 
@@ -358,10 +355,14 @@ public class DoctorDashboard extends javafx.application.Application {
                                 "-fx-font-family: '" +
                                                 Theme.FONT +
                                                 "';" +
-                                                "-fx-font-size: 13px;" +
+                                                "-fx-font-size: 15px;" +
                                                 "-fx-font-weight: BOLD;");
 
-                HBox content = new HBox(10);
+                // =================================================
+                // ICON + TEXT
+                // =================================================
+
+                HBox content = new HBox(8);
 
                 content.setAlignment(
                                 Pos.CENTER_LEFT);
@@ -372,6 +373,10 @@ public class DoctorDashboard extends javafx.application.Application {
 
                 button.setGraphic(content);
                 button.setText("");
+
+                // =================================================
+                // ACTIVE
+                // =================================================
 
                 if (active) {
 
@@ -490,30 +495,10 @@ public class DoctorDashboard extends javafx.application.Application {
                 HBox stats = new HBox(15);
 
                 stats.getChildren().addAll(
-                                statCard(
-                                                "▣",
-                                                "18",
-                                                "Today's",
-                                                "Appointments"),
-
-                                statCard(
-                                                "♙",
-                                                "6",
-                                                "New Patients",
-                                                "This Week"),
-
-                                statCard(
-                                                "▤",
-                                                "32",
-                                                "Reports",
-                                                "This Week"),
-
-                                statCard(
-                                                "★",
-                                                "4.8",
-                                                "Average Rating",
-                                                "This Month"));
-
+                                statCard("📅", "18", "Today's", "Appointments"),
+                                statCard("👥", "6", "New Patients", "This Week"),
+                                statCard("📋", "32", "Reports", "This Week"),
+                                statCard("⭐", "4.8", "Average Rating", "This Month"));
                 // =================================================
                 // MIDDLE
                 // =================================================
@@ -525,6 +510,8 @@ public class DoctorDashboard extends javafx.application.Application {
                 HBox.setHgrow(
                                 appointments,
                                 Priority.ALWAYS);
+                appointments.setPrefHeight(330);
+                appointments.setMinHeight(330);
 
                 Label appointmentTitle = new Label(
                                 "Today's Appointments");
@@ -569,6 +556,8 @@ public class DoctorDashboard extends javafx.application.Application {
                 VBox schedule = Theme.card();
 
                 schedule.setPrefWidth(330);
+                schedule.setPrefHeight(330);
+                schedule.setMinHeight(330);
 
                 Label scheduleTitle = new Label(
                                 "Today's Schedule");
@@ -637,25 +626,11 @@ public class DoctorDashboard extends javafx.application.Application {
                 HBox actions = new HBox(20);
 
                 actions.getChildren().addAll(
-                                quickAction(
-                                                "▣",
-                                                "Add Appointment"),
-
-                                quickAction(
-                                                "♙",
-                                                "Add Patient"),
-
-                                quickAction(
-                                                "▤",
-                                                "Write Prescription"),
-
-                                quickAction(
-                                                "↥",
-                                                "Upload Report"),
-
-                                quickAction(
-                                                "▱",
-                                                "Send Message"));
+                                quickAction("📅", "Add Appointment"),
+                                quickAction("👤", "Add Patient"),
+                                quickAction("💊", "Write Prescription"),
+                                quickAction("📤", "Upload Report"),
+                                quickAction("💬", "Send Message"));
 
                 quickActions.getChildren().addAll(
                                 quickTitle,
@@ -734,7 +709,7 @@ public class DoctorDashboard extends javafx.application.Application {
                                 javafx.scene.text.Font.font(
                                                 Theme.FONT,
                                                 javafx.scene.text.FontWeight.BOLD,
-                                                23));
+                                                30));
 
                 iconLabel.setTextFill(
                                 Color.web(Theme.PRIMARY));
@@ -796,7 +771,7 @@ public class DoctorDashboard extends javafx.application.Application {
                                 javafx.scene.text.Font.font(
                                                 Theme.FONT,
                                                 javafx.scene.text.FontWeight.BOLD,
-                                                10));
+                                                12));
 
                 t.setTextFill(
                                 Color.web(Theme.TEXT));
@@ -809,7 +784,7 @@ public class DoctorDashboard extends javafx.application.Application {
                                 javafx.scene.text.Font.font(
                                                 Theme.FONT,
                                                 javafx.scene.text.FontWeight.BOLD,
-                                                11));
+                                                13));
 
                 p.setTextFill(
                                 Color.web(Theme.TEXT));
@@ -895,7 +870,7 @@ public class DoctorDashboard extends javafx.application.Application {
                                 javafx.scene.text.Font.font(
                                                 Theme.FONT,
                                                 javafx.scene.text.FontWeight.BOLD,
-                                                10));
+                                                11));
 
                 n.setTextFill(
                                 Color.web(Theme.TEXT));
@@ -973,15 +948,5 @@ public class DoctorDashboard extends javafx.application.Application {
                                 l);
 
                 return box;
-        }
-
-        // =====================================================
-        // MAIN
-        // =====================================================
-
-        public static void main(
-                        String[] args) {
-
-                launch(args);
         }
 }
