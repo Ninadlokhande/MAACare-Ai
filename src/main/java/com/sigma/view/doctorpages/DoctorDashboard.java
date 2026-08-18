@@ -1235,9 +1235,5 @@ public class DoctorDashboard extends Application {
         // MAIN
         // =====================================================
 
-        public static void main(
-                        String[] args) {
-
-                launch(args);
-        }
+     
 }
