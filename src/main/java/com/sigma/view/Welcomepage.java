@@ -3,6 +3,7 @@ import com.sigma.view.adminpages.AdminAnalytics;
 import com.sigma.view.adminpages.AdminProfile;
 import com.sigma.view.adminpages.AdminRequestApproval;
 import com.sigma.view.adminpages.NewMembers;
+import com.sigma.view.trial.ImageUplaodTrial;
 
 import javafx.animation.FadeTransition;
 import javafx.animation.Interpolator;
@@ -136,8 +137,9 @@ GetStartedbtn.setOnMouseExited(e ->
     AdminAnalytics adminAnalytics = new AdminAnalytics();
     AdminProfile adminProfile = new AdminProfile();
     NewMembers newMembers = new NewMembers();
+    ImageUplaodTrial imageUplaodTrial = new ImageUplaodTrial();
+    testingScene = imageUplaodTrial.getImageuploaderScene(primaryStage);
 
-    testingScene = newMembers.getNewMembersScene();
     scene = testingScene;
 
     primaryStage.setScene(scene);
