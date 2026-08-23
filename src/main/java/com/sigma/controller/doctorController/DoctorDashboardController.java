@@ -1,4 +1,4 @@
-package com.sigma.controller;
+package com.sigma.controller.doctorController;
 
 public class DoctorDashboardController {
 

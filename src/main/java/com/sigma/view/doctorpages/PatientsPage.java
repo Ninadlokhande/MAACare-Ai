@@ -1,6 +1,6 @@
-package com.sigma.view;
+package com.sigma.view.doctorpages;
 
-import com.sigma.model.Patient;
+import com.sigma.model.DoctorModel.Patient;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;

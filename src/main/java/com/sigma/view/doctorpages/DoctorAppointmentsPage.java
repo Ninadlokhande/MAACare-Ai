@@ -1,6 +1,6 @@
-package com.sigma.view;
+package com.sigma.view.doctorpages;
 
-import com.sigma.model.DoctorAppointment;
+import com.sigma.model.DoctorModel.DoctorAppointment;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
