@@ -1,6 +1,6 @@
-package com.sigma.controller;
+package com.sigma.controller.doctorController;
 
-import com.sigma.model.Settings;
+import com.sigma.model.DoctorModel.Settings;
 
 public class SettingsController {
 
