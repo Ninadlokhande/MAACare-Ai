@@ -1,42 +1,143 @@
 package com.sigma.view.adminpages;
 
-import com.sigma.view.Welcomepage;
 import com.sigma.view.scenesettings;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+
+import javafx.scene.Node;
 import javafx.scene.Scene;
+
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.PieChart;
 import javafx.scene.chart.XYChart;
+
 import javafx.scene.paint.Color;
+
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+
 import javafx.scene.effect.DropShadow;
 
+
+/**
+ * MaaCare AI
+ *
+ * ADMIN DASHBOARD
+ *
+ * Architecture:
+ *
+ * One Scene
+ *      |
+ *      +--- BorderPane
+ *             |
+ *             +--- LEFT   = Sidebar
+ *             |
+ *             +--- TOP    = Page title
+ *             |
+ *             +--- CENTER = Current page
+ *
+ *
+ * IMPORTANT:
+ *
+ * All pages are created only once.
+ *
+ * Clicking a sidebar button only changes:
+ *
+ *     root.setCenter(existingPage);
+ *
+ * Therefore pages are NOT recreated every time.
+ */
 public class AdminDashboard {
+
+
+    // =========================================================
+    // MAIN ROOT
+    // =========================================================
+
+    private BorderPane root;
 
     private Scene adminDashboardScene;
 
+
+    // =========================================================
+    // DASHBOARD CENTER
+    // =========================================================
+
+    private ScrollPane dashboardScrollPane;
+
+
+    // =========================================================
+    // PAGE TITLE
+    // =========================================================
+
+    private Label pageTitle;
+
+
+    // =========================================================
+    // PERSISTENT PAGE INSTANCES
+    // =========================================================
+
+    private AdminNewMember newMemberPage;
+
+    private AdminRequestApproval approvalPage;
+
+    private AdminProfile profilePage;
+
+    private AdminSettings settingsPage;
+
+    private Node analyticsPage;
+
+
+    // =========================================================
+    // PERSISTENT PAGE ROOTS
+    // =========================================================
+
+    private Node newMemberRoot;
+
+    private Node approvalRoot;
+
+    private Node profileRoot;
+
+    private Node settingsRoot;
+
+
+    // =========================================================
+    // MAIN DASHBOARD
+    // =========================================================
+
     public Scene gotoAdminDashboard() {
+
+        // =====================================================
+        // DO NOT REBUILD THE DASHBOARD
+        // =====================================================
+
+        if (adminDashboardScene != null) {
+
+            return adminDashboardScene;
+        }
+
 
         // =====================================================
         // MAIN BORDERPANE
         // =====================================================
 
-        BorderPane root = new BorderPane();
+        root = new BorderPane();
 
         root.setStyle(
             "-fx-background-color: #F9F7FC;"
@@ -47,12 +148,18 @@ public class AdminDashboard {
         // LEFT SIDEBAR
         // =====================================================
 
-        VBox sidebar = new VBox(8);
+        VBox sidebar =
+            new VBox(8);
 
         sidebar.setPrefWidth(230);
 
         sidebar.setPadding(
-            new Insets(25, 15, 20, 15)
+            new Insets(
+                25,
+                15,
+                20,
+                15
+            )
         );
 
         sidebar.setStyle(
@@ -73,6 +180,7 @@ public class AdminDashboard {
                 "/assets/images/logo/logo.png"
             );
 
+
         if (logoResource != null) {
 
             Image logoImage =
@@ -81,24 +189,32 @@ public class AdminDashboard {
                 );
 
             logoView =
-                new ImageView(logoImage);
+                new ImageView(
+                    logoImage
+                );
 
             logoView.setPreserveRatio(true);
+
             logoView.setSmooth(true);
 
-            // Responsive logo size
-            logoView.fitHeightProperty().bind(
-                root.heightProperty().multiply(0.12)
-            );
+            logoView.fitHeightProperty()
+                .bind(
+                    root.heightProperty()
+                        .multiply(0.12)
+                );
 
-            logoView.fitWidthProperty().bind(
-                sidebar.widthProperty().multiply(0.75)
-            );
+            logoView.fitWidthProperty()
+                .bind(
+                    sidebar.widthProperty()
+                        .multiply(0.75)
+                );
         }
 
 
         Label adminText =
-            new Label("ADMIN DASHBOARD");
+            new Label(
+                "ADMIN DASHBOARD"
+            );
 
         adminText.setStyle(
             "-fx-text-fill: #8A8899;" +
@@ -115,7 +231,12 @@ public class AdminDashboard {
         );
 
         logoBox.setPadding(
-            new Insets(0, 0, 25, 10)
+            new Insets(
+                0,
+                0,
+                25,
+                10
+            )
         );
 
 
@@ -128,7 +249,9 @@ public class AdminDashboard {
         } else {
 
             Label logo =
-                new Label("MaaCare AI");
+                new Label(
+                    "MaaCare AI"
+                );
 
             logo.setFont(
                 Font.font(
@@ -165,43 +288,21 @@ public class AdminDashboard {
             );
 
 
-
         Button newMember =
             createSideButton(
                 "＋",
                 "New Member",
                 false
             );
-            
 
 
-       Button approvals =
-    createSideButton(
-        "✓",
-        "Approval Requests",
-        false
-    );
+        Button approvals =
+            createSideButton(
+                "✓",
+                "Approval Requests",
+                false
+            );
 
-approvals.setOnAction(e -> {
-
-    AdminRequestApproval adminRequestApproval =
-        new AdminRequestApproval();
-
-    Scene approvalScene =
-        adminRequestApproval.getAdminrequestApprovalScene();
-
-    Welcomepage.stage.setScene(
-        approvalScene
-    );
-
-    Welcomepage.stage.setMaximized(
-        true
-    );
-
-    System.out.println(
-        "[ADMIN] Approval Requests opened"
-    );
-});
 
         Button analytics =
             createSideButton(
@@ -232,110 +333,19 @@ approvals.setOnAction(e -> {
         // =====================================================
 
         Button[] sidebarButtons = {
+
             dashboard,
+
             newMember,
+
             approvals,
+
             analytics,
+
             profile,
+
             settings
         };
-
-
-        // =====================================================
-        // BUTTON ACTIONS
-        // =====================================================
-
-        dashboard.setOnAction(e -> {
-
-            setSelectedButton(
-                dashboard,
-                sidebarButtons
-            );
-
-            System.out.println(
-                "[ADMIN] Dashboard button pressed"
-            );
-        });
-
-
-        newMember.setOnAction(e -> {
-
-            setSelectedButton(
-                newMember,
-                sidebarButtons
-            );
-
-            System.out.println(
-                "[ADMIN] New Member button pressed"
-            );
-        });
-
-
-        approvals.setOnAction(e -> {
-
-            setSelectedButton(
-                approvals,
-                sidebarButtons
-            );
-
-            System.out.println(
-                "[ADMIN] Approval Requests button pressed"
-            );
-        });
-
-
-        analytics.setOnAction(e -> {
-
-            setSelectedButton(
-                analytics,
-                sidebarButtons
-            );
-
-            System.out.println(
-                "[ADMIN] Analytics button pressed"
-            );
-        });
-
-
-        profile.setOnAction(e -> {
-
-            setSelectedButton(
-                profile,
-                sidebarButtons
-            );
-
-            System.out.println(
-                "[ADMIN] My Profile button pressed"
-            );
-        });
-
-
-        settings.setOnAction(e -> {
-
-            setSelectedButton(
-                settings,
-                sidebarButtons
-            );
-
-            System.out.println(
-                "[ADMIN] Settings button pressed"
-            );
-        });
-
-
-        // =====================================================
-        // ADD BUTTONS TO SIDEBAR
-        // =====================================================
-
-        sidebar.getChildren().addAll(
-            logoBox,
-            dashboard,
-            newMember,
-            approvals,
-            analytics,
-            profile,
-            settings
-        );
 
 
         // =====================================================
@@ -346,7 +356,12 @@ approvals.setOnAction(e -> {
             new BorderPane();
 
         topBar.setPadding(
-            new Insets(18, 30, 18, 30)
+            new Insets(
+                18,
+                30,
+                18,
+                30
+            )
         );
 
         topBar.setStyle(
@@ -356,8 +371,10 @@ approvals.setOnAction(e -> {
         );
 
 
-        Label pageTitle =
-            new Label("Dashboard");
+        pageTitle =
+            new Label(
+                "Dashboard"
+            );
 
         pageTitle.setStyle(
             "-fx-text-fill: #24234F;" +
@@ -378,14 +395,363 @@ approvals.setOnAction(e -> {
         );
 
 
-        topBar.setLeft(pageTitle);
+        topBar.setLeft(
+            pageTitle
+        );
 
-        topBar.setRight(admin);
+        topBar.setRight(
+            admin
+        );
 
 
         // =====================================================
-        // CENTER CONTENT
+        // DASHBOARD CONTENT
         // =====================================================
+
+        VBox centerContent =
+            createDashboardContent();
+
+
+        dashboardScrollPane =
+            new ScrollPane(
+                centerContent
+            );
+
+        dashboardScrollPane.setFitToWidth(
+            true
+        );
+
+        dashboardScrollPane.setHbarPolicy(
+            ScrollPane.ScrollBarPolicy.NEVER
+        );
+
+        dashboardScrollPane.setStyle(
+            "-fx-background-color: transparent;" +
+            "-fx-background: #F9F7FC;"
+        );
+
+
+        // =====================================================
+        // CREATE ALL PAGES ONLY ONCE
+        // =====================================================
+
+        try {
+
+            // -------------------------------------------------
+            // NEW MEMBER
+            // -------------------------------------------------
+
+            newMemberPage =
+                new AdminNewMember();
+
+            newMemberRoot =
+                newMemberPage.getNewMemberRoot();
+
+
+            // -------------------------------------------------
+            // APPROVAL REQUESTS
+            // -------------------------------------------------
+
+            approvalPage =
+                new AdminRequestApproval();
+
+            approvalRoot =
+                approvalPage
+                    .getAdminrequestApprovalRoot();
+
+
+            // -------------------------------------------------
+            // PROFILE
+            // -------------------------------------------------
+
+            profilePage =
+                new AdminProfile();
+
+            profileRoot =
+                profilePage.getProfileRoot();
+
+
+            // -------------------------------------------------
+            // ANALYTICS
+            // -------------------------------------------------
+
+            analyticsPage =
+                createAnalyticsPage();
+
+
+            // -------------------------------------------------
+            // SETTINGS
+            // -------------------------------------------------
+            //
+            // IMPORTANT:
+            //
+            // This calls the separate AdminSettings class
+            // created earlier.
+            //
+            // It is created ONLY ONCE.
+            // -------------------------------------------------
+
+            settingsPage =
+                new AdminSettings();
+
+            settingsRoot =
+                settingsPage.getSettingsRoot();
+
+
+            System.out.println(
+                "[ADMIN] Persistent pages initialized"
+            );
+
+
+        } catch (Exception ex) {
+
+            ex.printStackTrace();
+
+            throw new RuntimeException(
+                "Failed to initialize Admin Dashboard pages.",
+                ex
+            );
+        }
+
+
+        // =====================================================
+        // DASHBOARD BUTTON
+        // =====================================================
+
+        dashboard.setOnAction(e -> {
+
+            setSelectedButton(
+                dashboard,
+                sidebarButtons
+            );
+
+            root.setCenter(
+                dashboardScrollPane
+            );
+
+            pageTitle.setText(
+                "Dashboard"
+            );
+
+            System.out.println(
+                "[ADMIN] Dashboard opened"
+            );
+        });
+
+
+        // =====================================================
+        // NEW MEMBER
+        // =====================================================
+
+        newMember.setOnAction(e -> {
+
+            setSelectedButton(
+                newMember,
+                sidebarButtons
+            );
+
+            // IMPORTANT:
+            // Do NOT create AdminNewMember here.
+
+            root.setCenter(
+                newMemberRoot
+            );
+
+            pageTitle.setText(
+                "New Member"
+            );
+
+            System.out.println(
+                "[ADMIN] New Member opened - existing page reused"
+            );
+        });
+
+
+        // =====================================================
+        // APPROVAL REQUESTS
+        // =====================================================
+
+        approvals.setOnAction(e -> {
+
+            setSelectedButton(
+                approvals,
+                sidebarButtons
+            );
+
+            // IMPORTANT:
+            // Do NOT create AdminRequestApproval here.
+
+            root.setCenter(
+                approvalRoot
+            );
+
+            pageTitle.setText(
+                "Approval Requests"
+            );
+
+            System.out.println(
+                "[ADMIN] Approval Requests opened - existing page reused"
+            );
+        });
+
+
+        // =====================================================
+        // ANALYTICS
+        // =====================================================
+
+        analytics.setOnAction(e -> {
+
+            setSelectedButton(
+                analytics,
+                sidebarButtons
+            );
+
+            // Reuse existing analytics page.
+
+            root.setCenter(
+                analyticsPage
+            );
+
+            pageTitle.setText(
+                "Analytics"
+            );
+
+            System.out.println(
+                "[ADMIN] Analytics opened - existing page reused"
+            );
+        });
+
+
+        // =====================================================
+        // PROFILE
+        // =====================================================
+
+        profile.setOnAction(e -> {
+
+            setSelectedButton(
+                profile,
+                sidebarButtons
+            );
+
+            // Reuse existing profile page.
+
+            root.setCenter(
+                profileRoot
+            );
+
+            pageTitle.setText(
+                "My Profile"
+            );
+
+            System.out.println(
+                "[ADMIN] Profile opened - existing page reused"
+            );
+        });
+
+
+        // =====================================================
+        // SETTINGS
+        // =====================================================
+
+        settings.setOnAction(e -> {
+
+            setSelectedButton(
+                settings,
+                sidebarButtons
+            );
+
+            // =================================================
+            // IMPORTANT
+            // =================================================
+            //
+            // We are NOT doing:
+            //
+            // new AdminSettings()
+            //
+            // here.
+            //
+            // The page was already created once above.
+            //
+            // We simply put its existing root in the
+            // BorderPane center.
+            // =================================================
+
+            root.setCenter(
+                settingsRoot
+            );
+
+            pageTitle.setText(
+                "Settings"
+            );
+
+            System.out.println(
+                "[ADMIN] Settings opened - existing page reused"
+            );
+        });
+
+
+        // =====================================================
+        // ADD BUTTONS TO SIDEBAR
+        // =====================================================
+
+        sidebar.getChildren().addAll(
+
+            logoBox,
+
+            dashboard,
+
+            newMember,
+
+            approvals,
+
+            analytics,
+
+            profile,
+
+            settings
+        );
+
+
+        // =====================================================
+        // SET BORDERPANE
+        // =====================================================
+
+        root.setLeft(
+            sidebar
+        );
+
+        root.setTop(
+            topBar
+        );
+
+        root.setCenter(
+            dashboardScrollPane
+        );
+
+
+        // =====================================================
+        // CREATE ONLY ONE SCENE
+        // =====================================================
+
+        adminDashboardScene =
+            new Scene(
+                root,
+                scenesettings.rectanguler2d
+                    .getWidth(),
+                scenesettings.rectanguler2d
+                    .getHeight()
+            );
+
+
+        return adminDashboardScene;
+    }
+
+
+    // =========================================================
+    // DASHBOARD CONTENT
+    // =========================================================
+
+    private VBox createDashboardContent() {
 
         VBox centerContent =
             new VBox(20);
@@ -396,23 +762,6 @@ approvals.setOnAction(e -> {
 
         centerContent.setStyle(
             "-fx-background-color: #F9F7FC;"
-        );
-
-
-        ScrollPane scrollPane1 =
-            new ScrollPane(
-                centerContent
-            );
-
-        scrollPane1.setFitToWidth(true);
-
-        scrollPane1.setHbarPolicy(
-            ScrollPane.ScrollBarPolicy.NEVER
-        );
-
-        scrollPane1.setStyle(
-            "-fx-background-color: transparent;" +
-            "-fx-background: #F9F7FC;"
         );
 
 
@@ -513,9 +862,13 @@ approvals.setOnAction(e -> {
 
 
         stats.getChildren().addAll(
+
             usersCard,
+
             doctorsCard,
+
             hospitalsCard,
+
             approvalsCard
         );
 
@@ -548,7 +901,9 @@ approvals.setOnAction(e -> {
 
 
         charts.getChildren().addAll(
+
             userGrowth,
+
             userDistribution
         );
 
@@ -632,14 +987,6 @@ approvals.setOnAction(e -> {
         );
 
 
-        viewApprovals.setOnAction(e -> {
-
-            System.out.println(
-                "[ADMIN] View All Approvals pressed"
-            );
-        });
-
-
         approvalsBox.getChildren().add(
             viewApprovals
         );
@@ -701,7 +1048,9 @@ approvals.setOnAction(e -> {
 
 
         middle.getChildren().addAll(
+
             approvalsBox,
+
             activityBox
         );
 
@@ -822,9 +1171,13 @@ approvals.setOnAction(e -> {
 
 
         systemStatus.getChildren().addAll(
+
             statusTitle,
+
             serverStatus,
+
             databaseStatus,
+
             storageStatus
         );
 
@@ -846,48 +1199,225 @@ approvals.setOnAction(e -> {
 
 
         lower.getChildren().addAll(
+
             registrationBox,
+
             summaryBox
         );
 
 
         // =====================================================
-        // ADD CONTENT
+        // ADD EVERYTHING
         // =====================================================
 
         centerContent.getChildren().addAll(
+
             heading,
+
             stats,
+
             charts,
+
             middle,
+
             lower
         );
 
 
-        // =====================================================
-        // SET BORDERPANE
-        // =====================================================
-
-        root.setLeft(sidebar);
-
-        root.setTop(topBar);
-
-        root.setCenter(scrollPane1);
+        return centerContent;
+    }
 
 
-        // =====================================================
-        // SCENE
-        // =====================================================
+    // =========================================================
+    // ANALYTICS PAGE
+    // =========================================================
 
-        adminDashboardScene =
-            new Scene(
-                root,
-                scenesettings.rectanguler2d.getWidth(),
-                scenesettings.rectanguler2d.getHeight()
+    private VBox createAnalyticsPage() {
+
+        VBox page =
+            new VBox(20);
+
+        page.setPadding(
+            new Insets(30)
+        );
+
+        page.setStyle(
+            "-fx-background-color: #F9F7FC;"
+        );
+
+
+        Label title =
+            new Label(
+                "Analytics"
+            );
+
+        title.setStyle(
+            "-fx-text-fill: #24234F;" +
+            "-fx-font-size: 28px;" +
+            "-fx-font-weight: bold;"
+        );
+
+
+        Label subtitle =
+            new Label(
+                "Monitor MaaCare AI platform activity and verification statistics."
+            );
+
+        subtitle.setStyle(
+            "-fx-text-fill: #77778D;" +
+            "-fx-font-size: 14px;"
+        );
+
+
+        HBox stats =
+            new HBox(15);
+
+
+        VBox users =
+            createStatCard(
+                "Total Users",
+                "12,450",
+                "+12.5%"
             );
 
 
-        return adminDashboardScene;
+        VBox doctors =
+            createStatCard(
+                "Doctors",
+                "184",
+                "+8.3%"
+            );
+
+
+        VBox hospitals =
+            createStatCard(
+                "Hospitals",
+                "42",
+                "+5.2%"
+            );
+
+
+        VBox workers =
+            createStatCard(
+                "ASHA Workers",
+                "156",
+                "+10.4%"
+            );
+
+
+        HBox.setHgrow(
+            users,
+            Priority.ALWAYS
+        );
+
+        HBox.setHgrow(
+            doctors,
+            Priority.ALWAYS
+        );
+
+        HBox.setHgrow(
+            hospitals,
+            Priority.ALWAYS
+        );
+
+        HBox.setHgrow(
+            workers,
+            Priority.ALWAYS
+        );
+
+
+        stats.getChildren().addAll(
+
+            users,
+
+            doctors,
+
+            hospitals,
+
+            workers
+        );
+
+
+        HBox charts =
+            new HBox(20);
+
+
+        VBox growth =
+            createUserGrowthChart();
+
+
+        VBox distribution =
+            createUserDistributionChart();
+
+
+        HBox.setHgrow(
+            growth,
+            Priority.ALWAYS
+        );
+
+        HBox.setHgrow(
+            distribution,
+            Priority.ALWAYS
+        );
+
+
+        charts.getChildren().addAll(
+
+            growth,
+
+            distribution
+        );
+
+
+        VBox registrations =
+            createRegistrationChart();
+
+
+        page.getChildren().addAll(
+
+            title,
+
+            subtitle,
+
+            stats,
+
+            charts,
+
+            registrations
+        );
+
+
+        ScrollPane scroll =
+            new ScrollPane(
+                page
+            );
+
+        scroll.setFitToWidth(
+            true
+        );
+
+        scroll.setHbarPolicy(
+            ScrollPane.ScrollBarPolicy.NEVER
+        );
+
+        scroll.setStyle(
+            "-fx-background-color: transparent;" +
+            "-fx-background: #F9F7FC;"
+        );
+
+
+        VBox wrapper =
+            new VBox(
+                scroll
+            );
+
+        VBox.setVgrow(
+            scroll,
+            Priority.ALWAYS
+        );
+
+
+        return wrapper;
     }
 
 
@@ -905,15 +1435,21 @@ approvals.setOnAction(e -> {
                 icon + "    " + text
             );
 
+
         button.setMaxWidth(
             Double.MAX_VALUE
         );
 
-        button.setPrefHeight(45);
+
+        button.setPrefHeight(
+            45
+        );
+
 
         button.setAlignment(
             Pos.CENTER_LEFT
         );
+
 
         button.setStyle(
             getSidebarButtonStyle(
@@ -921,43 +1457,35 @@ approvals.setOnAction(e -> {
             )
         );
 
+
         return button;
     }
 
 
     // =========================================================
-    // SET SELECTED BUTTON
+    // SELECTED BUTTON
     // =========================================================
 
     private void setSelectedButton(
             Button selectedButton,
             Button[] allButtons) {
 
-        for (Button button :
-                allButtons) {
+        for (
+            Button button :
+            allButtons
+        ) {
 
-            if (button == selectedButton) {
-
-                button.setStyle(
-                    getSidebarButtonStyle(
-                        true
-                    )
-                );
-
-            } else {
-
-                button.setStyle(
-                    getSidebarButtonStyle(
-                        false
-                    )
-                );
-            }
+            button.setStyle(
+                getSidebarButtonStyle(
+                    button == selectedButton
+                )
+            );
         }
     }
 
 
     // =========================================================
-    // SIDEBAR BUTTON STYLE
+    // SIDEBAR STYLE
     // =========================================================
 
     private String getSidebarButtonStyle(
@@ -1004,7 +1532,9 @@ approvals.setOnAction(e -> {
             new Insets(18)
         );
 
-        card.setPrefHeight(125);
+        card.setPrefHeight(
+            125
+        );
 
         card.setStyle(
             "-fx-background-color: white;" +
@@ -1066,8 +1596,11 @@ approvals.setOnAction(e -> {
 
 
         card.getChildren().addAll(
+
             titleLabel,
+
             valueLabel,
+
             changeLabel
         );
 
@@ -1202,14 +1735,12 @@ approvals.setOnAction(e -> {
             )
         );
 
-
         series.getData().add(
             new XYChart.Data<>(
                 "Apr",
                 8100
             )
         );
-
 
         series.getData().add(
             new XYChart.Data<>(
@@ -1218,7 +1749,6 @@ approvals.setOnAction(e -> {
             )
         );
 
-
         series.getData().add(
             new XYChart.Data<>(
                 "Jun",
@@ -1226,14 +1756,12 @@ approvals.setOnAction(e -> {
             )
         );
 
-
         series.getData().add(
             new XYChart.Data<>(
                 "Jul",
                 11200
             )
         );
-
 
         series.getData().add(
             new XYChart.Data<>(
@@ -1379,14 +1907,12 @@ approvals.setOnAction(e -> {
             )
         );
 
-
         series.getData().add(
             new XYChart.Data<>(
                 "Apr",
                 1040
             )
         );
-
 
         series.getData().add(
             new XYChart.Data<>(
@@ -1395,7 +1921,6 @@ approvals.setOnAction(e -> {
             )
         );
 
-
         series.getData().add(
             new XYChart.Data<>(
                 "Jun",
@@ -1403,14 +1928,12 @@ approvals.setOnAction(e -> {
             )
         );
 
-
         series.getData().add(
             new XYChart.Data<>(
                 "Jul",
                 1680
             )
         );
-
 
         series.getData().add(
             new XYChart.Data<>(
@@ -1451,7 +1974,6 @@ approvals.setOnAction(e -> {
         Label nameLabel =
             new Label(name);
 
-
         nameLabel.setStyle(
             "-fx-text-fill: #24234F;" +
             "-fx-font-weight: bold;"
@@ -1460,9 +1982,10 @@ approvals.setOnAction(e -> {
 
         Label roleLabel =
             new Label(
-                role + " • " + location
+                role +
+                " • " +
+                location
             );
-
 
         roleLabel.setStyle(
             "-fx-text-fill: #77778D;" +
@@ -1471,7 +1994,9 @@ approvals.setOnAction(e -> {
 
 
         person.getChildren().addAll(
+
             nameLabel,
+
             roleLabel
         );
 
@@ -1479,13 +2004,9 @@ approvals.setOnAction(e -> {
         Label statusLabel =
             new Label(status);
 
-
         statusLabel.setStyle(
-            "-fx-background-color: #FFF0D8;" +
-            "-fx-text-fill: #C67A00;" +
-            "-fx-padding: 5px 10px;" +
-            "-fx-background-radius: 8px;" +
-            "-fx-font-size: 10px;" +
+            "-fx-text-fill: #D88A20;" +
+            "-fx-font-size: 11px;" +
             "-fx-font-weight: bold;"
         );
 
@@ -1517,14 +2038,17 @@ approvals.setOnAction(e -> {
     // ACTIVITY ROW
     // =========================================================
 
-    private VBox createActivityRow(
+    private HBox createActivityRow(
             String title,
             String description,
             String time) {
 
+        VBox content =
+            new VBox(3);
+
+
         Label titleLabel =
             new Label(title);
-
 
         titleLabel.setStyle(
             "-fx-text-fill: #24234F;" +
@@ -1535,30 +2059,46 @@ approvals.setOnAction(e -> {
         Label descriptionLabel =
             new Label(description);
 
-
         descriptionLabel.setStyle(
             "-fx-text-fill: #77778D;" +
             "-fx-font-size: 11px;"
         );
 
 
+        content.getChildren().addAll(
+
+            titleLabel,
+
+            descriptionLabel
+        );
+
+
         Label timeLabel =
             new Label(time);
 
-
         timeLabel.setStyle(
-            "-fx-text-fill: #9999AA;" +
+            "-fx-text-fill: #9994A5;" +
             "-fx-font-size: 10px;"
         );
 
 
-        VBox row =
-            new VBox(
-                3,
-                titleLabel,
-                descriptionLabel,
+        HBox row =
+            new HBox(
+                15,
+                content,
                 timeLabel
             );
+
+
+        row.setAlignment(
+            Pos.CENTER_LEFT
+        );
+
+
+        HBox.setHgrow(
+            content,
+            Priority.ALWAYS
+        );
 
 
         return row;
@@ -1576,7 +2116,6 @@ approvals.setOnAction(e -> {
         Label titleLabel =
             new Label(title);
 
-
         titleLabel.setStyle(
             "-fx-text-fill: #77778D;" +
             "-fx-font-size: 12px;"
@@ -1586,9 +2125,9 @@ approvals.setOnAction(e -> {
         Label valueLabel =
             new Label(value);
 
-
         valueLabel.setStyle(
             "-fx-text-fill: #24234F;" +
+            "-fx-font-size: 14px;" +
             "-fx-font-weight: bold;"
         );
 

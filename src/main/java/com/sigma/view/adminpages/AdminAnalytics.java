@@ -1,648 +1,925 @@
 package com.sigma.view.adminpages;
 
-import com.sigma.view.scenesettings;
-
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
+
+import javafx.scene.Node;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.PieChart;
 import javafx.scene.chart.XYChart;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.layout.BorderPane;
+
+import javafx.scene.effect.DropShadow;
+
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+
 import javafx.scene.paint.Color;
+
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
+
 public class AdminAnalytics {
 
-    private Scene analyticsScene;
+    // =========================================================
+    // MAIN METHOD
+    // =========================================================
 
-    public Scene getAnalyticsScene() {
+    public Node getAnalyticsRoot() {
 
-        BorderPane root = new BorderPane();
+        VBox mainContent =
+            new VBox(20);
 
-        root.setStyle(
-                "-fx-background-color: #FAF8FD;");
+        mainContent.setPadding(
+            new Insets(30)
+        );
 
-        // =====================================================
-        // MAIN CONTENT
-        // =====================================================
+        mainContent.setStyle(
+            "-fx-background-color: #F9F7FC;"
+        );
 
-        VBox content = new VBox(22);
-
-        content.setPadding(
-                new Insets(30, 40, 40, 40));
-
-        // ====================================================
-        // GO BACK TO DASHBOARD BUTTON
-        // ====================================================
-        Button backButton = new Button(
-                "←   Back to Dashboard");
-
-        backButton.setPrefHeight(42);
-
-        backButton.setPadding(
-                new Insets(0, 20, 0, 20));
-
-        backButton.setStyle(
-                "-fx-background-color: white;" +
-                        "-fx-text-fill: #713CC3;" +
-                        "-fx-border-color: #713CC3;" +
-                        "-fx-border-width: 1.5px;" +
-                        "-fx-border-radius: 10px;" +
-                        "-fx-background-radius: 10px;" +
-                        "-fx-font-size: 14px;" +
-                        "-fx-font-weight: bold;" +
-                        "-fx-cursor: hand;");
-
-        backButton.setOnMouseEntered(e -> {
-
-            backButton.setStyle(
-                    "-fx-background-color: #713CC3;" +
-                            "-fx-text-fill: white;" +
-                            "-fx-border-color: #713CC3;" +
-                            "-fx-border-width: 1.5px;" +
-                            "-fx-border-radius: 10px;" +
-                            "-fx-background-radius: 10px;" +
-                            "-fx-font-size: 14px;" +
-                            "-fx-font-weight: bold;" +
-                            "-fx-cursor: hand;");
-        });
-
-        backButton.setOnMouseExited(e -> {
-
-            backButton.setStyle(
-                    "-fx-background-color: white;" +
-                            "-fx-text-fill: #713CC3;" +
-                            "-fx-border-color: #713CC3;" +
-                            "-fx-border-width: 1.5px;" +
-                            "-fx-border-radius: 10px;" +
-                            "-fx-background-radius: 10px;" +
-                            "-fx-font-size: 14px;" +
-                            "-fx-font-weight: bold;" +
-                            "-fx-cursor: hand;");
-        });
-
-        backButton.setOnAction(e -> {
-
-            System.out.println(
-                    "[ADMIN] Back to Dashboard clicked");
-
-            // Add AdminDashboard navigation here later
-        });
 
         // =====================================================
-        // TITLE
+        // HEADER
         // =====================================================
 
-        Label title = new Label("Analytics");
+        Label title =
+            new Label(
+                "Analytics"
+            );
 
-        title.setFont(
-                Font.font(
-                        "Arial",
-                        FontWeight.BOLD,
-                        32));
+        title.setStyle(
+            "-fx-text-fill: #24234F;" +
+            "-fx-font-size: 28px;" +
+            "-fx-font-weight: bold;"
+        );
 
-        title.setTextFill(
-                Color.web("#24234F"));
 
-        Label subtitle = new Label(
-                "Monitor MaaCare AI platform activity and verification statistics.");
+        Label subtitle =
+            new Label(
+                "Monitor MaaCare AI platform activity, users and registrations."
+            );
 
         subtitle.setStyle(
-                "-fx-text-fill: #77778D;" +
-                        "-fx-font-size: 14px;");
+            "-fx-text-fill: #77778D;" +
+            "-fx-font-size: 14px;"
+        );
 
-        VBox titleBox = new VBox(
+
+        VBox heading =
+            new VBox(
                 5,
-                backButton,
                 title,
-                subtitle);
+                subtitle
+            );
+
 
         // =====================================================
-        // FILTER BAR
+        // STATISTICS
         // =====================================================
 
-        HBox filterBar = new HBox(10);
+        HBox statistics =
+            new HBox(15);
 
-        filterBar.setAlignment(
-                Pos.CENTER_LEFT);
 
-        filterBar.setPadding(
-                new Insets(15));
+        VBox totalUsers =
+            createStatCard(
+                "Total Users",
+                "12,450",
+                "+12.5%"
+            );
 
-        filterBar.setStyle(
-                "-fx-background-color: white;" +
-                        "-fx-background-radius: 14px;" +
-                        "-fx-border-color: #E8E2EF;" +
-                        "-fx-border-radius: 14px;");
 
-        Label filter = new Label("View:");
+        VBox activeUsers =
+            createStatCard(
+                "Active Users",
+                "10,842",
+                "+9.7%"
+            );
 
-        filter.setStyle(
-                "-fx-text-fill: #24234F;" +
-                        "-fx-font-weight: bold;");
 
-        Button monthly = new Button("Monthly");
+        VBox doctors =
+            createStatCard(
+                "Doctors",
+                "184",
+                "+8.3%"
+            );
 
-        Button quarterly = new Button("Quarterly");
 
-        Button yearly = new Button("Yearly");
+        VBox hospitals =
+            createStatCard(
+                "Hospitals",
+                "42",
+                "+5.2%"
+            );
 
-        monthly.setStyle(
-                "-fx-background-color: #713CC3;" +
-                        "-fx-text-fill: white;" +
-                        "-fx-background-radius: 9px;" +
-                        "-fx-font-weight: bold;" +
-                        "-fx-cursor: hand;");
-
-        quarterly.setStyle(
-                "-fx-background-color: #F1E8FF;" +
-                        "-fx-text-fill: #713CC3;" +
-                        "-fx-background-radius: 9px;" +
-                        "-fx-cursor: hand;");
-
-        yearly.setStyle(
-                "-fx-background-color: #F1E8FF;" +
-                        "-fx-text-fill: #713CC3;" +
-                        "-fx-background-radius: 9px;" +
-                        "-fx-cursor: hand;");
-
-        monthly.setOnAction(e -> System.out.println(
-                "[ANALYTICS] Monthly selected"));
-
-        quarterly.setOnAction(e -> System.out.println(
-                "[ANALYTICS] Quarterly selected"));
-
-        yearly.setOnAction(e -> System.out.println(
-                "[ANALYTICS] Yearly selected"));
-
-        filterBar.getChildren().addAll(
-                filter,
-                monthly,
-                quarterly,
-                yearly);
-
-        // =====================================================
-        // STATISTICS CARDS
-        // =====================================================
-
-        HBox stats = new HBox(15);
-
-        VBox totalUsers = new VBox(
-                new Label("Total Users"),
-                new Label("12,450"),
-                new Label("+12.5%"));
-
-        VBox doctors = new VBox(
-                new Label("Doctors"),
-                new Label("184"),
-                new Label("+8.3%"));
-
-        VBox hospitals = new VBox(
-                new Label("Hospitals"),
-                new Label("42"),
-                new Label("+5.2%"));
-
-        VBox workers = new VBox(
-                new Label("ASHA Workers"),
-                new Label("156"),
-                new Label("+10.4%"));
-
-        VBox[] cards = {
-                totalUsers,
-                doctors,
-                hospitals,
-                workers
-        };
-
-        for (VBox card : cards) {
-
-            card.setSpacing(7);
-
-            card.setPadding(
-                    new Insets(18));
-
-            card.setPrefHeight(120);
-
-            card.setStyle(
-                    "-fx-background-color: white;" +
-                            "-fx-background-radius: 15px;" +
-                            "-fx-border-color: #E7E1EF;" +
-                            "-fx-border-radius: 15px;");
-
-            HBox.setHgrow(
-                    card,
-                    Priority.ALWAYS);
-
-            Label cardTitle = (Label) card.getChildren().get(0);
-
-            cardTitle.setStyle(
-                    "-fx-text-fill: #77778D;" +
-                            "-fx-font-size: 13px;");
-
-            Label value = (Label) card.getChildren().get(1);
-
-            value.setStyle(
-                    "-fx-text-fill: #24234F;" +
-                            "-fx-font-size: 27px;" +
-                            "-fx-font-weight: bold;");
-
-            Label change = (Label) card.getChildren().get(2);
-
-            change.setStyle(
-                    "-fx-text-fill: #20A56A;" +
-                            "-fx-font-size: 11px;" +
-                            "-fx-font-weight: bold;");
-
-            card.setOnMouseEntered(e -> card.setStyle(
-                    "-fx-background-color: white;" +
-                            "-fx-background-radius: 15px;" +
-                            "-fx-border-color: #BFA1E8;" +
-                            "-fx-border-width: 1.5px;" +
-                            "-fx-border-radius: 15px;" +
-                            "-fx-effect: dropshadow(gaussian, rgba(113,60,195,0.15), 12, 0, 0, 4);"));
-
-            card.setOnMouseExited(e -> card.setStyle(
-                    "-fx-background-color: white;" +
-                            "-fx-background-radius: 15px;" +
-                            "-fx-border-color: #E7E1EF;" +
-                            "-fx-border-radius: 15px;"));
-        }
-
-        stats.getChildren().addAll(
-                cards);
-
-        // =====================================================
-        // USER GROWTH CHART
-        // =====================================================
-
-        VBox growthBox = new VBox(15);
-
-        growthBox.setPadding(
-                new Insets(20));
-
-        growthBox.setStyle(
-                "-fx-background-color: white;" +
-                        "-fx-background-radius: 15px;" +
-                        "-fx-border-color: #E7E1EF;" +
-                        "-fx-border-radius: 15px;");
-
-        Label growthTitle = new Label("User Growth");
-
-        growthTitle.setStyle(
-                "-fx-text-fill: #24234F;" +
-                        "-fx-font-size: 18px;" +
-                        "-fx-font-weight: bold;");
-
-        CategoryAxis growthX = new CategoryAxis();
-
-        growthX.setLabel(
-                "Month");
-
-        NumberAxis growthY = new NumberAxis();
-
-        growthY.setLabel(
-                "Users");
-
-        LineChart<String, Number> growthChart = new LineChart<>(
-                growthX,
-                growthY);
-
-        growthChart.setAnimated(false);
-
-        growthChart.setLegendVisible(false);
-
-        growthChart.setCreateSymbols(true);
-
-        growthChart.setPrefHeight(320);
-
-        XYChart.Series<String, Number> growth = new XYChart.Series<>();
-
-        growth.getData().add(
-                new XYChart.Data<>(
-                        "Mar",
-                        7200));
-
-        growth.getData().add(
-                new XYChart.Data<>(
-                        "Apr",
-                        8100));
-
-        growth.getData().add(
-                new XYChart.Data<>(
-                        "May",
-                        8950));
-
-        growth.getData().add(
-                new XYChart.Data<>(
-                        "Jun",
-                        10100));
-
-        growth.getData().add(
-                new XYChart.Data<>(
-                        "Jul",
-                        11200));
-
-        growth.getData().add(
-                new XYChart.Data<>(
-                        "Aug",
-                        12450));
-
-        growthChart.getData().add(
-                growth);
-
-        growthBox.getChildren().addAll(
-                growthTitle,
-                growthChart);
-
-        // =====================================================
-        // USER DISTRIBUTION
-        // =====================================================
-
-        VBox distributionBox = new VBox(15);
-
-        distributionBox.setPadding(
-                new Insets(20));
-
-        distributionBox.setStyle(
-                "-fx-background-color: white;" +
-                        "-fx-background-radius: 15px;" +
-                        "-fx-border-color: #E7E1EF;" +
-                        "-fx-border-radius: 15px;");
-
-        Label distributionTitle = new Label(
-                "User Distribution");
-
-        distributionTitle.setStyle(
-                "-fx-text-fill: #24234F;" +
-                        "-fx-font-size: 18px;" +
-                        "-fx-font-weight: bold;");
-
-        PieChart pieChart = new PieChart();
-
-        pieChart.setPrefHeight(320);
-
-        pieChart.setLabelsVisible(true);
-
-        pieChart.setLegendVisible(true);
-
-        pieChart.getData().addAll(
-
-                new PieChart.Data(
-                        "Mother / Family",
-                        8450),
-
-                new PieChart.Data(
-                        "Doctors",
-                        184),
-
-                new PieChart.Data(
-                        "Hospitals",
-                        42),
-
-                new PieChart.Data(
-                        "ASHA Workers",
-                        156));
-
-        distributionBox.getChildren().addAll(
-                distributionTitle,
-                pieChart);
-
-        // =====================================================
-        // CHART ROW
-        // =====================================================
-
-        HBox chartRow = new HBox(20);
 
         HBox.setHgrow(
-                growthBox,
-                Priority.ALWAYS);
+            totalUsers,
+            Priority.ALWAYS
+        );
 
         HBox.setHgrow(
-                distributionBox,
-                Priority.ALWAYS);
+            activeUsers,
+            Priority.ALWAYS
+        );
 
-        chartRow.getChildren().addAll(
-                growthBox,
-                distributionBox);
+        HBox.setHgrow(
+            doctors,
+            Priority.ALWAYS
+        );
 
-        // =====================================================
-        // MONTHLY REGISTRATION CHART
-        // =====================================================
+        HBox.setHgrow(
+            hospitals,
+            Priority.ALWAYS
+        );
 
-        VBox registrationBox = new VBox(15);
 
-        registrationBox.setPadding(
-                new Insets(20));
+        statistics.getChildren().addAll(
 
-        registrationBox.setStyle(
-                "-fx-background-color: white;" +
-                        "-fx-background-radius: 15px;" +
-                        "-fx-border-color: #E7E1EF;" +
-                        "-fx-border-radius: 15px;");
+            totalUsers,
+            activeUsers,
+            doctors,
+            hospitals
+        );
 
-        Label registrationTitle = new Label(
-                "Monthly Registrations");
-
-        registrationTitle.setStyle(
-                "-fx-text-fill: #24234F;" +
-                        "-fx-font-size: 18px;" +
-                        "-fx-font-weight: bold;");
-
-        CategoryAxis registrationX = new CategoryAxis();
-
-        registrationX.setLabel(
-                "Month");
-
-        NumberAxis registrationY = new NumberAxis();
-
-        registrationY.setLabel(
-                "Registrations");
-
-        BarChart<String, Number> registrationChart = new BarChart<>(
-                registrationX,
-                registrationY);
-
-        registrationChart.setAnimated(false);
-
-        registrationChart.setLegendVisible(false);
-
-        registrationChart.setPrefHeight(320);
-
-        XYChart.Series<String, Number> registrations = new XYChart.Series<>();
-
-        registrations.getData().add(
-                new XYChart.Data<>(
-                        "Mar",
-                        850));
-
-        registrations.getData().add(
-                new XYChart.Data<>(
-                        "Apr",
-                        1040));
-
-        registrations.getData().add(
-                new XYChart.Data<>(
-                        "May",
-                        1250));
-
-        registrations.getData().add(
-                new XYChart.Data<>(
-                        "Jun",
-                        1430));
-
-        registrations.getData().add(
-                new XYChart.Data<>(
-                        "Jul",
-                        1680));
-
-        registrations.getData().add(
-                new XYChart.Data<>(
-                        "Aug",
-                        1920));
-
-        registrationChart.getData().add(
-                registrations);
-
-        registrationBox.getChildren().addAll(
-                registrationTitle,
-                registrationChart);
 
         // =====================================================
-        // VERIFICATION STATISTICS
+        // FIRST CHART ROW
         // =====================================================
 
-        VBox verificationBox = new VBox(15);
+        HBox firstCharts =
+            new HBox(20);
 
-        verificationBox.setPadding(
-                new Insets(20));
 
-        verificationBox.setStyle(
-                "-fx-background-color: white;" +
-                        "-fx-background-radius: 15px;" +
-                        "-fx-border-color: #E7E1EF;" +
-                        "-fx-border-radius: 15px;");
+        VBox userGrowth =
+            createUserGrowthChart();
 
-        Label verificationTitle = new Label(
-                "Verification Statistics");
 
-        verificationTitle.setStyle(
-                "-fx-text-fill: #24234F;" +
-                        "-fx-font-size: 18px;" +
-                        "-fx-font-weight: bold;");
+        VBox registrationChart =
+            createRegistrationChart();
 
-        HBox verificationStats = new HBox(15);
 
-        String[][] data = {
-                { "Approved", "1,842", "#20A56A" },
-                { "Pending", "27", "#C67A00" },
-                { "Rejected", "143", "#E53935" },
-                { "Approval Rate", "92.8%", "#713CC3" }
-        };
+        HBox.setHgrow(
+            userGrowth,
+            Priority.ALWAYS
+        );
 
-        for (String[] item : data) {
+        HBox.setHgrow(
+            registrationChart,
+            Priority.ALWAYS
+        );
 
-            VBox card = new VBox(5);
 
-            card.setPadding(
-                    new Insets(18));
+        firstCharts.getChildren().addAll(
 
-            card.setStyle(
-                    "-fx-background-color: #FAF8FD;" +
-                            "-fx-background-radius: 12px;");
+            userGrowth,
 
-            Label name = new Label(
-                    item[0]);
+            registrationChart
+        );
 
-            name.setStyle(
-                    "-fx-text-fill: #77778D;" +
-                            "-fx-font-size: 12px;");
 
-            Label value = new Label(
-                    item[1]);
+        // =====================================================
+        // SECOND CHART ROW
+        // =====================================================
 
-            value.setStyle(
-                    "-fx-text-fill: "
-                            + item[2]
-                            + ";" +
-                            "-fx-font-size: 24px;" +
-                            "-fx-font-weight: bold;");
+        HBox secondCharts =
+            new HBox(20);
 
-            card.getChildren().addAll(
-                    name,
-                    value);
 
-            HBox.setHgrow(
-                    card,
-                    Priority.ALWAYS);
+        VBox distribution =
+            createUserDistributionChart();
 
-            card.setOnMouseEntered(e -> card.setStyle(
-                    "-fx-background-color: white;" +
-                            "-fx-background-radius: 12px;" +
-                            "-fx-effect: dropshadow(gaussian, rgba(113,60,195,0.12), 10, 0, 0, 3);"));
 
-            card.setOnMouseExited(e -> card.setStyle(
-                    "-fx-background-color: #FAF8FD;" +
-                            "-fx-background-radius: 12px;"));
+        VBox roleDistribution =
+            createRoleDistributionChart();
 
-            verificationStats.getChildren().add(
-                    card);
-        }
 
-        verificationBox.getChildren().addAll(
-                verificationTitle,
-                verificationStats);
+        HBox.setHgrow(
+            distribution,
+            Priority.ALWAYS
+        );
+
+        HBox.setHgrow(
+            roleDistribution,
+            Priority.ALWAYS
+        );
+
+
+        secondCharts.getChildren().addAll(
+
+            distribution,
+
+            roleDistribution
+        );
+
+
+        // =====================================================
+        // SYSTEM ANALYTICS
+        // =====================================================
+
+        HBox systemRow =
+            new HBox(20);
+
+
+        VBox engagementBox =
+            createAnalyticsBox(
+                "Platform Engagement"
+            );
+
+
+        engagementBox.getChildren().addAll(
+
+            createMetricRow(
+                "Daily Active Users",
+                "4,285"
+            ),
+
+            createMetricRow(
+                "Weekly Active Users",
+                "8,920"
+            ),
+
+            createMetricRow(
+                "Monthly Active Users",
+                "10,842"
+            ),
+
+            createMetricRow(
+                "Average Session",
+                "18 min"
+            ),
+
+            createMetricRow(
+                "AI Queries Today",
+                "3,842"
+            )
+        );
+
+
+        VBox registrationSummary =
+            createAnalyticsBox(
+                "Registration Summary"
+            );
+
+
+        registrationSummary.getChildren().addAll(
+
+            createMetricRow(
+                "Mother / Family",
+                "8,450"
+            ),
+
+            createMetricRow(
+                "Doctors",
+                "184"
+            ),
+
+            createMetricRow(
+                "Hospitals",
+                "42"
+            ),
+
+            createMetricRow(
+                "ASHA Workers",
+                "156"
+            ),
+
+            createMetricRow(
+                "Pending Verification",
+                "27"
+            )
+        );
+
+
+        HBox.setHgrow(
+            engagementBox,
+            Priority.ALWAYS
+        );
+
+        HBox.setHgrow(
+            registrationSummary,
+            Priority.ALWAYS
+        );
+
+
+        systemRow.getChildren().addAll(
+
+            engagementBox,
+
+            registrationSummary
+        );
+
 
         // =====================================================
         // ADD EVERYTHING
         // =====================================================
 
-        content.getChildren().addAll(
-                titleBox,
-                filterBar,
-                stats,
-                chartRow,
-                registrationBox,
-                verificationBox);
+        mainContent.getChildren().addAll(
+
+            heading,
+
+            statistics,
+
+            firstCharts,
+
+            secondCharts,
+
+            systemRow
+        );
+
 
         // =====================================================
-        // SCROLL PANE
+        // SCROLL
         // =====================================================
 
-        ScrollPane scrollPane = new ScrollPane(
-                content);
+        ScrollPane scrollPane =
+            new ScrollPane(
+                mainContent
+            );
 
-        scrollPane.setFitToWidth(true);
+        scrollPane.setFitToWidth(
+            true
+        );
 
         scrollPane.setHbarPolicy(
-                ScrollPane.ScrollBarPolicy.NEVER);
+            ScrollPane.ScrollBarPolicy.NEVER
+        );
 
         scrollPane.setStyle(
-                "-fx-background-color: transparent;" +
-                        "-fx-background: #FAF8FD;");
+            "-fx-background-color: transparent;" +
+            "-fx-background: #F9F7FC;"
+        );
 
-        root.setCenter(
-                scrollPane);
 
-        // =====================================================
-        // SCENE
-        // =====================================================
+        return scrollPane;
+    }
 
-        analyticsScene = new Scene(
-                root,
-                scenesettings.rectanguler2d.getWidth(),
-                scenesettings.rectanguler2d.getHeight());
 
-        return analyticsScene;
+    // =========================================================
+    // STAT CARD
+    // =========================================================
+
+    private VBox createStatCard(
+            String title,
+            String value,
+            String change) {
+
+        VBox card =
+            new VBox(8);
+
+        card.setPadding(
+            new Insets(18)
+        );
+
+        card.setPrefHeight(
+            125
+        );
+
+        card.setStyle(
+            "-fx-background-color: white;" +
+            "-fx-background-radius: 15px;" +
+            "-fx-border-color: #E7E1EF;" +
+            "-fx-border-radius: 15px;"
+        );
+
+
+        DropShadow shadow =
+            new DropShadow();
+
+        shadow.setRadius(
+            12
+        );
+
+        shadow.setOffsetY(
+            4
+        );
+
+        shadow.setColor(
+            Color.rgb(
+                60,
+                30,
+                80,
+                0.08
+            )
+        );
+
+
+        card.setEffect(
+            shadow
+        );
+
+
+        Label titleLabel =
+            new Label(title);
+
+        titleLabel.setStyle(
+            "-fx-text-fill: #77778D;" +
+            "-fx-font-size: 13px;"
+        );
+
+
+        Label valueLabel =
+            new Label(value);
+
+        valueLabel.setStyle(
+            "-fx-text-fill: #24234F;" +
+            "-fx-font-size: 26px;" +
+            "-fx-font-weight: bold;"
+        );
+
+
+        Label changeLabel =
+            new Label(
+                change +
+                " this month"
+            );
+
+        changeLabel.setStyle(
+            "-fx-text-fill: #20A56A;" +
+            "-fx-font-size: 11px;" +
+            "-fx-font-weight: bold;"
+        );
+
+
+        card.getChildren().addAll(
+
+            titleLabel,
+
+            valueLabel,
+
+            changeLabel
+        );
+
+
+        return card;
+    }
+
+
+    // =========================================================
+    // USER GROWTH
+    // =========================================================
+
+    private VBox createUserGrowthChart() {
+
+        VBox box =
+            createAnalyticsBox(
+                "User Growth"
+            );
+
+
+        CategoryAxis xAxis =
+            new CategoryAxis();
+
+        xAxis.setLabel(
+            "Month"
+        );
+
+
+        NumberAxis yAxis =
+            new NumberAxis();
+
+        yAxis.setLabel(
+            "Users"
+        );
+
+
+        LineChart<String, Number> chart =
+            new LineChart<>(
+                xAxis,
+                yAxis
+            );
+
+
+        chart.setLegendVisible(
+            false
+        );
+
+        chart.setAnimated(
+            false
+        );
+
+        chart.setCreateSymbols(
+            true
+        );
+
+        chart.setPrefHeight(
+            300
+        );
+
+
+        XYChart.Series<String, Number> series =
+            new XYChart.Series<>();
+
+
+        series.getData().add(
+            new XYChart.Data<>(
+                "Mar",
+                7200
+            )
+        );
+
+        series.getData().add(
+            new XYChart.Data<>(
+                "Apr",
+                8100
+            )
+        );
+
+        series.getData().add(
+            new XYChart.Data<>(
+                "May",
+                8950
+            )
+        );
+
+        series.getData().add(
+            new XYChart.Data<>(
+                "Jun",
+                10100
+            )
+        );
+
+        series.getData().add(
+            new XYChart.Data<>(
+                "Jul",
+                11200
+            )
+        );
+
+        series.getData().add(
+            new XYChart.Data<>(
+                "Aug",
+                12450
+            )
+        );
+
+
+        chart.getData().add(
+            series
+        );
+
+
+        box.getChildren().add(
+            chart
+        );
+
+
+        return box;
+    }
+
+
+    // =========================================================
+    // MONTHLY REGISTRATIONS
+    // =========================================================
+
+    private VBox createRegistrationChart() {
+
+        VBox box =
+            createAnalyticsBox(
+                "Monthly Registrations"
+            );
+
+
+        CategoryAxis xAxis =
+            new CategoryAxis();
+
+        xAxis.setLabel(
+            "Month"
+        );
+
+
+        NumberAxis yAxis =
+            new NumberAxis();
+
+        yAxis.setLabel(
+            "Registrations"
+        );
+
+
+        BarChart<String, Number> chart =
+            new BarChart<>(
+                xAxis,
+                yAxis
+            );
+
+
+        chart.setLegendVisible(
+            false
+        );
+
+        chart.setAnimated(
+            false
+        );
+
+        chart.setPrefHeight(
+            300
+        );
+
+
+        XYChart.Series<String, Number> series =
+            new XYChart.Series<>();
+
+
+        series.getData().add(
+            new XYChart.Data<>(
+                "Mar",
+                850
+            )
+        );
+
+        series.getData().add(
+            new XYChart.Data<>(
+                "Apr",
+                1040
+            )
+        );
+
+        series.getData().add(
+            new XYChart.Data<>(
+                "May",
+                1250
+            )
+        );
+
+        series.getData().add(
+            new XYChart.Data<>(
+                "Jun",
+                1430
+            )
+        );
+
+        series.getData().add(
+            new XYChart.Data<>(
+                "Jul",
+                1680
+            )
+        );
+
+        series.getData().add(
+            new XYChart.Data<>(
+                "Aug",
+                1920
+            )
+        );
+
+
+        chart.getData().add(
+            series
+        );
+
+
+        box.getChildren().add(
+            chart
+        );
+
+
+        return box;
+    }
+
+
+    // =========================================================
+    // USER DISTRIBUTION
+    // =========================================================
+
+    private VBox createUserDistributionChart() {
+
+        VBox box =
+            createAnalyticsBox(
+                "User Distribution"
+            );
+
+
+        PieChart pieChart =
+            new PieChart();
+
+
+        pieChart.setPrefHeight(
+            300
+        );
+
+
+        pieChart.setLabelsVisible(
+            true
+        );
+
+
+        pieChart.getData().addAll(
+
+            new PieChart.Data(
+                "Mother / Family",
+                8450
+            ),
+
+            new PieChart.Data(
+                "Doctors",
+                184
+            ),
+
+            new PieChart.Data(
+                "Hospitals",
+                42
+            ),
+
+            new PieChart.Data(
+                "ASHA Workers",
+                156
+            )
+        );
+
+
+        box.getChildren().add(
+            pieChart
+        );
+
+
+        return box;
+    }
+
+
+    // =========================================================
+    // ROLE DISTRIBUTION
+    // =========================================================
+
+    private VBox createRoleDistributionChart() {
+
+        VBox box =
+            createAnalyticsBox(
+                "Healthcare Provider Distribution"
+            );
+
+
+        PieChart pieChart =
+            new PieChart();
+
+
+        pieChart.setPrefHeight(
+            300
+        );
+
+
+        pieChart.setLabelsVisible(
+            true
+        );
+
+
+        pieChart.getData().addAll(
+
+            new PieChart.Data(
+                "Doctors",
+                184
+            ),
+
+            new PieChart.Data(
+                "Hospitals",
+                42
+            ),
+
+            new PieChart.Data(
+                "ASHA Workers",
+                156
+            )
+        );
+
+
+        box.getChildren().add(
+            pieChart
+        );
+
+
+        return box;
+    }
+
+
+    // =========================================================
+    // COMMON ANALYTICS BOX
+    // =========================================================
+
+    private VBox createAnalyticsBox(
+            String title) {
+
+        VBox box =
+            new VBox(12);
+
+        box.setPadding(
+            new Insets(20)
+        );
+
+        box.setStyle(
+            "-fx-background-color: white;" +
+            "-fx-background-radius: 15px;" +
+            "-fx-border-color: #E7E1EF;" +
+            "-fx-border-radius: 15px;"
+        );
+
+
+        DropShadow shadow =
+            new DropShadow();
+
+        shadow.setRadius(
+            12
+        );
+
+        shadow.setOffsetY(
+            4
+        );
+
+        shadow.setColor(
+            Color.rgb(
+                60,
+                30,
+                80,
+                0.06
+            )
+        );
+
+
+        box.setEffect(
+            shadow
+        );
+
+
+        Label titleLabel =
+            new Label(title);
+
+        titleLabel.setStyle(
+            "-fx-text-fill: #24234F;" +
+            "-fx-font-size: 17px;" +
+            "-fx-font-weight: bold;"
+        );
+
+
+        box.getChildren().add(
+            titleLabel
+        );
+
+
+        return box;
+    }
+
+
+    // =========================================================
+    // METRIC ROW
+    // =========================================================
+
+    private HBox createMetricRow(
+            String title,
+            String value) {
+
+        Label titleLabel =
+            new Label(title);
+
+        titleLabel.setStyle(
+            "-fx-text-fill: #77778D;" +
+            "-fx-font-size: 12px;"
+        );
+
+
+        Label valueLabel =
+            new Label(value);
+
+        valueLabel.setStyle(
+            "-fx-text-fill: #24234F;" +
+            "-fx-font-size: 13px;" +
+            "-fx-font-weight: bold;"
+        );
+
+
+        HBox row =
+            new HBox(
+                titleLabel,
+                valueLabel
+            );
+
+
+        row.setAlignment(
+            Pos.CENTER_LEFT
+        );
+
+
+        row.setPadding(
+            new Insets(
+                8,
+                0,
+                8,
+                0
+            )
+        );
+
+
+        HBox.setHgrow(
+            titleLabel,
+            Priority.ALWAYS
+        );
+
+
+        return row;
     }
 }

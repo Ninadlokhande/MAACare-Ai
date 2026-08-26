@@ -17,735 +17,1366 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-// import javafx.scene.paint.Color;
-// import javafx.scene.shape.Circle;
-// import javafx.scene.text.Font;
-// import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 
 public class Loginpage {
 
-        private Scene loginpagScene;
-        public String role = "";
-        Controller controller = new Controller();
+    // =============================================================
+    // FIELDS
+    // =============================================================
 
-        public Scene gotologinpage() {
+    private Scene loginpagScene;
 
-                // =========================================================
-                // ROOT
-                // =========================================================
+    public String role = "";
 
-                BorderPane root = new BorderPane();
+    Controller controller = new Controller();
 
-                root.setStyle(
-                                "-fx-background-color: linear-gradient(" +
-                                                "to bottom right, " +
-                                                "#FFFFFF 0%, " +
-                                                "#FFF4F8 50%, " +
-                                                "#F1E8FF 100%" +
-                                                ");");
 
-                // =========================================================
-                // LEFT SIDE - BRANDING
-                // =========================================================
+    /*
+     * =============================================================
+     * FUTURE ROLE PAGE REFERENCES
+     * =============================================================
+     *
+     * Keep these commented for now.
+     *
+     * When the respective page/dashboard is created, uncomment
+     * the required field and use it after successful login.
+     *
+     * Example:
+     *
+     * private MotherDashboard motherDashboard;
+     * private DoctorDashboard doctorDashboard;
+     * private HospitalDashboard hospitalDashboard;
+     * private AshaDashboard ashaDashboard;
+     * private AmbulanceDashboard ambulanceDashboard;
+     *
+     * Loginpage itself does NOT need to keep AdminDashboard.
+     * AdminDashboard is created once after successful admin login.
+     */
 
-                VBox leftSide = new VBox(18);
 
-                leftSide.setAlignment(Pos.CENTER);
-                leftSide.setPadding(new Insets(40, 50, 40, 60));
+    // =============================================================
+    // LOGIN PAGE
+    // =============================================================
 
-                leftSide.setPrefWidth(550);
+    public Scene gotologinpage() {
 
-                // ---------------- LOGO ----------------
+        // =========================================================
+        // ROOT
+        // =========================================================
 
-                String IMAGE_PATH = "file:Maacare-Ai\\src\\main\\resources\\assets\\images\\logo\\logo.png";
+        BorderPane root = new BorderPane();
 
-                Image logoImage = new Image(IMAGE_PATH);
+        root.setStyle(
+                "-fx-background-color: linear-gradient(" +
+                        "to bottom right, " +
+                        "#FFFFFF 0%, " +
+                        "#FFF4F8 50%, " +
+                        "#F1E8FF 100%" +
+                        ");"
+        );
 
-                ImageView logoView = new ImageView(logoImage);
 
-                logoView.setPreserveRatio(true);
-                logoView.setSmooth(true);
+        // =========================================================
+        // LEFT SIDE - BRANDING
+        // =========================================================
 
-                logoView.fitWidthProperty().bind(
-                                leftSide.widthProperty().multiply(0.75));
-                Text logininfo = new Text("");
-                logininfo.setStyle("-fx-fill: #13cee3;" +
-                                "-fx-font-size: 16px;" +
-                                "-fx-font-weight: bold;");
+        VBox leftSide = new VBox(18);
 
-                // ---------------- TITLE ----------------
+        leftSide.setAlignment(Pos.CENTER);
 
-                Text brandName = new Text("MaaCare AI");
+        leftSide.setPadding(
+                new Insets(40, 50, 40, 60)
+        );
 
-                brandName.setStyle(
-                                "-fx-fill: linear-gradient(to right, #E84A87, #9B4DCC);" +
-                                                "-fx-font-size: 48px;" +
-                                                "-fx-font-weight: bold;");
+        leftSide.setPrefWidth(550);
 
-                // ---------------- TAGLINE ----------------
 
-                Text tagline1 = new Text("Care for Mom. Care for Baby. Care for Life.");
+        // =========================================================
+        // LOGO
+        // =========================================================
 
-                tagline1.setStyle(
-                                "-fx-fill: #24234F;" +
-                                                "-fx-font-size: 16px;" +
-                                                "-fx-font-weight: bold;");
+        String IMAGE_PATH =
+                "file:Maacare-Ai\\src\\main\\resources\\assets\\images\\logo\\logo.png";
 
-                // ---------------- DESCRIPTION ----------------
+        Image logoImage =
+                new Image(IMAGE_PATH);
 
-                Text description1 = new Text("Your AI-Powered Companion for");
+        ImageView logoView =
+                new ImageView(logoImage);
 
-                description1.setStyle(
-                                "-fx-fill: #24234F;" +
-                                                "-fx-font-size: 20px;" +
-                                                "-fx-font-weight: bold;");
+        logoView.setPreserveRatio(true);
 
-                Text descriptionPink = new Text(" Mother & Child");
+        logoView.setSmooth(true);
 
-                descriptionPink.setStyle(
-                                "-fx-fill: #E84A87;" +
-                                                "-fx-font-size: 20px;" +
-                                                "-fx-font-weight: bold;");
+        logoView.fitWidthProperty().bind(
+                leftSide.widthProperty().multiply(0.75)
+        );
 
-                Text description2 = new Text(" Healthcare");
 
-                description2.setStyle(
-                                "-fx-fill: #24234F;" +
-                                                "-fx-font-size: 20px;" +
-                                                "-fx-font-weight: bold;");
+        // =========================================================
+        // LOGIN STATUS
+        // =========================================================
 
-                HBox description = new HBox(
-                                description1,
-                                descriptionPink,
-                                description2);
+        Text logininfo =
+                new Text("");
 
-                description.setAlignment(Pos.CENTER);
+        logininfo.setStyle(
+                "-fx-fill: #13cee3;" +
+                        "-fx-font-size: 16px;" +
+                        "-fx-font-weight: bold;"
+        );
 
-                Text info = new Text(
-                                "Track. Monitor. Get AI Guidance.");
 
-                info.setStyle(
-                                "-fx-fill: #666680;" +
-                                                "-fx-font-size: 16px;");
+        // =========================================================
+        // TITLE
+        // =========================================================
 
-                Text smallInfo = new Text(
-                                "Because every mom and baby deserves the best care.");
+        Text brandName =
+                new Text("MaaCare AI");
 
-                smallInfo.setStyle(
-                                "-fx-fill: #77778D;" +
-                                                "-fx-font-size: 14px;");
+        brandName.setStyle(
+                "-fx-fill: linear-gradient(to right, #E84A87, #9B4DCC);" +
+                        "-fx-font-size: 48px;" +
+                        "-fx-font-weight: bold;"
+        );
 
-                // =========================================================
-                // FEATURE ITEMS
-                // =========================================================
 
-                HBox features = new HBox(25);
+        // =========================================================
+        // TAGLINE
+        // =========================================================
 
-                features.setAlignment(Pos.CENTER);
-                features.setPadding(new Insets(20, 0, 0, 0));
+        Text tagline1 =
+                new Text(
+                        "Care for Mom. Care for Baby. Care for Life."
+                );
 
-                features.getChildren().addAll(
-                                createFeature("♥", "Pregnancy", "Tracking"),
-                                createFeature("✚", "Health", "Records"),
-                                createFeature("✦", "AI Health", "Assistant"),
-                                createFeature("▣", "Doctor &", "Hospital"),
-                                createFeature("✚", "Emergency", "Support"));
+        tagline1.setStyle(
+                "-fx-fill: #24234F;" +
+                        "-fx-font-size: 16px;" +
+                        "-fx-font-weight: bold;"
+        );
 
-                leftSide.getChildren().addAll(
-                                logoView,
-                                brandName,
-                                tagline1,
-                                description,
-                                info,
-                                smallInfo,
-                                features,
-                                logininfo);
 
-                // =========================================================
-                // RIGHT SIDE - LOGIN CARD
-                // =========================================================
+        // =========================================================
+        // DESCRIPTION
+        // =========================================================
 
-                StackPane rightSide = new StackPane();
+        Text description1 =
+                new Text(
+                        "Your AI-Powered Companion for"
+                );
 
-                rightSide.setPadding(
-                                new Insets(40, 70, 40, 40));
+        description1.setStyle(
+                "-fx-fill: #24234F;" +
+                        "-fx-font-size: 20px;" +
+                        "-fx-font-weight: bold;"
+        );
 
-                VBox loginCard = new VBox(18);
 
-                loginCard.setAlignment(Pos.TOP_CENTER);
+        Text descriptionPink =
+                new Text(
+                        " Mother & Child"
+                );
 
-                loginCard.setPadding(
-                                new Insets(35, 40, 30, 40));
+        descriptionPink.setStyle(
+                "-fx-fill: #E84A87;" +
+                        "-fx-font-size: 20px;" +
+                        "-fx-font-weight: bold;"
+        );
 
-                loginCard.setMaxWidth(800);
-                loginCard.setMaxHeight(850);
 
-                loginCard.setStyle(
-                                "-fx-background-color: rgba(255,255,255,0.94);" +
-                                                "-fx-background-radius: 25px;" +
-                                                "-fx-border-color: rgba(220,200,230,0.45);" +
-                                                "-fx-border-width: 1px;" +
-                                                "-fx-border-radius: 25px;");
+        Text description2 =
+                new Text(
+                        " Healthcare"
+                );
 
-                // =========================================================
-                // LOGIN HEADING
-                // =========================================================
+        description2.setStyle(
+                "-fx-fill: #24234F;" +
+                        "-fx-font-size: 20px;" +
+                        "-fx-font-weight: bold;"
+        );
 
-                Text welcome = new Text("Welcome Back!");
 
-                welcome.setStyle(
-                                "-fx-fill: #24234F;" +
-                                                "-fx-font-size: 32px;" +
-                                                "-fx-font-weight: bold;");
+        HBox description =
+                new HBox(
+                        description1,
+                        descriptionPink,
+                        description2
+                );
 
-                Text loginInfo = new Text(
-                                "Login to your MaaCare AI account");
+        description.setAlignment(
+                Pos.CENTER
+        );
 
-                loginInfo.setStyle(
-                                "-fx-fill: #666680;" +
-                                                "-fx-font-size: 16px;");
 
-                // =========================================================
-                // ROLE SELECTION
-                // =========================================================
+        // =========================================================
+        // INFO
+        // =========================================================
 
-                Text roleTitle = new Text("Select Your Role");
+        Text info =
+                new Text(
+                        "Track. Monitor. Get AI Guidance."
+                );
 
-                roleTitle.setStyle(
-                                "-fx-fill: #7B3FC6;" +
-                                                "-fx-font-size: 19px;" +
-                                                "-fx-font-weight: bold;");
+        info.setStyle(
+                "-fx-fill: #666680;" +
+                        "-fx-font-size: 16px;"
+        );
 
-                Text forgot = new Text("");
 
-                forgot.setStyle(
-                                "-fx-fill: #D82F82;" +
-                                                "-fx-font-size: 14px;" +
-                                                "-fx-font-weight: bold;");
+        Text smallInfo =
+                new Text(
+                        "Because every mom and baby deserves the best care."
+                );
 
-                HBox roles = new HBox(12);
+        smallInfo.setStyle(
+                "-fx-fill: #77778D;" +
+                        "-fx-font-size: 14px;"
+        );
 
-                roles.setAlignment(Pos.CENTER);
 
-                Button mother = createRoleButton("🤱\nMother\nFamily");
-                mother.setOnAction(e -> {
-                        role = "mother";
+        // =========================================================
+        // FEATURES
+        // =========================================================
 
-                });
+        HBox features =
+                new HBox(25);
 
-                mother.setOnMouseClicked(e -> {
-                        forgot.setText("Role : Mother");
+        features.setAlignment(
+                Pos.CENTER
+        );
 
+        features.setPadding(
+                new Insets(20, 0, 0, 0)
+        );
+
+        features.getChildren().addAll(
+                createFeature(
+                        "♥",
+                        "Pregnancy",
+                        "Tracking"
+                ),
+
+                createFeature(
+                        "✚",
+                        "Health",
+                        "Records"
+                ),
+
+                createFeature(
+                        "✦",
+                        "AI Health",
+                        "Assistant"
+                ),
+
+                createFeature(
+                        "▣",
+                        "Doctor &",
+                        "Hospital"
+                ),
+
+                createFeature(
+                        "✚",
+                        "Emergency",
+                        "Support"
+                )
+        );
+
+
+        leftSide.getChildren().addAll(
+                logoView,
+                brandName,
+                tagline1,
+                description,
+                info,
+                smallInfo,
+                features,
+                logininfo
+        );
+
+
+        // =========================================================
+        // RIGHT SIDE
+        // =========================================================
+
+        StackPane rightSide =
+                new StackPane();
+
+        rightSide.setPadding(
+                new Insets(
+                        40,
+                        70,
+                        40,
+                        40
+                )
+        );
+
+
+        // =========================================================
+        // LOGIN CARD
+        // =========================================================
+
+        VBox loginCard =
+                new VBox(18);
+
+        loginCard.setAlignment(
+                Pos.TOP_CENTER
+        );
+
+        loginCard.setPadding(
+                new Insets(
+                        35,
+                        40,
+                        30,
+                        40
+                )
+        );
+
+        loginCard.setMaxWidth(800);
+
+        loginCard.setMaxHeight(850);
+
+        loginCard.setStyle(
+                "-fx-background-color: rgba(255,255,255,0.94);" +
+                        "-fx-background-radius: 25px;" +
+                        "-fx-border-color: rgba(220,200,230,0.45);" +
+                        "-fx-border-width: 1px;" +
+                        "-fx-border-radius: 25px;"
+        );
+
+
+        // =========================================================
+        // LOGIN HEADING
+        // =========================================================
+
+        Text welcome =
+                new Text(
+                        "Welcome Back!"
+                );
+
+        welcome.setStyle(
+                "-fx-fill: #24234F;" +
+                        "-fx-font-size: 32px;" +
+                        "-fx-font-weight: bold;"
+        );
+
+
+        Text loginInfo =
+                new Text(
+                        "Login to your MaaCare AI account"
+                );
+
+        loginInfo.setStyle(
+                "-fx-fill: #666680;" +
+                        "-fx-font-size: 16px;"
+        );
+
+
+        // =========================================================
+        // ROLE SELECTION
+        // =========================================================
+
+        Text roleTitle =
+                new Text(
+                        "Select Your Role"
+                );
+
+        roleTitle.setStyle(
+                "-fx-fill: #7B3FC6;" +
+                        "-fx-font-size: 19px;" +
+                        "-fx-font-weight: bold;"
+        );
+
+
+        Text forgot =
+                new Text("");
+
+        forgot.setStyle(
+                "-fx-fill: #D82F82;" +
+                        "-fx-font-size: 14px;" +
+                        "-fx-font-weight: bold;"
+        );
+
+
+        HBox roles =
+                new HBox(12);
+
+        roles.setAlignment(
+                Pos.CENTER
+        );
+
+
+        // =========================================================
+        // MOTHER
+        // =========================================================
+
+        Button mother =
+                createRoleButton(
+                        "🤱\nMother\nFamily"
+                );
+
+        mother.setOnAction(e -> {
+
+            role = "mother";
+
+            forgot.setText(
+                    "Role : Mother"
+            );
+        });
+
+
+        // =========================================================
+        // DOCTOR
+        // =========================================================
+
+        Button doctor =
+                createRoleButton(
+                        "🧑‍⚕️\nDoctor"
+                );
+
+        doctor.setOnAction(e -> {
+
+            role = "doctor";
+
+            forgot.setText(
+                    "Role : Doctor"
+            );
+        });
+
+
+        // =========================================================
+        // HOSPITAL
+        // =========================================================
+
+        Button hospital =
+                createRoleButton(
+                        "🏥\nHospital"
+                );
+
+        hospital.setOnAction(e -> {
+
+            role = "hospital";
+
+            forgot.setText(
+                    "Role : Hospital"
+            );
+        });
+
+
+        // =========================================================
+        // ASHA
+        // =========================================================
+
+        Button asha =
+                createRoleButton(
+                        "👩\nASHA Worker"
+                );
+
+        asha.setOnAction(e -> {
+
+            role = "asha";
+
+            forgot.setText(
+                    "Role : ASHA WORKER"
+            );
+        });
+
+
+        // =========================================================
+        // AMBULANCE
+        // =========================================================
+
+        Button ambulance =
+                createRoleButton(
+                        "🚑\nAmbulance"
+                );
+
+        ambulance.setOnAction(e -> {
+
+            role = "ambulance";
+
+            forgot.setText(
+                    "Role : Ambulance / Hospital"
+            );
+        });
+
+
+        // =========================================================
+        // ADMIN
+        // =========================================================
+
+        Button admin =
+                createRoleButton(
+                        "🧑‍💻\nAdmin"
+                );
+
+        admin.setOnAction(e -> {
+
+            role = "admin";
+
+            forgot.setText(
+                    "Role : ADMIN"
+            );
+        });
+
+
+        roles.getChildren().addAll(
+                mother,
+                doctor,
+                hospital,
+                asha,
+                ambulance,
+                admin
+        );
+
+
+        // =========================================================
+        // EMAIL
+        // =========================================================
+
+        TextField email =
+                new TextField();
+
+        email.setPromptText(
+                "Email / Phone Number"
+        );
+
+        email.setPrefHeight(55);
+
+        email.setStyle(
+                "-fx-background-color: white;" +
+                        "-fx-border-color: #DDD9E6;" +
+                        "-fx-border-width: 1px;" +
+                        "-fx-border-radius: 12px;" +
+                        "-fx-background-radius: 12px;" +
+                        "-fx-font-size: 16px;" +
+                        "-fx-padding: 0 18px;"
+        );
+
+
+        // =========================================================
+        // PASSWORD
+        // =========================================================
+
+        PasswordField password =
+                new PasswordField();
+
+        password.setPromptText(
+                "Password"
+        );
+
+        password.setPrefHeight(55);
+
+        password.setStyle(
+                "-fx-background-color: white;" +
+                        "-fx-border-color: #DDD9E6;" +
+                        "-fx-border-width: 1px;" +
+                        "-fx-border-radius: 12px;" +
+                        "-fx-background-radius: 12px;" +
+                        "-fx-font-size: 16px;" +
+                        "-fx-padding: 0 18px;"
+        );
+
+
+        // =========================================================
+        // REMEMBER ME
+        // =========================================================
+
+        CheckBox remember =
+                new CheckBox(
+                        "Remember me"
+                );
+
+        remember.setStyle(
+                "-fx-text-fill: #666680;" +
+                        "-fx-font-size: 14px;"
+        );
+
+
+        HBox options =
+                new HBox();
+
+        options.setAlignment(
+                Pos.CENTER_LEFT
+        );
+
+        HBox.setHgrow(
+                remember,
+                Priority.ALWAYS
+        );
+
+        options.getChildren().add(
+                remember
+        );
+
+
+        // =========================================================
+        // LOGIN BUTTON
+        // =========================================================
+
+        Button login =
+                new Button(
+                        "🔒   Login"
+                );
+
+
+        login.setOnAction(e -> {
+
+            System.out.println(
+                    "Login button pressed"
+            );
+
+            System.out.println(
+                    "Selected role : " + role
+            );
+
+            System.out.println(
+                    "Email : " + email.getText()
+            );
+
+
+            // =====================================================
+            // VALIDATION
+            // =====================================================
+
+            if (role.isBlank()) {
+
+                logininfo.setText(
+                        "Please select your role"
+                );
+
+                System.out.println(
+                        "[LOGIN] No role selected"
+                );
+
+                return;
+            }
+
+
+            if (email.getText().isBlank()) {
+
+                logininfo.setText(
+                        "Please enter your email"
+                );
+
+                System.out.println(
+                        "[LOGIN] Email is empty"
+                );
+
+                return;
+            }
+
+
+            if (password.getText().isBlank()) {
+
+                logininfo.setText(
+                        "Please enter your password"
+                );
+
+                System.out.println(
+                        "[LOGIN] Password is empty"
+                );
+
+                return;
+            }
+
+
+            // =====================================================
+            // AUTHENTICATION
+            // =====================================================
+
+            System.out.println(
+                    "[LOGIN] Authenticating user..."
+            );
+
+
+            boolean flag =
+                    controller.signin(
+                            email.getText(),
+                            password.getText()
+                    );
+
+
+            // =====================================================
+            // AUTHENTICATION SUCCESS
+            // =====================================================
+
+            if (flag) {
+
+                System.out.println(
+                        "[LOGIN] Authentication successful"
+                );
+
+                logininfo.setText(
+                        "Login successful"
+                );
+
+
+                // =================================================
+                // ADMIN
+                // =================================================
+
+                if (role.equals("admin")) {
+
+                    System.out.println(
+                            "[LOGIN] Admin role verified"
+                    );
+
+                    System.out.println(
+                            "[LOGIN] Opening Admin Dashboard..."
+                    );
+
+
+                    /*
+                     * Loginpage creates AdminDashboard here.
+                     *
+                     * This is intentional because Loginpage is
+                     * only responsible for login/navigation.
+                     *
+                     * AdminDashboard itself is responsible for
+                     * keeping its internal pages alive.
+                     */
+
+                    AdminDashboard adminDashboard =
+                            new AdminDashboard();
+
+
+                    /*
+                     * Get AdminDashboard scene.
+                     */
+
+                    Scene adminDashboardScene =
+                            adminDashboard.gotoAdminDashboard();
+
+
+                    /*
+                     * Replace login scene.
+                     */
+
+                    Welcomepage.stage.setScene(
+                            adminDashboardScene
+                    );
+
+
+                    Welcomepage.stage.setMaximized(
+                            true
+                    );
+
+
+                    System.out.println(
+                            "[LOGIN] Admin Dashboard opened"
+                    );
+
+
+                    email.clear();
+
+                    password.clear();
+
+
+                    return;
                 }
 
-                );
 
-                Button doctor = createRoleButton("🧑‍⚕️\nDoctor");
+                // =================================================
+                // MOTHER
+                // =================================================
 
-                doctor.setOnAction(e -> {
-                        role = "doctor";
+                if (role.equals("mother")) {
 
-                });
+                    System.out.println(
+                            "[LOGIN] Mother role verified"
+                    );
 
-                doctor.setOnMouseClicked(e -> {
-                        forgot.setText("Role : Doctor");
+
+                    /*
+                     * =================================================
+                     * TODO - MOTHER NAVIGATION
+                     * =================================================
+                     *
+                     * When Mother Dashboard is ready:
+                     *
+                     * MotherDashboard motherDashboard =
+                     *         new MotherDashboard();
+                     *
+                     * Scene motherScene =
+                     *         motherDashboard.gotoMotherDashboard();
+                     *
+                     * Welcomepage.stage.setScene(motherScene);
+                     *
+                     * Welcomepage.stage.setMaximized(true);
+                     */
+
+
+                    logininfo.setText(
+                            "Mother page not connected yet"
+                    );
+
+                    System.out.println(
+                            "[LOGIN] Mother page not connected yet"
+                    );
+
+                    return;
                 }
 
-                );
 
-                Button hospital = createRoleButton("🏥\nHospital");
-                hospital.setOnAction(e -> {
-                        role = "hospital";
-                });
-                hospital.setOnMouseClicked(e -> {
-                        forgot.setText("Role : Hospital");
+                // =================================================
+                // DOCTOR
+                // =================================================
 
+                if (role.equals("doctor")) {
+
+                    System.out.println(
+                            "[LOGIN] Doctor role verified"
+                    );
+
+
+                    /*
+                     * =================================================
+                     * TODO - DOCTOR NAVIGATION
+                     * =================================================
+                     *
+                     * When Doctor Dashboard is ready:
+                     *
+                     * DoctorDashboard doctorDashboard =
+                     *         new DoctorDashboard();
+                     *
+                     * Scene doctorScene =
+                     *         doctorDashboard.gotoDoctorDashboard();
+                     *
+                     * Welcomepage.stage.setScene(doctorScene);
+                     *
+                     * Welcomepage.stage.setMaximized(true);
+                     */
+
+
+                    logininfo.setText(
+                            "Doctor page not connected yet"
+                    );
+
+                    System.out.println(
+                            "[LOGIN] Doctor page not connected yet"
+                    );
+
+                    return;
                 }
 
-                );
 
-                Button asha = createRoleButton("👩\nASHA Worker");
-                asha.setOnAction(e -> {
-                        role = "asha";
-                });
+                // =================================================
+                // HOSPITAL
+                // =================================================
 
-                asha.setOnMouseClicked(e -> {
-                        forgot.setText("Role : ASHA WORKER");
+                if (role.equals("hospital")) {
 
+                    System.out.println(
+                            "[LOGIN] Hospital role verified"
+                    );
+
+
+                    /*
+                     * =================================================
+                     * TODO - HOSPITAL NAVIGATION
+                     * =================================================
+                     *
+                     * When Hospital Dashboard is ready:
+                     *
+                     * HospitalDashboard hospitalDashboard =
+                     *         new HospitalDashboard();
+                     *
+                     * Scene hospitalScene =
+                     *         hospitalDashboard.gotoHospitalDashboard();
+                     *
+                     * Welcomepage.stage.setScene(hospitalScene);
+                     *
+                     * Welcomepage.stage.setMaximized(true);
+                     */
+
+
+                    logininfo.setText(
+                            "Hospital page not connected yet"
+                    );
+
+                    System.out.println(
+                            "[LOGIN] Hospital page not connected yet"
+                    );
+
+                    return;
                 }
 
-                );
 
-                Button ambulance = createRoleButton("🚑\nAmbulance");
-                ambulance.setOnAction(e -> {
-                        role = "ambulance";
-                });
+                // =================================================
+                // ASHA WORKER
+                // =================================================
 
-                ambulance.setOnMouseClicked(e -> {
+                if (role.equals("asha")) {
 
-                        forgot.setText("Role : Ambulence / Hospital \n 🚑");
+                    System.out.println(
+                            "[LOGIN] ASHA Worker role verified"
+                    );
+
+
+                    /*
+                     * =================================================
+                     * TODO - ASHA NAVIGATION
+                     * =================================================
+                     *
+                     * When ASHA Dashboard is ready:
+                     *
+                     * AshaDashboard ashaDashboard =
+                     *         new AshaDashboard();
+                     *
+                     * Scene ashaScene =
+                     *         ashaDashboard.gotoAshaDashboard();
+                     *
+                     * Welcomepage.stage.setScene(ashaScene);
+                     *
+                     * Welcomepage.stage.setMaximized(true);
+                     */
+
+
+                    logininfo.setText(
+                            "ASHA Worker page not connected yet"
+                    );
+
+                    System.out.println(
+                            "[LOGIN] ASHA Worker page not connected yet"
+                    );
+
+                    return;
                 }
 
-                );
 
-                Button admin = createRoleButton(" 🧑‍💻\nAdmin");
-                admin.setOnAction(e -> {
-                        role = "admin";
-                });
-                admin.setOnMouseClicked(e -> {
+                // =================================================
+                // AMBULANCE
+                // =================================================
 
-                        forgot.setText("Role : ADMIN");
+                if (role.equals("ambulance")) {
+
+                    System.out.println(
+                            "[LOGIN] Ambulance role verified"
+                    );
+
+
+                    /*
+                     * =================================================
+                     * TODO - AMBULANCE NAVIGATION
+                     * =================================================
+                     *
+                     * When Ambulance Dashboard is ready:
+                     *
+                     * AmbulanceDashboard ambulanceDashboard =
+                     *         new AmbulanceDashboard();
+                     *
+                     * Scene ambulanceScene =
+                     *         ambulanceDashboard.gotoAmbulanceDashboard();
+                     *
+                     * Welcomepage.stage.setScene(ambulanceScene);
+                     *
+                     * Welcomepage.stage.setMaximized(true);
+                     */
+
+
+                    logininfo.setText(
+                            "Ambulance page not connected yet"
+                    );
+
+                    System.out.println(
+                            "[LOGIN] Ambulance page not connected yet"
+                    );
+
+                    return;
                 }
 
+
+                // =================================================
+                // UNKNOWN ROLE
+                // =================================================
+
+                System.out.println(
+                        "[LOGIN] Unknown role: " + role
                 );
 
-                roles.getChildren().addAll(
-                                mother,
-                                doctor,
-                                hospital,
-                                asha,
-                                ambulance,
-                                admin);
-
-                // =========================================================
-                // EMAIL
-                // =========================================================
-
-                TextField email = new TextField();
-
-                email.setPromptText(
-                                "Email / Phone Number");
-
-                email.setPrefHeight(55);
-
-                email.setStyle(
-                                "-fx-background-color: white;" +
-                                                "-fx-border-color: #DDD9E6;" +
-                                                "-fx-border-width: 1px;" +
-                                                "-fx-border-radius: 12px;" +
-                                                "-fx-background-radius: 12px;" +
-                                                "-fx-font-size: 16px;" +
-                                                "-fx-padding: 0 18px;");
-
-                // =========================================================
-                // PASSWORD
-                // =========================================================
-
-                PasswordField password = new PasswordField();
-
-                password.setPromptText(
-                                "Password");
-
-                password.setPrefHeight(55);
-
-                password.setStyle(
-                                "-fx-background-color: white;" +
-                                                "-fx-border-color: #DDD9E6;" +
-                                                "-fx-border-width: 1px;" +
-                                                "-fx-border-radius: 12px;" +
-                                                "-fx-background-radius: 12px;" +
-                                                "-fx-font-size: 16px;" +
-                                                "-fx-padding: 0 18px;");
-
-                // =========================================================
-                // REMEMBER + FORGOT
-                // =========================================================
-
-                CheckBox remember = new CheckBox("Remember me");
-
-                remember.setStyle(
-                                "-fx-text-fill: #666680;" +
-                                                "-fx-font-size: 14px;");
-
-                HBox options = new HBox();
-
-                options.setAlignment(Pos.CENTER_LEFT);
-
-                HBox.setHgrow(remember, Priority.ALWAYS);
-
-                options.getChildren().addAll(
-                                remember
-
+                logininfo.setText(
+                        "Invalid role selected"
                 );
 
-                // =========================================================
-                // LOGIN BUTTON
-                // =========================================================
 
-                Button login = new Button("🔒   Login");
+            } else {
 
-                login.setOnAction(e -> {
+                // =================================================
+                // AUTHENTICATION FAILED
+                // =================================================
 
-                        System.out.println("Login button pressed");
-                        System.out.println("Selected role : " + role);
-                        System.out.println("Email : " + email.getText());
+                System.out.println(
+                        "[LOGIN] Authentication failed"
+                );
 
-                        // Check whether all fields are filled
-                        if (role.isBlank()) {
+                logininfo.setText(
+                        "Invalid credentials. Try again."
+                );
 
-                                logininfo.setText(
-                                                "Please select your role");
+                email.clear();
 
-                                System.out.println(
-                                                "[LOGIN] No role selected");
+                password.clear();
+            }
+        });
 
-                                return;
-                        }
 
-                        if (email.getText().isBlank()) {
+        login.setMaxWidth(
+                Double.MAX_VALUE
+        );
 
-                                logininfo.setText(
-                                                "Please enter your email");
+        login.setPrefHeight(55);
 
-                                System.out.println(
-                                                "[LOGIN] Email is empty");
+        login.setStyle(
+                "-fx-background-color: linear-gradient(" +
+                        "to right, #F54B87, #9B4DCC" +
+                        ");" +
+                        "-fx-text-fill: white;" +
+                        "-fx-font-size: 17px;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-background-radius: 12px;" +
+                        "-fx-border-radius: 12px;" +
+                        "-fx-cursor: hand;"
+        );
 
-                                return;
-                        }
 
-                        if (password.getText().isBlank()) {
+        // =========================================================
+        // OR
+        // =========================================================
 
-                                logininfo.setText(
-                                                "Please enter your password");
+        Text or =
+                new Text("OR");
 
-                                System.out.println(
-                                                "[LOGIN] Password is empty");
+        or.setStyle(
+                "-fx-fill: #666680;" +
+                        "-fx-font-size: 14px;" +
+                        "-fx-font-weight: bold;"
+        );
 
-                                return;
-                        }
 
-                        // =====================================================
-                        // AUTHENTICATION
-                        // =====================================================
+        // =========================================================
+        // SIGN UP BUTTON
+        // =========================================================
 
-                        System.out.println(
-                                        "[LOGIN] Authenticating user...");
+        Button google =
+                new Button("Sign Up");
 
-                        boolean flag = controller.signin(
-                                        email.getText(),
-                                        password.getText());
 
-                        // =====================================================
-                        // AUTHENTICATION SUCCESS
-                        // =====================================================
+        google.setOnAction(e -> {
 
-                        if (flag) {
+            System.out.println(
+                    role
+            );
 
-                                System.out.println(
-                                                "[LOGIN] Authentication successful");
+            System.out.println(
+                    "sign up button pressed"
+            );
 
-                                logininfo.setText(
-                                                "Login successful");
+            System.out.println(
+                    email
+            );
 
-                                // =================================================
-                                // ADMIN NAVIGATION
-                                // =================================================
+            System.out.println(
+                    password
+            );
 
-                                if (role.equals("admin")) {
 
-                                        System.out.println(
-                                                        "[LOGIN] Admin role verified");
+            if (!role.isBlank()
+                    && !email.getText().isBlank()
+                    && !password.getText().isBlank()) {
 
-                                        System.out.println(
-                                                        "[LOGIN] Opening Admin Dashboard...");
 
-                                        AdminDashboard adminDashboard = new AdminDashboard();
+                controller.signup(
+                        email.getText(),
+                        password.getText()
+                );
 
-                                        Scene admindashboardScene = adminDashboard.gotoAdminDashboard();
 
-                                        Welcomepage.stage.setScene(
-                                                        admindashboardScene);
+                if (controller.status_code == 200) {
 
-                                        Welcomepage.stage.setMaximized(
-                                                        true);
+                    logininfo.setText(
+                            "Sign up successful. Login to continue"
+                    );
 
-                                        System.out.println(
-                                                        "[LOGIN] Admin Dashboard opened");
+                    email.clear();
 
-                                        email.clear();
-                                        password.clear();
+                    password.clear();
 
-                                } else {
 
-                                        System.out.println(
-                                                        "[LOGIN] Authenticated role: "
-                                                                        + role);
-
-                                        logininfo.setText(
-                                                        "Login successful");
-
-                                        // Other role navigation
-                                        // will be added here later.
-                                }
+                } else if (controller.status_code == 400) {
 
-                        } else {
+                    logininfo.setText(
+                            "Email exists. Sign up with another email / login"
+                    );
+                }
 
-                                // =================================================
-                                // AUTHENTICATION FAILED
-                                // =================================================
+            } else {
 
-                                System.out.println(
-                                                "[LOGIN] Authentication failed");
+                logininfo.setText(
+                        "Select role and enter email/password"
+                );
+            }
+        });
 
-                                logininfo.setText(
-                                                "Invalid credentials. Try again.");
 
-                                email.clear();
-                                password.clear();
-                        }
-                });
+        google.setMaxWidth(
+                Double.MAX_VALUE
+        );
 
-                login.setMaxWidth(Double.MAX_VALUE);
+        google.setPrefHeight(52);
 
-                login.setPrefHeight(55);
+        google.setStyle(
+                "-fx-background-color: white;" +
+                        "-fx-text-fill: #49308C;" +
+                        "-fx-font-size: 16px;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-border-color: #9B4DCC;" +
+                        "-fx-border-width: 1px;" +
+                        "-fx-border-radius: 12px;" +
+                        "-fx-background-radius: 12px;" +
+                        "-fx-cursor: hand;"
+        );
 
-                login.setStyle(
-                                "-fx-background-color: linear-gradient(" +
-                                                "to right, #F54B87, #9B4DCC" +
-                                                ");" +
-                                                "-fx-text-fill: white;" +
-                                                "-fx-font-size: 17px;" +
-                                                "-fx-font-weight: bold;" +
-                                                "-fx-background-radius: 12px;" +
-                                                "-fx-border-radius: 12px;" +
-                                                "-fx-cursor: hand;");
 
-                // =========================================================
-                // OR
-                // =========================================================
+        // =========================================================
+        // CREATE ACCOUNT
+        // =========================================================
 
-                Text or = new Text("OR");
+        HBox createAccount =
+                new HBox(6);
 
-                or.setStyle(
-                                "-fx-fill: #666680;" +
-                                                "-fx-font-size: 14px;" +
-                                                "-fx-font-weight: bold;");
+        createAccount.setAlignment(
+                Pos.CENTER
+        );
 
-                // =========================================================
-                // GOOGLE BUTTON
-                // =========================================================
 
-                Button google = new Button("Sign Up");
-                google.setOnAction(e -> {
-                        System.out.println(role);
-                        ;
-                        System.out.println("sign up button pressed");
-                        System.out.println(email);
-                        System.out.println(password);
-                        if (!role.isBlank()
-                                        && !email.getText().isBlank()
-                                        && !password.getText().isBlank()) {
+        Text accountText =
+                new Text(
+                        "Don't have an account?"
+                );
 
-                                controller.signup(email.getText(), password.getText());
+        accountText.setStyle(
+                "-fx-fill: #77778D;" +
+                        "-fx-font-size: 14px;"
+        );
 
-                                if (controller.status_code == 200) {
-                                        logininfo.setText("sign up sucessfull login to continue");
-                                        email.clear();
-                                        password.clear();
 
-                                } else if (controller.status_code == 400) {
-                                        logininfo.setText("Email exists sign up with another email / login");
+        Text createText =
+                new Text(
+                        " Sign up"
+                );
 
-                                }
+        createText.setStyle(
+                "-fx-fill: #D82F82;" +
+                        "-fx-font-size: 14px;" +
+                        "-fx-font-weight: bold;"
+        );
 
-                        }
-                });
 
-                google.setMaxWidth(Double.MAX_VALUE);
+        createAccount.getChildren().addAll(
+                accountText,
+                createText
+        );
 
-                google.setPrefHeight(52);
 
-                google.setStyle(
-                                "-fx-background-color: white;" +
-                                                "-fx-text-fill: #49308C;" +
-                                                "-fx-font-size: 16px;" +
-                                                "-fx-font-weight: bold;" +
-                                                "-fx-border-color: #9B4DCC;" +
-                                                "-fx-border-width: 1px;" +
-                                                "-fx-border-radius: 12px;" +
-                                                "-fx-background-radius: 12px;" +
-                                                "-fx-cursor: hand;");
+        // =========================================================
+        // ADD EVERYTHING TO LOGIN CARD
+        // =========================================================
 
-                // =========================================================
-                // CREATE ACCOUNT
-                // =========================================================
+        loginCard.getChildren().addAll(
+                welcome,
+                loginInfo,
 
-                HBox createAccount = new HBox(6);
+                roleTitle,
+                roles,
 
-                createAccount.setAlignment(Pos.CENTER);
+                forgot,
 
-                Text accountText = new Text("Don't have an account?");
+                email,
+                password,
 
-                accountText.setStyle(
-                                "-fx-fill: #77778D;" +
-                                                "-fx-font-size: 14px;");
+                options,
 
-                Text createText = new Text(" Sign up");
+                login,
 
-                createText.setStyle(
-                                "-fx-fill: #D82F82;" +
-                                                "-fx-font-size: 14px;" +
-                                                "-fx-font-weight: bold;");
+                or,
 
-                createAccount.getChildren().addAll(
-                                accountText,
-                                createText);
+                google,
 
-                // =========================================================
-                // ADD EVERYTHING TO LOGIN CARD
-                // =========================================================
+                createAccount
+        );
 
-                loginCard.getChildren().addAll(
-                                welcome,
-                                loginInfo,
 
-                                roleTitle,
-                                roles,
+        rightSide.getChildren().add(
+                loginCard
+        );
 
-                                forgot,
 
-                                email,
-                                password,
+        // =========================================================
+        // ROOT LAYOUT
+        // =========================================================
 
-                                login,
+        root.setLeft(
+                leftSide
+        );
 
-                                or,
+        root.setCenter(
+                rightSide
+        );
 
-                                google,
 
-                                createAccount);
+        BorderPane.setAlignment(
+                leftSide,
+                Pos.CENTER
+        );
 
-                rightSide.getChildren().add(loginCard);
 
-                // =========================================================
-                // RESPONSIVE LAYOUT
-                // =========================================================
+        // =========================================================
+        // SCENE
+        // =========================================================
 
-                root.setLeft(leftSide);
-                root.setCenter(rightSide);
+        loginpagScene =
+                new Scene(
+                        root,
+                        scenesettings.rectanguler2d.getWidth(),
+                        scenesettings.rectanguler2d.getHeight()
+                );
 
-                BorderPane.setAlignment(
-                                leftSide,
-                                Pos.CENTER);
 
-                // =========================================================
-                // SCENE
-                // =========================================================
+        return loginpagScene;
+    }
 
-                loginpagScene = new Scene(root, scenesettings.rectanguler2d.getWidth(),
-                                scenesettings.rectanguler2d.getHeight());
 
-                return loginpagScene;
-        }
+    // =============================================================
+    // FEATURE CREATION
+    // =============================================================
 
-        // =============================================================
-        // FEATURE CREATION
-        // =============================================================
+    private VBox createFeature(
+            String symbol,
+            String line1,
+            String line2) {
 
-        private VBox createFeature(
-                        String symbol,
-                        String line1,
-                        String line2) {
+        Text icon =
+                new Text(symbol);
 
-                Text icon = new Text(symbol);
+        icon.setStyle(
+                "-fx-fill: #E84A87;" +
+                        "-fx-font-size: 25px;" +
+                        "-fx-font-weight: bold;"
+        );
 
-                icon.setStyle(
-                                "-fx-fill: #E84A87;" +
-                                                "-fx-font-size: 25px;" +
-                                                "-fx-font-weight: bold;");
 
-                Text text1 = new Text(line1);
+        Text text1 =
+                new Text(line1);
 
-                text1.setStyle(
-                                "-fx-fill: #24234F;" +
-                                                "-fx-font-size: 13px;" +
-                                                "-fx-font-weight: bold;");
+        text1.setStyle(
+                "-fx-fill: #24234F;" +
+                        "-fx-font-size: 13px;" +
+                        "-fx-font-weight: bold;"
+        );
 
-                Text text2 = new Text(line2);
 
-                text2.setStyle(
-                                "-fx-fill: #24234F;" +
-                                                "-fx-font-size: 13px;" +
-                                                "-fx-font-weight: bold;");
+        Text text2 =
+                new Text(line2);
 
-                VBox box = new VBox(2);
+        text2.setStyle(
+                "-fx-fill: #24234F;" +
+                        "-fx-font-size: 13px;" +
+                        "-fx-font-weight: bold;"
+        );
 
-                box.setAlignment(Pos.CENTER);
 
-                box.getChildren().addAll(
-                                icon,
-                                text1,
-                                text2);
+        VBox box =
+                new VBox(2);
 
-                return box;
-        }
+        box.setAlignment(
+                Pos.CENTER
+        );
 
-        // =============================================================
-        // ROLE BUTTON
-        // =============================================================
 
-        private Button createRoleButton(
-                        String text) {
+        box.getChildren().addAll(
+                icon,
+                text1,
+                text2
+        );
 
-                Button button = new Button(text);
 
-                button.setPrefWidth(105);
-                button.setPrefHeight(100);
+        return box;
+    }
 
-                button.setWrapText(true);
 
-                button.setStyle(
-                                "-fx-background-color: white;" +
-                                                "-fx-text-fill: #24234F;" +
-                                                "-fx-font-size: 13px;" +
-                                                "-fx-font-weight: bold;" +
-                                                "-fx-background-radius: 12px;" +
-                                                "-fx-border-color: #E2DFEA;" +
-                                                "-fx-border-radius: 12px;" +
-                                                "-fx-border-width: 1px;" +
-                                                "-fx-cursor: hand;");
+    // =============================================================
+    // ROLE BUTTON
+    // =============================================================
 
-                button.setOnMouseEntered(e -> {
+    private Button createRoleButton(
+            String text) {
 
-                        button.setStyle(
-                                        "-fx-background-color: #FFF0F6;" +
-                                                        "-fx-text-fill: #C92F78;" +
-                                                        "-fx-font-size: 13px;" +
-                                                        "-fx-font-weight: bold;" +
-                                                        "-fx-background-radius: 12px;" +
-                                                        "-fx-border-color: #F54B87;" +
-                                                        "-fx-border-radius: 12px;" +
-                                                        "-fx-border-width: 2px;" +
-                                                        "-fx-cursor: hand;");
+        Button button =
+                new Button(text);
 
-                });
 
-                button.setOnMouseExited(e -> {
+        button.setPrefWidth(105);
 
-                        button.setStyle(
-                                        "-fx-background-color: white;" +
-                                                        "-fx-text-fill: #24234F;" +
-                                                        "-fx-font-size: 13px;" +
-                                                        "-fx-font-weight: bold;" +
-                                                        "-fx-background-radius: 12px;" +
-                                                        "-fx-border-color: #E2DFEA;" +
-                                                        "-fx-border-radius: 12px;" +
-                                                        "-fx-border-width: 1px;" +
-                                                        "-fx-cursor: hand;");
+        button.setPrefHeight(100);
 
-                });
+        button.setWrapText(true);
 
-                button.setWrapText(true);
-                button.setTextAlignment(TextAlignment.CENTER);
 
-                return button;
-        }
+        button.setStyle(
+                "-fx-background-color: white;" +
+                        "-fx-text-fill: #24234F;" +
+                        "-fx-font-size: 13px;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-background-radius: 12px;" +
+                        "-fx-border-color: #E2DFEA;" +
+                        "-fx-border-radius: 12px;" +
+                        "-fx-border-width: 1px;" +
+                        "-fx-cursor: hand;"
+        );
 
-        // =============================================================
-        // SEPARATOR
-        // =============================================================
 
-        
+        button.setOnMouseEntered(e -> {
+
+            button.setStyle(
+                    "-fx-background-color: #FFF0F6;" +
+                            "-fx-text-fill: #C92F78;" +
+                            "-fx-font-size: 13px;" +
+                            "-fx-font-weight: bold;" +
+                            "-fx-background-radius: 12px;" +
+                            "-fx-border-color: #F54B87;" +
+                            "-fx-border-radius: 12px;" +
+                            "-fx-border-width: 2px;" +
+                            "-fx-cursor: hand;"
+            );
+        });
+
+
+        button.setOnMouseExited(e -> {
+
+            button.setStyle(
+                    "-fx-background-color: white;" +
+                            "-fx-text-fill: #24234F;" +
+                            "-fx-font-size: 13px;" +
+                            "-fx-font-weight: bold;" +
+                            "-fx-background-radius: 12px;" +
+                            "-fx-border-color: #E2DFEA;" +
+                            "-fx-border-radius: 12px;" +
+                            "-fx-border-width: 1px;" +
+                            "-fx-cursor: hand;"
+            );
+        });
+
+
+        button.setWrapText(true);
+
+        button.setTextAlignment(
+                TextAlignment.CENTER
+        );
+
+
+        return button;
+    }
 }
