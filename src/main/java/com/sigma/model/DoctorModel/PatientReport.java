@@ -5,20 +5,12 @@ import javafx.beans.property.StringProperty;
 
 public class PatientReport {
 
-    // =====================================================
-    // FIELDS
-    // =====================================================
-
     private final StringProperty reportName;
     private final StringProperty patientName;
     private final StringProperty reportType;
     private final StringProperty date;
     private final StringProperty status;
     private final StringProperty action;
-
-    // =====================================================
-    // CONSTRUCTOR
-    // =====================================================
 
     public PatientReport(
             String reportName,
@@ -29,21 +21,14 @@ public class PatientReport {
             String action) {
 
         this.reportName = new SimpleStringProperty(reportName);
-
         this.patientName = new SimpleStringProperty(patientName);
-
         this.reportType = new SimpleStringProperty(reportType);
-
         this.date = new SimpleStringProperty(date);
-
         this.status = new SimpleStringProperty(status);
-
         this.action = new SimpleStringProperty(action);
     }
 
-    // =====================================================
     // GETTERS
-    // =====================================================
 
     public String getReportName() {
         return reportName.get();
@@ -69,9 +54,7 @@ public class PatientReport {
         return action.get();
     }
 
-    // =====================================================
     // PROPERTY METHODS
-    // =====================================================
 
     public StringProperty reportNameProperty() {
         return reportName;
@@ -97,9 +80,7 @@ public class PatientReport {
         return action;
     }
 
-    // =====================================================
     // SETTERS
-    // =====================================================
 
     public void setReportName(String reportName) {
         this.reportName.set(reportName);

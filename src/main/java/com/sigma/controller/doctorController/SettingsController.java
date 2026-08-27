@@ -1,24 +1,33 @@
 package com.sigma.controller.doctorController;
 
+import com.sigma.dao.SettingsDAO;
 import com.sigma.model.DoctorModel.Settings;
 
 public class SettingsController {
 
-        private Settings doctorSettings;
+        private final SettingsDAO dao;
+
+        // =====================================================
+        // CONSTRUCTOR
+        // =====================================================
 
         public SettingsController() {
 
-                doctorSettings = new Settings(
-                                "Dr. Anjali Mehta",
-                                "anjalimehta@maacare.com",
-                                "9876543210",
-                                "Obstetrician & Gynecologist",
-                                "GYN/2020/12345");
+                dao = new SettingsDAO();
         }
 
-        // ==========================
-        // SAVE SETTINGS
-        // ==========================
+        // =====================================================
+        // GET SETTINGS
+        // =====================================================
+
+        public Settings getDoctorSettings() {
+
+                return dao.getSettings();
+        }
+
+        // =====================================================
+        // SAVE ACCOUNT SETTINGS
+        // =====================================================
 
         public void saveSettings(
                         String fullName,
@@ -27,40 +36,101 @@ public class SettingsController {
                         String specialization,
                         String license) {
 
-                doctorSettings.setFullName(fullName);
-                doctorSettings.setEmail(email);
-                doctorSettings.setPhone(phone);
-                doctorSettings.setSpecialization(specialization);
-                doctorSettings.setLicense(license);
+                Settings settings = dao.getSettings();
 
-                System.out.println("Settings Saved Successfully!");
+                settings.setFullName(
+                                fullName);
 
-                System.out.println(
-                                "Doctor: " +
-                                                doctorSettings.getFullName());
+                settings.setEmail(
+                                email);
 
-                System.out.println(
-                                "Email: " +
-                                                doctorSettings.getEmail());
+                settings.setPhone(
+                                phone);
 
-                System.out.println(
-                                "Phone: " +
-                                                doctorSettings.getPhone());
+                settings.setSpecialization(
+                                specialization);
 
-                System.out.println(
-                                "Specialization: " +
-                                                doctorSettings.getSpecialization());
+                settings.setLicense(
+                                license);
 
-                System.out.println(
-                                "License: " +
-                                                doctorSettings.getLicense());
+                dao.updateSettings(
+                                settings);
         }
 
-        // ==========================
-        // GET MODEL
-        // ==========================
+        // =====================================================
+        // NOTIFICATIONS
+        // =====================================================
 
-        public Settings getDoctorSettings() {
-                return doctorSettings;
+        public void saveNotifications(
+                        boolean appointmentReminders,
+                        boolean messageNotifications,
+                        boolean emailNotifications) {
+
+                dao.updateNotifications(
+                                appointmentReminders,
+                                messageNotifications,
+                                emailNotifications);
+        }
+
+        // =====================================================
+        // APPEARANCE
+        // =====================================================
+
+        public void saveAppearance(
+                        String appearance) {
+
+                dao.updateAppearance(
+                                appearance);
+        }
+
+        // =====================================================
+        // LANGUAGE
+        // =====================================================
+
+        public void saveLanguage(
+                        String language) {
+
+                dao.updateLanguage(
+                                language);
+        }
+
+        // =====================================================
+        // PASSWORD
+        // =====================================================
+
+        public boolean changePassword(
+                        String oldPassword,
+                        String newPassword,
+                        String confirmPassword) {
+
+                if (oldPassword == null
+                                || newPassword == null
+                                || confirmPassword == null) {
+
+                        return false;
+                }
+
+                if (oldPassword.isEmpty()
+                                || newPassword.isEmpty()
+                                || confirmPassword.isEmpty()) {
+
+                        return false;
+                }
+
+                if (!newPassword.equals(
+                                confirmPassword)) {
+
+                        return false;
+                }
+
+                if (newPassword.length() < 6) {
+
+                        return false;
+                }
+
+                System.out.println(
+                                "Password changed successfully.");
+
+                return true;
         }
 }

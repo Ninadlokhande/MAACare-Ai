@@ -257,7 +257,7 @@ public class DoctorDashboard extends javafx.application.Application {
 
                 Runnable openReports = () -> PatientReportsPage.show();
 
-                Runnable openProfile = () -> DoctorProfilePage.show();
+                Runnable openProfile = () -> DoctorProfile.show();
 
                 Runnable openSettings = () -> SettingsPage.show();
 
