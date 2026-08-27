@@ -1,4 +1,3 @@
-
 package com.sigma.model.DoctorModel;
 
 import javafx.beans.property.SimpleStringProperty;
@@ -6,20 +5,12 @@ import javafx.beans.property.StringProperty;
 
 public class Patient {
 
-        // =====================================================
-        // FIELDS
-        // =====================================================
-
         private final StringProperty name;
         private final StringProperty age;
         private final StringProperty contact;
         private final StringProperty lastVisit;
         private final StringProperty nextVisit;
         private final StringProperty action;
-
-        // =====================================================
-        // CONSTRUCTOR
-        // =====================================================
 
         public Patient(
                         String name,
@@ -30,21 +21,12 @@ public class Patient {
                         String action) {
 
                 this.name = new SimpleStringProperty(name);
-
                 this.age = new SimpleStringProperty(age);
-
                 this.contact = new SimpleStringProperty(contact);
-
                 this.lastVisit = new SimpleStringProperty(lastVisit);
-
                 this.nextVisit = new SimpleStringProperty(nextVisit);
-
                 this.action = new SimpleStringProperty(action);
         }
-
-        // =====================================================
-        // GETTERS
-        // =====================================================
 
         public String getName() {
                 return name.get();
@@ -70,10 +52,6 @@ public class Patient {
                 return action.get();
         }
 
-        // =====================================================
-        // PROPERTY METHODS
-        // =====================================================
-
         public StringProperty nameProperty() {
                 return name;
         }
@@ -97,10 +75,6 @@ public class Patient {
         public StringProperty actionProperty() {
                 return action;
         }
-
-        // =====================================================
-        // SETTERS
-        // =====================================================
 
         public void setName(String name) {
                 this.name.set(name);
