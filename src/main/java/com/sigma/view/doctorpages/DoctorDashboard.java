@@ -34,10 +34,10 @@ public class DoctorDashboard extends javafx.application.Application {
                 dashboardStage.setTitle(
                                 "MaaCare AI - Doctor Dashboard");
 
-                // Dashboard scene तयार
+                // Create Dashboard Scene
                 dashboardScene = createDashboardScene();
 
-                // Dashboard scene stage वर set
+                // Set Dashboard Scene
                 dashboardStage.setScene(
                                 dashboardScene);
 
@@ -68,23 +68,9 @@ public class DoctorDashboard extends javafx.application.Application {
                 if (dashboardStage != null &&
                                 newScene != null) {
 
-                        // ONLY SCENE CHANGES
-
+                        // ONLY CHANGE SCENE
                         dashboardStage.setScene(
                                         newScene);
-
-                        /*
-                         * IMPORTANT:
-                         *
-                         * इथे setWidth()
-                         * setHeight()
-                         * centerOnScreen()
-                         *
-                         * काहीही करू नये.
-                         *
-                         * त्यामुळे existing Stage size
-                         * तसेच राहील.
-                         */
                 }
         }
 
@@ -97,7 +83,6 @@ public class DoctorDashboard extends javafx.application.Application {
                 if (dashboardStage != null &&
                                 dashboardScene != null) {
 
-                        // फक्त Dashboard Scene
                         dashboardStage.setScene(
                                         dashboardScene);
                 }
@@ -120,12 +105,6 @@ public class DoctorDashboard extends javafx.application.Application {
                 VBox content = createDashboardContent();
 
                 root.setCenter(content);
-
-                /*
-                 * Scene ला width/height देत नाही.
-                 *
-                 * Stage चा existing size वापरला जाईल.
-                 */
 
                 return new Scene(root);
         }
@@ -217,6 +196,7 @@ public class DoctorDashboard extends javafx.application.Application {
                 // =================================================
                 // MENU
                 // =================================================
+
                 Button dashboard = createMenuButton(
                                 "🏠",
                                 "Dashboard",
@@ -248,7 +228,7 @@ public class DoctorDashboard extends javafx.application.Application {
                                 false);
 
                 // =================================================
-                // RUNNABLE NAVIGATION
+                // NAVIGATION
                 // =================================================
 
                 Runnable openAppointments = () -> DoctorAppointmentsPage.show();
@@ -279,6 +259,9 @@ public class DoctorDashboard extends javafx.application.Application {
 
                 settings.setOnAction(
                                 e -> openSettings.run());
+
+                dashboard.setOnAction(
+                                e -> showDashboard());
 
                 sidebar.getChildren().addAll(
                                 dashboard,
@@ -315,6 +298,7 @@ public class DoctorDashboard extends javafx.application.Application {
         // =====================================================
         // MENU BUTTON
         // =====================================================
+
         private static Button createMenuButton(
                         String icon,
                         String text,
@@ -372,6 +356,7 @@ public class DoctorDashboard extends javafx.application.Application {
                                 textLabel);
 
                 button.setGraphic(content);
+
                 button.setText("");
 
                 // =================================================
@@ -495,21 +480,47 @@ public class DoctorDashboard extends javafx.application.Application {
                 HBox stats = new HBox(15);
 
                 stats.getChildren().addAll(
-                                statCard("📅", "18", "Today's", "Appointments"),
-                                statCard("👥", "6", "New Patients", "This Week"),
-                                statCard("📋", "32", "Reports", "This Week"),
-                                statCard("⭐", "4.8", "Average Rating", "This Month"));
+
+                                statCard(
+                                                "📅",
+                                                "18",
+                                                "Today's",
+                                                "Appointments"),
+
+                                statCard(
+                                                "👥",
+                                                "6",
+                                                "New Patients",
+                                                "This Week"),
+
+                                statCard(
+                                                "📋",
+                                                "32",
+                                                "Reports",
+                                                "This Week"),
+
+                                statCard(
+                                                "⭐",
+                                                "4.8",
+                                                "Average Rating",
+                                                "This Month"));
+
                 // =================================================
                 // MIDDLE
                 // =================================================
 
                 HBox middle = new HBox(18);
 
+                // =================================================
+                // TODAY'S APPOINTMENTS
+                // =================================================
+
                 VBox appointments = Theme.card();
 
                 HBox.setHgrow(
                                 appointments,
                                 Priority.ALWAYS);
+
                 appointments.setPrefHeight(330);
                 appointments.setMinHeight(330);
 
@@ -529,6 +540,7 @@ public class DoctorDashboard extends javafx.application.Application {
                                 appointmentTitle);
 
                 appointments.getChildren().addAll(
+
                                 appointmentRow(
                                                 "09:30 AM",
                                                 "Priya Sharma",
@@ -553,10 +565,16 @@ public class DoctorDashboard extends javafx.application.Application {
                                                 "30 Y | Ultrasound Follow-up",
                                                 "Pending"));
 
+                // =================================================
+                // TODAY'S SCHEDULE
+                // =================================================
+
                 VBox schedule = Theme.card();
 
                 schedule.setPrefWidth(330);
+
                 schedule.setPrefHeight(330);
+
                 schedule.setMinHeight(330);
 
                 Label scheduleTitle = new Label(
@@ -575,6 +593,7 @@ public class DoctorDashboard extends javafx.application.Application {
                                 scheduleTitle);
 
                 schedule.getChildren().addAll(
+
                                 scheduleRow(
                                                 "09:30 AM - 10:00 AM",
                                                 "Priya Sharma",
@@ -600,45 +619,16 @@ public class DoctorDashboard extends javafx.application.Application {
                                 schedule);
 
                 // =================================================
-                // BOTTOM
+                // BOTTOM - PATIENT FEEDBACK ONLY
                 // =================================================
 
                 HBox bottom = new HBox(20);
 
-                VBox quickActions = Theme.card();
-
-                HBox.setHgrow(
-                                quickActions,
-                                Priority.ALWAYS);
-
-                Label quickTitle = new Label(
-                                "Quick Actions");
-
-                quickTitle.setFont(
-                                javafx.scene.text.Font.font(
-                                                Theme.FONT,
-                                                javafx.scene.text.FontWeight.BOLD,
-                                                16));
-
-                quickTitle.setTextFill(
-                                Color.web(Theme.TEXT));
-
-                HBox actions = new HBox(20);
-
-                actions.getChildren().addAll(
-                                quickAction("📅", "Add Appointment"),
-                                quickAction("👤", "Add Patient"),
-                                quickAction("💊", "Write Prescription"),
-                                quickAction("📤", "Upload Report"),
-                                quickAction("💬", "Send Message"));
-
-                quickActions.getChildren().addAll(
-                                quickTitle,
-                                actions);
-
                 VBox feedback = Theme.card();
 
-                feedback.setPrefWidth(220);
+                HBox.setHgrow(
+                                feedback,
+                                Priority.ALWAYS);
 
                 Label feedbackTitle = new Label(
                                 "Patient Feedback");
@@ -672,9 +662,12 @@ public class DoctorDashboard extends javafx.application.Application {
                                 rating,
                                 based);
 
-                bottom.getChildren().addAll(
-                                quickActions,
+                bottom.getChildren().add(
                                 feedback);
+
+                // =================================================
+                // ADD CONTENT
+                // =================================================
 
                 content.getChildren().addAll(
                                 header,
@@ -892,65 +885,12 @@ public class DoctorDashboard extends javafx.application.Application {
         }
 
         // =====================================================
-        // QUICK ACTION
+        // START DASHBOARD
         // =====================================================
-
-        private static VBox quickAction(
-                        String icon,
-                        String text) {
-
-                VBox box = new VBox(7);
-
-                box.setAlignment(
-                                Pos.CENTER);
-
-                box.setPrefWidth(115);
-
-                box.setPadding(
-                                new Insets(10));
-
-                box.setStyle(
-                                "-fx-background-color: #ffffff;" +
-                                                "-fx-border-color: " +
-                                                Theme.BORDER + ";" +
-                                                "-fx-border-radius: 8;" +
-                                                "-fx-background-radius: 8;");
-
-                Label i = new Label(icon);
-
-                i.setFont(
-                                javafx.scene.text.Font.font(
-                                                Theme.FONT,
-                                                javafx.scene.text.FontWeight.BOLD,
-                                                22));
-
-                i.setTextFill(
-                                Color.web(Theme.PRIMARY));
-
-                Label l = new Label(text);
-
-                l.setWrapText(true);
-
-                l.setAlignment(
-                                Pos.CENTER);
-
-                l.setFont(
-                                javafx.scene.text.Font.font(
-                                                Theme.FONT,
-                                                javafx.scene.text.FontWeight.BOLD,
-                                                13));
-
-                l.setTextFill(
-                                Color.web(Theme.TEXT));
-
-                box.getChildren().addAll(
-                                i,
-                                l);
-
-                return box;
-        }
 
         public static void startDashboard(Stage stage) {
 
+                // Dashboard is started using JavaFX Application.start()
+                // No separate implementation required here.
         }
 }

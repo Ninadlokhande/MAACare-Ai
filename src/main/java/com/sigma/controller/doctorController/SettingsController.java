@@ -1,6 +1,6 @@
 package com.sigma.controller.doctorController;
 
-import com.sigma.dao.SettingsDAO;
+import com.sigma.dao.doctorDao.SettingsDAO;
 import com.sigma.model.DoctorModel.Settings;
 
 public class SettingsController {

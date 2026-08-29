@@ -1,5 +1,6 @@
 package com.sigma.view.doctorpages;
 
+import com.sigma.controller.doctorController.PatientController;
 import com.sigma.model.DoctorModel.Patient;
 
 import javafx.collections.FXCollections;
@@ -12,9 +13,9 @@ import javafx.scene.layout.*;
 
 public class PatientsPage {
 
-        private static ObservableList<Patient> patients = FXCollections.observableArrayList();
-
         private static TableView<Patient> table;
+
+        private static final PatientController controller = new PatientController();
 
         // =====================================================
         // SHOW PATIENT PAGE
@@ -35,7 +36,8 @@ public class PatientsPage {
 
                 HBox header = new HBox();
 
-                header.setAlignment(Pos.CENTER_LEFT);
+                header.setAlignment(
+                                Pos.CENTER_LEFT);
 
                 VBox heading = Theme.pageHeader(
                                 "My Patients",
@@ -49,6 +51,9 @@ public class PatientsPage {
 
                 Button back = Theme.backButton();
 
+                back.setOnAction(
+                                e -> DoctorDashboard.showDashboard());
+
                 header.getChildren().addAll(
                                 heading,
                                 spacer,
@@ -60,9 +65,11 @@ public class PatientsPage {
 
                 HBox filter = new HBox(10);
 
-                filter.setAlignment(Pos.CENTER_LEFT);
+                filter.setAlignment(
+                                Pos.CENTER_LEFT);
 
-                filter.setPadding(new Insets(14));
+                filter.setPadding(
+                                new Insets(14));
 
                 filter.setStyle(
                                 "-fx-background-color: white;" +
@@ -74,7 +81,7 @@ public class PatientsPage {
                 TextField search = new TextField();
 
                 search.setPromptText(
-                                "Search patient name or ID...");
+                                "Search patient name or contact...");
 
                 search.setPrefWidth(280);
 
@@ -112,6 +119,13 @@ public class PatientsPage {
                 table.setColumnResizePolicy(
                                 TableView.CONSTRAINED_RESIZE_POLICY);
 
+                table.setPlaceholder(
+                                new Label("No patients found."));
+
+                // =====================================================
+                // COLUMNS
+                // =====================================================
+
                 TableColumn<Patient, String> name = new TableColumn<>("Patient");
 
                 TableColumn<Patient, String> age = new TableColumn<>("Age / Gender");
@@ -125,19 +139,24 @@ public class PatientsPage {
                 TableColumn<Patient, String> action = new TableColumn<>("Action");
 
                 name.setCellValueFactory(
-                                d -> d.getValue().nameProperty());
+                                data -> data.getValue()
+                                                .nameProperty());
 
                 age.setCellValueFactory(
-                                d -> d.getValue().ageProperty());
+                                data -> data.getValue()
+                                                .ageProperty());
 
                 contact.setCellValueFactory(
-                                d -> d.getValue().contactProperty());
+                                data -> data.getValue()
+                                                .contactProperty());
 
                 lastVisit.setCellValueFactory(
-                                d -> d.getValue().lastVisitProperty());
+                                data -> data.getValue()
+                                                .lastVisitProperty());
 
                 nextVisit.setCellValueFactory(
-                                d -> d.getValue().nextVisitProperty());
+                                data -> data.getValue()
+                                                .nextVisitProperty());
 
                 // =====================================================
                 // ACTION BUTTONS
@@ -148,51 +167,54 @@ public class PatientsPage {
 
                                         private final Button viewButton = new Button("👁");
 
-                                        private final Button editButton = new Button("✏️");
+                                        private final Button editButton = new Button("✏");
 
                                         private final HBox buttons = new HBox(6);
 
                                         {
 
-                                                // ==========================
-                                                // VIEW BUTTON
-                                                // ==========================
+                                                // =================================================
+                                                // VIEW
+                                                // =================================================
 
                                                 viewButton.setStyle(
                                                                 "-fx-background-color: #E0F2FE;" +
                                                                                 "-fx-text-fill: #0284C7;" +
                                                                                 "-fx-font-size: 14px;" +
                                                                                 "-fx-background-radius: 7;" +
-                                                                                "-fx-padding: 5 9 5 9;" +
+                                                                                "-fx-padding: 5 9;" +
                                                                                 "-fx-cursor: hand;");
 
                                                 viewButton.setTooltip(
-                                                                new Tooltip("View Patient"));
+                                                                new Tooltip(
+                                                                                "View Patient"));
 
-                                                // ==========================
-                                                // EDIT BUTTON
-                                                // ==========================
+                                                // =================================================
+                                                // EDIT
+                                                // =================================================
 
                                                 editButton.setStyle(
                                                                 "-fx-background-color: #FFF4DE;" +
                                                                                 "-fx-text-fill: #F59E0B;" +
                                                                                 "-fx-font-size: 14px;" +
                                                                                 "-fx-background-radius: 7;" +
-                                                                                "-fx-padding: 5 9 5 9;" +
+                                                                                "-fx-padding: 5 9;" +
                                                                                 "-fx-cursor: hand;");
 
                                                 editButton.setTooltip(
-                                                                new Tooltip("Edit Patient"));
+                                                                new Tooltip(
+                                                                                "Edit Patient"));
 
-                                                // ==========================
+                                                // =================================================
                                                 // VIEW ACTION
-                                                // ==========================
+                                                // =================================================
 
                                                 viewButton.setOnAction(e -> {
 
                                                         if (getIndex() < 0 ||
                                                                         getIndex() >= getTableView()
-                                                                                        .getItems().size()) {
+                                                                                        .getItems()
+                                                                                        .size()) {
                                                                 return;
                                                         }
 
@@ -200,20 +222,20 @@ public class PatientsPage {
                                                                         .getItems()
                                                                         .get(getIndex());
 
-                                                        System.out.println(
-                                                                        "Viewing Patient: " +
-                                                                                        patient.getName());
+                                                        controller.viewPatient(
+                                                                        patient);
                                                 });
 
-                                                // ==========================
+                                                // =================================================
                                                 // EDIT ACTION
-                                                // ==========================
+                                                // =================================================
 
                                                 editButton.setOnAction(e -> {
 
                                                         if (getIndex() < 0 ||
                                                                         getIndex() >= getTableView()
-                                                                                        .getItems().size()) {
+                                                                                        .getItems()
+                                                                                        .size()) {
                                                                 return;
                                                         }
 
@@ -221,9 +243,8 @@ public class PatientsPage {
                                                                         .getItems()
                                                                         .get(getIndex());
 
-                                                        System.out.println(
-                                                                        "Editing Patient: " +
-                                                                                        patient.getName());
+                                                        controller.editPatient(
+                                                                        patient);
                                                 });
 
                                                 buttons.setAlignment(
@@ -266,36 +287,69 @@ public class PatientsPage {
                                 action);
 
                 // =====================================================
-                // INITIAL HARD-CODED DATA
+                // LOAD PATIENTS FROM CONTROLLER
                 // =====================================================
 
-                loadInitialPatients();
+                table.setItems(
+                                FXCollections.observableArrayList(
+                                                controller.getPatients()));
 
-                table.setItems(patients);
+                // =====================================================
+                // FILTER
+                // =====================================================
+
+                Runnable applyFilters = () -> {
+
+                        String searchText = search.getText() == null
+                                        ? ""
+                                        : search.getText()
+                                                        .trim()
+                                                        .toLowerCase();
+
+                        String selectedGender = gender.getValue();
+
+                        ObservableList<Patient> filtered = FXCollections.observableArrayList();
+
+                        for (Patient patient : controller.getPatients()) {
+
+                                boolean matchesSearch = searchText.isEmpty()
+                                                || patient.getName()
+                                                                .toLowerCase()
+                                                                .contains(searchText)
+                                                || patient.getContact()
+                                                                .contains(searchText);
+
+                                boolean matchesGender = selectedGender == null
+                                                || selectedGender.equals("All")
+                                                || patient.getAge()
+                                                                .toLowerCase()
+                                                                .contains(
+                                                                                selectedGender
+                                                                                                .toLowerCase());
+
+                                if (matchesSearch &&
+                                                matchesGender) {
+
+                                        filtered.add(patient);
+                                }
+                        }
+
+                        table.setItems(filtered);
+                };
 
                 // =====================================================
                 // SEARCH
                 // =====================================================
 
                 search.textProperty().addListener(
-                                (observable, oldValue, newValue) -> {
-
-                                        filterPatients(
-                                                        newValue,
-                                                        gender.getValue());
-                                });
+                                (obs, oldValue, newValue) -> applyFilters.run());
 
                 // =====================================================
-                // GENDER FILTER
+                // GENDER
                 // =====================================================
 
                 gender.valueProperty().addListener(
-                                (observable, oldValue, newValue) -> {
-
-                                        filterPatients(
-                                                        search.getText(),
-                                                        newValue);
-                                });
+                                (obs, oldValue, newValue) -> applyFilters.run());
 
                 // =====================================================
                 // ADD PATIENT
@@ -335,106 +389,6 @@ public class PatientsPage {
         }
 
         // =====================================================
-        // INITIAL DATA
-        // =====================================================
-
-        private static void loadInitialPatients() {
-
-                if (!patients.isEmpty()) {
-                        return;
-                }
-
-                patients.addAll(
-
-                                new Patient(
-                                                "Priya Sharma",
-                                                "28 Y / Female",
-                                                "9876543210",
-                                                "07 May 2024",
-                                                "14 May 2024",
-                                                ""),
-
-                                new Patient(
-                                                "Neha Kulkarni",
-                                                "32 Y / Female",
-                                                "9765432109",
-                                                "05 May 2024",
-                                                "15 May 2024",
-                                                ""),
-
-                                new Patient(
-                                                "Sneha Patil",
-                                                "26 Y / Female",
-                                                "9988776655",
-                                                "04 May 2024",
-                                                "18 May 2024",
-                                                ""),
-
-                                new Patient(
-                                                "Ayesha Khan",
-                                                "29 Y / Female",
-                                                "9871234567",
-                                                "03 May 2024",
-                                                "17 May 2024",
-                                                ""),
-
-                                new Patient(
-                                                "Ritika Singh",
-                                                "30 Y / Female",
-                                                "9812345670",
-                                                "01 May 2024",
-                                                "12 May 2024",
-                                                ""));
-        }
-
-        // =====================================================
-        // FILTER PATIENTS
-        // =====================================================
-
-        private static void filterPatients(
-                        String searchText,
-                        String selectedGender) {
-
-                String searchValue = searchText == null
-                                ? ""
-                                : searchText.trim().toLowerCase();
-
-                String genderValue = selectedGender == null
-                                ? "All"
-                                : selectedGender;
-
-                ObservableList<Patient> filtered = FXCollections.observableArrayList();
-
-                for (Patient patient : patients) {
-
-                        boolean matchesSearch = searchValue.isEmpty()
-                                        || patient.getName()
-                                                        .toLowerCase()
-                                                        .contains(searchValue)
-                                        || patient.getContact()
-                                                        .contains(searchValue);
-
-                        boolean matchesGender = true;
-
-                        if (!genderValue.equals("All")) {
-
-                                matchesGender = patient.getAge()
-                                                .toLowerCase()
-                                                .contains(
-                                                                genderValue.toLowerCase());
-                        }
-
-                        if (matchesSearch &&
-                                        matchesGender) {
-
-                                filtered.add(patient);
-                        }
-                }
-
-                table.setItems(filtered);
-        }
-
-        // =====================================================
         // ADD NEW PATIENT
         // =====================================================
 
@@ -445,10 +399,15 @@ public class PatientsPage {
                         return;
                 }
 
-                patients.add(patient);
+                controller.getPatients()
+                                .add(patient);
 
                 if (table != null) {
-                        table.setItems(patients);
+
+                        table.setItems(
+                                        FXCollections.observableArrayList(
+                                                        controller.getPatients()));
+
                         table.refresh();
                 }
         }

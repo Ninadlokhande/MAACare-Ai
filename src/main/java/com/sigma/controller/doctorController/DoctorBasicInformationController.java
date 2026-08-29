@@ -1,79 +1,79 @@
 package com.sigma.controller.doctorController;
 
-import com.sigma.dao.DoctorBasicInformationDAO;
+import com.sigma.dao.doctorDao.DoctorBasicInformationDAO;
 import com.sigma.model.DoctorModel.DoctorBasicInformationModel;
 
 public class DoctorBasicInformationController {
 
-    private final DoctorBasicInformationDAO dao;
+        private final DoctorBasicInformationDAO dao;
 
-    // =====================================================
-    // CONSTRUCTOR
-    // =====================================================
+        // =====================================================
+        // CONSTRUCTOR
+        // =====================================================
 
-    public DoctorBasicInformationController() {
+        public DoctorBasicInformationController() {
 
-        dao = new DoctorBasicInformationDAO();
-    }
+                dao = new DoctorBasicInformationDAO();
+        }
 
-    // =====================================================
-    // GET PROFILE
-    // =====================================================
+        // =====================================================
+        // GET PROFILE
+        // =====================================================
 
-    public DoctorBasicInformationModel getDoctorInformation() {
+        public DoctorBasicInformationModel getDoctorInformation() {
 
-        return dao.getDoctorInformation();
-    }
+                return dao.getDoctorInformation();
+        }
 
-    // =====================================================
-    // UPDATE PROFILE
-    // =====================================================
+        // =====================================================
+        // UPDATE PROFILE
+        // =====================================================
 
-    public void updateProfile(
-            String firstName,
-            String lastName,
-            String gender,
-            String dob,
-            String phone,
-            String email,
-            String address,
-            String specialization,
-            String qualification,
-            String experience,
-            String medicalLicense,
-            String clinicName,
-            String clinicAddress) {
+        public void updateProfile(
+                        String firstName,
+                        String lastName,
+                        String gender,
+                        String dob,
+                        String phone,
+                        String email,
+                        String address,
+                        String specialization,
+                        String qualification,
+                        String experience,
+                        String medicalLicense,
+                        String clinicName,
+                        String clinicAddress) {
 
-        DoctorBasicInformationModel doctor = dao.getDoctorInformation();
+                DoctorBasicInformationModel doctor = dao.getDoctorInformation();
 
-        doctor.setFirstName(firstName);
-        doctor.setLastName(lastName);
-        doctor.setGender(gender);
-        doctor.setDob(dob);
+                doctor.setFirstName(firstName);
+                doctor.setLastName(lastName);
+                doctor.setGender(gender);
+                doctor.setDob(dob);
 
-        doctor.setPhone(phone);
-        doctor.setEmail(email);
-        doctor.setAddress(address);
+                doctor.setPhone(phone);
+                doctor.setEmail(email);
+                doctor.setAddress(address);
 
-        doctor.setSpecialization(
-                specialization);
+                doctor.setSpecialization(
+                                specialization);
 
-        doctor.setQualification(
-                qualification);
+                doctor.setQualification(
+                                qualification);
 
-        doctor.setExperience(
-                experience);
+                doctor.setExperience(
+                                experience);
 
-        doctor.setMedicalLicense(
-                medicalLicense);
+                doctor.setMedicalLicense(
+                                medicalLicense);
 
-        doctor.setClinicName(
-                clinicName);
+                doctor.setClinicName(
+                                clinicName);
 
-        doctor.setClinicAddress(
-                clinicAddress);
+                doctor.setClinicAddress(
+                                clinicAddress);
 
-        dao.updateDoctorInformation(
-                doctor);
-    }
+                dao.updateDoctorInformation(
+                                doctor);
+        }
 }

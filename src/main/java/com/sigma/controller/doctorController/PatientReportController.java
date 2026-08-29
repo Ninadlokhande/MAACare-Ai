@@ -1,6 +1,6 @@
 package com.sigma.controller.doctorController;
 
-import com.sigma.dao.PatientReportDAO;
+import com.sigma.dao.doctorDao.PatientReportDAO;
 import com.sigma.model.DoctorModel.PatientReport;
 
 import javafx.collections.FXCollections;
