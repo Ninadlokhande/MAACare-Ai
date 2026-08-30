@@ -13,8 +13,9 @@ public class Main {
         System.out.println(
                 "The Complete New World of Maternity HealthCare...");
 
-        Application.launch(
+      /*  Application.launch(
                 DoctorDashboard.class,
-                args);
+                args);*/
+                Application.launch(Welcomepage.class,args);
     }
 }
