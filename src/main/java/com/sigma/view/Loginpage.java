@@ -908,43 +908,62 @@ public class Loginpage {
                 // =================================================
                 // ASHA WORKER
                 // =================================================
+               // =================================================
+// ASHA WORKER
+// =================================================
 
-                if (role.equals("asha")) {
+if (role.equals("asha")) {
 
-                    System.out.println(
-                            "[LOGIN] ASHA Worker role verified"
-                    );
+    System.out.println(
+            "[LOGIN] ASHA Worker role verified"
+    );
 
+    System.out.println(
+            "[LOGIN] Opening ASHA Worker Dashboard..."
+    );
 
-                    /*
-                     * =================================================
-                     * TODO - ASHA NAVIGATION
-                     * =================================================
-                     *
-                     * When ASHA Dashboard is ready:
-                     *
-                     * AshaDashboard ashaDashboard =
-                     *         new AshaDashboard();
-                     *
-                     * Scene ashaScene =
-                     *         ashaDashboard.gotoAshaDashboard();
-                     *
-                     * Welcomepage.stage.setScene(ashaScene);
-                     *
-                     * Welcomepage.stage.setMaximized(true);
-                     */
+    try {
 
+        Asha_workerdashboard ashaDashboard =
+                new Asha_workerdashboard();
 
-                    logininfo.setText(
-                            "ASHA Worker page not connected yet"
-                    );
+        Scene ashaScene =
+                ashaDashboard.run();
 
-                    System.out.println(
-                            "[LOGIN] ASHA Worker page not connected yet"
-                    );
+        Welcomepage.stage.setScene(
+                ashaScene
+        );
 
-                    return;
-                }
+        Welcomepage.stage.setMaximized(
+                true
+        );
+
+        System.out.println(
+                "[LOGIN] ASHA Worker Dashboard opened"
+        );
+
+        email.clear();
+        password.clear();
+
+    } catch (Exception ex) {
+
+        ex.printStackTrace();
+
+        logininfo.setText(
+                "Unable to open ASHA Worker Dashboard"
+        );
+
+        System.out.println(
+                "[LOGIN] Error opening ASHA Dashboard"
+        );
+    }
+
+    return;
+}
+
+              // ==========================================
+                     
+                            
 
 
                 // =================================================

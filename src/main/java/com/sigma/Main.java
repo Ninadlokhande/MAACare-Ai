@@ -14,7 +14,7 @@ public class Main {
                 "The Complete New World of Maternity HealthCare...");
 
         Application.launch(
-                DoctorDashboard.class,
+                Welcomepage.class,
                 args);
     }
 }
