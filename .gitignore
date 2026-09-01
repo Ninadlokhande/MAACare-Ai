@@ -16,4 +16,10 @@ target/
 
 # OS
 .DS_Store
-Thumbs.db
+Thumbs.db 
+
+# Local backup files
+my_changes_backup.txt
+
+# Firebase service account credentials
+java2026.json

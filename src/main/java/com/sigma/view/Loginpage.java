@@ -19,6 +19,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
+import com.sigma.view.Dashboard;
 
 public class Loginpage {
 
@@ -97,8 +98,9 @@ public class Loginpage {
         // LOGO
         // =========================================================
 
-        String IMAGE_PATH =
-                "file:Maacare-Ai\\src\\main\\resources\\assets\\images\\logo\\logo.png";
+      String IMAGE_PATH =
+             "file:Maacare-Ai\\src\\main\\resources\\assets\\images\\logo\\logo.png";
+         //  String IMAGE_PATH="asssets\\images\\logo\\logo.png";
 
         Image logoImage =
                 new Image(IMAGE_PATH);
@@ -867,14 +869,14 @@ public class Loginpage {
                 // HOSPITAL
                 // =================================================
 
-                if (role.equals("hospital")) {
+             /*   if (role.equals("hospital")) {
 
                     System.out.println(
                             "[LOGIN] Hospital role verified"
                     );
 
 
-                    /*
+                    
                      * =================================================
                      * TODO - HOSPITAL NAVIGATION
                      * =================================================
@@ -890,7 +892,7 @@ public class Loginpage {
                      * Welcomepage.stage.setScene(hospitalScene);
                      *
                      * Welcomepage.stage.setMaximized(true);
-                     */
+                     
 
 
                     logininfo.setText(
@@ -902,7 +904,42 @@ public class Loginpage {
                     );
 
                     return;
-                }
+                }*/  
+
+if (role.equals("hospital")) {
+
+    System.out.println(
+            "[LOGIN] Hospital role verified"
+    );
+
+    System.out.println(
+            "[LOGIN] Opening Hospital Dashboard..."
+    );
+
+    Dashboard dashboard = new Dashboard();
+
+    dashboard.show(
+            Welcomepage.stage
+    );
+
+    Welcomepage.stage.setMaximized(
+            true
+    );
+
+    System.out.println(
+            "[LOGIN] Hospital Dashboard opened"
+    );
+
+    email.clear();
+    password.clear();
+
+    return;
+}
+
+
+
+
+
 
 
                 // =================================================

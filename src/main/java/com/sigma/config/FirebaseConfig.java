@@ -1,6 +1,5 @@
 package com.sigma.config;
 
-
 import java.io.InputStream;
 
 import com.google.auth.oauth2.GoogleCredentials;
@@ -10,7 +9,6 @@ import com.google.firebase.FirebaseOptions;
 import com.google.firebase.cloud.FirestoreClient;
 
 public class FirebaseConfig {
-    
 
     static {
         getFirebaseConfig();
@@ -31,18 +29,22 @@ public class FirebaseConfig {
                 );
             }
 
-           
-            FirebaseOptions options = FirebaseOptions.builder()
-                    .setCredentials(
-                        GoogleCredentials.fromStream(serviceAccount)
-                    )
-                    .build();
+            FirebaseOptions options =
+                    FirebaseOptions.builder()
+                            .setCredentials(
+                                GoogleCredentials.fromStream(
+                                    serviceAccount
+                                )
+                            )
+                            .build();
 
             if (FirebaseApp.getApps().isEmpty()) {
                 FirebaseApp.initializeApp(options);
             }
 
-            System.out.println("Firebase initialized successfully!");
+            System.out.println(
+                    "Firebase initialized successfully!"
+            );
 
         } catch (Exception e) {
             e.printStackTrace();
