@@ -3,17 +3,52 @@ package com.sigma.view.doctorpages;
 import com.sigma.controller.doctorController.PatientReportController;
 import com.sigma.model.DoctorModel.PatientReport;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.util.Duration;
+
+import java.util.List;
 
 public class PatientReportsPage {
 
+        // =====================================================
+        // CONTROLLER
+        // =====================================================
+
         private static PatientReportController controller;
 
+        // =====================================================
+        // TABLE
+        // =====================================================
+
         private static TableView<PatientReport> table;
+
+        // =====================================================
+        // SEARCH / STATUS
+        // =====================================================
+
+        private static TextField searchField;
+
+        private static ComboBox<String> statusCombo;
+
+        // =====================================================
+        // REALTIME REFRESH
+        // =====================================================
+
+        private static Timeline realtimeRefreshTimeline;
+
+        // =====================================================
+        // CURRENT FILTER VALUES
+        // =====================================================
+
+        private static String currentSearchText = "";
+
+        private static String currentStatus = "All Status";
 
         // =====================================================
         // GET SHARED CONTROLLER
@@ -38,10 +73,24 @@ public class PatientReportsPage {
                 controller = getController();
 
                 // =================================================
-                // REFRESH FIRESTORE
+                // INITIAL FIRESTORE LOAD
                 // =================================================
 
-                controller.refreshReports();
+                try {
+
+                        controller.refreshReports();
+
+                } catch (Exception e) {
+
+                        e.printStackTrace();
+
+                        System.out.println(
+                                        "[PATIENT REPORTS] Initial report load failed.");
+                }
+
+                // =================================================
+                // ROOT
+                // =================================================
 
                 BorderPane root = new BorderPane();
 
@@ -76,12 +125,18 @@ public class PatientReportsPage {
                 Button back = Theme.backButton();
 
                 back.setOnAction(
-                                e -> DoctorDashboard.showDashboard());
+                                e -> {
 
-                header.getChildren().addAll(
-                                heading,
-                                spacer,
-                                back);
+                                        stopRealtimeRefresh();
+
+                                        DoctorDashboard.showDashboard();
+                                });
+
+                header.getChildren()
+                                .addAll(
+                                                heading,
+                                                spacer,
+                                                back);
 
                 // =================================================
                 // FILTER
@@ -96,31 +151,45 @@ public class PatientReportsPage {
                                 new Insets(14));
 
                 filter.setStyle(
-                                "-fx-background-color: white;" +
-                                                "-fx-background-radius: 10;" +
-                                                "-fx-border-color: "
-                                                + Theme.BORDER + ";" +
-                                                "-fx-border-radius: 10;");
+                                "-fx-background-color: white;"
+                                                + "-fx-background-radius: 10;"
+                                                + "-fx-border-color: "
+                                                + Theme.BORDER + ";"
+                                                + "-fx-border-radius: 10;");
 
-                TextField search = new TextField();
+                // =================================================
+                // SEARCH
+                // =================================================
 
-                search.setPromptText(
+                searchField = new TextField();
+
+                searchField.setPromptText(
                                 "Search report or patient...");
 
-                search.setPrefWidth(280);
+                searchField.setPrefWidth(
+                                280);
 
-                ComboBox<String> status = new ComboBox<>();
+                // =================================================
+                // STATUS
+                // =================================================
 
-                status.getItems().addAll(
-                                "All Status",
-                                "Normal",
-                                "Abnormal",
-                                "Low",
-                                "High",
-                                "Pending");
+                statusCombo = new ComboBox<>();
 
-                status.setValue(
+                statusCombo.getItems()
+                                .addAll(
+                                                "All Status",
+                                                "Normal",
+                                                "Abnormal",
+                                                "Low",
+                                                "High",
+                                                "Pending");
+
+                statusCombo.setValue(
                                 "All Status");
+
+                // =================================================
+                // UPLOAD BUTTON
+                // =================================================
 
                 Button upload = Theme.primaryButton(
                                 "+  Upload Report");
@@ -131,11 +200,12 @@ public class PatientReportsPage {
                                 filterSpacer,
                                 Priority.ALWAYS);
 
-                filter.getChildren().addAll(
-                                search,
-                                status,
-                                filterSpacer,
-                                upload);
+                filter.getChildren()
+                                .addAll(
+                                                searchField,
+                                                statusCombo,
+                                                filterSpacer,
+                                                upload);
 
                 // =================================================
                 // TABLE
@@ -154,17 +224,27 @@ public class PatientReportsPage {
                 // COLUMNS
                 // =================================================
 
-                TableColumn<PatientReport, String> reportName = new TableColumn<>("Report");
+                TableColumn<PatientReport, String> reportName = new TableColumn<>(
+                                "Report");
 
-                TableColumn<PatientReport, String> patientName = new TableColumn<>("Patient");
+                TableColumn<PatientReport, String> patientName = new TableColumn<>(
+                                "Patient");
 
-                TableColumn<PatientReport, String> reportType = new TableColumn<>("Type");
+                TableColumn<PatientReport, String> reportType = new TableColumn<>(
+                                "Type");
 
-                TableColumn<PatientReport, String> date = new TableColumn<>("Date");
+                TableColumn<PatientReport, String> date = new TableColumn<>(
+                                "Date");
 
-                TableColumn<PatientReport, String> reportStatus = new TableColumn<>("Status");
+                TableColumn<PatientReport, String> reportStatus = new TableColumn<>(
+                                "Status");
 
-                TableColumn<PatientReport, String> action = new TableColumn<>("Action");
+                TableColumn<PatientReport, String> action = new TableColumn<>(
+                                "Action");
+
+                // =================================================
+                // CELL VALUE FACTORIES
+                // =================================================
 
                 reportName.setCellValueFactory(
                                 d -> d.getValue()
@@ -201,21 +281,33 @@ public class PatientReportsPage {
 
                                         {
 
+                                                // =================================
+                                                // VIEW STYLE
+                                                // =================================
+
                                                 view.setStyle(
-                                                                "-fx-background-color: #E0F2FE;" +
-                                                                                "-fx-text-fill: #0284C7;" +
-                                                                                "-fx-font-size: 14px;" +
-                                                                                "-fx-background-radius: 7;" +
-                                                                                "-fx-padding: 5 9;" +
-                                                                                "-fx-cursor: hand;");
+                                                                "-fx-background-color: #E0F2FE;"
+                                                                                + "-fx-text-fill: #0284C7;"
+                                                                                + "-fx-font-size: 14px;"
+                                                                                + "-fx-background-radius: 7;"
+                                                                                + "-fx-padding: 5 9;"
+                                                                                + "-fx-cursor: hand;");
+
+                                                // =================================
+                                                // DELETE STYLE
+                                                // =================================
 
                                                 delete.setStyle(
-                                                                "-fx-background-color: #FEE2E2;" +
-                                                                                "-fx-text-fill: #DC2626;" +
-                                                                                "-fx-font-size: 14px;" +
-                                                                                "-fx-background-radius: 7;" +
-                                                                                "-fx-padding: 5 9;" +
-                                                                                "-fx-cursor: hand;");
+                                                                "-fx-background-color: #FEE2E2;"
+                                                                                + "-fx-text-fill: #DC2626;"
+                                                                                + "-fx-font-size: 14px;"
+                                                                                + "-fx-background-radius: 7;"
+                                                                                + "-fx-padding: 5 9;"
+                                                                                + "-fx-cursor: hand;");
+
+                                                // =================================
+                                                // TOOLTIPS
+                                                // =================================
 
                                                 view.setTooltip(
                                                                 new Tooltip(
@@ -225,49 +317,53 @@ public class PatientReportsPage {
                                                                 new Tooltip(
                                                                                 "Delete Report"));
 
-                                                // =========================
+                                                // =================================
                                                 // VIEW
-                                                // =========================
+                                                // =================================
 
-                                                view.setOnAction(e -> {
+                                                view.setOnAction(
+                                                                e -> {
 
-                                                        if (getIndex() < 0 ||
-                                                                        getIndex() >= getTableView()
+                                                                        if (getIndex() < 0 ||
+                                                                                        getIndex() >= getTableView()
+                                                                                                        .getItems()
+                                                                                                        .size()) {
+
+                                                                                return;
+                                                                        }
+
+                                                                        PatientReport report = getTableView()
                                                                                         .getItems()
-                                                                                        .size()) {
+                                                                                        .get(
+                                                                                                        getIndex());
 
-                                                                return;
-                                                        }
+                                                                        showReportDetails(
+                                                                                        report);
+                                                                });
 
-                                                        PatientReport report = getTableView()
-                                                                        .getItems()
-                                                                        .get(getIndex());
-
-                                                        showReportDetails(
-                                                                        report);
-                                                });
-
-                                                // =========================
+                                                // =================================
                                                 // DELETE
-                                                // =========================
+                                                // =================================
 
-                                                delete.setOnAction(e -> {
+                                                delete.setOnAction(
+                                                                e -> {
 
-                                                        if (getIndex() < 0 ||
-                                                                        getIndex() >= getTableView()
+                                                                        if (getIndex() < 0 ||
+                                                                                        getIndex() >= getTableView()
+                                                                                                        .getItems()
+                                                                                                        .size()) {
+
+                                                                                return;
+                                                                        }
+
+                                                                        PatientReport report = getTableView()
                                                                                         .getItems()
-                                                                                        .size()) {
+                                                                                        .get(
+                                                                                                        getIndex());
 
-                                                                return;
-                                                        }
-
-                                                        PatientReport report = getTableView()
-                                                                        .getItems()
-                                                                        .get(getIndex());
-
-                                                        deleteReport(
-                                                                        report);
-                                                });
+                                                                        deleteReport(
+                                                                                        report);
+                                                                });
 
                                                 buttons.setAlignment(
                                                                 Pos.CENTER);
@@ -293,7 +389,8 @@ public class PatientReportsPage {
 
                                                 } else {
 
-                                                        setGraphic(buttons);
+                                                        setGraphic(
+                                                                        buttons);
 
                                                         setAlignment(
                                                                         Pos.CENTER);
@@ -301,44 +398,51 @@ public class PatientReportsPage {
                                         }
                                 });
 
-                table.getColumns().addAll(
-                                reportName,
-                                patientName,
-                                reportType,
-                                date,
-                                reportStatus,
-                                action);
-
                 // =================================================
-                // LOAD REPORTS
+                // ADD COLUMNS
                 // =================================================
 
-                table.setItems(
-                                controller.getReports());
+                table.getColumns()
+                                .addAll(
+                                                reportName,
+                                                patientName,
+                                                reportType,
+                                                date,
+                                                reportStatus,
+                                                action);
 
                 // =================================================
-                // SEARCH
+                // INITIAL TABLE DATA
                 // =================================================
 
-                search.textProperty()
+                refreshTableFromFirestore();
+
+                // =================================================
+                // SEARCH LISTENER
+                // =================================================
+
+                searchField.textProperty()
                                 .addListener(
                                                 (obs, oldValue, newValue) -> {
 
-                                                        table.setItems(
-                                                                        controller.searchReports(
-                                                                                        newValue));
+                                                        currentSearchText = newValue == null
+                                                                        ? ""
+                                                                        : newValue.trim();
+
+                                                        refreshTableUsingFilters();
                                                 });
 
                 // =================================================
-                // STATUS FILTER
+                // STATUS LISTENER
                 // =================================================
 
-                status.setOnAction(e -> {
+                statusCombo.setOnAction(
+                                e -> {
 
-                        table.setItems(
-                                        controller.filterByStatus(
-                                                        status.getValue()));
-                });
+                                        currentStatus = statusCombo.getValue();
+
+                                        refreshTableUsingFilters();
+                                });
 
                 // =================================================
                 // UPLOAD
@@ -360,7 +464,12 @@ public class PatientReportsPage {
                                 table,
                                 Priority.ALWAYS);
 
-                root.setTop(header);
+                // =================================================
+                // ROOT LAYOUT
+                // =================================================
+
+                root.setTop(
+                                header);
 
                 BorderPane.setMargin(
                                 header,
@@ -370,7 +479,8 @@ public class PatientReportsPage {
                                                 20,
                                                 0));
 
-                root.setCenter(content);
+                root.setCenter(
+                                content);
 
                 // =================================================
                 // SAME DASHBOARD STAGE
@@ -380,6 +490,158 @@ public class PatientReportsPage {
 
                 DoctorDashboard.changeScene(
                                 scene);
+
+                // =================================================
+                // START REALTIME REFRESH
+                // =================================================
+
+                startRealtimeRefresh();
+        }
+
+        // =====================================================
+        // REFRESH TABLE FROM FIRESTORE
+        // =====================================================
+
+        private static void refreshTableFromFirestore() {
+
+                try {
+
+                        controller.refreshReports();
+
+                        refreshTableUsingFilters();
+
+                        System.out.println(
+                                        "[PATIENT REPORTS] Firestore data refreshed.");
+
+                } catch (Exception e) {
+
+                        e.printStackTrace();
+
+                        System.out.println(
+                                        "[PATIENT REPORTS] Refresh failed: "
+                                                        + e.getMessage());
+                }
+        }
+
+        // =====================================================
+        // APPLY CURRENT FILTERS
+        // =====================================================
+
+        private static void refreshTableUsingFilters() {
+
+                if (controller == null ||
+                                table == null) {
+
+                        return;
+                }
+
+                try {
+
+                        List<PatientReport> reports;
+
+                        // =============================================
+                        // SEARCH + STATUS
+                        // =============================================
+
+                        if (currentSearchText != null &&
+                                        !currentSearchText.isEmpty()) {
+
+                                reports = controller.searchReports(
+                                                currentSearchText);
+
+                        } else {
+
+                                reports = controller.getReports();
+                        }
+
+                        // =============================================
+                        // STATUS FILTER
+                        // =============================================
+
+                        if (currentStatus != null &&
+                                        !currentStatus.equals(
+                                                        "All Status")) {
+
+                                List<PatientReport> statusReports = controller.filterByStatus(
+                                                currentStatus);
+
+                                // -----------------------------------------
+                                // If search is also active, find matching
+                                // reports between search and status results
+                                // -----------------------------------------
+
+                                if (currentSearchText != null &&
+                                                !currentSearchText.isEmpty()) {
+
+                                        reports.retainAll(
+                                                        statusReports);
+
+                                } else {
+
+                                        reports = statusReports;
+                                }
+                        }
+
+                        table.getItems()
+                                        .setAll(
+                                                        reports);
+
+                        table.refresh();
+
+                } catch (Exception e) {
+
+                        e.printStackTrace();
+
+                        System.out.println(
+                                        "[PATIENT REPORTS] "
+                                                        + "Unable to apply filters: "
+                                                        + e.getMessage());
+                }
+        }
+
+        // =====================================================
+        // REALTIME AUTO REFRESH
+        // =====================================================
+
+        private static void startRealtimeRefresh() {
+
+                stopRealtimeRefresh();
+
+                realtimeRefreshTimeline = new Timeline(
+                                new KeyFrame(
+                                                Duration.seconds(3),
+                                                e -> {
+
+                                                        refreshTableFromFirestore();
+
+                                                }));
+
+                realtimeRefreshTimeline.setCycleCount(
+                                Timeline.INDEFINITE);
+
+                realtimeRefreshTimeline.play();
+
+                System.out.println(
+                                "[PATIENT REPORTS] "
+                                                + "Realtime refresh started.");
+        }
+
+        // =====================================================
+        // STOP REALTIME REFRESH
+        // =====================================================
+
+        private static void stopRealtimeRefresh() {
+
+                if (realtimeRefreshTimeline != null) {
+
+                        realtimeRefreshTimeline.stop();
+
+                        realtimeRefreshTimeline = null;
+
+                        System.out.println(
+                                        "[PATIENT REPORTS] "
+                                                        + "Realtime refresh stopped.");
+                }
         }
 
         // =====================================================
@@ -393,19 +655,35 @@ public class PatientReportsPage {
                         return;
                 }
 
-                PatientReportController reportController = getController();
+                try {
 
-                reportController.addReport(
-                                report);
+                        PatientReportController reportController = getController();
 
-                if (table != null) {
+                        reportController.addReport(
+                                        report);
+
+                        // =============================================
+                        // FIRESTORE REFRESH
+                        // =============================================
 
                         reportController.refreshReports();
 
-                        table.setItems(
-                                        reportController.getReports());
+                        if (table != null) {
 
-                        table.refresh();
+                                refreshTableUsingFilters();
+                        }
+
+                        System.out.println(
+                                        "[PATIENT REPORTS] "
+                                                        + "Report added successfully.");
+
+                } catch (Exception e) {
+
+                        e.printStackTrace();
+
+                        showError(
+                                        "Unable to add patient report.\n\n"
+                                                        + e.getMessage());
                 }
         }
 
@@ -427,23 +705,29 @@ public class PatientReportsPage {
                                 "Patient Report");
 
                 alert.setHeaderText(
-                                report.getReportName());
+                                safe(
+                                                report.getReportName()));
 
                 alert.setContentText(
                                 "Patient: "
-                                                + safe(report.getPatientName())
+                                                + safe(
+                                                                report.getPatientName())
 
                                                 + "\n\nReport Type: "
-                                                + safe(report.getReportType())
+                                                + safe(
+                                                                report.getReportType())
 
                                                 + "\n\nDate: "
-                                                + safe(report.getDate())
+                                                + safe(
+                                                                report.getDate())
 
                                                 + "\n\nStatus: "
-                                                + safe(report.getStatus())
+                                                + safe(
+                                                                report.getStatus())
 
                                                 + "\n\nFile: "
-                                                + safe(report.getAction()));
+                                                + safe(
+                                                                report.getAction()));
 
                 alert.showAndWait();
         }
@@ -469,43 +753,74 @@ public class PatientReportsPage {
                                 "Delete this report?");
 
                 confirmation.setContentText(
-                                report.getReportName());
+                                safe(
+                                                report.getReportName()));
 
                 confirmation.showAndWait()
-                                .ifPresent(response -> {
+                                .ifPresent(
+                                                response -> {
 
-                                        if (response == ButtonType.OK) {
+                                                        if (response == ButtonType.OK) {
 
-                                                try {
+                                                                try {
 
-                                                        controller.deleteReport(
-                                                                        report);
+                                                                        controller.deleteReport(
+                                                                                        report);
 
-                                                        table.setItems(
-                                                                        controller.getReports());
+                                                                        // =================================
+                                                                        // REFRESH FIRESTORE DATA
+                                                                        // =================================
 
-                                                        table.refresh();
+                                                                        controller.refreshReports();
 
-                                                } catch (Exception ex) {
+                                                                        refreshTableUsingFilters();
 
-                                                        ex.printStackTrace();
+                                                                        System.out.println(
+                                                                                        "[PATIENT REPORTS] "
+                                                                                                        + "Report deleted.");
 
-                                                        Alert error = new Alert(
-                                                                        Alert.AlertType.ERROR);
+                                                                } catch (Exception ex) {
 
-                                                        error.setTitle(
-                                                                        "Delete Error");
+                                                                        ex.printStackTrace();
 
-                                                        error.setHeaderText(
-                                                                        "Unable to delete report");
+                                                                        Alert error = new Alert(
+                                                                                        Alert.AlertType.ERROR);
 
-                                                        error.setContentText(
-                                                                        "Please check your Firebase connection.");
+                                                                        error.setTitle(
+                                                                                        "Delete Error");
 
-                                                        error.showAndWait();
-                                                }
-                                        }
-                                });
+                                                                        error.setHeaderText(
+                                                                                        "Unable to delete report");
+
+                                                                        error.setContentText(
+                                                                                        "Please check your Firebase connection.");
+
+                                                                        error.showAndWait();
+                                                                }
+                                                        }
+                                                });
+        }
+
+        // =====================================================
+        // ERROR ALERT
+        // =====================================================
+
+        private static void showError(
+                        String message) {
+
+                Alert alert = new Alert(
+                                Alert.AlertType.ERROR);
+
+                alert.setTitle(
+                                "Patient Reports");
+
+                alert.setHeaderText(
+                                null);
+
+                alert.setContentText(
+                                message);
+
+                alert.showAndWait();
         }
 
         // =====================================================

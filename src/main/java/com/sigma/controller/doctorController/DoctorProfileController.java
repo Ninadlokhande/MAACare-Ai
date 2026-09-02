@@ -10,17 +10,11 @@ public class DoctorProfileController {
 
         private String doctorUid;
 
-        // =========================
-        // CONSTRUCTOR
-        // =========================
         public DoctorProfileController(Firestore db) {
 
                 this.dao = new DoctorProfileDAO(db);
         }
 
-        // =========================
-        // CONSTRUCTOR WITH UID
-        // =========================
         public DoctorProfileController(
                         Firestore db,
                         String doctorUid) {
@@ -28,31 +22,30 @@ public class DoctorProfileController {
                 this.dao = new DoctorProfileDAO(db);
 
                 this.doctorUid = doctorUid;
+
+                System.out.println(
+                                "[DOCTOR PROFILE CONTROLLER] UID = "
+                                                + doctorUid);
         }
 
-        // =========================
-        // SET UID
-        // =========================
         public void setDoctorUid(String doctorUid) {
 
                 this.doctorUid = doctorUid;
+
+                System.out.println(
+                                "[DOCTOR PROFILE CONTROLLER] UID updated = "
+                                                + doctorUid);
         }
 
-        // =========================
-        // GET UID
-        // =========================
         public String getDoctorUid() {
 
                 return doctorUid;
         }
 
-        // =========================
-        // GET PROFILE
-        // =========================
         public DoctorProfileModel getDoctorInformation() {
 
-                if (doctorUid == null ||
-                                doctorUid.trim().isEmpty()) {
+                if (doctorUid == null
+                                || doctorUid.trim().isEmpty()) {
 
                         System.out.println(
                                         "[DOCTOR PROFILE] UID is not available.");
@@ -60,12 +53,10 @@ public class DoctorProfileController {
                         return new DoctorProfileModel();
                 }
 
-                return dao.getDoctorInformation(doctorUid);
+                return dao.getDoctorInformation(
+                                doctorUid);
         }
 
-        // =========================
-        // SAVE PROFILE
-        // =========================
         public boolean updateProfile(
                         String firstName,
                         String lastName,
@@ -81,11 +72,11 @@ public class DoctorProfileController {
                         String clinicName,
                         String clinicAddress) {
 
-                if (doctorUid == null ||
-                                doctorUid.trim().isEmpty()) {
+                if (doctorUid == null
+                                || doctorUid.trim().isEmpty()) {
 
                         System.out.println(
-                                        "[DOCTOR PROFILE] Cannot update profile. UID is empty.");
+                                        "[DOCTOR PROFILE] UID is empty.");
 
                         return false;
                 }
@@ -96,21 +87,74 @@ public class DoctorProfileController {
                 doctor.setLastName(lastName);
                 doctor.setGender(gender);
                 doctor.setDob(dob);
-
                 doctor.setPhone(phone);
                 doctor.setEmail(email);
                 doctor.setAddress(address);
-
                 doctor.setSpecialization(specialization);
                 doctor.setQualification(qualification);
                 doctor.setExperience(experience);
                 doctor.setMedicalLicense(medicalLicense);
-
                 doctor.setClinicName(clinicName);
                 doctor.setClinicAddress(clinicAddress);
 
                 return dao.updateDoctorInformation(
                                 doctorUid,
                                 doctor);
+        }
+
+        // =========================================================
+        // GET PHOTO URL
+        // =========================================================
+
+        public String getDoctorPhotoUrl() {
+
+                if (doctorUid == null
+                                || doctorUid.trim().isEmpty()) {
+
+                        return "";
+                }
+
+                return dao.getDoctorPhotoUrl(
+                                doctorUid);
+        }
+
+        // =========================================================
+        // SAVE PHOTO URL
+        // =========================================================
+
+        public boolean saveDoctorPhotoUrl(
+                        String photoUrl) {
+
+                if (doctorUid == null
+                                || doctorUid.trim().isEmpty()) {
+
+                        return false;
+                }
+
+                if (photoUrl == null
+                                || photoUrl.trim().isEmpty()) {
+
+                        return false;
+                }
+
+                return dao.saveDoctorPhotoUrl(
+                                doctorUid,
+                                photoUrl);
+        }
+
+        // =========================================================
+        // REMOVE PHOTO
+        // =========================================================
+
+        public boolean removeDoctorPhoto() {
+
+                if (doctorUid == null
+                                || doctorUid.trim().isEmpty()) {
+
+                        return false;
+                }
+
+                return dao.removeDoctorPhoto(
+                                doctorUid);
         }
 }

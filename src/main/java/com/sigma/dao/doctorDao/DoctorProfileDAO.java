@@ -1,4 +1,3 @@
-
 package com.sigma.dao.doctorDao;
 
 import java.util.HashMap;
@@ -8,7 +7,6 @@ import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
-
 import com.sigma.model.DoctorModel.DoctorProfileModel;
 
 public class DoctorProfileDAO {
@@ -31,8 +29,7 @@ public class DoctorProfileDAO {
 
                 DoctorProfileModel doctor = new DoctorProfileModel();
 
-                if (uid == null ||
-                                uid.trim().isEmpty()) {
+                if (uid == null || uid.trim().isEmpty()) {
 
                         System.out.println(
                                         "[DOCTOR PROFILE] UID is empty.");
@@ -42,8 +39,7 @@ public class DoctorProfileDAO {
 
                 try {
 
-                        DocumentReference docRef = db.collection("doctors")
-                                        .document(uid);
+                        DocumentReference docRef = db.collection("doctors").document(uid);
 
                         ApiFuture<DocumentSnapshot> future = docRef.get();
 
@@ -138,7 +134,6 @@ public class DoctorProfileDAO {
         // =====================================================
 
         public boolean updateDoctorInformation(
-
                         String uid,
                         DoctorProfileModel doctor) {
 
@@ -146,8 +141,7 @@ public class DoctorProfileDAO {
                 // CHECK UID
                 // =================================================
 
-                if (uid == null ||
-                                uid.trim().isEmpty()) {
+                if (uid == null || uid.trim().isEmpty()) {
 
                         System.out.println(
                                         "[DOCTOR PROFILE] Cannot save. UID is empty.");
@@ -247,13 +241,21 @@ public class DoctorProfileDAO {
                                         .document(uid);
 
                         /*
-                         * set() will:
+                         * IMPORTANT:
+                         *
+                         * update() is NOT used here because the doctor
+                         * document may not exist yet.
+                         *
+                         * set(data, SetOptions.merge()) means:
                          *
                          * 1. Create document if it does not exist.
-                         * 2. Replace/update document if it exists.
+                         * 2. Update only the fields inside data.
+                         * 3. Existing photoUrl will NOT be deleted.
                          */
 
-                        docRef.set(data).get();
+                        docRef.set(
+                                        data,
+                                        com.google.cloud.firestore.SetOptions.merge()).get();
 
                         System.out.println(
                                         "[DOCTOR PROFILE] Profile saved successfully to Firestore.");
@@ -272,6 +274,206 @@ public class DoctorProfileDAO {
         }
 
         // =====================================================
+        // GET DOCTOR PHOTO URL
+        // =====================================================
+
+        public String getDoctorPhotoUrl(String uid) {
+
+                if (uid == null || uid.trim().isEmpty()) {
+
+                        System.out.println(
+                                        "[DOCTOR PHOTO] UID is empty.");
+
+                        return "";
+                }
+
+                try {
+
+                        DocumentReference docRef = db.collection("doctors")
+                                        .document(uid);
+
+                        DocumentSnapshot document = docRef.get().get();
+
+                        if (!document.exists()) {
+
+                                System.out.println(
+                                                "[DOCTOR PHOTO] Doctor document not found.");
+
+                                return "";
+                        }
+
+                        /*
+                         * Main field:
+                         * photoUrl
+                         */
+
+                        String photoUrl = getString(document, "photoUrl");
+
+                        if (!photoUrl.isEmpty()) {
+
+                                return photoUrl;
+                        }
+
+                        /*
+                         * Backward compatibility:
+                         * If existing data uses another field name.
+                         */
+
+                        photoUrl = getString(document, "profilePhotoUrl");
+
+                        if (!photoUrl.isEmpty()) {
+
+                                return photoUrl;
+                        }
+
+                        photoUrl = getString(document, "photoURL");
+
+                        if (!photoUrl.isEmpty()) {
+
+                                return photoUrl;
+                        }
+
+                        photoUrl = getString(document, "cloudinaryUrl");
+
+                        if (!photoUrl.isEmpty()) {
+
+                                return photoUrl;
+                        }
+
+                        return "";
+
+                } catch (Exception e) {
+
+                        System.out.println(
+                                        "[DOCTOR PHOTO] Error loading doctor photo URL.");
+
+                        e.printStackTrace();
+
+                        return "";
+                }
+        }
+
+        // =====================================================
+        // SAVE DOCTOR PHOTO URL
+        // =====================================================
+
+        public boolean saveDoctorPhotoUrl(
+                        String uid,
+                        String photoUrl) {
+
+                if (uid == null || uid.trim().isEmpty()) {
+
+                        System.out.println(
+                                        "[DOCTOR PHOTO] Cannot save photo. UID is empty.");
+
+                        return false;
+                }
+
+                if (photoUrl == null ||
+                                photoUrl.trim().isEmpty()) {
+
+                        System.out.println(
+                                        "[DOCTOR PHOTO] Cannot save photo. URL is empty.");
+
+                        return false;
+                }
+
+                try {
+
+                        DocumentReference docRef = db.collection("doctors")
+                                        .document(uid);
+
+                        Map<String, Object> photoData = new HashMap<>();
+
+                        photoData.put(
+                                        "photoUrl",
+                                        photoUrl.trim());
+
+                        /*
+                         * merge() is very important.
+                         *
+                         * It will NOT remove:
+                         *
+                         * firstName
+                         * lastName
+                         * email
+                         * phone
+                         * specialization
+                         * clinicName
+                         * etc.
+                         *
+                         * Only photoUrl will be added/updated.
+                         */
+
+                        docRef.set(
+                                        photoData,
+                                        com.google.cloud.firestore.SetOptions.merge()).get();
+
+                        System.out.println(
+                                        "[DOCTOR PHOTO] Photo URL saved successfully.");
+
+                        System.out.println(
+                                        "[DOCTOR PHOTO] URL = " + photoUrl);
+
+                        return true;
+
+                } catch (Exception e) {
+
+                        System.out.println(
+                                        "[DOCTOR PHOTO] Error saving photo URL.");
+
+                        e.printStackTrace();
+
+                        return false;
+                }
+        }
+
+        // =====================================================
+        // DELETE DOCTOR PHOTO URL
+        // =====================================================
+
+        public boolean removeDoctorPhoto(String uid) {
+
+                if (uid == null || uid.trim().isEmpty()) {
+
+                        System.out.println(
+                                        "[DOCTOR PHOTO] Cannot remove photo. UID is empty.");
+
+                        return false;
+                }
+
+                try {
+
+                        DocumentReference docRef = db.collection("doctors")
+                                        .document(uid);
+
+                        Map<String, Object> data = new HashMap<>();
+
+                        data.put(
+                                        "photoUrl",
+                                        com.google.cloud.firestore.FieldValue.delete());
+
+                        docRef.set(
+                                        data,
+                                        com.google.cloud.firestore.SetOptions.merge()).get();
+
+                        System.out.println(
+                                        "[DOCTOR PHOTO] Photo URL removed successfully.");
+
+                        return true;
+
+                } catch (Exception e) {
+
+                        System.out.println(
+                                        "[DOCTOR PHOTO] Error removing photo URL.");
+
+                        e.printStackTrace();
+
+                        return false;
+                }
+        }
+
+        // =====================================================
         // GET STRING SAFELY
         // =====================================================
 
@@ -281,7 +483,9 @@ public class DoctorProfileDAO {
 
                 String value = document.getString(field);
 
-                return value == null ? "" : value;
+                return value == null
+                                ? ""
+                                : value.trim();
         }
 
         // =====================================================
