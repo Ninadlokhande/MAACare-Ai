@@ -117,9 +117,22 @@ if (existingprofile == null) {
 
         // -------- MaaCare Logo --------
 
-        Label maaCareLogo = new Label("❤");
+       /*  Label maaCareLogo = new Label("❤");
         maaCareLogo.setFont(Font.font(30));
-        maaCareLogo.setTextFill(Color.web(PINK));
+        maaCareLogo.setTextFill(Color.web(PINK));*/ 
+
+        // -------- MaaCare Logo --------
+
+Image maaCareImage = new Image(
+        "assets\\images\\logo\\logo.png"
+);
+
+ImageView maaCareLogo = new ImageView(maaCareImage);
+
+maaCareLogo.setFitWidth(75);
+maaCareLogo.setFitHeight(75);
+maaCareLogo.setPreserveRatio(true);
+maaCareLogo.setTranslateY(-5) ;  
 
         Label maaCareText = new Label("MaaCare AI");
         maaCareText.setFont(Font.font("Arial", FontWeight.BOLD, 27));
