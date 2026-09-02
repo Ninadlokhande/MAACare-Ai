@@ -1,5 +1,7 @@
+
 package com.sigma.view.doctorpages;
 
+import com.sigma.controller.doctorController.PatientReportController;
 import com.sigma.model.DoctorModel.PatientReport;
 
 import javafx.geometry.Insets;
@@ -14,6 +16,10 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class UploadReportPage {
+
+        // =====================================================
+        // SHOW PAGE
+        // =====================================================
 
         public static void show() {
 
@@ -48,6 +54,9 @@ public class UploadReportPage {
                                 Priority.ALWAYS);
 
                 Button back = Theme.backButton();
+
+                // BACK TO REPORTS
+                back.setOnAction(e -> PatientReportsPage.show());
 
                 header.getChildren().addAll(
                                 heading,
@@ -123,7 +132,7 @@ public class UploadReportPage {
                 reportName.setPrefHeight(40);
 
                 // =====================================================
-                // SOURCE
+                // SOURCE / LABORATORY
                 // =====================================================
 
                 TextField source = new TextField();
@@ -188,8 +197,7 @@ public class UploadReportPage {
                                                                         "All Files",
                                                                         "*.*"));
 
-                        File file = chooser.showOpenDialog(
-                                        null);
+                        File file = chooser.showOpenDialog(null);
 
                         if (file != null) {
 
@@ -248,16 +256,17 @@ public class UploadReportPage {
                 // CANCEL
                 // =====================================================
 
-                cancel.setOnAction(e -> {
-
-                        PatientReportsPage.show();
-                });
+                cancel.setOnAction(e -> PatientReportsPage.show());
 
                 // =====================================================
                 // UPLOAD
                 // =====================================================
 
                 upload.setOnAction(e -> {
+
+                        // =================================================
+                        // VALIDATION
+                        // =================================================
 
                         if (patient.getValue() == null
                                         || reportType.getValue() == null
@@ -277,9 +286,9 @@ public class UploadReportPage {
                                 alert.setHeaderText(null);
 
                                 alert.setContentText(
-                                                "Please select patient, " +
-                                                                "report type, report name " +
-                                                                "and report file.");
+                                                "Please select patient, "
+                                                                + "report type, report name "
+                                                                + "and report file.");
 
                                 alert.showAndWait();
 
@@ -296,7 +305,7 @@ public class UploadReportPage {
                                                                         "dd MMM yyyy hh:mm a"));
 
                         // =================================================
-                        // CREATE REPORT
+                        // CREATE REPORT OBJECT
                         // =================================================
 
                         PatientReport report = new PatientReport(
@@ -312,14 +321,48 @@ public class UploadReportPage {
 
                                         status.getValue(),
 
-                                        filePath.getText());
+                                        filePath.getText()
+                                                        .trim());
 
                         // =================================================
-                        // ADD REPORT
+                        // SAVE TO FIRESTORE
                         // =================================================
 
-                        PatientReportsPage.addReport(
-                                        report);
+                        try {
+
+                                PatientReportController reportController = DoctorDashboard
+                                                .getReportController();
+
+                                reportController.addReport(
+                                                report);
+
+                                System.out.println(
+                                                "[UPLOAD REPORT] "
+                                                                + "Report saved to Firestore.");
+
+                        } catch (Exception ex) {
+
+                                ex.printStackTrace();
+
+                                Alert error = new Alert(
+                                                Alert.AlertType.ERROR);
+
+                                error.setTitle(
+                                                "Upload Error");
+
+                                error.setHeaderText(
+                                                "Unable to upload report");
+
+                                error.setContentText(
+                                                "The report could not be saved "
+                                                                + "to Firestore.\n\n"
+                                                                + "Please check your Firebase "
+                                                                + "connection and try again.");
+
+                                error.showAndWait();
+
+                                return;
+                        }
 
                         // =================================================
                         // SUCCESS
@@ -335,16 +378,20 @@ public class UploadReportPage {
                                         "Report Uploaded Successfully");
 
                         alert.setContentText(
-                                        "The report has been added " +
-                                                        "to the patient reports list.");
+                                        "The report has been saved successfully "
+                                                        + "and is now available in Patient Reports.");
 
                         alert.showAndWait();
+
+                        // =================================================
+                        // GO TO REPORTS PAGE
+                        // =================================================
 
                         PatientReportsPage.show();
                 });
 
                 // =====================================================
-                // FORM
+                // FORM FIELDS
                 // =====================================================
 
                 form.getChildren().addAll(
@@ -410,6 +457,7 @@ public class UploadReportPage {
 
                 Scene scene = new Scene(root);
 
+                // Use SAME Dashboard Stage
                 DoctorDashboard.changeScene(
                                 scene);
         }
@@ -429,8 +477,8 @@ public class UploadReportPage {
                 label.setStyle(
                                 "-fx-font-size: 11px;" +
                                                 "-fx-font-weight: bold;" +
-                                                "-fx-text-fill: " +
-                                                Theme.TEXT + ";");
+                                                "-fx-text-fill: "
+                                                + Theme.TEXT + ";");
 
                 box.getChildren().addAll(
                                 label,

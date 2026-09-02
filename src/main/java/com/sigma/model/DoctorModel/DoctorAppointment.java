@@ -6,10 +6,6 @@ import javafx.beans.property.StringProperty;
 
 public class DoctorAppointment {
 
-    // =====================================================
-    // PROPERTIES
-    // =====================================================
-
     private final StringProperty appointmentId;
     private final StringProperty doctorId;
     private final StringProperty patientId;
@@ -20,10 +16,6 @@ public class DoctorAppointment {
     private final StringProperty status;
     private final StringProperty payment;
     private final StringProperty action;
-
-    // =====================================================
-    // CONSTRUCTOR
-    // =====================================================
 
     public DoctorAppointment(
             String appointmentId,
@@ -68,10 +60,6 @@ public class DoctorAppointment {
                 action == null ? "View" : action);
     }
 
-    // =====================================================
-    // BACKWARD COMPATIBLE CONSTRUCTOR
-    // =====================================================
-
     public DoctorAppointment(
             String time,
             String patient,
@@ -92,10 +80,6 @@ public class DoctorAppointment {
                 payment,
                 action);
     }
-
-    // =====================================================
-    // GETTERS
-    // =====================================================
 
     public String getAppointmentId() {
         return appointmentId.get();
@@ -137,10 +121,6 @@ public class DoctorAppointment {
         return action.get();
     }
 
-    // =====================================================
-    // PROPERTY METHODS
-    // =====================================================
-
     public StringProperty appointmentIdProperty() {
         return appointmentId;
     }
@@ -181,53 +161,45 @@ public class DoctorAppointment {
         return action;
     }
 
-    // =====================================================
-    // SETTERS
-    // =====================================================
-
     public void setAppointmentId(String value) {
-        appointmentId.set(value);
+        appointmentId.set(value == null ? "" : value);
     }
 
     public void setDoctorId(String value) {
-        doctorId.set(value);
+        doctorId.set(value == null ? "" : value);
     }
 
     public void setPatientId(String value) {
-        patientId.set(value);
+        patientId.set(value == null ? "" : value);
     }
 
     public void setDate(String value) {
-        date.set(value);
+        date.set(value == null ? "" : value);
     }
 
     public void setTime(String value) {
-        time.set(value);
+        time.set(value == null ? "" : value);
     }
 
     public void setPatient(String value) {
-        patient.set(value);
+        patient.set(value == null ? "" : value);
     }
 
     public void setType(String value) {
-        type.set(value);
+        type.set(value == null ? "" : value);
     }
 
     public void setStatus(String value) {
-        status.set(value);
+        status.set(value == null ? "" : value);
     }
 
     public void setPayment(String value) {
-        payment.set(value);
+        payment.set(value == null ? "" : value);
     }
 
     public void setAction(String value) {
-        action.set(value);
+        action.set(value == null ? "View" : value);
     }
-
-    // =====================================================
-    // TO STRING
-    // =====================================================
 
     @Override
     public String toString() {

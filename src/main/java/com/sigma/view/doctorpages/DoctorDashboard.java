@@ -1,5 +1,15 @@
+
 package com.sigma.view.doctorpages;
 
+import com.sigma.config.DoctorModule.FirebaseConfig;
+
+import com.sigma.controller.doctorController.DoctorAppointmentController;
+import com.sigma.controller.doctorController.PatientController;
+import com.sigma.controller.doctorController.PatientReportController;
+
+import com.sigma.model.DoctorModel.DoctorAppointment;
+
+import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -8,42 +18,109 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
-public class DoctorDashboard extends javafx.application.Application {
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 
-        // =====================================================
-        // ONE COMMON STAGE
-        // =====================================================
+public class DoctorDashboard extends Application {
+
+        // =========================================================
+        // COMMON DASHBOARD INSTANCE / STAGE
+        // =========================================================
+
+        private static DoctorDashboard instance;
 
         public static Stage dashboardStage;
 
-        // =====================================================
-        // DASHBOARD SCENE
-        // =====================================================
-
         private static Scene dashboardScene;
 
-        // =====================================================
+        private static String currentDoctorUid;
+
+        // =========================================================
+        // CONTROLLERS
+        // =========================================================
+
+        private static DoctorAppointmentController appointmentController;
+        private static PatientController patientController;
+        private static PatientReportController reportController;
+
+        // =========================================================
+        // SAVED STAGE STATE
+        // =========================================================
+
+        private static double dashboardWidth = Theme.WIDTH;
+        private static double dashboardHeight = Theme.HEIGHT;
+
+        private static double dashboardX = -1;
+        private static double dashboardY = -1;
+
+        private static boolean dashboardWasMaximized = false;
+
+        // =========================================================
+        // GET INSTANCE
+        // =========================================================
+
+        public static DoctorDashboard getInstance() {
+
+                if (instance == null) {
+                        instance = new DoctorDashboard();
+                }
+
+                return instance;
+        }
+
+        // =========================================================
+        // GET CURRENT DOCTOR UID
+        // =========================================================
+
+        public static String getCurrentDoctorUid() {
+
+                if (currentDoctorUid != null &&
+                                !currentDoctorUid.trim().isEmpty()) {
+
+                        return currentDoctorUid;
+                }
+
+                return FirebaseConfig.getCurrentDoctorUid();
+        }
+
+        // =========================================================
+        // SET CURRENT DOCTOR UID
+        // =========================================================
+
+        public static void setCurrentDoctorUid(String doctorUid) {
+
+                currentDoctorUid = doctorUid;
+
+                if (doctorUid != null &&
+                                !doctorUid.trim().isEmpty()) {
+
+                        FirebaseConfig.setCurrentDoctorUid(doctorUid);
+                }
+        }
+
+        // =========================================================
         // START
-        // =====================================================
+        // =========================================================
 
         @Override
         public void start(Stage stage) {
+
+                instance = this;
 
                 dashboardStage = stage;
 
                 dashboardStage.setTitle(
                                 "MaaCare AI - Doctor Dashboard");
 
-                // Create Dashboard Scene
+                dashboardStage.setResizable(true);
+
+                initializeControllers();
+
                 dashboardScene = createDashboardScene();
 
-                // Set Dashboard Scene
                 dashboardStage.setScene(
                                 dashboardScene);
-
-                // =================================================
-                // STAGE SIZE - ONLY ONCE
-                // =================================================
 
                 dashboardStage.setWidth(
                                 Theme.WIDTH);
@@ -53,71 +130,482 @@ public class DoctorDashboard extends javafx.application.Application {
 
                 dashboardStage.centerOnScreen();
 
-                dashboardStage.setResizable(true);
-
                 dashboardStage.show();
+
+                dashboardStage.toFront();
+
+                dashboardStage.requestFocus();
         }
 
-        // =====================================================
+        // =========================================================
+        // INITIALIZE CONTROLLERS
+        // =========================================================
+
+        private static void initializeControllers() {
+
+                try {
+
+                        if (appointmentController == null) {
+
+                                appointmentController = new DoctorAppointmentController();
+
+                        } else {
+
+                                appointmentController.refreshAppointments();
+                        }
+
+                } catch (Exception e) {
+
+                        e.printStackTrace();
+
+                        System.out.println(
+                                        "[DASHBOARD] Appointment controller error: "
+                                                        + e.getMessage());
+                }
+
+                try {
+
+                        if (patientController == null) {
+
+                                patientController = new PatientController();
+
+                        } else {
+
+                                patientController.refreshPatients();
+                        }
+
+                } catch (Exception e) {
+
+                        e.printStackTrace();
+
+                        System.out.println(
+                                        "[DASHBOARD] Patient controller error: "
+                                                        + e.getMessage());
+                }
+
+                try {
+
+                        if (reportController == null) {
+
+                                reportController = new PatientReportController();
+
+                        } else {
+
+                                reportController.refreshReports();
+                        }
+
+                } catch (Exception e) {
+
+                        e.printStackTrace();
+
+                        System.out.println(
+                                        "[DASHBOARD] Report controller error: "
+                                                        + e.getMessage());
+                }
+        }
+
+        // =========================================================
+        // SHOW DASHBOARD WITH DOCTOR UID
+        // =========================================================
+
+        public static void showDashboard(
+                        String doctorUid) {
+
+                try {
+
+                        System.out.println(
+                                        "========================================");
+
+                        System.out.println(
+                                        "[DOCTOR DASHBOARD] Opening dashboard");
+
+                        System.out.println(
+                                        "[DOCTOR DASHBOARD] UID : "
+                                                        + doctorUid);
+
+                        // -----------------------------------------------------
+                        // SAVE UID
+                        // -----------------------------------------------------
+
+                        setCurrentDoctorUid(
+                                        doctorUid);
+
+                        // -----------------------------------------------------
+                        // INITIALIZE INSTANCE
+                        // -----------------------------------------------------
+
+                        DoctorDashboard dashboard = getInstance();
+
+                        // -----------------------------------------------------
+                        // CREATE COMMON STAGE
+                        // -----------------------------------------------------
+
+                        if (dashboardStage == null) {
+
+                                dashboardStage = new Stage();
+
+                                dashboard.start(
+                                                dashboardStage);
+
+                                return;
+                        }
+
+                        // -----------------------------------------------------
+                        // INITIALIZE CONTROLLERS
+                        // -----------------------------------------------------
+
+                        initializeControllers();
+
+                        // -----------------------------------------------------
+                        // CREATE DASHBOARD SCENE
+                        // -----------------------------------------------------
+
+                        dashboardScene = createDashboardScene();
+
+                        // -----------------------------------------------------
+                        // SET SCENE
+                        // -----------------------------------------------------
+
+                        dashboardStage.setScene(
+                                        dashboardScene);
+
+                        // -----------------------------------------------------
+                        // SHOW
+                        // -----------------------------------------------------
+
+                        dashboardStage.show();
+
+                        dashboardStage.toFront();
+
+                        dashboardStage.requestFocus();
+
+                        System.out.println(
+                                        "[DOCTOR DASHBOARD] Dashboard opened successfully");
+
+                        System.out.println(
+                                        "========================================");
+
+                } catch (Exception e) {
+
+                        e.printStackTrace();
+
+                        System.out.println(
+                                        "[DOCTOR DASHBOARD ERROR] "
+                                                        + e.getMessage());
+                }
+        }
+
+        // =========================================================
+        // SHOW DASHBOARD WITHOUT UID
+        // =========================================================
+
+        public static void showDashboard() {
+
+                try {
+
+                        String uid = getCurrentDoctorUid();
+
+                        if (uid != null &&
+                                        !uid.trim().isEmpty()) {
+
+                                showDashboard(uid);
+
+                                return;
+                        }
+
+                        // -----------------------------------------------------
+                        // NO UID - STILL SHOW DASHBOARD
+                        // -----------------------------------------------------
+
+                        DoctorDashboard dashboard = getInstance();
+
+                        if (dashboardStage == null) {
+
+                                dashboardStage = new Stage();
+
+                                dashboard.start(
+                                                dashboardStage);
+
+                        } else {
+
+                                initializeControllers();
+
+                                dashboardScene = createDashboardScene();
+
+                                dashboardStage.setScene(
+                                                dashboardScene);
+
+                                dashboardStage.show();
+
+                                dashboardStage.toFront();
+
+                                dashboardStage.requestFocus();
+                        }
+
+                } catch (Exception e) {
+
+                        e.printStackTrace();
+
+                        System.out.println(
+                                        "[DOCTOR DASHBOARD ERROR] "
+                                                        + e.getMessage());
+                }
+        }
+
+        // =========================================================
         // CHANGE SCENE
-        // =====================================================
+        // =========================================================
 
         public static void changeScene(
                         Scene newScene) {
 
-                if (dashboardStage != null &&
-                                newScene != null) {
+                if (dashboardStage == null) {
 
-                        // ONLY CHANGE SCENE
+                        System.out.println(
+                                        "[NAVIGATION] Dashboard stage is null.");
+
+                        return;
+                }
+
+                if (newScene == null) {
+
+                        System.out.println(
+                                        "[NAVIGATION] New scene is null.");
+
+                        return;
+                }
+
+                try {
+
+                        // -----------------------------------------------------
+                        // SAVE CURRENT STAGE STATE
+                        // -----------------------------------------------------
+
+                        if (!dashboardStage.isMaximized()) {
+
+                                dashboardWidth = dashboardStage.getWidth();
+
+                                dashboardHeight = dashboardStage.getHeight();
+
+                                dashboardX = dashboardStage.getX();
+
+                                dashboardY = dashboardStage.getY();
+                        }
+
+                        dashboardWasMaximized = dashboardStage.isMaximized();
+
+                        // -----------------------------------------------------
+                        // CHANGE SCENE
+                        // -----------------------------------------------------
+
                         dashboardStage.setScene(
                                         newScene);
+
+                        // -----------------------------------------------------
+                        // RESTORE STAGE STATE
+                        // -----------------------------------------------------
+
+                        if (dashboardWasMaximized) {
+
+                                dashboardStage.setMaximized(
+                                                true);
+
+                        } else {
+
+                                dashboardStage.setMaximized(
+                                                false);
+
+                                dashboardStage.setWidth(
+                                                dashboardWidth);
+
+                                dashboardStage.setHeight(
+                                                dashboardHeight);
+
+                                if (dashboardX >= 0 &&
+                                                dashboardY >= 0) {
+
+                                        dashboardStage.setX(
+                                                        dashboardX);
+
+                                        dashboardStage.setY(
+                                                        dashboardY);
+                                }
+                        }
+
+                        dashboardStage.show();
+
+                        dashboardStage.toFront();
+
+                        dashboardStage.requestFocus();
+
+                } catch (Exception e) {
+
+                        e.printStackTrace();
+
+                        System.out.println(
+                                        "[NAVIGATION ERROR] "
+                                                        + e.getMessage());
                 }
         }
 
-        // =====================================================
-        // SHOW DASHBOARD
-        // =====================================================
+        // =========================================================
+        // GET APPOINTMENT CONTROLLER
+        // =========================================================
 
-        public static void showDashboard() {
+        public static DoctorAppointmentController getAppointmentController() {
 
-                if (dashboardStage != null &&
-                                dashboardScene != null) {
+                if (appointmentController == null) {
 
-                        dashboardStage.setScene(
-                                        dashboardScene);
+                        appointmentController = new DoctorAppointmentController();
+                }
+
+                return appointmentController;
+        }
+
+        // =========================================================
+        // GET PATIENT CONTROLLER
+        // =========================================================
+
+        public static PatientController getPatientController() {
+
+                if (patientController == null) {
+
+                        patientController = new PatientController();
+                }
+
+                return patientController;
+        }
+
+        // =========================================================
+        // GET REPORT CONTROLLER
+        // =========================================================
+
+        public static PatientReportController getReportController() {
+
+                if (reportController == null) {
+
+                        reportController = new PatientReportController();
+                }
+
+                return reportController;
+        }
+
+        // =========================================================
+        // OPEN DOCTOR PROFILE
+        // =========================================================
+
+        private static void openDoctorProfile() {
+
+                try {
+
+                        if (dashboardStage == null) {
+
+                                showError(
+                                                "Dashboard stage is not available.\n"
+                                                                + "Please open the dashboard again.");
+
+                                return;
+                        }
+
+                        String doctorUid = getCurrentDoctorUid();
+
+                        if (doctorUid == null ||
+                                        doctorUid.trim().isEmpty()) {
+
+                                showError(
+                                                "Doctor UID is not available.\n\n"
+                                                                + "Please login again.");
+
+                                return;
+                        }
+
+                        System.out.println(
+                                        "[PROFILE] Opening profile for UID: "
+                                                        + doctorUid);
+
+                        DoctorProfilePage profilePage = new DoctorProfilePage(
+                                        dashboardStage,
+                                        doctorUid);
+
+                        profilePage.show();
+
+                } catch (Exception e) {
+
+                        e.printStackTrace();
+
+                        showError(
+                                        "Unable to open Doctor Profile.\n\n"
+                                                        + e.getMessage());
                 }
         }
 
-        // =====================================================
+        // =========================================================
+        // ERROR ALERT
+        // =========================================================
+
+        private static void showError(
+                        String message) {
+
+                Alert alert = new Alert(
+                                Alert.AlertType.ERROR);
+
+                alert.setTitle(
+                                "Doctor Dashboard");
+
+                alert.setHeaderText(
+                                null);
+
+                alert.setContentText(
+                                message);
+
+                alert.showAndWait();
+        }
+
+        // =========================================================
         // DASHBOARD SCENE
-        // =====================================================
+        // =========================================================
 
         private static Scene createDashboardScene() {
 
                 BorderPane root = new BorderPane();
 
-                Theme.applyBackground(root);
+                Theme.applyBackground(
+                                root);
+
+                // -----------------------------------------------------
+                // SIDEBAR
+                // -----------------------------------------------------
 
                 VBox sidebar = createSidebar();
 
-                root.setLeft(sidebar);
+                root.setLeft(
+                                sidebar);
+
+                // -----------------------------------------------------
+                // MAIN CONTENT
+                // -----------------------------------------------------
 
                 VBox content = createDashboardContent();
 
-                root.setCenter(content);
+                root.setCenter(
+                                content);
 
-                return new Scene(root);
+                return new Scene(
+                                root,
+                                Theme.WIDTH,
+                                Theme.HEIGHT);
         }
 
-        // =====================================================
+        // =========================================================
         // SIDEBAR
-        // =====================================================
+        // =========================================================
 
         private static VBox createSidebar() {
 
                 VBox sidebar = new VBox();
 
-                sidebar.setPrefWidth(205);
+                sidebar.setPrefWidth(
+                                205);
 
                 sidebar.setPadding(
                                 new Insets(
@@ -126,24 +614,22 @@ public class DoctorDashboard extends javafx.application.Application {
                                                 18,
                                                 18));
 
-                sidebar.setSpacing(8);
+                sidebar.setSpacing(
+                                8);
 
                 sidebar.setStyle(
-                                "-fx-background-color: #EEE7FF;" +
-                                                "-fx-border-color: " +
-                                                Theme.BORDER + ";" +
-                                                "-fx-border-width: 0 1 0 0;");
+                                "-fx-background-color: #EEE7FF;"
+                                                + "-fx-border-color: "
+                                                + Theme.BORDER + ";"
+                                                + "-fx-border-width: 0 1 0 0;");
 
-                // =================================================
-                // LOGO
-                // =================================================
+                sidebar.getChildren()
+                                .add(
+                                                Theme.logo());
 
-                sidebar.getChildren().add(
-                                Theme.logo());
-
-                // =================================================
-                // DOCTOR
-                // =================================================
+                // =====================================================
+                // DOCTOR INFORMATION
+                // =====================================================
 
                 VBox doctorBox = new VBox(2);
 
@@ -158,18 +644,19 @@ public class DoctorDashboard extends javafx.application.Application {
                                 "Dr. Anjali Mehta");
 
                 doctor.setStyle(
-                                "-fx-font-weight: BOLD;" +
-                                                "-fx-font-size: 14px");
+                                "-fx-font-weight: BOLD;"
+                                                + "-fx-font-size: 14px");
 
                 doctor.setTextFill(
-                                Color.web(Theme.TEXT));
+                                Color.web(
+                                                Theme.TEXT));
 
                 Label specialist = new Label(
                                 "Obstetrician & Gynecologist");
 
                 specialist.setStyle(
-                                "-fx-font-weight: BOLD;" +
-                                                "-fx-font-size: 11px");
+                                "-fx-font-weight: BOLD;"
+                                                + "-fx-font-size: 11px");
 
                 specialist.setTextFill(
                                 Color.web(
@@ -179,23 +666,26 @@ public class DoctorDashboard extends javafx.application.Application {
                                 "●  Online");
 
                 online.setStyle(
-                                "-fx-font-weight: BOLD;" +
-                                                "-fx-font-size: 11px");
+                                "-fx-font-weight: BOLD;"
+                                                + "-fx-font-size: 11px");
 
                 online.setTextFill(
-                                Color.web(Theme.GREEN));
+                                Color.web(
+                                                Theme.GREEN));
 
-                doctorBox.getChildren().addAll(
-                                doctor,
-                                specialist,
-                                online);
+                doctorBox.getChildren()
+                                .addAll(
+                                                doctor,
+                                                specialist,
+                                                online);
 
-                sidebar.getChildren().add(
-                                doctorBox);
+                sidebar.getChildren()
+                                .add(
+                                                doctorBox);
 
-                // =================================================
-                // MENU
-                // =================================================
+                // =====================================================
+                // MENU BUTTONS
+                // =====================================================
 
                 Button dashboard = createMenuButton(
                                 "🏠",
@@ -227,77 +717,47 @@ public class DoctorDashboard extends javafx.application.Application {
                                 "Settings",
                                 false);
 
-                // =================================================
+                // =====================================================
                 // NAVIGATION
-                // =================================================
-
-                Runnable openAppointments = () -> DoctorAppointmentsPage.show();
-
-                Runnable openPatients = () -> PatientsPage.show();
-
-                Runnable openReports = () -> PatientReportsPage.show();
-
-                Runnable openProfile = () -> DoctorProfile.show();
-
-                Runnable openSettings = () -> SettingsPage.show();
-
-                // =================================================
-                // SET ON ACTION
-                // =================================================
+                // =====================================================
 
                 appointments.setOnAction(
-                                e -> openAppointments.run());
+                                e -> DoctorAppointmentsPage.show());
 
                 patients.setOnAction(
-                                e -> openPatients.run());
+                                e -> PatientsPage.show());
 
                 reports.setOnAction(
-                                e -> openReports.run());
+                                e -> PatientReportsPage.show());
 
                 profile.setOnAction(
-                                e -> openProfile.run());
+                                e -> openDoctorProfile());
 
                 settings.setOnAction(
-                                e -> openSettings.run());
+                                e -> SettingsPage.display());
 
                 dashboard.setOnAction(
                                 e -> showDashboard());
 
-                sidebar.getChildren().addAll(
-                                dashboard,
-                                appointments,
-                                patients,
-                                reports,
-                                profile,
-                                settings);
+                // =====================================================
+                // ADD MENU
+                // =====================================================
 
-                // =================================================
-                // LOGOUT AT BOTTOM
-                // =================================================
-
-                Region spacer = new Region();
-
-                VBox.setVgrow(
-                                spacer,
-                                Priority.ALWAYS);
-
-                sidebar.getChildren().add(
-                                spacer);
-
-                Button logout = createMenuButton(
-                                "↪",
-                                "Logout",
-                                false);
-
-                sidebar.getChildren().add(
-                                logout);
+                sidebar.getChildren()
+                                .addAll(
+                                                dashboard,
+                                                appointments,
+                                                patients,
+                                                reports,
+                                                profile,
+                                                settings);
 
                 return sidebar;
         }
 
-        // =====================================================
+        // =========================================================
         // MENU BUTTON
-        // =====================================================
+        // =========================================================
 
         private static Button createMenuButton(
                         String icon,
@@ -312,92 +772,90 @@ public class DoctorDashboard extends javafx.application.Application {
                 button.setAlignment(
                                 Pos.CENTER_LEFT);
 
-                // =================================================
-                // ICON
-                // =================================================
-
                 Label iconLabel = new Label(icon);
 
-                iconLabel.setPrefWidth(35);
-                iconLabel.setMinWidth(35);
-                iconLabel.setMaxWidth(35);
+                iconLabel.setPrefWidth(
+                                35);
+
+                iconLabel.setMinWidth(
+                                35);
+
+                iconLabel.setMaxWidth(
+                                35);
 
                 iconLabel.setAlignment(
                                 Pos.CENTER);
 
                 iconLabel.setStyle(
-                                "-fx-font-family: 'Segoe UI Emoji';" +
-                                                "-fx-font-size: 18px;");
-
-                // =================================================
-                // TEXT
-                // =================================================
+                                "-fx-font-family: 'Segoe UI Emoji';"
+                                                + "-fx-font-size: 18px;");
 
                 Label textLabel = new Label(text);
 
                 textLabel.setStyle(
-                                "-fx-font-family: '" +
-                                                Theme.FONT +
-                                                "';" +
-                                                "-fx-font-size: 15px;" +
-                                                "-fx-font-weight: BOLD;");
-
-                // =================================================
-                // ICON + TEXT
-                // =================================================
+                                "-fx-font-family: '"
+                                                + Theme.FONT
+                                                + "';"
+                                                + "-fx-font-size: 15px;"
+                                                + "-fx-font-weight: BOLD;");
 
                 HBox content = new HBox(8);
 
                 content.setAlignment(
                                 Pos.CENTER_LEFT);
 
-                content.getChildren().addAll(
-                                iconLabel,
-                                textLabel);
+                content.getChildren()
+                                .addAll(
+                                                iconLabel,
+                                                textLabel);
 
-                button.setGraphic(content);
+                button.setGraphic(
+                                content);
 
                 button.setText("");
-
-                // =================================================
-                // ACTIVE
-                // =================================================
 
                 if (active) {
 
                         button.setStyle(
-                                        "-fx-background-color:" +
-                                                        Theme.PRIMARY_LIGHT + ";" +
-                                                        "-fx-background-radius: 8;" +
-                                                        "-fx-padding: 10 12 10 12;");
+                                        "-fx-background-color:"
+                                                        + Theme.PRIMARY_LIGHT + ";"
+                                                        + "-fx-background-radius: 8;"
+                                                        + "-fx-padding:"
+                                                        + "10 12 10 12;");
 
                         iconLabel.setTextFill(
-                                        Color.web(Theme.PRIMARY));
+                                        Color.web(
+                                                        Theme.PRIMARY));
 
                         textLabel.setTextFill(
-                                        Color.web(Theme.PRIMARY));
+                                        Color.web(
+                                                        Theme.PRIMARY));
 
                 } else {
 
                         button.setStyle(
-                                        "-fx-background-color: transparent;" +
-                                                        "-fx-background-radius: 8;" +
-                                                        "-fx-padding: 10 12 10 12;" +
-                                                        "-fx-cursor: hand;");
+                                        "-fx-background-color:"
+                                                        + "transparent;"
+                                                        + "-fx-background-radius: 8;"
+                                                        + "-fx-padding:"
+                                                        + "10 12 10 12;"
+                                                        + "-fx-cursor: hand;");
 
                         iconLabel.setTextFill(
-                                        Color.web(Theme.TEXT));
+                                        Color.web(
+                                                        Theme.TEXT));
 
                         textLabel.setTextFill(
-                                        Color.web(Theme.TEXT));
+                                        Color.web(
+                                                        Theme.TEXT));
                 }
 
                 return button;
         }
 
-        // =====================================================
+        // =========================================================
         // DASHBOARD CONTENT
-        // =====================================================
+        // =========================================================
 
         private static VBox createDashboardContent() {
 
@@ -410,11 +868,12 @@ public class DoctorDashboard extends javafx.application.Application {
                                                 25,
                                                 30));
 
-                Theme.applyBackground(content);
+                Theme.applyBackground(
+                                content);
 
-                // =================================================
+                // =====================================================
                 // HEADER
-                // =================================================
+                // =====================================================
 
                 HBox header = new HBox();
 
@@ -433,14 +892,17 @@ public class DoctorDashboard extends javafx.application.Application {
                                                 20));
 
                 title.setTextFill(
-                                Color.web(Theme.TEXT));
+                                Color.web(
+                                                Theme.TEXT));
 
                 Label sub = Theme.subtitle(
-                                "Here's what's happening in your clinic today.");
+                                "Here's what's happening "
+                                                + "in your clinic today.");
 
-                welcome.getChildren().addAll(
-                                title,
-                                sub);
+                welcome.getChildren()
+                                .addAll(
+                                                title,
+                                                sub);
 
                 Region spacer = new Region();
 
@@ -448,8 +910,14 @@ public class DoctorDashboard extends javafx.application.Application {
                                 spacer,
                                 Priority.ALWAYS);
 
+                String currentDate = LocalDate.now()
+                                .format(
+                                                DateTimeFormatter.ofPattern(
+                                                                "dd MMMM yyyy"));
+
                 Label date = new Label(
-                                "08 May 2024   📅");
+                                currentDate
+                                                + "   📅");
 
                 date.setFont(
                                 javafx.scene.text.Font.font(
@@ -458,62 +926,104 @@ public class DoctorDashboard extends javafx.application.Application {
                                                 11));
 
                 date.setTextFill(
-                                Color.web(Theme.TEXT));
+                                Color.web(
+                                                Theme.TEXT));
 
                 date.setStyle(
-                                "-fx-background-color: white;" +
-                                                "-fx-border-color: " +
-                                                Theme.BORDER + ";" +
-                                                "-fx-border-radius: 8;" +
-                                                "-fx-background-radius: 8;" +
-                                                "-fx-padding: 10 14;");
+                                "-fx-background-color: white;"
+                                                + "-fx-border-color: "
+                                                + Theme.BORDER + ";"
+                                                + "-fx-border-radius: 8;"
+                                                + "-fx-background-radius: 8;"
+                                                + "-fx-padding: 10 14;");
 
-                header.getChildren().addAll(
-                                welcome,
-                                spacer,
-                                date);
+                header.getChildren()
+                                .addAll(
+                                                welcome,
+                                                spacer,
+                                                date);
 
-                // =================================================
+                // =====================================================
+                // DYNAMIC COUNTS
+                // =====================================================
+
+                int todayAppointmentCount = 0;
+
+                int patientCount = 0;
+
+                int reportCount = 0;
+
+                if (appointmentController != null) {
+
+                        todayAppointmentCount = appointmentController
+                                        .getTodayAppointmentCount();
+                }
+
+                if (patientController != null) {
+
+                        patientCount = patientController
+                                        .getPatientCount();
+                }
+
+                if (reportController != null) {
+
+                        try {
+
+                                reportCount = reportController
+                                                .getReports()
+                                                .size();
+
+                        } catch (Exception e) {
+
+                                reportCount = 0;
+                        }
+                }
+
+                // =====================================================
                 // STAT CARDS
-                // =================================================
+                // =====================================================
 
                 HBox stats = new HBox(15);
 
-                stats.getChildren().addAll(
+                stats.getChildren()
+                                .addAll(
 
-                                statCard(
-                                                "📅",
-                                                "18",
-                                                "Today's",
-                                                "Appointments"),
+                                                statCard(
+                                                                "📅",
+                                                                String.valueOf(
+                                                                                todayAppointmentCount),
+                                                                "Today's",
+                                                                "Appointments"),
 
-                                statCard(
-                                                "👥",
-                                                "6",
-                                                "New Patients",
-                                                "This Week"),
+                                                statCard(
+                                                                "👥",
+                                                                String.valueOf(
+                                                                                patientCount),
+                                                                "Patients",
+                                                                "Registered"),
 
-                                statCard(
-                                                "📋",
-                                                "32",
-                                                "Reports",
-                                                "This Week"),
+                                                statCard(
+                                                                "📋",
+                                                                String.valueOf(
+                                                                                reportCount),
+                                                                "Reports",
+                                                                "Available"),
 
-                                statCard(
-                                                "⭐",
-                                                "4.8",
-                                                "Average Rating",
-                                                "This Month"));
+                                                statCard(
+                                                                "⭐",
+                                                                "4.8",
+                                                                "Average Rating",
+                                                                "This Month"));
 
-                // =================================================
+                // =====================================================
                 // MIDDLE
-                // =================================================
+                // =====================================================
 
                 HBox middle = new HBox(18);
 
-                // =================================================
+                // =====================================================
                 // TODAY'S APPOINTMENTS
-                // =================================================
+                // =====================================================
 
                 VBox appointments = Theme.card();
 
@@ -521,8 +1031,11 @@ public class DoctorDashboard extends javafx.application.Application {
                                 appointments,
                                 Priority.ALWAYS);
 
-                appointments.setPrefHeight(330);
-                appointments.setMinHeight(330);
+                appointments.setPrefHeight(
+                                330);
+
+                appointments.setMinHeight(
+                                330);
 
                 Label appointmentTitle = new Label(
                                 "Today's Appointments");
@@ -534,48 +1047,94 @@ public class DoctorDashboard extends javafx.application.Application {
                                                 16));
 
                 appointmentTitle.setTextFill(
-                                Color.web(Theme.TEXT));
+                                Color.web(
+                                                Theme.TEXT));
 
-                appointments.getChildren().add(
-                                appointmentTitle);
+                appointments.getChildren()
+                                .add(
+                                                appointmentTitle);
 
-                appointments.getChildren().addAll(
+                if (appointmentController != null) {
 
-                                appointmentRow(
-                                                "09:30 AM",
-                                                "Priya Sharma",
-                                                "28 Y | 24 Weeks Pregnant",
-                                                "Confirmed"),
+                        List<DoctorAppointment> todayAppointments = appointmentController
+                                        .getTodayAppointments();
 
-                                appointmentRow(
-                                                "10:15 AM",
-                                                "Neha Kulkarni",
-                                                "32 Y | Routine Checkup",
-                                                "Confirmed"),
+                        if (todayAppointments.isEmpty()) {
 
-                                appointmentRow(
-                                                "11:00 AM",
-                                                "Sneha Patil",
-                                                "26 Y | First Consultation",
-                                                "Confirmed"),
+                                Label noAppointment = new Label(
+                                                "No appointments for today.");
 
-                                appointmentRow(
-                                                "12:00 PM",
-                                                "Ritika Singh",
-                                                "30 Y | Ultrasound Follow-up",
-                                                "Pending"));
+                                noAppointment.setFont(
+                                                javafx.scene.text.Font.font(
+                                                                Theme.FONT,
+                                                                javafx.scene.text.FontWeight.NORMAL,
+                                                                13));
 
-                // =================================================
+                                noAppointment.setTextFill(
+                                                Color.web(
+                                                                Theme.SECONDARY_TEXT));
+
+                                noAppointment.setPadding(
+                                                new Insets(
+                                                                20,
+                                                                0,
+                                                                0,
+                                                                0));
+
+                                appointments.getChildren()
+                                                .add(
+                                                                noAppointment);
+
+                        } else {
+
+                                for (DoctorAppointment appointment : todayAppointments) {
+
+                                        String details = appointment.getType();
+
+                                        if (details == null ||
+                                                        details.trim().isEmpty()) {
+
+                                                details = "Consultation";
+                                        }
+
+                                        appointments.getChildren()
+                                                        .add(
+                                                                        appointmentRow(
+                                                                                        appointment.getTime(),
+                                                                                        appointment.getPatient(),
+                                                                                        details,
+                                                                                        appointment.getStatus()));
+                                }
+                        }
+
+                } else {
+
+                        Label loading = new Label(
+                                        "Appointments loading...");
+
+                        loading.setTextFill(
+                                        Color.web(
+                                                        Theme.SECONDARY_TEXT));
+
+                        appointments.getChildren()
+                                        .add(
+                                                        loading);
+                }
+
+                // =====================================================
                 // TODAY'S SCHEDULE
-                // =================================================
+                // =====================================================
 
                 VBox schedule = Theme.card();
 
-                schedule.setPrefWidth(330);
+                schedule.setPrefWidth(
+                                330);
 
-                schedule.setPrefHeight(330);
+                schedule.setPrefHeight(
+                                330);
 
-                schedule.setMinHeight(330);
+                schedule.setMinHeight(
+                                330);
 
                 Label scheduleTitle = new Label(
                                 "Today's Schedule");
@@ -587,40 +1146,81 @@ public class DoctorDashboard extends javafx.application.Application {
                                                 16));
 
                 scheduleTitle.setTextFill(
-                                Color.web(Theme.TEXT));
+                                Color.web(
+                                                Theme.TEXT));
 
-                schedule.getChildren().add(
-                                scheduleTitle);
+                schedule.getChildren()
+                                .add(
+                                                scheduleTitle);
 
-                schedule.getChildren().addAll(
+                if (appointmentController != null) {
 
-                                scheduleRow(
-                                                "09:30 AM - 10:00 AM",
-                                                "Priya Sharma",
-                                                "Consultation"),
+                        List<DoctorAppointment> todayAppointments = appointmentController
+                                        .getTodayAppointments();
 
-                                scheduleRow(
-                                                "10:15 AM - 10:45 AM",
-                                                "Neha Kulkarni",
-                                                "Consultation"),
+                        if (todayAppointments.isEmpty()) {
 
-                                scheduleRow(
-                                                "11:00 AM - 11:30 AM",
-                                                "Sneha Patil",
-                                                "Consultation"),
+                                Label noSchedule = new Label(
+                                                "No schedule for today.");
 
-                                scheduleRow(
-                                                "12:00 PM - 12:30 PM",
-                                                "Ritika Singh",
-                                                "Follow-up"));
+                                noSchedule.setTextFill(
+                                                Color.web(
+                                                                Theme.SECONDARY_TEXT));
 
-                middle.getChildren().addAll(
-                                appointments,
-                                schedule);
+                                noSchedule.setPadding(
+                                                new Insets(
+                                                                20,
+                                                                0,
+                                                                0,
+                                                                0));
 
-                // =================================================
-                // BOTTOM - PATIENT FEEDBACK ONLY
-                // =================================================
+                                schedule.getChildren()
+                                                .add(
+                                                                noSchedule);
+
+                        } else {
+
+                                for (DoctorAppointment appointment : todayAppointments) {
+
+                                        String type = appointment.getType();
+
+                                        if (type == null ||
+                                                        type.trim().isEmpty()) {
+
+                                                type = "Consultation";
+                                        }
+
+                                        schedule.getChildren()
+                                                        .add(
+                                                                        scheduleRow(
+                                                                                        appointment.getTime(),
+                                                                                        appointment.getPatient(),
+                                                                                        type));
+                                }
+                        }
+
+                } else {
+
+                        Label loading = new Label(
+                                        "Schedule loading...");
+
+                        loading.setTextFill(
+                                        Color.web(
+                                                        Theme.SECONDARY_TEXT));
+
+                        schedule.getChildren()
+                                        .add(
+                                                        loading);
+                }
+
+                middle.getChildren()
+                                .addAll(
+                                                appointments,
+                                                schedule);
+
+                // =====================================================
+                // PATIENT FEEDBACK
+                // =====================================================
 
                 HBox bottom = new HBox(20);
 
@@ -640,7 +1240,8 @@ public class DoctorDashboard extends javafx.application.Application {
                                                 16));
 
                 feedbackTitle.setTextFill(
-                                Color.web(Theme.TEXT));
+                                Color.web(
+                                                Theme.TEXT));
 
                 Label rating = new Label(
                                 "4.8  ★★★★★");
@@ -652,35 +1253,39 @@ public class DoctorDashboard extends javafx.application.Application {
                                                 18));
 
                 rating.setTextFill(
-                                Color.web(Theme.PRIMARY));
+                                Color.web(
+                                                Theme.PRIMARY));
 
                 Label based = Theme.subtitle(
                                 "Based on 156 reviews");
 
-                feedback.getChildren().addAll(
-                                feedbackTitle,
-                                rating,
-                                based);
+                feedback.getChildren()
+                                .addAll(
+                                                feedbackTitle,
+                                                rating,
+                                                based);
 
-                bottom.getChildren().add(
-                                feedback);
+                bottom.getChildren()
+                                .add(
+                                                feedback);
 
-                // =================================================
-                // ADD CONTENT
-                // =================================================
+                // =====================================================
+                // FINAL CONTENT
+                // =====================================================
 
-                content.getChildren().addAll(
-                                header,
-                                stats,
-                                middle,
-                                bottom);
+                content.getChildren()
+                                .addAll(
+                                                header,
+                                                stats,
+                                                middle,
+                                                bottom);
 
                 return content;
         }
 
-        // =====================================================
+        // =========================================================
         // STAT CARD
-        // =====================================================
+        // =========================================================
 
         private static VBox statCard(
                         String icon,
@@ -705,7 +1310,8 @@ public class DoctorDashboard extends javafx.application.Application {
                                                 30));
 
                 iconLabel.setTextFill(
-                                Color.web(Theme.PRIMARY));
+                                Color.web(
+                                                Theme.PRIMARY));
 
                 VBox text = new VBox(2);
 
@@ -718,25 +1324,30 @@ public class DoctorDashboard extends javafx.application.Application {
                                                 20));
 
                 num.setTextFill(
-                                Color.web(Theme.TEXT));
+                                Color.web(
+                                                Theme.TEXT));
 
-                text.getChildren().addAll(
-                                num,
-                                Theme.subtitle(line1),
-                                Theme.subtitle(line2));
+                text.getChildren()
+                                .addAll(
+                                                num,
+                                                Theme.subtitle(line1),
+                                                Theme.subtitle(line2));
 
-                row.getChildren().addAll(
-                                iconLabel,
-                                text);
+                row.getChildren()
+                                .addAll(
+                                                iconLabel,
+                                                text);
 
-                box.getChildren().add(row);
+                box.getChildren()
+                                .add(
+                                                row);
 
                 return box;
         }
 
-        // =====================================================
+        // =========================================================
         // APPOINTMENT ROW
-        // =====================================================
+        // =========================================================
 
         private static HBox appointmentRow(
                         String time,
@@ -756,9 +1367,13 @@ public class DoctorDashboard extends javafx.application.Application {
                                                 12,
                                                 0));
 
-                Label t = new Label(time);
+                Label t = new Label(
+                                time == null
+                                                ? ""
+                                                : time);
 
-                t.setPrefWidth(65);
+                t.setPrefWidth(
+                                65);
 
                 t.setFont(
                                 javafx.scene.text.Font.font(
@@ -767,11 +1382,15 @@ public class DoctorDashboard extends javafx.application.Application {
                                                 12));
 
                 t.setTextFill(
-                                Color.web(Theme.TEXT));
+                                Color.web(
+                                                Theme.TEXT));
 
                 VBox patientBox = new VBox(2);
 
-                Label p = new Label(patient);
+                Label p = new Label(
+                                patient == null
+                                                ? ""
+                                                : patient);
 
                 p.setFont(
                                 javafx.scene.text.Font.font(
@@ -780,17 +1399,28 @@ public class DoctorDashboard extends javafx.application.Application {
                                                 13));
 
                 p.setTextFill(
-                                Color.web(Theme.TEXT));
+                                Color.web(
+                                                Theme.TEXT));
 
-                patientBox.getChildren().addAll(
-                                p,
-                                Theme.subtitle(details));
+                patientBox.getChildren()
+                                .addAll(
+                                                p,
+                                                Theme.subtitle(
+                                                                details == null
+                                                                                ? ""
+                                                                                : details));
 
                 HBox.setHgrow(
                                 patientBox,
                                 Priority.ALWAYS);
 
-                Label s = new Label(status);
+                String actualStatus = status == null ||
+                                status.trim().isEmpty()
+                                                ? "Pending"
+                                                : status;
+
+                Label s = new Label(
+                                actualStatus);
 
                 s.setFont(
                                 javafx.scene.text.Font.font(
@@ -805,38 +1435,44 @@ public class DoctorDashboard extends javafx.application.Application {
                                                 5,
                                                 9));
 
-                if (status.equals("Pending")) {
+                if (actualStatus.equalsIgnoreCase(
+                                "Pending")) {
 
                         s.setTextFill(
-                                        Color.web(Theme.ORANGE));
+                                        Color.web(
+                                                        Theme.ORANGE));
 
                         s.setStyle(
-                                        "-fx-background-color: " +
-                                                        Theme.ORANGE_LIGHT + ";" +
-                                                        "-fx-background-radius: 12;");
+                                        "-fx-background-color: "
+                                                        + Theme.ORANGE_LIGHT
+                                                        + ";"
+                                                        + "-fx-background-radius: 12;");
 
                 } else {
 
                         s.setTextFill(
-                                        Color.web(Theme.GREEN));
+                                        Color.web(
+                                                        Theme.GREEN));
 
                         s.setStyle(
-                                        "-fx-background-color: " +
-                                                        Theme.GREEN_LIGHT + ";" +
-                                                        "-fx-background-radius: 12;");
+                                        "-fx-background-color: "
+                                                        + Theme.GREEN_LIGHT
+                                                        + ";"
+                                                        + "-fx-background-radius: 12;");
                 }
 
-                row.getChildren().addAll(
-                                t,
-                                patientBox,
-                                s);
+                row.getChildren()
+                                .addAll(
+                                                t,
+                                                patientBox,
+                                                s);
 
                 return row;
         }
 
-        // =====================================================
+        // =========================================================
         // SCHEDULE ROW
-        // =====================================================
+        // =========================================================
 
         private static HBox scheduleRow(
                         String time,
@@ -854,10 +1490,17 @@ public class DoctorDashboard extends javafx.application.Application {
 
                 VBox details = new VBox(3);
 
-                details.getChildren().addAll(
-                                Theme.subtitle(time));
+                details.getChildren()
+                                .add(
+                                                Theme.subtitle(
+                                                                time == null
+                                                                                ? ""
+                                                                                : time));
 
-                Label n = new Label(name);
+                Label n = new Label(
+                                name == null
+                                                ? ""
+                                                : name);
 
                 n.setFont(
                                 javafx.scene.text.Font.font(
@@ -866,9 +1509,11 @@ public class DoctorDashboard extends javafx.application.Application {
                                                 11));
 
                 n.setTextFill(
-                                Color.web(Theme.TEXT));
+                                Color.web(
+                                                Theme.TEXT));
 
-                details.getChildren().add(n);
+                details.getChildren()
+                                .add(n);
 
                 Region spacer = new Region();
 
@@ -876,21 +1521,27 @@ public class DoctorDashboard extends javafx.application.Application {
                                 spacer,
                                 Priority.ALWAYS);
 
-                row.getChildren().addAll(
-                                details,
-                                spacer,
-                                Theme.subtitle(type));
+                row.getChildren()
+                                .addAll(
+                                                details,
+                                                spacer,
+                                                Theme.subtitle(
+                                                                type == null
+                                                                                ? ""
+                                                                                : type));
 
                 return row;
         }
 
-        // =====================================================
+        // =========================================================
         // START DASHBOARD
-        // =====================================================
+        // =========================================================
 
-        public static void startDashboard(Stage stage) {
+        public static void startDashboard(
+                        Stage stage) {
 
-                // Dashboard is started using JavaFX Application.start()
-                // No separate implementation required here.
+                DoctorDashboard dashboard = getInstance();
+
+                dashboard.start(stage);
         }
 }

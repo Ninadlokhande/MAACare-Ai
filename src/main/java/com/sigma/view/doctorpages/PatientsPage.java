@@ -15,24 +15,50 @@ public class PatientsPage {
 
         private static TableView<Patient> table;
 
-        private static final PatientController controller = new PatientController();
+        private static PatientController controller;
 
         // =====================================================
-        // SHOW PATIENT PAGE
+        // GET SHARED CONTROLLER
+        // =====================================================
+
+        private static PatientController getController() {
+
+                if (controller == null) {
+
+                        controller = DoctorDashboard.getPatientController();
+                }
+
+                return controller;
+        }
+
+        // =====================================================
+        // SHOW PAGE
         // =====================================================
 
         public static void show() {
 
+                PatientController patientController = getController();
+
+                // =================================================
+                // REFRESH FIRESTORE DATA
+                // =================================================
+
+                patientController.refreshPatients();
+
                 VBox root = new VBox(20);
 
                 root.setPadding(
-                                new Insets(28, 35, 28, 35));
+                                new Insets(
+                                                28,
+                                                35,
+                                                28,
+                                                35));
 
                 Theme.applyBackground(root);
 
-                // =====================================================
+                // =================================================
                 // HEADER
-                // =====================================================
+                // =================================================
 
                 HBox header = new HBox();
 
@@ -59,9 +85,9 @@ public class PatientsPage {
                                 spacer,
                                 back);
 
-                // =====================================================
+                // =================================================
                 // FILTER
-                // =====================================================
+                // =================================================
 
                 HBox filter = new HBox(10);
 
@@ -74,8 +100,8 @@ public class PatientsPage {
                 filter.setStyle(
                                 "-fx-background-color: white;" +
                                                 "-fx-background-radius: 10;" +
-                                                "-fx-border-color: " +
-                                                Theme.BORDER + ";" +
+                                                "-fx-border-color: "
+                                                + Theme.BORDER + ";" +
                                                 "-fx-border-radius: 10;");
 
                 TextField search = new TextField();
@@ -110,9 +136,9 @@ public class PatientsPage {
                                 filterSpacer,
                                 add);
 
-                // =====================================================
+                // =================================================
                 // TABLE
-                // =====================================================
+                // =================================================
 
                 table = new TableView<>();
 
@@ -122,9 +148,9 @@ public class PatientsPage {
                 table.setPlaceholder(
                                 new Label("No patients found."));
 
-                // =====================================================
+                // =================================================
                 // COLUMNS
-                // =====================================================
+                // =================================================
 
                 TableColumn<Patient, String> name = new TableColumn<>("Patient");
 
@@ -143,8 +169,10 @@ public class PatientsPage {
                                                 .nameProperty());
 
                 age.setCellValueFactory(
-                                data -> data.getValue()
-                                                .ageProperty());
+                                data -> new javafx.beans.property.SimpleStringProperty(
+                                                safe(data.getValue().getAge())
+                                                                + " Y / "
+                                                                + safe(data.getValue().getGender())));
 
                 contact.setCellValueFactory(
                                 data -> data.getValue()
@@ -158,9 +186,9 @@ public class PatientsPage {
                                 data -> data.getValue()
                                                 .nextVisitProperty());
 
-                // =====================================================
-                // ACTION BUTTONS
-                // =====================================================
+                // =================================================
+                // ACTION COLUMN
+                // =================================================
 
                 action.setCellFactory(
                                 column -> new TableCell<Patient, String>() {
@@ -173,10 +201,6 @@ public class PatientsPage {
 
                                         {
 
-                                                // =================================================
-                                                // VIEW
-                                                // =================================================
-
                                                 viewButton.setStyle(
                                                                 "-fx-background-color: #E0F2FE;" +
                                                                                 "-fx-text-fill: #0284C7;" +
@@ -184,14 +208,6 @@ public class PatientsPage {
                                                                                 "-fx-background-radius: 7;" +
                                                                                 "-fx-padding: 5 9;" +
                                                                                 "-fx-cursor: hand;");
-
-                                                viewButton.setTooltip(
-                                                                new Tooltip(
-                                                                                "View Patient"));
-
-                                                // =================================================
-                                                // EDIT
-                                                // =================================================
 
                                                 editButton.setStyle(
                                                                 "-fx-background-color: #FFF4DE;" +
@@ -201,13 +217,17 @@ public class PatientsPage {
                                                                                 "-fx-padding: 5 9;" +
                                                                                 "-fx-cursor: hand;");
 
+                                                viewButton.setTooltip(
+                                                                new Tooltip(
+                                                                                "View Patient"));
+
                                                 editButton.setTooltip(
                                                                 new Tooltip(
                                                                                 "Edit Patient"));
 
-                                                // =================================================
-                                                // VIEW ACTION
-                                                // =================================================
+                                                // =========================
+                                                // VIEW
+                                                // =========================
 
                                                 viewButton.setOnAction(e -> {
 
@@ -215,6 +235,7 @@ public class PatientsPage {
                                                                         getIndex() >= getTableView()
                                                                                         .getItems()
                                                                                         .size()) {
+
                                                                 return;
                                                         }
 
@@ -222,13 +243,14 @@ public class PatientsPage {
                                                                         .getItems()
                                                                         .get(getIndex());
 
-                                                        controller.viewPatient(
-                                                                        patient);
+                                                        patientController
+                                                                        .viewPatient(
+                                                                                        patient);
                                                 });
 
-                                                // =================================================
-                                                // EDIT ACTION
-                                                // =================================================
+                                                // =========================
+                                                // EDIT
+                                                // =========================
 
                                                 editButton.setOnAction(e -> {
 
@@ -236,6 +258,7 @@ public class PatientsPage {
                                                                         getIndex() >= getTableView()
                                                                                         .getItems()
                                                                                         .size()) {
+
                                                                 return;
                                                         }
 
@@ -243,16 +266,18 @@ public class PatientsPage {
                                                                         .getItems()
                                                                         .get(getIndex());
 
-                                                        controller.editPatient(
-                                                                        patient);
+                                                        patientController
+                                                                        .editPatient(
+                                                                                        patient);
                                                 });
 
                                                 buttons.setAlignment(
                                                                 Pos.CENTER);
 
-                                                buttons.getChildren().addAll(
-                                                                viewButton,
-                                                                editButton);
+                                                buttons.getChildren()
+                                                                .addAll(
+                                                                                viewButton,
+                                                                                editButton);
                                         }
 
                                         @Override
@@ -286,17 +311,16 @@ public class PatientsPage {
                                 nextVisit,
                                 action);
 
-                // =====================================================
-                // LOAD PATIENTS FROM CONTROLLER
-                // =====================================================
+                // =================================================
+                // LOAD FIRESTORE PATIENTS
+                // =================================================
 
                 table.setItems(
-                                FXCollections.observableArrayList(
-                                                controller.getPatients()));
+                                patientController.getPatients());
 
-                // =====================================================
-                // FILTER
-                // =====================================================
+                // =================================================
+                // FILTER FUNCTION
+                // =================================================
 
                 Runnable applyFilters = () -> {
 
@@ -310,22 +334,27 @@ public class PatientsPage {
 
                         ObservableList<Patient> filtered = FXCollections.observableArrayList();
 
-                        for (Patient patient : controller.getPatients()) {
+                        for (Patient patient : patientController.getPatients()) {
+
+                                String patientName = safe(patient.getName())
+                                                .toLowerCase();
+
+                                String patientContact = safe(patient.getContact());
+
+                                String patientGender = safe(patient.getGender());
 
                                 boolean matchesSearch = searchText.isEmpty()
-                                                || patient.getName()
-                                                                .toLowerCase()
+                                                || patientName
                                                                 .contains(searchText)
-                                                || patient.getContact()
+                                                || patientContact
                                                                 .contains(searchText);
 
                                 boolean matchesGender = selectedGender == null
-                                                || selectedGender.equals("All")
-                                                || patient.getAge()
-                                                                .toLowerCase()
-                                                                .contains(
-                                                                                selectedGender
-                                                                                                .toLowerCase());
+                                                || selectedGender
+                                                                .equalsIgnoreCase("All")
+                                                || patientGender
+                                                                .equalsIgnoreCase(
+                                                                                selectedGender);
 
                                 if (matchesSearch &&
                                                 matchesGender) {
@@ -337,50 +366,37 @@ public class PatientsPage {
                         table.setItems(filtered);
                 };
 
-                // =====================================================
-                // SEARCH
-                // =====================================================
+                search.textProperty()
+                                .addListener(
+                                                (obs, oldValue, newValue) -> applyFilters.run());
 
-                search.textProperty().addListener(
-                                (obs, oldValue, newValue) -> applyFilters.run());
+                gender.valueProperty()
+                                .addListener(
+                                                (obs, oldValue, newValue) -> applyFilters.run());
 
-                // =====================================================
-                // GENDER
-                // =====================================================
-
-                gender.valueProperty().addListener(
-                                (obs, oldValue, newValue) -> applyFilters.run());
-
-                // =====================================================
+                // =================================================
                 // ADD PATIENT
-                // =====================================================
+                // =================================================
 
-                add.setOnAction(e -> {
+                add.setOnAction(
+                                e -> AddPatientPage.show());
 
-                        AddPatientPage.show();
-
-                });
-
-                // =====================================================
+                // =================================================
                 // TABLE GROW
-                // =====================================================
+                // =================================================
 
                 VBox.setVgrow(
                                 table,
                                 Priority.ALWAYS);
-
-                // =====================================================
-                // ADD CONTENT
-                // =====================================================
 
                 root.getChildren().addAll(
                                 header,
                                 filter,
                                 table);
 
-                // =====================================================
-                // SCENE
-                // =====================================================
+                // =================================================
+                // SAME DASHBOARD STAGE
+                // =================================================
 
                 Scene patientsScene = new Scene(root);
 
@@ -389,7 +405,7 @@ public class PatientsPage {
         }
 
         // =====================================================
-        // ADD NEW PATIENT
+        // ADD PATIENT
         // =====================================================
 
         public static void addPatient(
@@ -399,16 +415,36 @@ public class PatientsPage {
                         return;
                 }
 
-                controller.getPatients()
-                                .add(patient);
+                PatientController patientController = getController();
+
+                if (!patientController
+                                .getPatients()
+                                .contains(patient)) {
+
+                        patientController
+                                        .getPatients()
+                                        .add(patient);
+                }
 
                 if (table != null) {
 
                         table.setItems(
-                                        FXCollections.observableArrayList(
-                                                        controller.getPatients()));
+                                        patientController
+                                                        .getPatients());
 
                         table.refresh();
                 }
+        }
+
+        // =====================================================
+        // SAFE STRING
+        // =====================================================
+
+        private static String safe(
+                        String value) {
+
+                return value == null
+                                ? ""
+                                : value;
         }
 }

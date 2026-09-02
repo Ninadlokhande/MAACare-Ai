@@ -1,5 +1,6 @@
 package com.sigma.view.doctorpages;
 
+import com.sigma.controller.doctorController.PatientController;
 import com.sigma.model.DoctorModel.Patient;
 
 import javafx.geometry.Insets;
@@ -25,8 +26,7 @@ public class AddPatientPage {
 
                 HBox header = new HBox();
 
-                header.setAlignment(
-                                Pos.CENTER_LEFT);
+                header.setAlignment(Pos.CENTER_LEFT);
 
                 VBox heading = Theme.pageHeader(
                                 "Add Patient",
@@ -67,24 +67,11 @@ public class AddPatientPage {
                 personalTitle.setStyle(
                                 "-fx-font-size: 17px;" +
                                                 "-fx-font-weight: bold;" +
-                                                "-fx-text-fill: " +
-                                                Theme.TEXT + ";");
-
-                // =====================================================
-                // NAME
-                // =====================================================
+                                                "-fx-text-fill: " + Theme.TEXT + ";");
 
                 TextField name = textField("Full Name");
 
-                // =====================================================
-                // AGE
-                // =====================================================
-
                 TextField age = textField("Age");
-
-                // =====================================================
-                // GENDER
-                // =====================================================
 
                 ComboBox<String> gender = new ComboBox<>();
 
@@ -101,15 +88,7 @@ public class AddPatientPage {
 
                 gender.setPrefHeight(40);
 
-                // =====================================================
-                // CONTACT
-                // =====================================================
-
                 TextField phone = textField("Contact Number");
-
-                // =====================================================
-                // ADDRESS
-                // =====================================================
 
                 TextField address = textField("Address");
 
@@ -122,8 +101,7 @@ public class AddPatientPage {
                 visitTitle.setStyle(
                                 "-fx-font-size: 17px;" +
                                                 "-fx-font-weight: bold;" +
-                                                "-fx-text-fill: " +
-                                                Theme.TEXT + ";");
+                                                "-fx-text-fill: " + Theme.TEXT + ";");
 
                 TextField lastVisit = textField("Last Visit");
 
@@ -146,36 +124,44 @@ public class AddPatientPage {
 
                 col2.setPercentWidth(50);
 
-                grid.getColumnConstraints()
-                                .addAll(col1, col2);
+                grid.getColumnConstraints().addAll(
+                                col1,
+                                col2);
 
                 grid.add(
                                 fieldBox("Full Name", name),
-                                0, 0);
+                                0,
+                                0);
 
                 grid.add(
                                 fieldBox("Age", age),
-                                1, 0);
+                                1,
+                                0);
 
                 grid.add(
                                 fieldBox("Gender", gender),
-                                0, 1);
+                                0,
+                                1);
 
                 grid.add(
                                 fieldBox("Contact Number", phone),
-                                1, 1);
+                                1,
+                                1);
 
                 grid.add(
                                 fieldBox("Address", address),
-                                0, 2);
+                                0,
+                                2);
 
                 grid.add(
                                 fieldBox("Last Visit", lastVisit),
-                                1, 2);
+                                1,
+                                2);
 
                 grid.add(
                                 fieldBox("Next Visit", nextVisit),
-                                0, 3);
+                                0,
+                                3);
 
                 // =====================================================
                 // BUTTONS
@@ -185,8 +171,7 @@ public class AddPatientPage {
 
                 cancel.setStyle(
                                 "-fx-background-color: transparent;" +
-                                                "-fx-text-fill: " +
-                                                Theme.SECONDARY_TEXT + ";" +
+                                                "-fx-text-fill: " + Theme.SECONDARY_TEXT + ";" +
                                                 "-fx-font-weight: bold;" +
                                                 "-fx-cursor: hand;");
 
@@ -203,24 +188,22 @@ public class AddPatientPage {
                                 save);
 
                 // =====================================================
-                // CANCEL
+                // BACK / CANCEL
                 // =====================================================
 
-                cancel.setOnAction(e -> {
+                back.setOnAction(e -> PatientsPage.show());
 
-                        PatientsPage.show();
-
-                });
+                cancel.setOnAction(e -> PatientsPage.show());
 
                 // =====================================================
-                // SAVE
+                // SAVE PATIENT
                 // =====================================================
 
                 save.setOnAction(e -> {
 
-                        // -----------------------------------------
+                        // -----------------------------------------------
                         // VALIDATION
-                        // -----------------------------------------
+                        // -----------------------------------------------
 
                         if (name.getText().trim().isEmpty()
                                         || age.getText().trim().isEmpty()
@@ -243,42 +226,69 @@ public class AddPatientPage {
                                 return;
                         }
 
-                        // -----------------------------------------
-                        // AGE + GENDER
-                        // -----------------------------------------
+                        // -----------------------------------------------
+                        // GET SHARED PATIENT CONTROLLER
+                        // -----------------------------------------------
 
-                        String ageGender = age.getText().trim()
-                                        + " Y / "
-                                        + gender.getValue();
+                        PatientController controller = DoctorDashboard.getPatientController();
 
-                        // -----------------------------------------
-                        // CREATE PATIENT
-                        // -----------------------------------------
+                        if (controller == null) {
 
-                        Patient patient = new Patient(
+                                Alert alert = new Alert(
+                                                Alert.AlertType.ERROR);
 
+                                alert.setTitle(
+                                                "Patient Controller Error");
+
+                                alert.setHeaderText(null);
+
+                                alert.setContentText(
+                                                "Patient controller is not available.");
+
+                                alert.showAndWait();
+
+                                return;
+                        }
+
+                        // -----------------------------------------------
+                        // SAVE TO FIRESTORE
+                        // -----------------------------------------------
+
+                        Patient savedPatient = controller.addPatient(
                                         name.getText().trim(),
-
-                                        ageGender,
-
+                                        age.getText().trim(),
+                                        gender.getValue(),
                                         phone.getText().trim(),
-
                                         lastVisit.getText().trim(),
+                                        nextVisit.getText().trim());
 
-                                        nextVisit.getText().trim(),
+                        // -----------------------------------------------
+                        // SAVE FAILED
+                        // -----------------------------------------------
 
-                                        "");
+                        if (savedPatient == null) {
 
-                        // -----------------------------------------
-                        // ADD TO PATIENT LIST
-                        // -----------------------------------------
+                                Alert alert = new Alert(
+                                                Alert.AlertType.ERROR);
 
-                        PatientsPage.addPatient(
-                                        patient);
+                                alert.setTitle(
+                                                "Save Error");
 
-                        // -----------------------------------------
-                        // SUCCESS MESSAGE
-                        // -----------------------------------------
+                                alert.setHeaderText(
+                                                "Unable to add patient");
+
+                                alert.setContentText(
+                                                "Patient could not be saved to Firebase. "
+                                                                + "Please check your Firebase connection.");
+
+                                alert.showAndWait();
+
+                                return;
+                        }
+
+                        // -----------------------------------------------
+                        // SUCCESS
+                        // -----------------------------------------------
 
                         Alert alert = new Alert(
                                         Alert.AlertType.INFORMATION);
@@ -291,29 +301,25 @@ public class AddPatientPage {
 
                         alert.setContentText(
                                         name.getText().trim()
-                                                        + " has been added to your patient list.");
+                                                        + " has been added successfully.");
 
                         alert.showAndWait();
 
-                        // -----------------------------------------
-                        // BACK TO PATIENT PAGE
-                        // -----------------------------------------
+                        // -----------------------------------------------
+                        // GO BACK TO PATIENT PAGE
+                        // -----------------------------------------------
 
                         PatientsPage.show();
                 });
 
                 // =====================================================
-                // FORM CONTENT
+                // ADD FORM CONTENT
                 // =====================================================
 
                 form.getChildren().addAll(
-
                                 personalTitle,
-
                                 grid,
-
                                 visitTitle,
-
                                 buttons);
 
                 // =====================================================
@@ -325,6 +331,10 @@ public class AddPatientPage {
                 center.setAlignment(
                                 Pos.CENTER);
 
+                // =====================================================
+                // SCROLL
+                // =====================================================
+
                 ScrollPane scroll = new ScrollPane(center);
 
                 scroll.setFitToWidth(true);
@@ -332,6 +342,10 @@ public class AddPatientPage {
                 scroll.setStyle(
                                 "-fx-background-color: transparent;" +
                                                 "-fx-background: transparent;");
+
+                // =====================================================
+                // ROOT
+                // =====================================================
 
                 root.setTop(header);
 
@@ -342,18 +356,17 @@ public class AddPatientPage {
                 root.setCenter(scroll);
 
                 // =====================================================
-                // SCENE
+                // SAME DASHBOARD STAGE
                 // =====================================================
 
                 Scene scene = new Scene(root);
 
-                DoctorDashboard.changeScene(
-                                scene);
+                DoctorDashboard.changeScene(scene);
         }
 
-        // =====================================================
+        // =========================================================
         // TEXT FIELD
-        // =====================================================
+        // =========================================================
 
         private static TextField textField(
                         String prompt) {
@@ -370,9 +383,9 @@ public class AddPatientPage {
                 return field;
         }
 
-        // =====================================================
+        // =========================================================
         // FIELD BOX
-        // =====================================================
+        // =========================================================
 
         private static VBox fieldBox(
                         String labelText,
@@ -385,8 +398,7 @@ public class AddPatientPage {
                 label.setStyle(
                                 "-fx-font-size: 11px;" +
                                                 "-fx-font-weight: bold;" +
-                                                "-fx-text-fill: " +
-                                                Theme.TEXT + ";");
+                                                "-fx-text-fill: " + Theme.TEXT + ";");
 
                 box.getChildren().addAll(
                                 label,

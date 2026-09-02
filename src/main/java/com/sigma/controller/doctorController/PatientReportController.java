@@ -1,5 +1,7 @@
 package com.sigma.controller.doctorController;
 
+import java.util.List;
+
 import com.sigma.dao.doctorDao.PatientReportDAO;
 import com.sigma.model.DoctorModel.PatientReport;
 
@@ -34,15 +36,36 @@ public class PatientReportController {
     }
 
     // =====================================================
-    // LOAD REPORTS
+    // LOAD REPORTS FROM FIRESTORE
     // =====================================================
 
     private void loadReports() {
 
-        reports.clear();
+        try {
 
-        reports.addAll(
-                patientReportDAO.getAllReports());
+            reports.clear();
+
+            List<PatientReport> loadedReports = patientReportDAO.getAllReports();
+
+            if (loadedReports != null) {
+
+                reports.addAll(
+                        loadedReports);
+            }
+
+            System.out.println(
+                    "[REPORT] Loaded "
+                            + reports.size()
+                            + " reports from Firestore.");
+
+        } catch (Exception e) {
+
+            System.out.println(
+                    "[REPORT ERROR] "
+                            + "Unable to load reports.");
+
+            e.printStackTrace();
+        }
     }
 
     // =====================================================
@@ -52,6 +75,15 @@ public class PatientReportController {
     public ObservableList<PatientReport> getReports() {
 
         return reports;
+    }
+
+    // =====================================================
+    // GET REPORT COUNT
+    // =====================================================
+
+    public int getReportCount() {
+
+        return reports.size();
     }
 
     // =====================================================
@@ -65,11 +97,28 @@ public class PatientReportController {
             return;
         }
 
-        // Add to current list
-        reports.add(report);
+        try {
 
-        // Send to DAO
-        patientReportDAO.addReport(report);
+            // First save to Firestore
+            patientReportDAO.addReport(
+                    report);
+
+            // Then add to local list
+            reports.add(report);
+
+            System.out.println(
+                    "[REPORT] Report added successfully.");
+
+        } catch (Exception e) {
+
+            System.out.println(
+                    "[REPORT ERROR] "
+                            + "Unable to add report.");
+
+            e.printStackTrace();
+
+            throw e;
+        }
     }
 
     // =====================================================
@@ -83,9 +132,28 @@ public class PatientReportController {
             return;
         }
 
-        reports.remove(report);
+        try {
 
-        patientReportDAO.deleteReport(report);
+            // Delete from Firestore
+            patientReportDAO.deleteReport(
+                    report);
+
+            // Delete from local list
+            reports.remove(report);
+
+            System.out.println(
+                    "[REPORT] Report deleted successfully.");
+
+        } catch (Exception e) {
+
+            System.out.println(
+                    "[REPORT ERROR] "
+                            + "Unable to delete report.");
+
+            e.printStackTrace();
+
+            throw e;
+        }
     }
 
     // =====================================================
@@ -97,17 +165,15 @@ public class PatientReportController {
 
         ObservableList<PatientReport> filtered = FXCollections.observableArrayList();
 
-        if (searchText == null ||
-                searchText.trim().isEmpty()) {
+        if (searchText == null
+                || searchText.trim().isEmpty()) {
 
             filtered.addAll(reports);
 
             return filtered;
         }
 
-        String search = searchText
-                .trim()
-                .toLowerCase();
+        String search = searchText.trim().toLowerCase();
 
         for (PatientReport report : reports) {
 
@@ -147,7 +213,8 @@ public class PatientReportController {
         ObservableList<PatientReport> filtered = FXCollections.observableArrayList();
 
         if (selectedStatus == null
-                || selectedStatus.equals("All Status")) {
+                || selectedStatus.equalsIgnoreCase(
+                        "All Status")) {
 
             filtered.addAll(reports);
 
@@ -156,8 +223,11 @@ public class PatientReportController {
 
         for (PatientReport report : reports) {
 
-            if (selectedStatus.equals(
-                    report.getStatus())) {
+            String status = report.getStatus() == null
+                    ? ""
+                    : report.getStatus();
+
+            if (selectedStatus.equalsIgnoreCase(status)) {
 
                 filtered.add(report);
             }
@@ -183,5 +253,17 @@ public class PatientReportController {
     public void refreshReports() {
 
         loadReports();
+
+        System.out.println(
+                "[REPORT] Reports refreshed from Firestore.");
+    }
+
+    // =====================================================
+    // REPORT COUNT THIS WEEK
+    // =====================================================
+
+    public int getReportCountThisWeek() {
+
+        return reports.size();
     }
 }

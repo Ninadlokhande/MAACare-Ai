@@ -10,445 +10,384 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
 
 import java.time.LocalDate;
 
 public class DoctorAppointmentsPage {
 
+        private static final String PINK = "#E84A87";
+        private static final String LIGHT_PINK = "#FFEAF3";
+        private static final String PURPLE = "#754CE0";
+        private static final String DARK_TEXT = "#172554";
+        private static final String SECONDARY = "#64748B";
+        private static final String BORDER = "#E8E8F0";
+        private static final String PAGE_BACKGROUND = "#FAF9FC";
+
         private static TableView<DoctorAppointment> table;
 
         private static final DoctorAppointmentController controller = new DoctorAppointmentController();
 
-        // =====================================================
-        // SHOW
-        // =====================================================
-
         public static void show() {
 
-                VBox root = new VBox(20);
+                /*
+                 * Load latest appointments from Firebase
+                 */
+                controller.refreshAppointments();
 
-                root.setPadding(
-                                new Insets(28, 35, 28, 35));
+                BorderPane root = new BorderPane();
 
-                Theme.applyBackground(root);
+                root.setStyle(
+                                "-fx-background-color: " +
+                                                PAGE_BACKGROUND + ";");
 
-                // =====================================================
-                // HEADER
-                // =====================================================
+                // ================= HEADER =================
 
-                HBox header = new HBox();
+                HBox header = new HBox(18);
+
+                header.setPadding(
+                                new Insets(20, 25, 20, 25));
 
                 header.setAlignment(
                                 Pos.CENTER_LEFT);
 
-                VBox heading = Theme.pageHeader(
-                                "All Appointments",
-                                "Manage and view all patient appointments.");
+                header.setStyle(
+                                "-fx-background-color: white;" +
+                                                "-fx-border-color: " +
+                                                BORDER + ";" +
+                                                "-fx-border-width: 0 0 1 0;");
+
+                VBox titleBox = new VBox(4);
+
+                Label title = new Label("Appointments");
+
+                title.setStyle(
+                                "-fx-font-size: 26px;" +
+                                                "-fx-font-weight: bold;" +
+                                                "-fx-text-fill: " +
+                                                DARK_TEXT + ";");
+
+                Label subtitle = new Label(
+                                "Manage and view all patient appointments");
+
+                subtitle.setStyle(
+                                "-fx-font-size: 13px;" +
+                                                "-fx-text-fill: " +
+                                                SECONDARY + ";");
+
+                titleBox.getChildren().addAll(
+                                title,
+                                subtitle);
 
                 Region spacer = new Region();
 
                 HBox.setHgrow(
                                 spacer,
                                 Priority.ALWAYS);
+                // ================= REFRESH BUTTON =================
+                Button refresh = new Button("↻ Refresh");
 
-                Button back = Theme.backButton();
+                refresh.setStyle(
+                                "-fx-background-color: " + LIGHT_PINK + ";" +
+                                                "-fx-text-fill: " + PINK + ";" +
+                                                "-fx-font-weight: bold;" +
+                                                "-fx-background-radius: 8;" +
+                                                "-fx-padding: 10 16 10 16;" +
+                                                "-fx-cursor: hand;");
+
+                refresh.setOnAction(e -> {
+
+                        try {
+
+                                System.out.println(
+                                                "[APPOINTMENT] Refresh button clicked.");
+
+                                // ==========================================
+                                // 1. FIRESTORE मधून latest data load करा
+                                // ==========================================
+
+                                controller.refreshAppointments();
+
+                                // ==========================================
+                                // 2. TableView ला नवीन data द्या
+                                // ==========================================
+
+                                if (table != null) {
+
+                                        table.setItems(
+                                                        controller.getAppointments());
+
+                                        table.refresh();
+                                }
+
+                                // ==========================================
+                                // 3. Success message
+                                // ==========================================
+
+                                System.out.println(
+                                                "[APPOINTMENT] Appointments refreshed successfully.");
+
+                        } catch (Exception ex) {
+
+                                ex.printStackTrace();
+
+                                System.out.println(
+                                                "[APPOINTMENT ERROR] Refresh failed.");
+
+                                Alert alert = new Alert(Alert.AlertType.ERROR);
+
+                                alert.setTitle("Refresh Error");
+
+                                alert.setHeaderText(
+                                                "Unable to refresh appointments");
+
+                                alert.setContentText(
+                                                "Please check your Firebase connection and try again.");
+
+                                alert.showAndWait();
+                        }
+                });
+
+                // ================= ADD BUTTON =================
+
+                Button add = new Button(
+                                "+ Add Appointment");
+
+                add.setStyle(
+                                "-fx-background-color: " +
+                                                PINK + ";" +
+                                                "-fx-text-fill: white;" +
+                                                "-fx-font-weight: bold;" +
+                                                "-fx-background-radius: 8;" +
+                                                "-fx-padding: 10 18 10 18;" +
+                                                "-fx-cursor: hand;");
+
+                add.setOnAction(
+                                e -> showAddAppointmentDialog());
+
+                // ================= BACK BUTTON =================
+
+                Button back = new Button(
+                                "← Back to Dashboard");
+
+                back.setStyle(
+                                "-fx-background-color: " +
+                                                LIGHT_PINK + ";" +
+                                                "-fx-text-fill: " +
+                                                PINK + ";" +
+                                                "-fx-font-weight: bold;" +
+                                                "-fx-background-radius: 8;" +
+                                                "-fx-padding: 10 16 10 16;" +
+                                                "-fx-cursor: hand;");
 
                 back.setOnAction(
                                 e -> DoctorDashboard.showDashboard());
 
                 header.getChildren().addAll(
-                                heading,
+                                titleBox,
                                 spacer,
+                                refresh,
+                                add,
                                 back);
 
-                // =====================================================
-                // FILTER BOX
-                // =====================================================
+                root.setTop(header);
 
-                HBox filters = new HBox(10);
+                // ================= FILTER BOX =================
 
-                filters.setPadding(
-                                new Insets(14));
+                HBox filterBox = new HBox(14);
 
-                filters.setAlignment(
+                filterBox.setPadding(
+                                new Insets(20, 25, 10, 25));
+
+                filterBox.setAlignment(
                                 Pos.CENTER_LEFT);
 
-                filters.setStyle(
+                TextField searchField = new TextField();
+
+                searchField.setPromptText(
+                                "Search patient, type, date...");
+
+                searchField.setPrefWidth(300);
+
+                searchField.setStyle(
                                 "-fx-background-color: white;" +
-                                                "-fx-background-radius: 10;" +
                                                 "-fx-border-color: " +
-                                                Theme.BORDER + ";" +
-                                                "-fx-border-radius: 10;");
-
-                // =====================================================
-                // DATE
-                // =====================================================
-
-                DatePicker date = new DatePicker();
-
-                date.setPromptText(
-                                "Select Date");
-
-                date.setPrefWidth(145);
-
-                // =====================================================
-                // STATUS
-                // =====================================================
-
-                ComboBox<String> status = new ComboBox<>();
-
-                status.getItems().addAll(
-                                "All Status",
-                                "Confirmed",
-                                "Pending",
-                                "Cancelled");
-
-                status.setValue(
-                                "All Status");
-
-                status.setPrefWidth(145);
-
-                // =====================================================
-                // TYPE
-                // =====================================================
-
-                ComboBox<String> type = new ComboBox<>();
-
-                type.getItems().addAll(
-                                "All Appointment Types",
-                                "Consultation",
-                                "Follow-up",
-                                "Routine Checkup",
-                                "First Consultation",
-                                "Ultrasound Follow-up",
-                                "Pregnancy Checkup");
-
-                type.setValue(
-                                "All Appointment Types");
-
-                type.setPrefWidth(190);
-
-                // =====================================================
-                // SEARCH
-                // =====================================================
-
-                TextField search = new TextField();
-
-                search.setPromptText(
-                                "Search patient...");
-
-                search.setPrefWidth(
-                                230);
-
-                // =====================================================
-                // CLEAR
-                // =====================================================
-
-                Button clear = new Button("Clear");
-
-                clear.setStyle(
-                                "-fx-background-color: #F3ECFF;" +
-                                                "-fx-text-fill: " +
-                                                Theme.PRIMARY + ";" +
-                                                "-fx-font-weight: bold;" +
+                                                BORDER + ";" +
+                                                "-fx-border-radius: 8;" +
                                                 "-fx-background-radius: 8;" +
-                                                "-fx-padding: 9 16;" +
-                                                "-fx-cursor: hand;");
+                                                "-fx-padding: 10;");
 
-                Region filterSpacer = new Region();
+                ComboBox<String> statusCombo = new ComboBox<>(
+                                FXCollections.observableArrayList(
+                                                "All",
+                                                "Confirmed",
+                                                "Pending",
+                                                "Completed",
+                                                "Cancelled"));
 
-                HBox.setHgrow(
-                                filterSpacer,
-                                Priority.ALWAYS);
+                statusCombo.setValue("All");
+                statusCombo.setPrefWidth(150);
 
-                filters.getChildren().addAll(
-                                date,
-                                status,
-                                type,
-                                search,
-                                filterSpacer,
-                                clear);
+                ComboBox<String> typeCombo = new ComboBox<>(
+                                FXCollections.observableArrayList(
+                                                "All",
+                                                "Consultation",
+                                                "Follow-up",
+                                                "Emergency",
+                                                "Check-up"));
 
-                // =====================================================
-                // TABLE
-                // =====================================================
+                typeCombo.setValue("All");
+                typeCombo.setPrefWidth(150);
+
+                /*
+                 * Clear button removed completely.
+                 */
+
+                filterBox.getChildren().addAll(
+                                searchField,
+                                statusCombo,
+                                typeCombo);
+
+                // ================= TABLE =================
 
                 table = new TableView<>();
+
+                table.setItems(
+                                controller.getAppointments());
 
                 table.setColumnResizePolicy(
                                 TableView.CONSTRAINED_RESIZE_POLICY);
 
-                table.setPlaceholder(
-                                new Label(
-                                                "No appointments found."));
+                table.setStyle(
+                                "-fx-background-color: white;" +
+                                                "-fx-border-color: " +
+                                                BORDER + ";" +
+                                                "-fx-border-radius: 10;" +
+                                                "-fx-background-radius: 10;");
 
-                // =====================================================
-                // COLUMNS
-                // =====================================================
+                // ================= TIME =================
 
-                TableColumn<DoctorAppointment, String> dateColumn = new TableColumn<>("Date");
+                TableColumn<DoctorAppointment, String> timeCol = new TableColumn<>("Time");
 
-                TableColumn<DoctorAppointment, String> time = new TableColumn<>("Time");
+                timeCol.setCellValueFactory(
+                                new PropertyValueFactory<>("time"));
 
-                TableColumn<DoctorAppointment, String> patient = new TableColumn<>("Patient");
+                // ================= PATIENT =================
 
-                TableColumn<DoctorAppointment, String> appointmentType = new TableColumn<>("Type");
+                TableColumn<DoctorAppointment, String> patientCol = new TableColumn<>("Patient");
 
-                TableColumn<DoctorAppointment, String> stat = new TableColumn<>("Status");
+                patientCol.setCellValueFactory(
+                                new PropertyValueFactory<>("patient"));
 
-                TableColumn<DoctorAppointment, String> payment = new TableColumn<>("Payment");
+                // ================= TYPE =================
 
-                TableColumn<DoctorAppointment, String> action = new TableColumn<>("Action");
+                TableColumn<DoctorAppointment, String> typeCol = new TableColumn<>("Type");
 
-                // =====================================================
-                // CELL VALUE FACTORIES
-                // =====================================================
+                typeCol.setCellValueFactory(
+                                new PropertyValueFactory<>("type"));
 
-                dateColumn.setCellValueFactory(
-                                data -> data.getValue()
-                                                .dateProperty());
+                // ================= STATUS =================
 
-                time.setCellValueFactory(
-                                data -> data.getValue()
-                                                .timeProperty());
+                TableColumn<DoctorAppointment, String> statusCol = new TableColumn<>("Status");
 
-                patient.setCellValueFactory(
-                                data -> data.getValue()
-                                                .patientProperty());
+                statusCol.setCellValueFactory(
+                                new PropertyValueFactory<>("status"));
 
-                appointmentType.setCellValueFactory(
-                                data -> data.getValue()
-                                                .typeProperty());
+                // ================= PAYMENT =================
 
-                stat.setCellValueFactory(
-                                data -> data.getValue()
-                                                .statusProperty());
+                TableColumn<DoctorAppointment, String> paymentCol = new TableColumn<>("Payment");
 
-                payment.setCellValueFactory(
-                                data -> data.getValue()
-                                                .paymentProperty());
+                paymentCol.setCellValueFactory(
+                                new PropertyValueFactory<>("payment"));
 
-                // =====================================================
-                // STATUS CELL
-                // =====================================================
+                // ================= ACTION =================
 
-                stat.setCellFactory(
-                                column -> new TableCell<DoctorAppointment, String>() {
+                TableColumn<DoctorAppointment, Void> actionCol = new TableColumn<>("Action");
 
-                                        @Override
-                                        protected void updateItem(
-                                                        String item,
-                                                        boolean empty) {
+                actionCol.setPrefWidth(190);
 
-                                                super.updateItem(
-                                                                item,
-                                                                empty);
+                actionCol.setCellFactory(
+                                column -> new TableCell<>() {
 
-                                                if (empty ||
-                                                                item == null) {
+                                        private final Button view = new Button("View");
 
-                                                        setText(null);
-                                                        setStyle("");
+                                        private final Button edit = new Button("Edit");
 
-                                                        return;
-                                                }
+                                        private final Button delete = new Button("Delete");
 
-                                                setText(item);
-
-                                                setAlignment(
-                                                                Pos.CENTER);
-
-                                                if (item.equalsIgnoreCase(
-                                                                "Confirmed")) {
-
-                                                        setStyle(
-                                                                        "-fx-text-fill: "
-                                                                                        + Theme.GREEN
-                                                                                        + ";" +
-                                                                                        "-fx-font-weight: bold;");
-
-                                                } else if (item.equalsIgnoreCase(
-                                                                "Pending")) {
-
-                                                        setStyle(
-                                                                        "-fx-text-fill: "
-                                                                                        + Theme.ORANGE
-                                                                                        + ";" +
-                                                                                        "-fx-font-weight: bold;");
-
-                                                } else {
-
-                                                        setStyle(
-                                                                        "-fx-text-fill: #EF4444;" +
-                                                                                        "-fx-font-weight: bold;");
-                                                }
-                                        }
-                                });
-
-                // =====================================================
-                // PAYMENT CELL
-                // =====================================================
-
-                payment.setCellFactory(
-                                column -> new TableCell<DoctorAppointment, String>() {
-
-                                        @Override
-                                        protected void updateItem(
-                                                        String item,
-                                                        boolean empty) {
-
-                                                super.updateItem(
-                                                                item,
-                                                                empty);
-
-                                                if (empty ||
-                                                                item == null) {
-
-                                                        setText(null);
-                                                        setStyle("");
-
-                                                        return;
-                                                }
-
-                                                setText(item);
-
-                                                setAlignment(
-                                                                Pos.CENTER);
-
-                                                if (item.equalsIgnoreCase(
-                                                                "Paid")) {
-
-                                                        setStyle(
-                                                                        "-fx-text-fill: "
-                                                                                        + Theme.GREEN
-                                                                                        + ";" +
-                                                                                        "-fx-font-weight: bold;");
-
-                                                } else if (item.equalsIgnoreCase(
-                                                                "Pending")) {
-
-                                                        setStyle(
-                                                                        "-fx-text-fill: "
-                                                                                        + Theme.ORANGE
-                                                                                        + ";" +
-                                                                                        "-fx-font-weight: bold;");
-
-                                                } else {
-
-                                                        setStyle(
-                                                                        "-fx-text-fill: #EF4444;" +
-                                                                                        "-fx-font-weight: bold;");
-                                                }
-                                        }
-                                });
-
-                // =====================================================
-                // ACTION BUTTONS
-                // =====================================================
-
-                action.setCellFactory(
-                                column -> new TableCell<DoctorAppointment, String>() {
-
-                                        private final Button viewButton = new Button("👁");
-
-                                        private final Button editButton = new Button("✏");
-
-                                        private final Button deleteButton = new Button("🗑");
-
-                                        private final HBox buttons = new HBox(6);
+                                        private final HBox buttons = new HBox(7);
 
                                         {
+                                                buttons.setAlignment(
+                                                                Pos.CENTER);
 
-                                                // ---------------------------------
+                                                buttons.getChildren().addAll(
+                                                                view,
+                                                                edit,
+                                                                delete);
+
                                                 // VIEW
-                                                // ---------------------------------
 
-                                                viewButton.setStyle(
-                                                                "-fx-background-color: #E0F2FE;" +
-                                                                                "-fx-text-fill: #0284C7;" +
-                                                                                "-fx-font-size: 14px;" +
-                                                                                "-fx-background-radius: 7;" +
-                                                                                "-fx-padding: 5 9;" +
+                                                view.setStyle(
+                                                                "-fx-background-color: " +
+                                                                                LIGHT_PINK + ";" +
+                                                                                "-fx-text-fill: " +
+                                                                                PURPLE + ";" +
+                                                                                "-fx-font-weight: bold;" +
+                                                                                "-fx-background-radius: 6;" +
                                                                                 "-fx-cursor: hand;");
 
-                                                viewButton.setTooltip(
-                                                                new Tooltip(
-                                                                                "View Appointment"));
-
-                                                // ---------------------------------
                                                 // EDIT
-                                                // ---------------------------------
 
-                                                editButton.setStyle(
-                                                                "-fx-background-color: #FFF4DE;" +
-                                                                                "-fx-text-fill: #F59E0B;" +
-                                                                                "-fx-font-size: 14px;" +
-                                                                                "-fx-background-radius: 7;" +
-                                                                                "-fx-padding: 5 9;" +
+                                                edit.setStyle(
+                                                                "-fx-background-color: #F3ECFF;" +
+                                                                                "-fx-text-fill: " +
+                                                                                PURPLE + ";" +
+                                                                                "-fx-font-weight: bold;" +
+                                                                                "-fx-background-radius: 6;" +
                                                                                 "-fx-cursor: hand;");
 
-                                                editButton.setTooltip(
-                                                                new Tooltip(
-                                                                                "Edit Appointment"));
-
-                                                // ---------------------------------
                                                 // DELETE
-                                                // ---------------------------------
 
-                                                deleteButton.setStyle(
-                                                                "-fx-background-color: #FEE2E2;" +
-                                                                                "-fx-text-fill: #DC2626;" +
-                                                                                "-fx-font-size: 14px;" +
-                                                                                "-fx-background-radius: 7;" +
-                                                                                "-fx-padding: 5 9;" +
+                                                delete.setStyle(
+                                                                "-fx-background-color: #FFF0F0;" +
+                                                                                "-fx-text-fill: #D93636;" +
+                                                                                "-fx-font-weight: bold;" +
+                                                                                "-fx-background-radius: 6;" +
                                                                                 "-fx-cursor: hand;");
 
-                                                deleteButton.setTooltip(
-                                                                new Tooltip(
-                                                                                "Delete Appointment"));
-
-                                                // ---------------------------------
                                                 // VIEW ACTION
-                                                // ---------------------------------
 
-                                                viewButton.setOnAction(e -> {
+                                                view.setOnAction(e -> {
 
-                                                        DoctorAppointment appointment = getSelectedAppointment();
+                                                        DoctorAppointment appointment = getTableView()
+                                                                        .getItems()
+                                                                        .get(getIndex());
 
-                                                        if (appointment != null) {
-
-                                                                controller.viewAppointment(
-                                                                                appointment);
-                                                        }
+                                                        showAppointmentDetails(
+                                                                        appointment);
                                                 });
 
-                                                // ---------------------------------
                                                 // EDIT ACTION
-                                                // ---------------------------------
 
-                                                editButton.setOnAction(e -> {
+                                                edit.setOnAction(e -> {
 
-                                                        DoctorAppointment appointment = getSelectedAppointment();
+                                                        DoctorAppointment appointment = getTableView()
+                                                                        .getItems()
+                                                                        .get(getIndex());
 
-                                                        if (appointment != null) {
-
-                                                                controller.editAppointment(
-                                                                                appointment);
-                                                        }
+                                                        showEditAppointmentDialog(
+                                                                        appointment);
                                                 });
 
-                                                // ---------------------------------
                                                 // DELETE ACTION
-                                                // ---------------------------------
 
-                                                deleteButton.setOnAction(e -> {
+                                                delete.setOnAction(e -> {
 
-                                                        DoctorAppointment appointment = getSelectedAppointment();
-
-                                                        if (appointment == null) {
-                                                                return;
-                                                        }
+                                                        DoctorAppointment appointment = getTableView()
+                                                                        .getItems()
+                                                                        .get(getIndex());
 
                                                         Alert confirm = new Alert(
                                                                         Alert.AlertType.CONFIRMATION);
@@ -460,66 +399,48 @@ public class DoctorAppointmentsPage {
                                                                         "Delete this appointment?");
 
                                                         confirm.setContentText(
-                                                                        "Patient: "
-                                                                                        + appointment
-                                                                                                        .getPatient()
-                                                                                        + "\nDate: "
-                                                                                        + appointment
-                                                                                                        .getDate()
-                                                                                        + "\nTime: "
-                                                                                        + appointment
-                                                                                                        .getTime());
+                                                                        "Patient: " +
+                                                                                        appointment.getPatient());
 
                                                         confirm.showAndWait()
-                                                                        .ifPresent(
-                                                                                        result -> {
+                                                                        .ifPresent(result -> {
 
-                                                                                                if (result == ButtonType.OK) {
+                                                                                if (result == ButtonType.OK) {
 
-                                                                                                        boolean deleted = controller
-                                                                                                                        .deleteAppointment(
-                                                                                                                                        appointment);
+                                                                                        boolean deleted = controller
+                                                                                                        .deleteAppointment(
+                                                                                                                        appointment);
 
-                                                                                                        if (deleted) {
+                                                                                        if (deleted) {
 
-                                                                                                                applyFilters(
-                                                                                                                                search,
-                                                                                                                                status,
-                                                                                                                                type,
-                                                                                                                                date);
-                                                                                                        }
-                                                                                                }
-                                                                                        });
+                                                                                                table.setItems(
+                                                                                                                controller
+                                                                                                                                .getAppointments());
+
+                                                                                                table.refresh();
+
+                                                                                                Alert success = new Alert(
+                                                                                                                Alert.AlertType.INFORMATION);
+
+                                                                                                success.setTitle(
+                                                                                                                "Deleted");
+
+                                                                                                success.setHeaderText(
+                                                                                                                "Appointment Deleted");
+
+                                                                                                success.setContentText(
+                                                                                                                "Appointment deleted successfully.");
+
+                                                                                                success.showAndWait();
+                                                                                        }
+                                                                                }
+                                                                        });
                                                 });
-
-                                                buttons.setAlignment(
-                                                                Pos.CENTER);
-
-                                                buttons.getChildren()
-                                                                .addAll(
-                                                                                viewButton,
-                                                                                editButton,
-                                                                                deleteButton);
-                                        }
-
-                                        private DoctorAppointment getSelectedAppointment() {
-
-                                                if (getIndex() < 0 ||
-                                                                getIndex() >= getTableView()
-                                                                                .getItems()
-                                                                                .size()) {
-
-                                                        return null;
-                                                }
-
-                                                return getTableView()
-                                                                .getItems()
-                                                                .get(getIndex());
                                         }
 
                                         @Override
                                         protected void updateItem(
-                                                        String item,
+                                                        Void item,
                                                         boolean empty) {
 
                                                 super.updateItem(
@@ -532,254 +453,597 @@ public class DoctorAppointmentsPage {
 
                                                 } else {
 
-                                                        setGraphic(
-                                                                        buttons);
-
-                                                        setAlignment(
-                                                                        Pos.CENTER);
+                                                        setGraphic(buttons);
                                                 }
                                         }
                                 });
 
-                // =====================================================
-                // ADD COLUMNS
-                // =====================================================
-
                 table.getColumns().addAll(
-                                dateColumn,
-                                time,
-                                patient,
-                                appointmentType,
-                                stat,
-                                payment,
-                                action);
+                                timeCol,
+                                patientCol,
+                                typeCol,
+                                statusCol,
+                                paymentCol,
+                                actionCol);
 
-                // =====================================================
-                // INITIAL DATA
-                // =====================================================
+                // ================= FILTER LOGIC =================
 
-                table.setItems(
-                                FXCollections.observableArrayList(
-                                                controller.getAppointments()));
+                Runnable applyFilter = () -> {
 
-                // =====================================================
-                // SEARCH LISTENER
-                // =====================================================
+                        String search = searchField.getText() == null
+                                        ? ""
+                                        : searchField.getText()
+                                                        .trim()
+                                                        .toLowerCase();
 
-                search.textProperty().addListener(
-                                (obs, oldValue, newValue) -> applyFilters(
-                                                search,
-                                                status,
-                                                type,
-                                                date));
+                        String selectedStatus = statusCombo.getValue();
 
-                // =====================================================
-                // STATUS LISTENER
-                // =====================================================
+                        String selectedType = typeCombo.getValue();
 
-                status.valueProperty().addListener(
-                                (obs, oldValue, newValue) -> applyFilters(
-                                                search,
-                                                status,
-                                                type,
-                                                date));
+                        ObservableList<DoctorAppointment> filtered = FXCollections.observableArrayList();
 
-                // =====================================================
-                // TYPE LISTENER
-                // =====================================================
+                        for (DoctorAppointment appointment : controller.getAppointments()) {
 
-                type.valueProperty().addListener(
-                                (obs, oldValue, newValue) -> applyFilters(
-                                                search,
-                                                status,
-                                                type,
-                                                date));
+                                boolean searchMatch = search.isEmpty()
 
-                // =====================================================
-                // DATE LISTENER
-                // =====================================================
+                                                ||
 
-                date.valueProperty().addListener(
-                                (obs, oldValue, newValue) -> applyFilters(
-                                                search,
-                                                status,
-                                                type,
-                                                date));
+                                                appointment.getPatient()
+                                                                .toLowerCase()
+                                                                .contains(search)
 
-                // =====================================================
-                // CLEAR
-                // =====================================================
+                                                ||
 
-                clear.setOnAction(e -> {
+                                                appointment.getPatientId()
+                                                                .toLowerCase()
+                                                                .contains(search)
 
-                        search.clear();
+                                                ||
 
-                        status.setValue(
-                                        "All Status");
+                                                appointment.getType()
+                                                                .toLowerCase()
+                                                                .contains(search)
 
-                        type.setValue(
-                                        "All Appointment Types");
+                                                ||
 
-                        date.setValue(null);
+                                                appointment.getDate()
+                                                                .toLowerCase()
+                                                                .contains(search)
+
+                                                ||
+
+                                                appointment.getTime()
+                                                                .toLowerCase()
+                                                                .contains(search);
+
+                                boolean statusMatch = selectedStatus == null
+                                                ||
+                                                selectedStatus.equals("All")
+                                                ||
+                                                selectedStatus.equalsIgnoreCase(
+                                                                appointment.getStatus());
+
+                                boolean typeMatch = selectedType == null
+                                                ||
+                                                selectedType.equals("All")
+                                                ||
+                                                selectedType.equalsIgnoreCase(
+                                                                appointment.getType());
+
+                                if (searchMatch &&
+                                                statusMatch &&
+                                                typeMatch) {
+
+                                        filtered.add(
+                                                        appointment);
+                                }
+                        }
 
                         table.setItems(
-                                        FXCollections.observableArrayList(
-                                                        controller.getAppointments()));
-                });
+                                        filtered);
+                };
 
-                // =====================================================
-                // TABLE GROW
-                // =====================================================
+                searchField.textProperty()
+                                .addListener(
+                                                (obs, oldValue, newValue) -> applyFilter.run());
+
+                statusCombo.valueProperty()
+                                .addListener(
+                                                (obs, oldValue, newValue) -> applyFilter.run());
+
+                typeCombo.valueProperty()
+                                .addListener(
+                                                (obs, oldValue, newValue) -> applyFilter.run());
+
+                // ================= CONTENT =================
+
+                VBox content = new VBox(10);
+
+                content.setPadding(
+                                new Insets(
+                                                0,
+                                                25,
+                                                25,
+                                                25));
 
                 VBox.setVgrow(
                                 table,
                                 Priority.ALWAYS);
 
-                // =====================================================
-                // ROOT CONTENT
-                // =====================================================
-
-                root.getChildren().addAll(
-                                header,
-                                filters,
+                content.getChildren().addAll(
+                                filterBox,
                                 table);
 
-                // =====================================================
-                // SCENE
-                // =====================================================
+                root.setCenter(content);
+
+                // ================= SCENE =================
 
                 Scene appointmentsScene = new Scene(root);
 
+                /*
+                 * Open Appointment page using
+                 * the same Dashboard Stage.
+                 */
                 DoctorDashboard.changeScene(
                                 appointmentsScene);
         }
 
-        // =====================================================
-        // APPLY ALL FILTERS
-        // =====================================================
+        // =========================================================
+        // APPOINTMENT DETAILS
+        // =========================================================
 
-        private static void applyFilters(
-                        TextField search,
-                        ComboBox<String> status,
-                        ComboBox<String> type,
-                        DatePicker date) {
+        private static void showAppointmentDetails(
+                        DoctorAppointment appointment) {
 
-                String searchText = search.getText() == null
-                                ? ""
-                                : search.getText()
-                                                .trim()
-                                                .toLowerCase();
+                Alert alert = new Alert(
+                                Alert.AlertType.INFORMATION);
 
-                String selectedStatus = status.getValue();
+                alert.setTitle(
+                                "Appointment Details");
 
-                String selectedType = type.getValue();
+                alert.setHeaderText(
+                                appointment.getPatient());
 
-                LocalDate selectedDate = date.getValue();
+                alert.setContentText(
+                                "Appointment ID: " +
+                                                appointment.getAppointmentId()
+                                                + "\n\n" +
 
-                ObservableList<DoctorAppointment> filtered = FXCollections.observableArrayList();
+                                                "Patient ID: " +
+                                                appointment.getPatientId()
+                                                + "\n\n" +
 
-                for (DoctorAppointment appointment : controller.getAppointments()) {
+                                                "Date: " +
+                                                appointment.getDate()
+                                                + "\n\n" +
 
-                        // ---------------------------------------------
-                        // SEARCH
-                        // ---------------------------------------------
+                                                "Time: " +
+                                                appointment.getTime()
+                                                + "\n\n" +
 
-                        boolean matchesSearch = searchText.isEmpty()
-                                        ||
-                                        safeContains(
-                                                        appointment.getPatient(),
-                                                        searchText)
-                                        ||
-                                        safeContains(
-                                                        appointment.getType(),
-                                                        searchText)
-                                        ||
-                                        safeContains(
-                                                        appointment.getTime(),
-                                                        searchText)
-                                        ||
-                                        safeContains(
-                                                        appointment.getStatus(),
-                                                        searchText)
-                                        ||
-                                        safeContains(
-                                                        appointment.getPayment(),
-                                                        searchText)
-                                        ||
-                                        safeContains(
-                                                        appointment.getDate(),
-                                                        searchText);
+                                                "Type: " +
+                                                appointment.getType()
+                                                + "\n\n" +
 
-                        // ---------------------------------------------
-                        // STATUS
-                        // ---------------------------------------------
+                                                "Status: " +
+                                                appointment.getStatus()
+                                                + "\n\n" +
 
-                        boolean matchesStatus = selectedStatus == null
-                                        ||
-                                        selectedStatus.equals(
-                                                        "All Status")
-                                        ||
-                                        appointment.getStatus()
-                                                        .equalsIgnoreCase(
-                                                                        selectedStatus);
+                                                "Payment: " +
+                                                appointment.getPayment());
 
-                        // ---------------------------------------------
-                        // TYPE
-                        // ---------------------------------------------
-
-                        boolean matchesType = selectedType == null
-                                        ||
-                                        selectedType.equals(
-                                                        "All Appointment Types")
-                                        ||
-                                        appointment.getType()
-                                                        .equalsIgnoreCase(
-                                                                        selectedType);
-
-                        // ---------------------------------------------
-                        // DATE
-                        // ---------------------------------------------
-
-                        boolean matchesDate = true;
-
-                        if (selectedDate != null) {
-
-                                String selectedDateString = selectedDate.toString();
-
-                                matchesDate = appointment.getDate()
-                                                .equals(
-                                                                selectedDateString);
-                        }
-
-                        // ---------------------------------------------
-                        // ADD
-                        // ---------------------------------------------
-
-                        if (matchesSearch
-                                        && matchesStatus
-                                        && matchesType
-                                        && matchesDate) {
-
-                                filtered.add(
-                                                appointment);
-                        }
-                }
-
-                table.setItems(
-                                filtered);
+                alert.showAndWait();
         }
 
-        // =====================================================
-        // SAFE CONTAINS
-        // =====================================================
+        // =========================================================
+        // EDIT APPOINTMENT
+        // =========================================================
 
-        private static boolean safeContains(
-                        String value,
-                        String search) {
+        private static void showEditAppointmentDialog(
+                        DoctorAppointment appointment) {
 
-                return value != null
-                                &&
-                                value.toLowerCase()
-                                                .contains(search);
+                Dialog<ButtonType> dialog = new Dialog<>();
+
+                dialog.setTitle(
+                                "Edit Appointment");
+
+                dialog.setHeaderText(
+                                "Edit Appointment");
+
+                GridPane grid = new GridPane();
+
+                grid.setHgap(12);
+                grid.setVgap(12);
+
+                grid.setPadding(
+                                new Insets(20));
+
+                TextField patient = new TextField(
+                                appointment.getPatient());
+
+                TextField patientId = new TextField(
+                                appointment.getPatientId());
+
+                DatePicker date = new DatePicker();
+
+                try {
+
+                        date.setValue(
+                                        LocalDate.parse(
+                                                        appointment.getDate()));
+
+                } catch (Exception ignored) {
+                }
+
+                TextField time = new TextField(
+                                appointment.getTime());
+
+                ComboBox<String> type = new ComboBox<>(
+                                FXCollections.observableArrayList(
+                                                "Consultation",
+                                                "Follow-up",
+                                                "Emergency",
+                                                "Check-up"));
+
+                type.setValue(
+                                appointment.getType());
+
+                ComboBox<String> status = new ComboBox<>(
+                                FXCollections.observableArrayList(
+                                                "Pending",
+                                                "Confirmed",
+                                                "Completed",
+                                                "Cancelled"));
+
+                status.setValue(
+                                appointment.getStatus());
+
+                ComboBox<String> payment = new ComboBox<>(
+                                FXCollections.observableArrayList(
+                                                "Paid",
+                                                "Unpaid",
+                                                "Pending"));
+
+                payment.setValue(
+                                appointment.getPayment());
+
+                grid.add(
+                                new Label("Patient ID:"),
+                                0, 0);
+
+                grid.add(
+                                patientId,
+                                1, 0);
+
+                grid.add(
+                                new Label("Patient Name:"),
+                                0, 1);
+
+                grid.add(
+                                patient,
+                                1, 1);
+
+                grid.add(
+                                new Label("Date:"),
+                                0, 2);
+
+                grid.add(
+                                date,
+                                1, 2);
+
+                grid.add(
+                                new Label("Time:"),
+                                0, 3);
+
+                grid.add(
+                                time,
+                                1, 3);
+
+                grid.add(
+                                new Label("Type:"),
+                                0, 4);
+
+                grid.add(
+                                type,
+                                1, 4);
+
+                grid.add(
+                                new Label("Status:"),
+                                0, 5);
+
+                grid.add(
+                                status,
+                                1, 5);
+
+                grid.add(
+                                new Label("Payment:"),
+                                0, 6);
+
+                grid.add(
+                                payment,
+                                1, 6);
+
+                dialog.getDialogPane()
+                                .setContent(grid);
+
+                ButtonType save = new ButtonType(
+                                "Save",
+                                ButtonBar.ButtonData.OK_DONE);
+
+                ButtonType cancel = new ButtonType(
+                                "Cancel",
+                                ButtonBar.ButtonData.CANCEL_CLOSE);
+
+                dialog.getDialogPane()
+                                .getButtonTypes()
+                                .addAll(
+                                                save,
+                                                cancel);
+
+                dialog.setResultConverter(
+                                button -> {
+
+                                        if (button == save) {
+
+                                                Alert info = new Alert(
+                                                                Alert.AlertType.INFORMATION);
+
+                                                info.setTitle(
+                                                                "Edit Appointment");
+
+                                                info.setHeaderText(
+                                                                "Edit functionality");
+
+                                                info.setContentText(
+                                                                "The Edit UI is ready. "
+                                                                                + "Firestore update method "
+                                                                                + "can be connected next.");
+
+                                                info.showAndWait();
+                                        }
+
+                                        return button;
+                                });
+
+                dialog.showAndWait();
+        }
+
+        // =========================================================
+        // ADD APPOINTMENT
+        // =========================================================
+
+        private static void showAddAppointmentDialog() {
+
+                Dialog<ButtonType> dialog = new Dialog<>();
+
+                dialog.setTitle(
+                                "Add Appointment");
+
+                dialog.setHeaderText(
+                                "Create New Appointment");
+
+                GridPane grid = new GridPane();
+
+                grid.setHgap(12);
+                grid.setVgap(12);
+
+                grid.setPadding(
+                                new Insets(20));
+
+                TextField doctorId = new TextField(
+                                controller.getDefaultDoctorId());
+
+                doctorId.setDisable(true);
+
+                TextField patientId = new TextField();
+
+                patientId.setPromptText(
+                                "Enter patient ID");
+
+                TextField patientName = new TextField();
+
+                patientName.setPromptText(
+                                "Enter patient name");
+
+                DatePicker appointmentDate = new DatePicker();
+
+                appointmentDate.setValue(
+                                LocalDate.now());
+
+                TextField time = new TextField();
+
+                time.setPromptText(
+                                "e.g. 10:30 AM");
+
+                ComboBox<String> type = new ComboBox<>(
+                                FXCollections.observableArrayList(
+                                                "Consultation",
+                                                "Follow-up",
+                                                "Emergency",
+                                                "Check-up"));
+
+                type.setValue(
+                                "Consultation");
+
+                ComboBox<String> status = new ComboBox<>(
+                                FXCollections.observableArrayList(
+                                                "Pending",
+                                                "Confirmed",
+                                                "Completed",
+                                                "Cancelled"));
+
+                status.setValue(
+                                "Pending");
+
+                ComboBox<String> payment = new ComboBox<>(
+                                FXCollections.observableArrayList(
+                                                "Paid",
+                                                "Unpaid",
+                                                "Pending"));
+
+                payment.setValue(
+                                "Unpaid");
+
+                grid.add(
+                                new Label("Doctor ID:"),
+                                0, 0);
+
+                grid.add(
+                                doctorId,
+                                1, 0);
+
+                grid.add(
+                                new Label("Patient ID:"),
+                                0, 1);
+
+                grid.add(
+                                patientId,
+                                1, 1);
+
+                grid.add(
+                                new Label("Patient Name:"),
+                                0, 2);
+
+                grid.add(
+                                patientName,
+                                1, 2);
+
+                grid.add(
+                                new Label("Date:"),
+                                0, 3);
+
+                grid.add(
+                                appointmentDate,
+                                1, 3);
+
+                grid.add(
+                                new Label("Time:"),
+                                0, 4);
+
+                grid.add(
+                                time,
+                                1, 4);
+
+                grid.add(
+                                new Label("Type:"),
+                                0, 5);
+
+                grid.add(
+                                type,
+                                1, 5);
+
+                grid.add(
+                                new Label("Status:"),
+                                0, 6);
+
+                grid.add(
+                                status,
+                                1, 6);
+
+                grid.add(
+                                new Label("Payment:"),
+                                0, 7);
+
+                grid.add(
+                                payment,
+                                1, 7);
+
+                dialog.getDialogPane()
+                                .setContent(grid);
+
+                ButtonType saveButton = new ButtonType(
+                                "Save",
+                                ButtonBar.ButtonData.OK_DONE);
+
+                ButtonType cancelButton = new ButtonType(
+                                "Cancel",
+                                ButtonBar.ButtonData.CANCEL_CLOSE);
+
+                dialog.getDialogPane()
+                                .getButtonTypes()
+                                .addAll(
+                                                saveButton,
+                                                cancelButton);
+
+                dialog.setResultConverter(
+                                button -> {
+
+                                        if (button == saveButton) {
+
+                                                String selectedDate = appointmentDate.getValue() == null
+                                                                ? ""
+                                                                : appointmentDate
+                                                                                .getValue()
+                                                                                .toString();
+
+                                                DoctorAppointment appointment = controller.addAppointment(
+
+                                                                doctorId.getText(),
+
+                                                                patientId.getText(),
+
+                                                                selectedDate,
+
+                                                                time.getText(),
+
+                                                                patientName.getText(),
+
+                                                                type.getValue(),
+
+                                                                status.getValue(),
+
+                                                                payment.getValue());
+
+                                                if (appointment != null) {
+
+                                                        controller.refreshAppointments();
+
+                                                        if (table != null) {
+
+                                                                table.setItems(
+                                                                                controller
+                                                                                                .getAppointments());
+
+                                                                table.refresh();
+                                                        }
+
+                                                        Alert success = new Alert(
+                                                                        Alert.AlertType.INFORMATION);
+
+                                                        success.setTitle(
+                                                                        "Appointment Added");
+
+                                                        success.setHeaderText(
+                                                                        "Appointment added successfully");
+
+                                                        success.setContentText(
+                                                                        "The appointment has been saved "
+                                                                                        + "to Firebase.");
+
+                                                        success.showAndWait();
+
+                                                } else {
+
+                                                        Alert alert = new Alert(
+                                                                        Alert.AlertType.ERROR);
+
+                                                        alert.setTitle(
+                                                                        "Appointment Error");
+
+                                                        alert.setHeaderText(
+                                                                        "Unable to add appointment");
+
+                                                        alert.setContentText(
+                                                                        "Please check the entered "
+                                                                                        + "data and try again.");
+
+                                                        alert.showAndWait();
+                                                }
+                                        }
+
+                                        return button;
+                                });
+
+                dialog.showAndWait();
         }
 }

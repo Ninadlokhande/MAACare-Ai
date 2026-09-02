@@ -16,14 +16,32 @@ public class PatientReportsPage {
         private static TableView<PatientReport> table;
 
         // =====================================================
+        // GET SHARED CONTROLLER
+        // =====================================================
+
+        private static PatientReportController getController() {
+
+                if (controller == null) {
+
+                        controller = DoctorDashboard.getReportController();
+                }
+
+                return controller;
+        }
+
+        // =====================================================
         // SHOW PAGE
         // =====================================================
 
         public static void show() {
 
-                if (controller == null) {
-                        controller = new PatientReportController();
-                }
+                controller = getController();
+
+                // =================================================
+                // REFRESH FIRESTORE
+                // =================================================
+
+                controller.refreshReports();
 
                 BorderPane root = new BorderPane();
 
@@ -36,9 +54,9 @@ public class PatientReportsPage {
                                                 28,
                                                 35));
 
-                // =====================================================
+                // =================================================
                 // HEADER
-                // =====================================================
+                // =================================================
 
                 HBox header = new HBox();
 
@@ -57,14 +75,17 @@ public class PatientReportsPage {
 
                 Button back = Theme.backButton();
 
+                back.setOnAction(
+                                e -> DoctorDashboard.showDashboard());
+
                 header.getChildren().addAll(
                                 heading,
                                 spacer,
                                 back);
 
-                // =====================================================
+                // =================================================
                 // FILTER
-                // =====================================================
+                // =================================================
 
                 HBox filter = new HBox(10);
 
@@ -77,8 +98,8 @@ public class PatientReportsPage {
                 filter.setStyle(
                                 "-fx-background-color: white;" +
                                                 "-fx-background-radius: 10;" +
-                                                "-fx-border-color: " +
-                                                Theme.BORDER + ";" +
+                                                "-fx-border-color: "
+                                                + Theme.BORDER + ";" +
                                                 "-fx-border-radius: 10;");
 
                 TextField search = new TextField();
@@ -116,14 +137,22 @@ public class PatientReportsPage {
                                 filterSpacer,
                                 upload);
 
-                // =====================================================
+                // =================================================
                 // TABLE
-                // =====================================================
+                // =================================================
 
                 table = new TableView<>();
 
                 table.setColumnResizePolicy(
                                 TableView.CONSTRAINED_RESIZE_POLICY);
+
+                table.setPlaceholder(
+                                new Label(
+                                                "No reports found."));
+
+                // =================================================
+                // COLUMNS
+                // =================================================
 
                 TableColumn<PatientReport, String> reportName = new TableColumn<>("Report");
 
@@ -157,9 +186,9 @@ public class PatientReportsPage {
                                 d -> d.getValue()
                                                 .statusProperty());
 
-                // =====================================================
+                // =================================================
                 // ACTION COLUMN
-                // =====================================================
+                // =================================================
 
                 action.setCellFactory(
                                 column -> new TableCell<PatientReport, String>() {
@@ -196,7 +225,19 @@ public class PatientReportsPage {
                                                                 new Tooltip(
                                                                                 "Delete Report"));
 
+                                                // =========================
+                                                // VIEW
+                                                // =========================
+
                                                 view.setOnAction(e -> {
+
+                                                        if (getIndex() < 0 ||
+                                                                        getIndex() >= getTableView()
+                                                                                        .getItems()
+                                                                                        .size()) {
+
+                                                                return;
+                                                        }
 
                                                         PatientReport report = getTableView()
                                                                         .getItems()
@@ -206,13 +247,26 @@ public class PatientReportsPage {
                                                                         report);
                                                 });
 
+                                                // =========================
+                                                // DELETE
+                                                // =========================
+
                                                 delete.setOnAction(e -> {
+
+                                                        if (getIndex() < 0 ||
+                                                                        getIndex() >= getTableView()
+                                                                                        .getItems()
+                                                                                        .size()) {
+
+                                                                return;
+                                                        }
 
                                                         PatientReport report = getTableView()
                                                                         .getItems()
                                                                         .get(getIndex());
 
-                                                        deleteReport(report);
+                                                        deleteReport(
+                                                                        report);
                                                 });
 
                                                 buttons.setAlignment(
@@ -255,16 +309,16 @@ public class PatientReportsPage {
                                 reportStatus,
                                 action);
 
+                // =================================================
+                // LOAD REPORTS
+                // =================================================
+
                 table.setItems(
                                 controller.getReports());
 
-                VBox.setVgrow(
-                                table,
-                                Priority.ALWAYS);
-
-                // =====================================================
+                // =================================================
                 // SEARCH
-                // =====================================================
+                // =================================================
 
                 search.textProperty()
                                 .addListener(
@@ -275,9 +329,9 @@ public class PatientReportsPage {
                                                                                         newValue));
                                                 });
 
-                // =====================================================
+                // =================================================
                 // STATUS FILTER
-                // =====================================================
+                // =================================================
 
                 status.setOnAction(e -> {
 
@@ -286,18 +340,16 @@ public class PatientReportsPage {
                                                         status.getValue()));
                 });
 
-                // =====================================================
+                // =================================================
                 // UPLOAD
-                // =====================================================
+                // =================================================
 
-                upload.setOnAction(e -> {
+                upload.setOnAction(
+                                e -> UploadReportPage.show());
 
-                        UploadReportPage.show();
-                });
-
-                // =====================================================
-                // ROOT
-                // =====================================================
+                // =================================================
+                // CONTENT
+                // =================================================
 
                 VBox content = new VBox(
                                 15,
@@ -320,9 +372,9 @@ public class PatientReportsPage {
 
                 root.setCenter(content);
 
-                // =====================================================
-                // SCENE
-                // =====================================================
+                // =================================================
+                // SAME DASHBOARD STAGE
+                // =================================================
 
                 Scene scene = new Scene(root);
 
@@ -337,13 +389,24 @@ public class PatientReportsPage {
         public static void addReport(
                         PatientReport report) {
 
-                if (controller == null) {
-
-                        controller = new PatientReportController();
+                if (report == null) {
+                        return;
                 }
 
-                controller.addReport(
+                PatientReportController reportController = getController();
+
+                reportController.addReport(
                                 report);
+
+                if (table != null) {
+
+                        reportController.refreshReports();
+
+                        table.setItems(
+                                        reportController.getReports());
+
+                        table.refresh();
+                }
         }
 
         // =====================================================
@@ -367,21 +430,20 @@ public class PatientReportsPage {
                                 report.getReportName());
 
                 alert.setContentText(
+                                "Patient: "
+                                                + safe(report.getPatientName())
 
-                                "Patient: " +
-                                                report.getPatientName()
+                                                + "\n\nReport Type: "
+                                                + safe(report.getReportType())
 
-                                                + "\n\nReport Type: " +
-                                                report.getReportType()
+                                                + "\n\nDate: "
+                                                + safe(report.getDate())
 
-                                                + "\n\nDate: " +
-                                                report.getDate()
+                                                + "\n\nStatus: "
+                                                + safe(report.getStatus())
 
-                                                + "\n\nStatus: " +
-                                                report.getStatus()
-
-                                                + "\n\nFile: " +
-                                                report.getAction());
+                                                + "\n\nFile: "
+                                                + safe(report.getAction()));
 
                 alert.showAndWait();
         }
@@ -392,6 +454,10 @@ public class PatientReportsPage {
 
         private static void deleteReport(
                         PatientReport report) {
+
+                if (report == null) {
+                        return;
+                }
 
                 Alert confirmation = new Alert(
                                 Alert.AlertType.CONFIRMATION);
@@ -410,12 +476,47 @@ public class PatientReportsPage {
 
                                         if (response == ButtonType.OK) {
 
-                                                controller.deleteReport(
-                                                                report);
+                                                try {
 
-                                                table.setItems(
-                                                                controller.getReports());
+                                                        controller.deleteReport(
+                                                                        report);
+
+                                                        table.setItems(
+                                                                        controller.getReports());
+
+                                                        table.refresh();
+
+                                                } catch (Exception ex) {
+
+                                                        ex.printStackTrace();
+
+                                                        Alert error = new Alert(
+                                                                        Alert.AlertType.ERROR);
+
+                                                        error.setTitle(
+                                                                        "Delete Error");
+
+                                                        error.setHeaderText(
+                                                                        "Unable to delete report");
+
+                                                        error.setContentText(
+                                                                        "Please check your Firebase connection.");
+
+                                                        error.showAndWait();
+                                                }
                                         }
                                 });
+        }
+
+        // =====================================================
+        // SAFE STRING
+        // =====================================================
+
+        private static String safe(
+                        String value) {
+
+                return value == null
+                                ? ""
+                                : value;
         }
 }
