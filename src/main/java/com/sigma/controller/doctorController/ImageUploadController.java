@@ -14,7 +14,7 @@ public class ImageUploadController {
         Cloudinary cloudinary = CloudinaryConfig.getCloudinary();
         try {
             Map<String, Object> result = cloudinary.uploader()
-                    .upload(file, ObjectUtils.asMap("resource_type", "image"));
+                    .upload(file, ObjectUtils.asMap("resource_type", "auto"));
             System.out.println(result);
             String url = String.valueOf(result.get("secure_url"));
             System.out.println(url);

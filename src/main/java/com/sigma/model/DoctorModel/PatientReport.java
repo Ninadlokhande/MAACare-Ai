@@ -12,6 +12,13 @@ public class PatientReport {
     private final StringProperty status;
     private final StringProperty action;
 
+    // NEW: Actual uploaded file URL
+    private final StringProperty reportUrl;
+
+    // =====================================================
+    // CONSTRUCTOR - EXISTING
+    // =====================================================
+
     public PatientReport(
             String reportName,
             String patientName,
@@ -19,6 +26,29 @@ public class PatientReport {
             String date,
             String status,
             String action) {
+
+        this(
+                reportName,
+                patientName,
+                reportType,
+                date,
+                status,
+                action,
+                "");
+    }
+
+    // =====================================================
+    // NEW CONSTRUCTOR WITH REPORT URL
+    // =====================================================
+
+    public PatientReport(
+            String reportName,
+            String patientName,
+            String reportType,
+            String date,
+            String status,
+            String action,
+            String reportUrl) {
 
         this.reportName = new SimpleStringProperty(
                 reportName == null ? "" : reportName);
@@ -37,11 +67,14 @@ public class PatientReport {
 
         this.action = new SimpleStringProperty(
                 action == null ? "View" : action);
+
+        this.reportUrl = new SimpleStringProperty(
+                reportUrl == null ? "" : reportUrl);
     }
 
-    // =========================
+    // =====================================================
     // GETTERS
-    // =========================
+    // =====================================================
 
     public String getReportName() {
         return reportName.get();
@@ -67,9 +100,14 @@ public class PatientReport {
         return action.get();
     }
 
-    // =========================
+    // NEW
+    public String getReportUrl() {
+        return reportUrl.get();
+    }
+
+    // =====================================================
     // PROPERTY METHODS
-    // =========================
+    // =====================================================
 
     public StringProperty reportNameProperty() {
         return reportName;
@@ -95,9 +133,14 @@ public class PatientReport {
         return action;
     }
 
-    // =========================
+    // NEW
+    public StringProperty reportUrlProperty() {
+        return reportUrl;
+    }
+
+    // =====================================================
     // SETTERS
-    // =========================
+    // =====================================================
 
     public void setReportName(String reportName) {
         this.reportName.set(
@@ -129,15 +172,35 @@ public class PatientReport {
                 action == null ? "View" : action);
     }
 
+    // NEW
+    public void setReportUrl(String reportUrl) {
+        this.reportUrl.set(
+                reportUrl == null ? "" : reportUrl);
+    }
+
+    // =====================================================
+    // TOSTRING
+    // =====================================================
+
     @Override
     public String toString() {
+
         return "PatientReport{" +
+
                 "reportName='" + getReportName() + '\'' +
+
                 ", patientName='" + getPatientName() + '\'' +
+
                 ", reportType='" + getReportType() + '\'' +
+
                 ", date='" + getDate() + '\'' +
+
                 ", status='" + getStatus() + '\'' +
+
                 ", action='" + getAction() + '\'' +
+
+                ", reportUrl='" + getReportUrl() + '\'' +
+
                 '}';
     }
 }
