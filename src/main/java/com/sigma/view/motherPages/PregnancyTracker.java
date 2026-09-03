@@ -3,22 +3,25 @@ package com.sigma.view.motherPages;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import com.sigma.controller.PregnancyWeekController;
 import com.sigma.model.MotherWlcModel;
+import com.sigma.model.PregnancyWeekModel;
 
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 
+import javafx.scene.Node;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
-import javafx.application.Platform;
-import javafx.scene.Node;
 
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -48,11 +51,20 @@ public class PregnancyTracker {
     private final String LIGHT_PINK = "#FFF3F8";
     private final String LIGHT_PURPLE = "#F7F1FF";
 
+
     // =========================================================
     // MOTHER MODEL
     // =========================================================
 
     private MotherWlcModel motherModel;
+
+
+    // =========================================================
+    // PREGNANCY WEEK CONTROLLER
+    // =========================================================
+
+    private final PregnancyWeekController pregnancyWeekController =
+            new PregnancyWeekController();
 
 
     // =========================================================
@@ -99,7 +111,7 @@ public class PregnancyTracker {
     // WEEK DATA
     // =========================================================
 
-    private final Map<Integer, String[]> weekData =
+    private final Map<Integer, PregnancyWeekModel> weekData =
             new HashMap<>();
 
 
@@ -109,9 +121,9 @@ public class PregnancyTracker {
 
     public PregnancyTracker() {
 
-        loadWeekData();
-
         currentWeek = 20;
+
+        loadWeekDataFromFirebase();
     }
 
 
@@ -124,9 +136,9 @@ public class PregnancyTracker {
 
         this.motherModel = motherModel;
 
-        loadWeekData();
-
         calculateCurrentWeekFromLMP();
+
+        loadWeekDataFromFirebase();
     }
 
 
@@ -147,6 +159,73 @@ public class PregnancyTracker {
         }
 
         updateWeekContent();
+    }
+
+
+    // =========================================================
+    // LOAD WEEK DATA FROM FIREBASE
+    // =========================================================
+
+    private void loadWeekDataFromFirebase() {
+
+        new Thread(() -> {
+
+            try {
+
+                List<PregnancyWeekModel> weeks =
+                        pregnancyWeekController.getAllWeeks();
+
+                weekData.clear();
+
+                for (PregnancyWeekModel week : weeks) {
+
+                    weekData.put(
+                            week.getWeek(),
+                            week
+                    );
+                }
+
+                Platform.runLater(() -> {
+
+                    if (weekCombo != null) {
+
+                        weekCombo.setValue(currentWeek);
+                    }
+
+                    updateWeekContent();
+                });
+
+            } catch (Exception e) {
+
+                e.printStackTrace();
+
+                Platform.runLater(() -> {
+
+                    if (motherDetailsBox != null) {
+
+                        motherDetailsBox
+                                .getChildren()
+                                .clear();
+
+                        Label errorLabel =
+                                new Label(
+                                        "Unable to load pregnancy data."
+                                );
+
+                        errorLabel.setStyle(
+                                "-fx-font-size: 14px;" +
+                                "-fx-text-fill: #E84A87;"
+                        );
+
+                        motherDetailsBox
+                                .getChildren()
+                                .add(
+                                        errorLabel
+                                );
+                    }
+                });
+            }
+        }).start();
     }
 
 
@@ -222,10 +301,8 @@ public class PregnancyTracker {
 
     public VBox createPregnancyTrackingPage() {
 
-        // Always calculate the latest week from the mother's LMP
-        // before creating the UI. This ensures the page does not
-        // remain on the default Week 20 when an LMP is available.
         calculateCurrentWeekFromLMP();
+
 
         VBox page =
                 new VBox();
@@ -569,10 +646,6 @@ public class PregnancyTracker {
 
         card.setSpacing(15);
 
-
-        // =====================================================
-        // HEADING
-        // =====================================================
 
         HBox heading =
                 new HBox();
@@ -991,10 +1064,6 @@ public class PregnancyTracker {
         );
 
 
-        // =====================================================
-        // LINE CHART
-        // =====================================================
-
         babyDevelopmentChart =
                 createBabyDevelopmentChart(
                         currentWeek
@@ -1094,7 +1163,9 @@ public class PregnancyTracker {
 
 
         chart.setPrefWidth(390);
+
         chart.setMinWidth(390);
+
         chart.setMaxWidth(390);
 
 
@@ -1122,14 +1193,6 @@ public class PregnancyTracker {
         );
 
 
-        /*
-         * Show all weeks up to the current week.
-         *
-         * Example:
-         * Week 20 selected
-         * → graph displays Week 1 to Week 20
-         */
-
         for (
                 int i = 1;
                 i <= week;
@@ -1156,21 +1219,31 @@ public class PregnancyTracker {
                 progressSeries
         );
 
-        // Light-pink line and symbols. The chart node is available
-        // after CSS/layout, so apply the series style on the FX thread.
+
         Platform.runLater(() -> {
-            Node line = progressSeries.getNode();
+
+            Node line =
+                    progressSeries.getNode();
+
             if (line != null) {
+
                 line.setStyle(
                         "-fx-stroke: #F3A6C2;" +
                         "-fx-stroke-width: 3px;"
                 );
             }
 
-            for (XYChart.Data<String, Number> data :
-                    progressSeries.getData()) {
-                Node symbol = data.getNode();
+
+            for (
+                    XYChart.Data<String, Number> data :
+                    progressSeries.getData()
+            ) {
+
+                Node symbol =
+                        data.getNode();
+
                 if (symbol != null) {
+
                     symbol.setStyle(
                             "-fx-background-color: #F3A6C2, white;" +
                             "-fx-background-insets: 0, 2;" +
@@ -1180,6 +1253,7 @@ public class PregnancyTracker {
                 }
             }
         });
+
 
         return chart;
     }
@@ -1240,19 +1314,31 @@ public class PregnancyTracker {
                         progressSeries
                 );
 
+
         Platform.runLater(() -> {
-            Node line = progressSeries.getNode();
+
+            Node line =
+                    progressSeries.getNode();
+
             if (line != null) {
+
                 line.setStyle(
                         "-fx-stroke: #F3A6C2;" +
                         "-fx-stroke-width: 3px;"
                 );
             }
 
-            for (XYChart.Data<String, Number> data :
-                    progressSeries.getData()) {
-                Node symbol = data.getNode();
+
+            for (
+                    XYChart.Data<String, Number> data :
+                    progressSeries.getData()
+            ) {
+
+                Node symbol =
+                        data.getNode();
+
                 if (symbol != null) {
+
                     symbol.setStyle(
                             "-fx-background-color: #F3A6C2, white;" +
                             "-fx-background-insets: 0, 2;" +
@@ -1277,7 +1363,7 @@ public class PregnancyTracker {
         }
 
 
-        String[] data =
+        PregnancyWeekModel data =
                 weekData.get(currentWeek);
 
 
@@ -1298,19 +1384,19 @@ public class PregnancyTracker {
 
                         createInfoBox(
                                 "Body Changes",
-                                data[0],
+                                data.getMotherChanges(),
                                 PINK
                         ),
 
                         createInfoBox(
                                 "Common Feelings",
-                                data[1],
+                                data.getSymptoms(),
                                 PURPLE
                         ),
 
                         createInfoBox(
                                 "Care Focus",
-                                data[2],
+                                data.getTips(),
                                 GREEN
                         )
                 );
@@ -1329,7 +1415,7 @@ public class PregnancyTracker {
         }
 
 
-        String[] data =
+        PregnancyWeekModel data =
                 weekData.get(currentWeek);
 
 
@@ -1350,19 +1436,19 @@ public class PregnancyTracker {
 
                         createInfoBox(
                                 "Development",
-                                data[3],
+                                data.getBabyDevelopment(),
                                 PURPLE
                         ),
 
                         createInfoBox(
                                 "Baby Size",
-                                data[4],
+                                data.getBabySize(),
                                 PINK
                         ),
 
                         createInfoBox(
                                 "This Week's Milestone",
-                                data[5],
+                                data.getMilestone(),
                                 GREEN
                         )
                 );
@@ -1411,7 +1497,11 @@ public class PregnancyTracker {
 
 
         Label descriptionLabel =
-                new Label(description);
+                new Label(
+                        description != null
+                                ? description
+                                : ""
+                );
 
 
         descriptionLabel.setWrapText(true);
@@ -1496,13 +1586,15 @@ public class PregnancyTracker {
         );
 
 
-        String[] data =
+        PregnancyWeekModel data =
                 weekData.get(currentWeek);
 
 
         milestoneLabel =
                 new Label(
-                        data[5]
+                        data != null
+                                ? data.getMilestone()
+                                : "Loading..."
                 );
 
 
@@ -1518,7 +1610,9 @@ public class PregnancyTracker {
 
         milestoneDevelopmentLabel =
                 new Label(
-                        "👶 " + data[3]
+                        data != null
+                                ? "👶 " + data.getBabyDevelopment()
+                                : "👶 Loading..."
                 );
 
 
@@ -1818,61 +1912,87 @@ public class PregnancyTracker {
             );
         }
 
+
         if (journeySubtitleLabel != null) {
+
             journeySubtitleLabel.setText(
                     getTrimesterName(currentWeek) +
                     " • Week " + currentWeek + " of 40"
             );
         }
 
+
         if (trimesterLabel != null) {
+
             trimesterLabel.setText(
                     getTrimesterName(currentWeek)
             );
         }
 
+
         if (trimesterDescriptionLabel != null) {
+
             trimesterDescriptionLabel.setText(
                     getTrimesterDescription(currentWeek)
             );
         }
 
+
         if (pregnancyProgressBar != null) {
+
             pregnancyProgressBar.setProgress(
                     currentWeek / 40.0
             );
         }
 
+
         if (motherWeekHint != null) {
+
             motherWeekHint.setText(
                     "How your body may change during Week " +
                     currentWeek
             );
         }
 
+
         if (babyWeekHint != null) {
+
             babyWeekHint.setText(
                     "Your baby's growth during Week " +
                     currentWeek
             );
         }
 
-        String[] currentData = weekData.get(currentWeek);
+
+        PregnancyWeekModel currentData =
+                weekData.get(currentWeek);
+
 
         if (currentData != null) {
+
             if (milestoneWeekLabel != null) {
+
                 milestoneWeekLabel.setText(
-                        "Week " + currentWeek + " Development"
+                        "Week " +
+                        currentWeek +
+                        " Development"
                 );
             }
 
+
             if (milestoneLabel != null) {
-                milestoneLabel.setText(currentData[5]);
+
+                milestoneLabel.setText(
+                        currentData.getMilestone()
+                );
             }
 
+
             if (milestoneDevelopmentLabel != null) {
+
                 milestoneDevelopmentLabel.setText(
-                        "👶 " + currentData[3]
+                        "👶 " +
+                        currentData.getBabyDevelopment()
                 );
             }
         }
@@ -2462,641 +2582,5 @@ public class PregnancyTracker {
 
 
         return button;
-    }
-
-
-    // =========================================================
-    // WEEK DATA
-    // =========================================================
-
-    private void loadWeekData() {
-
-        // =====================================================
-        // WEEK 1
-        // =====================================================
-
-        addWeek(
-                1,
-                "Pregnancy is just beginning and conception " +
-                "typically occurs around this time.",
-                "You may not notice pregnancy symptoms yet.",
-                "Start focusing on healthy habits and prenatal care.",
-                "The fertilized egg begins its early journey toward implantation.",
-                "Microscopic — too small to measure meaningfully.",
-                "Early cell division and preparation for implantation begin."
-        );
-
-
-        // =====================================================
-        // WEEK 2
-        // =====================================================
-
-        addWeek(
-                2,
-                "Ovulation and fertilization may occur during this period.",
-                "Most people still do not feel pregnancy-related changes.",
-                "Track your cycle and begin pregnancy planning if appropriate.",
-                "The fertilized egg continues dividing as it moves toward the uterus.",
-                "Microscopic.",
-                "Cell division continues and the early embryo prepares for implantation."
-        );
-
-
-        // =====================================================
-        // WEEK 3
-        // =====================================================
-
-        addWeek(
-                3,
-                "Implantation may occur and early pregnancy hormones begin rising.",
-                "Some people notice mild tiredness or light changes.",
-                "Begin prenatal care and discuss folic acid with your healthcare provider.",
-                "The embryo starts developing the foundations of the nervous system and other structures.",
-                "About a tiny seed.",
-                "Implantation and early embryonic development take place."
-        );
-
-
-        // =====================================================
-        // WEEK 4
-        // =====================================================
-
-        addWeek(
-                4,
-                "Pregnancy hormones increase and a missed period may occur.",
-                "Fatigue, breast tenderness or mild nausea may begin.",
-                "Take prescribed prenatal supplements and arrange prenatal care.",
-                "The embryo's basic layers begin forming and early development accelerates.",
-                "About a poppy seed.",
-                "Early structures that will become the baby's organs begin forming."
-        );
-
-
-        // =====================================================
-        // WEEK 5
-        // =====================================================
-
-        addWeek(
-                5,
-                "Hormonal changes may make you feel more tired or sensitive.",
-                "Nausea, fatigue and breast tenderness can become more noticeable.",
-                "Eat regular nutritious meals and stay hydrated.",
-                "The neural tube and early heart structures continue developing.",
-                "About a sesame seed.",
-                "Early heart and nervous-system development progresses."
-        );
-
-
-        // =====================================================
-        // WEEK 6
-        // =====================================================
-
-        addWeek(
-                6,
-                "Your body is adjusting rapidly to increasing pregnancy hormones.",
-                "Morning sickness, tiredness and food aversions may occur.",
-                "Rest when needed and discuss persistent vomiting with your provider.",
-                "The embryo develops early facial features and limb buds.",
-                "About a lentil.",
-                "Early heart activity may begin and the brain develops rapidly."
-        );
-
-
-        // =====================================================
-        // WEEK 7
-        // =====================================================
-
-        addWeek(
-                7,
-                "Hormonal changes can make fatigue and nausea stronger.",
-                "You may experience nausea, tiredness or increased urination.",
-                "Choose small frequent meals and maintain hydration.",
-                "The brain continues developing and limb structures become more defined.",
-                "About a blueberry.",
-                "Arm and leg development continues."
-        );
-
-
-        // =====================================================
-        // WEEK 8
-        // =====================================================
-
-        addWeek(
-                8,
-                "Your uterus continues growing while pregnancy hormones remain high.",
-                "Nausea, fatigue and breast changes may continue.",
-                "Continue prenatal care, nutrition and adequate rest.",
-                "Facial features and developing limbs become more recognizable.",
-                "About a raspberry.",
-                "The embryo's major body structures continue taking shape."
-        );
-
-
-        // =====================================================
-        // WEEK 9
-        // =====================================================
-
-        addWeek(
-                9,
-                "Your body continues adapting to pregnancy hormones.",
-                "Fatigue and nausea may still be noticeable.",
-                "Keep meals nutritious and follow your prenatal-care schedule.",
-                "The embryo is developing rapidly and the basic body plan is becoming clearer.",
-                "About a cherry.",
-                "Fingers and toes begin becoming more defined."
-        );
-
-
-        // =====================================================
-        // WEEK 10
-        // =====================================================
-
-        addWeek(
-                10,
-                "Your uterus continues expanding and your body needs extra energy.",
-                "You may feel tired, nauseated or emotionally sensitive.",
-                "Continue healthy nutrition and prescribed supplements.",
-                "Major organs have formed in early form and continue maturing.",
-                "About a small strawberry.",
-                "The embryo transitions toward the fetal stage."
-        );
-
-
-        // =====================================================
-        // WEEK 11
-        // =====================================================
-
-        addWeek(
-                11,
-                "Some early pregnancy symptoms may begin changing.",
-                "Nausea may continue while energy may slowly improve.",
-                "Include protein, fruits, vegetables and whole grains in meals.",
-                "The baby's body continues growing and the head remains proportionally large.",
-                "About a lime.",
-                "Hands and feet continue developing."
-        );
-
-
-        // =====================================================
-        // WEEK 12
-        // =====================================================
-
-        addWeek(
-                12,
-                "Your uterus is growing and early pregnancy symptoms may start easing.",
-                "Energy may begin improving, although symptoms vary.",
-                "Keep prenatal appointments and maintain balanced nutrition.",
-                "The baby's facial features and organs continue maturing.",
-                "About a plum.",
-                "Reflexive movements begin developing."
-        );
-
-
-        // =====================================================
-        // WEEK 13
-        // =====================================================
-
-        addWeek(
-                13,
-                "You are reaching the end of the first trimester.",
-                "Nausea may reduce and appetite or energy may improve.",
-                "Continue prenatal vitamins and prepare for the second trimester.",
-                "The baby's bones and muscles continue developing.",
-                "About a peach.",
-                "The baby can make small movements even though you may not feel them yet."
-        );
-
-
-        // =====================================================
-        // WEEK 14
-        // =====================================================
-
-        addWeek(
-                14,
-                "The second trimester begins and many early symptoms may improve.",
-                "You may feel more energetic than during early pregnancy.",
-                "Continue balanced meals, hydration and regular checkups.",
-                "The baby's facial muscles and body proportions continue developing.",
-                "About a lemon.",
-                "The baby continues moving and developing facial features."
-        );
-
-
-        // =====================================================
-        // WEEK 15
-        // =====================================================
-
-        addWeek(
-                15,
-                "Your uterus continues growing as your abdomen gradually changes.",
-                "Mild stretching sensations may occur.",
-                "Maintain comfortable activity and adequate hydration.",
-                "The baby's bones continue developing and becoming stronger.",
-                "About an apple.",
-                "The baby's skeletal development progresses."
-        );
-
-
-        // =====================================================
-        // WEEK 16
-        // =====================================================
-
-        addWeek(
-                16,
-                "Your pregnancy may become more visible as your uterus grows.",
-                "Some people begin noticing more energy and appetite.",
-                "Follow your provider's guidance for nutrition and activity.",
-                "The baby's facial muscles and movements continue developing.",
-                "About an avocado.",
-                "The baby can make facial movements and move the limbs."
-        );
-
-
-        // =====================================================
-        // WEEK 17
-        // =====================================================
-
-        addWeek(
-                17,
-                "Your belly may become more noticeable as the uterus grows.",
-                "You may experience stretching sensations and changing posture.",
-                "Focus on comfortable movement, hydration and balanced meals.",
-                "The baby's skeleton continues developing and body fat begins gradually increasing later in pregnancy.",
-                "About a pear.",
-                "The baby continues growing rapidly and becoming more active."
-        );
-
-
-        // =====================================================
-        // WEEK 18
-        // =====================================================
-
-        addWeek(
-                18,
-                "Your uterus continues expanding and your center of gravity changes.",
-                "Back discomfort or sleep changes may occur.",
-                "Use comfortable sleeping positions and discuss significant pain with your provider.",
-                "The baby's hearing structures continue developing.",
-                "About a bell pepper.",
-                "The baby may begin responding to sounds."
-        );
-
-
-        // =====================================================
-        // WEEK 19
-        // =====================================================
-
-        addWeek(
-                19,
-                "Your growing uterus may affect posture and comfort.",
-                "You may notice skin changes or occasional aches.",
-                "Stay hydrated and maintain gentle, provider-approved activity.",
-                "The baby's senses continue developing and movement becomes stronger.",
-                "About a mango.",
-                "Sensory development continues, including touch and hearing."
-        );
-
-
-        // =====================================================
-        // WEEK 20
-        // =====================================================
-
-        addWeek(
-                20,
-                "You are around the halfway point of pregnancy.",
-                "Your belly is more noticeable and movements may become clearer.",
-                "Attend scheduled scans and continue nutritious meals.",
-                "The baby's growth continues and movements may become easier to feel.",
-                "About a banana.",
-                "The baby's movement and sensory development continue."
-        );
-
-
-        // =====================================================
-        // WEEK 21
-        // =====================================================
-
-        addWeek(
-                21,
-                "Your growing uterus may increase pressure on your back and legs.",
-                "You may feel stronger baby movements.",
-                "Rest when needed and keep up with hydration.",
-                "The baby's digestive system and sensory development continue.",
-                "About a carrot.",
-                "The baby continues swallowing amniotic fluid and practicing movements."
-        );
-
-
-        // =====================================================
-        // WEEK 22
-        // =====================================================
-
-        addWeek(
-                22,
-                "Your abdomen continues growing and your body needs increasing support.",
-                "You may notice more movement and occasional leg discomfort.",
-                "Maintain balanced nutrition and discuss persistent symptoms with your provider.",
-                "The baby's facial features become more defined.",
-                "About a papaya.",
-                "The baby's senses continue developing."
-        );
-
-
-        // =====================================================
-        // WEEK 23
-        // =====================================================
-
-        addWeek(
-                23,
-                "Your uterus continues expanding as pregnancy progresses.",
-                "Backache, leg cramps or sleep changes may occur.",
-                "Keep hydrated and follow safe activity recommendations.",
-                "The baby's lungs continue developing even though they are not yet mature.",
-                "About a large grapefruit.",
-                "The baby continues practicing breathing-like movements."
-        );
-
-
-        // =====================================================
-        // WEEK 24
-        // =====================================================
-
-        addWeek(
-                24,
-                "Your body is supporting rapid baby growth.",
-                "You may notice increased movement and physical tiredness.",
-                "Keep prenatal appointments and monitor your wellbeing.",
-                "The baby's lungs and nervous system continue maturing.",
-                "About an ear of corn.",
-                "The baby's developing senses respond increasingly to the environment."
-        );
-
-
-        // =====================================================
-        // WEEK 25
-        // =====================================================
-
-        addWeek(
-                25,
-                "Your growing uterus can affect sleep, posture and comfort.",
-                "You may notice stronger kicks and occasional heartburn.",
-                "Eat smaller meals if needed and stay hydrated.",
-                "The baby's brain and nervous system continue developing.",
-                "About a rutabaga.",
-                "The baby's movements become more coordinated."
-        );
-
-
-        // =====================================================
-        // WEEK 26
-        // =====================================================
-
-        addWeek(
-                26,
-                "Your pregnancy is progressing toward the third trimester.",
-                "Back discomfort, leg cramps or swelling may occur.",
-                "Discuss unusual swelling or symptoms with your healthcare provider.",
-                "The baby's eyes and brain continue developing.",
-                "About a cucumber.",
-                "The baby may respond to familiar sounds."
-        );
-
-
-        // =====================================================
-        // WEEK 27
-        // =====================================================
-
-        addWeek(
-                27,
-                "You are finishing the second trimester.",
-                "You may experience stronger movements and increasing tiredness.",
-                "Prepare for the third trimester and keep regular checkups.",
-                "The baby's brain and lungs continue maturing.",
-                "About a cauliflower.",
-                "The baby's sleep and wake patterns become more noticeable."
-        );
-
-
-        // =====================================================
-        // WEEK 28
-        // =====================================================
-
-        addWeek(
-                28,
-                "The third trimester begins and your body is preparing for later pregnancy.",
-                "You may feel more tired and experience sleep changes.",
-                "Prioritize rest, hydration and prenatal appointments.",
-                "The baby's brain continues rapid development and the lungs mature further.",
-                "About an eggplant.",
-                "The baby's eyes can open and close."
-        );
-
-
-        // =====================================================
-        // WEEK 29
-        // =====================================================
-
-        addWeek(
-                29,
-                "Your growing uterus may create more pressure and discomfort.",
-                "You may notice stronger kicks and occasional shortness of breath.",
-                "Take comfortable breaks and discuss concerning symptoms with your provider.",
-                "The baby continues gaining muscle and body fat.",
-                "About a butternut squash.",
-                "The baby's movements become stronger and more coordinated."
-        );
-
-
-        // =====================================================
-        // WEEK 30
-        // =====================================================
-
-        addWeek(
-                30,
-                "Your body is supporting rapid growth during the third trimester.",
-                "Fatigue, back discomfort and sleep changes may continue.",
-                "Continue prenatal care and prepare gradually for delivery.",
-                "The baby's brain continues developing rapidly.",
-                "About a cabbage.",
-                "The baby continues gaining weight and developing brain connections."
-        );
-
-
-        // =====================================================
-        // WEEK 31
-        // =====================================================
-
-        addWeek(
-                31,
-                "Your uterus continues expanding and may affect your breathing and sleep.",
-                "You may experience stronger movements and more frequent urination.",
-                "Rest comfortably and maintain hydration.",
-                "The baby's muscles, bones and brain continue maturing.",
-                "About a coconut.",
-                "The baby continues practicing movements and breathing-like motions."
-        );
-
-
-        // =====================================================
-        // WEEK 32
-        // =====================================================
-
-        addWeek(
-                32,
-                "Your body is preparing increasingly for birth.",
-                "You may feel heavier and need more rest.",
-                "Keep prenatal appointments and discuss your birth plan with your provider.",
-                "The baby's bones continue hardening while the skull remains flexible.",
-                "About a squash.",
-                "The baby continues gaining fat and developing brain function."
-        );
-
-
-        // =====================================================
-        // WEEK 33
-        // =====================================================
-
-        addWeek(
-                33,
-                "Your growing belly may affect movement and sleeping comfort.",
-                "Backache, pelvic pressure and fatigue may increase.",
-                "Rest regularly and report concerning symptoms promptly.",
-                "The baby's immune system and brain continue maturing.",
-                "About a pineapple.",
-                "The baby continues gaining strength and preparing for life outside the womb."
-        );
-
-
-        // =====================================================
-        // WEEK 34
-        // =====================================================
-
-        addWeek(
-                34,
-                "Your body is getting closer to full-term pregnancy.",
-                "You may experience increased tiredness and pelvic pressure.",
-                "Keep all prenatal appointments and follow your provider's guidance.",
-                "The baby's lungs and nervous system continue maturing.",
-                "About a cantaloupe.",
-                "The baby continues gaining body fat and improving temperature regulation."
-        );
-
-
-        // =====================================================
-        // WEEK 35
-        // =====================================================
-
-        addWeek(
-                35,
-                "Your uterus is taking up more space and movement may feel harder.",
-                "Frequent urination, fatigue and pelvic pressure may occur.",
-                "Rest, stay hydrated and prepare essential items for delivery.",
-                "The baby's brain and lungs continue maturing.",
-                "About a honeydew melon.",
-                "The baby continues gaining weight and practicing coordinated movements."
-        );
-
-
-        // =====================================================
-        // WEEK 36
-        // =====================================================
-
-        addWeek(
-                36,
-                "Your body is approaching the final weeks of pregnancy.",
-                "You may feel increased pelvic pressure as the baby moves lower.",
-                "Attend all remaining prenatal appointments and know when to contact your provider.",
-                "The baby's organs are continuing to mature and the body is gaining fat.",
-                "About a large melon.",
-                "The baby continues preparing for birth."
-        );
-
-
-        // =====================================================
-        // WEEK 37
-        // =====================================================
-
-        addWeek(
-                37,
-                "Pregnancy is now considered early term.",
-                "You may notice increased pelvic pressure and changes in comfort.",
-                "Keep your healthcare provider's contact information available.",
-                "The baby's organs continue functioning and the body continues maturing.",
-                "About a bunch of Swiss chard.",
-                "The baby continues gaining weight and preparing for birth."
-        );
-
-
-        // =====================================================
-        // WEEK 38
-        // =====================================================
-
-        addWeek(
-                38,
-                "Your body continues preparing for labor and birth.",
-                "You may feel more pelvic pressure and tiredness.",
-                "Continue monitoring your wellbeing and follow your birth plan.",
-                "The baby continues gaining weight and maturing.",
-                "About a leek-sized baby.",
-                "The baby continues final preparation for life outside the uterus."
-        );
-
-
-        // =====================================================
-        // WEEK 39
-        // =====================================================
-
-        addWeek(
-                39,
-                "You are very close to meeting your baby.",
-                "You may feel increased pressure and contractions may occur.",
-                "Follow your healthcare provider's instructions about signs of labor.",
-                "The baby's organs are mature enough for life outside the uterus in most cases.",
-                "About a small watermelon.",
-                "The baby continues final growth and preparation for birth."
-        );
-
-
-        // =====================================================
-        // WEEK 40
-        // =====================================================
-
-        addWeek(
-                40,
-                "This is the estimated due week for many pregnancies.",
-                "You may experience increasing pressure and signs that labor is approaching.",
-                "Stay in contact with your healthcare provider and follow your birth plan.",
-                "Your baby has completed most major development and is ready for birth.",
-                "About a small pumpkin.",
-                "Final preparation for birth and transition to life outside the womb."
-        );
-    }
-
-
-    // =========================================================
-    // ADD WEEK
-    // =========================================================
-
-    private void addWeek(
-            int week,
-            String bodyChanges,
-            String feelings,
-            String careFocus,
-            String development,
-            String size,
-            String milestone) {
-
-
-        weekData.put(
-                week,
-                new String[] {
-                        bodyChanges,
-                        feelings,
-                        careFocus,
-                        development,
-                        size,
-                        milestone
-                }
-        );
     }
 }

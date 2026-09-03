@@ -5,7 +5,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.sigma.model.Vaccination;
+import com.sigma.controller.MotherVaccinationController;
+import com.sigma.model.MotherVaccinationmodel;
+import com.sigma.model.MotherWlcModel;
 
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
@@ -37,11 +39,56 @@ public class MotherVaccination {
     private final String GREEN = "#3C9A68";
 
     // =========================================================
+    // FIREBASE
+    // =========================================================
+
+    private final MotherVaccinationController controller;
+
+    private MotherWlcModel motherModel;
+
+    private String motherId;
+
+
+    // =========================================================
     // VACCINATION DATA
     // =========================================================
 
-    private final List<Vaccination> vaccinations =
+    private final List<MotherVaccinationmodel> vaccinations =
             new ArrayList<>();
+
+
+    // =========================================================
+    // CONSTRUCTOR - EXISTING COMPATIBILITY
+    // =========================================================
+
+    public MotherVaccination() {
+
+        this.motherModel = null;
+
+        this.motherId = null;
+
+        this.controller =
+                new MotherVaccinationController();
+    }
+
+
+    // =========================================================
+    // CONSTRUCTOR - FIREBASE
+    // =========================================================
+
+    public MotherVaccination(
+            MotherWlcModel motherModel) {
+
+        this.motherModel = motherModel;
+
+        this.motherId =
+                motherModel != null
+                        ? motherModel.getMotherId()
+                        : null;
+
+        this.controller =
+                new MotherVaccinationController();
+    }
 
 
     // =========================================================
@@ -50,7 +97,6 @@ public class MotherVaccination {
 
     public VBox createVaccinationPage() {
 
-        // Load current vaccination data
         loadVaccinationData();
 
         VBox page = new VBox();
@@ -85,7 +131,7 @@ public class MotherVaccination {
         // =====================================================
 
         content.getChildren().add(
-            createPageTitle()
+                createPageTitle()
         );
 
 
@@ -94,7 +140,7 @@ public class MotherVaccination {
         // =====================================================
 
         content.getChildren().add(
-            createSummaryCards()
+                createSummaryCards()
         );
 
 
@@ -103,7 +149,7 @@ public class MotherVaccination {
         // =====================================================
 
         content.getChildren().add(
-            createUpcomingVaccination()
+                createUpcomingVaccination()
         );
 
 
@@ -112,7 +158,7 @@ public class MotherVaccination {
         // =====================================================
 
         content.getChildren().add(
-            createBabyVaccination()
+                createBabyVaccination()
         );
 
 
@@ -121,7 +167,7 @@ public class MotherVaccination {
         // =====================================================
 
         content.getChildren().add(
-            createMotherVaccination()
+                createMotherVaccination()
         );
 
 
@@ -130,7 +176,7 @@ public class MotherVaccination {
         // =====================================================
 
         content.getChildren().add(
-            createReminder()
+                createReminder()
         );
 
 
@@ -139,7 +185,7 @@ public class MotherVaccination {
         // =====================================================
 
         content.getChildren().add(
-            createConsultation()
+                createConsultation()
         );
 
 
@@ -185,32 +231,84 @@ public class MotherVaccination {
 
 
     // =========================================================
-    // LOAD VACCINATION DATA
+    // LOAD FIREBASE DATA
     // =========================================================
 
     private void loadVaccinationData() {
 
         vaccinations.clear();
 
-        /*
-         * IMPORTANT:
-         *
-         * Actual vaccination data will come from Firebase later.
-         *
-         * Do NOT put actual due dates here.
-         *
-         * These are only vaccine definitions for the UI.
-         */
+        try {
+
+            if (motherId != null &&
+                !motherId.trim().isEmpty()) {
+
+                List<MotherVaccinationmodel> firebaseData =
+                        controller.getVaccinationsByMotherId(
+                                motherId
+                        );
+
+                if (firebaseData != null &&
+                    !firebaseData.isEmpty()) {
+
+                    vaccinations.addAll(
+                            firebaseData
+                    );
+
+                    System.out.println(
+                            "💉 Vaccinations loaded from Firebase: "
+                            + vaccinations.size()
+                    );
+
+                    return;
+                }
+            }
+
+            System.out.println(
+                    "ℹ️ No vaccination data found in Firebase."
+            );
+
+            System.out.println(
+                    "📋 Loading demo vaccination data..."
+            );
+
+            loadDemoVaccinationData();
+
+        } catch (Exception e) {
+
+            System.out.println(
+                    "❌ Error loading vaccination data."
+            );
+
+            e.printStackTrace();
+
+            loadDemoVaccinationData();
+        }
+    }
+
+
+    // =========================================================
+    // DEMO / FALLBACK DATA
+    // =========================================================
+
+    private void loadDemoVaccinationData() {
+
+        String demoMotherId =
+                motherId != null &&
+                !motherId.trim().isEmpty()
+                        ? motherId
+                        : "DEMO_MOTHER_001";
 
 
         vaccinations.add(
-            new Vaccination(
-                "baby_bcg",
+            new MotherVaccinationmodel(
+                "DEMO_VACC_001",
+                demoMotherId,
                 "Baby",
                 "BCG",
                 "Birth Dose",
-                null,
-                null,
+                "02 Sep 2026",
+                "02 Sep 2026",
                 "Completed",
                 "Tuberculosis protection"
             )
@@ -218,13 +316,14 @@ public class MotherVaccination {
 
 
         vaccinations.add(
-            new Vaccination(
-                "baby_opv",
+            new MotherVaccinationmodel(
+                "DEMO_VACC_002",
+                demoMotherId,
                 "Baby",
                 "OPV",
                 "Birth Dose",
-                null,
-                null,
+                "02 Sep 2026",
+                "02 Sep 2026",
                 "Completed",
                 "Polio protection"
             )
@@ -232,12 +331,13 @@ public class MotherVaccination {
 
 
         vaccinations.add(
-            new Vaccination(
-                "baby_penta",
+            new MotherVaccinationmodel(
+                "DEMO_VACC_003",
+                demoMotherId,
                 "Baby",
                 "Pentavalent",
                 "Dose 1",
-                null,
+                "15 Sep 2026",
                 null,
                 "Upcoming",
                 "Protection against diphtheria, tetanus, pertussis and other infections"
@@ -246,12 +346,13 @@ public class MotherVaccination {
 
 
         vaccinations.add(
-            new Vaccination(
-                "baby_rotavirus",
+            new MotherVaccinationmodel(
+                "DEMO_VACC_004",
+                demoMotherId,
                 "Baby",
                 "Rotavirus",
                 "Dose 1",
-                null,
+                "15 Sep 2026",
                 null,
                 "Upcoming",
                 "Protection against rotavirus infection"
@@ -260,12 +361,13 @@ public class MotherVaccination {
 
 
         vaccinations.add(
-            new Vaccination(
-                "baby_pcv",
+            new MotherVaccinationmodel(
+                "DEMO_VACC_005",
+                demoMotherId,
                 "Baby",
                 "PCV",
                 "Dose 1",
-                null,
+                "20 Sep 2026",
                 null,
                 "Upcoming",
                 "Protection against pneumococcal disease"
@@ -274,12 +376,13 @@ public class MotherVaccination {
 
 
         vaccinations.add(
-            new Vaccination(
-                "mother_td",
+            new MotherVaccinationmodel(
+                "DEMO_VACC_006",
+                demoMotherId,
                 "Mother",
                 "Td / Tdap",
                 "Recommended Dose",
-                null,
+                "12 Sep 2026",
                 null,
                 "Upcoming",
                 "Protects mother and baby"
@@ -288,12 +391,13 @@ public class MotherVaccination {
 
 
         vaccinations.add(
-            new Vaccination(
-                "mother_flu",
+            new MotherVaccinationmodel(
+                "DEMO_VACC_007",
+                demoMotherId,
                 "Mother",
                 "Influenza",
                 "Seasonal",
-                null,
+                "25 Sep 2026",
                 null,
                 "Upcoming",
                 "Seasonal flu protection"
@@ -302,8 +406,9 @@ public class MotherVaccination {
 
 
         vaccinations.add(
-            new Vaccination(
-                "mother_covid",
+            new MotherVaccinationmodel(
+                "DEMO_VACC_008",
+                demoMotherId,
                 "Mother",
                 "COVID-19",
                 "As Recommended",
@@ -312,6 +417,12 @@ public class MotherVaccination {
                 "Consult Doctor",
                 "Vaccination according to doctor's recommendation"
             )
+        );
+
+
+        System.out.println(
+                "✅ Demo vaccinations loaded: "
+                + vaccinations.size()
         );
     }
 
@@ -441,33 +552,34 @@ public class MotherVaccination {
 
         HBox row = new HBox(15);
 
-
         int upcoming = 0;
         int completed = 0;
         int dueSoon = 0;
 
 
-        for (Vaccination vaccination : vaccinations) {
+        for (MotherVaccinationmodel vaccination :
+                vaccinations) {
 
-            if ("Completed".equalsIgnoreCase(
-                    vaccination.getStatus())) {
+            String status =
+                    vaccination.getStatus();
+
+            if ("Completed".equalsIgnoreCase(status)) {
 
                 completed++;
 
-            } else if ("Due Soon".equalsIgnoreCase(
-                    vaccination.getStatus())) {
+            } else if ("Due Soon".equalsIgnoreCase(status)) {
 
                 dueSoon++;
 
-            } else if ("Upcoming".equalsIgnoreCase(
-                    vaccination.getStatus())) {
+            } else if ("Upcoming".equalsIgnoreCase(status)) {
 
                 upcoming++;
             }
         }
 
 
-        int total = vaccinations.size();
+        int total =
+                vaccinations.size();
 
 
         row.getChildren().addAll(
@@ -620,10 +732,13 @@ public class MotherVaccination {
                 new HBox(15);
 
 
-        for (Vaccination vaccination : vaccinations) {
+        for (MotherVaccinationmodel vaccination :
+                vaccinations) {
 
-            if (!"Completed".equalsIgnoreCase(
-                    vaccination.getStatus())) {
+            String status =
+                    vaccination.getStatus();
+
+            if (!"Completed".equalsIgnoreCase(status)) {
 
                 vaccines.getChildren().add(
                         createUpcomingCard(
@@ -646,10 +761,13 @@ public class MotherVaccination {
 
 
     private VBox createUpcomingCard(
-            Vaccination vaccination) {
+            MotherVaccinationmodel vaccination) {
+
+        String person =
+                vaccination.getPerson();
 
         String color =
-                vaccination.getPerson().equalsIgnoreCase("Mother")
+                "Mother".equalsIgnoreCase(person)
                         ? PURPLE
                         : PINK;
 
@@ -679,8 +797,7 @@ public class MotherVaccination {
 
         Label icon =
                 new Label(
-                        vaccination.getPerson()
-                                .equalsIgnoreCase("Mother")
+                        "Mother".equalsIgnoreCase(person)
                                 ? "🤰"
                                 : "👶"
                 );
@@ -690,12 +807,15 @@ public class MotherVaccination {
         );
 
 
-        VBox personBox = new VBox();
+        VBox personBox =
+                new VBox();
 
 
         Label personLabel =
                 new Label(
-                        vaccination.getPerson()
+                        person == null
+                                ? "Unknown"
+                                : person
                 );
 
         personLabel.setStyle(
@@ -707,7 +827,9 @@ public class MotherVaccination {
 
         Label vaccineLabel =
                 new Label(
-                        vaccination.getVaccineName()
+                        vaccination.getVaccineName() == null
+                                ? "Vaccination"
+                                : vaccination.getVaccineName()
                 );
 
         vaccineLabel.setStyle(
@@ -731,7 +853,9 @@ public class MotherVaccination {
 
         Label doseLabel =
                 new Label(
-                        vaccination.getDose()
+                        vaccination.getDose() == null
+                                ? "Dose not available"
+                                : vaccination.getDose()
                 );
 
         doseLabel.setStyle(
@@ -742,7 +866,8 @@ public class MotherVaccination {
 
         Label dateLabel =
                 new Label(
-                        vaccination.getDueDate() == null
+                        vaccination.getDueDate() == null ||
+                        vaccination.getDueDate().isEmpty()
                                 ? "Date will be updated"
                                 : "Due: " +
                                   vaccination.getDueDate()
@@ -756,7 +881,9 @@ public class MotherVaccination {
 
         Label statusLabel =
                 new Label(
-                        vaccination.getStatus()
+                        vaccination.getStatus() == null
+                                ? "Unknown"
+                                : vaccination.getStatus()
                 );
 
         statusLabel.setStyle(
@@ -782,16 +909,164 @@ public class MotherVaccination {
         );
 
 
+        Button complete =
+                createSmallButton(
+                        "Complete"
+                );
+
+
+        if ("Completed".equalsIgnoreCase(
+                vaccination.getStatus())) {
+
+            complete.setDisable(true);
+        }
+
+
+        complete.setOnAction(e ->
+                completeVaccination(
+                        vaccination
+                )
+        );
+
+
         box.getChildren().addAll(
                 top,
                 doseLabel,
                 dateLabel,
                 statusLabel,
-                view
+                view,
+                complete
         );
 
 
         return box;
+    }
+
+
+    // =========================================================
+    // COMPLETE VACCINATION
+    // =========================================================
+
+    private void completeVaccination(
+            MotherVaccinationmodel vaccination) {
+
+        if (vaccination == null) {
+            return;
+        }
+
+
+        String id =
+                vaccination.getId();
+
+
+        // -----------------------------------------------------
+        // DEMO DATA
+        // -----------------------------------------------------
+
+        if (id != null &&
+            id.startsWith("DEMO_")) {
+
+            vaccination.setStatus(
+                    "Completed"
+            );
+
+            vaccination.setCompletedDate(
+                    LocalDate.now().format(
+                            DateTimeFormatter.ofPattern(
+                                    "dd MMM yyyy"
+                            )
+                    )
+            );
+
+
+            showInfo(
+                    "Vaccination Completed",
+                    vaccination.getVaccineName()
+                            + " marked as completed."
+            );
+
+
+            refreshPage();
+
+            return;
+        }
+
+
+        // -----------------------------------------------------
+        // FIREBASE DATA
+        // -----------------------------------------------------
+
+        try {
+
+            String completedDate =
+                    LocalDate.now().format(
+                            DateTimeFormatter.ofPattern(
+                                    "dd MMM yyyy"
+                            )
+                    );
+
+
+            boolean success =
+                    controller.markAsCompleted(
+                            id,
+                            completedDate
+                    );
+
+
+            if (success) {
+
+                vaccination.setStatus(
+                        "Completed"
+                );
+
+                vaccination.setCompletedDate(
+                        completedDate
+                );
+
+
+                showInfo(
+                        "Vaccination Completed",
+                        vaccination.getVaccineName()
+                                + " marked as completed and saved to Firebase."
+                );
+
+
+                refreshPage();
+
+            } else {
+
+                showInfo(
+                        "Update Failed",
+                        "Unable to update vaccination in Firebase."
+                );
+            }
+
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+            showInfo(
+                    "Error",
+                    "Something went wrong while updating vaccination."
+            );
+        }
+    }
+
+
+    // =========================================================
+    // REFRESH PAGE
+    // =========================================================
+
+    private void refreshPage() {
+
+        if (motherModel != null) {
+
+            motherId =
+                    motherModel.getMotherId();
+        }
+
+        loadVaccinationData();
     }
 
 
@@ -825,15 +1100,18 @@ public class MotherVaccination {
                 "12 Months"
         );
 
+
         age.setValue(
                 "6 Weeks"
         );
+
 
         age.setPrefWidth(145);
 
 
         HBox headingRow =
                 new HBox();
+
 
         headingRow.setAlignment(
                 Pos.CENTER_LEFT
@@ -856,7 +1134,8 @@ public class MotherVaccination {
                 new VBox(10);
 
 
-        for (Vaccination vaccination : vaccinations) {
+        for (MotherVaccinationmodel vaccination :
+                vaccinations) {
 
             if ("Baby".equalsIgnoreCase(
                     vaccination.getPerson())) {
@@ -879,7 +1158,7 @@ public class MotherVaccination {
         schedule.setOnAction(e ->
                 showInfo(
                         "Baby Vaccination Schedule",
-                        "Complete vaccination schedule will be loaded from your baby's vaccination data."
+                        "Complete vaccination schedule is loaded from your baby's vaccination data."
                 )
         );
 
@@ -917,6 +1196,7 @@ public class MotherVaccination {
                         "Important vaccines recommended during pregnancy"
                 );
 
+
         subtitle.setStyle(
                 "-fx-font-size: 13px;" +
                 "-fx-text-fill: " + TEXT_GRAY + ";"
@@ -926,16 +1206,19 @@ public class MotherVaccination {
         GridPane grid =
                 new GridPane();
 
+
         grid.setHgap(15);
 
         grid.setVgap(15);
 
 
         int column = 0;
+
         int row = 0;
 
 
-        for (Vaccination vaccination : vaccinations) {
+        for (MotherVaccinationmodel vaccination :
+                vaccinations) {
 
             if ("Mother".equalsIgnoreCase(
                     vaccination.getPerson())) {
@@ -953,7 +1236,9 @@ public class MotherVaccination {
 
 
                 if (column == 2) {
+
                     column = 0;
+
                     row++;
                 }
             }
@@ -972,11 +1257,14 @@ public class MotherVaccination {
 
 
     private VBox createMotherVaccineCard(
-            Vaccination vaccination) {
+            MotherVaccinationmodel vaccination) {
+
+        String vaccineName =
+                vaccination.getVaccineName();
+
 
         String color =
-                vaccination.getVaccineName()
-                        .equalsIgnoreCase("COVID-19")
+                "COVID-19".equalsIgnoreCase(vaccineName)
                         ? GREEN
                         : PINK;
 
@@ -984,9 +1272,11 @@ public class MotherVaccination {
         VBox box =
                 new VBox(7);
 
+
         box.setPadding(
                 new Insets(14)
         );
+
 
         box.setStyle(
                 "-fx-background-color: #FFF9FC;" +
@@ -999,6 +1289,7 @@ public class MotherVaccination {
         HBox top =
                 new HBox(10);
 
+
         top.setAlignment(
                 Pos.CENTER_LEFT
         );
@@ -1007,6 +1298,7 @@ public class MotherVaccination {
         Label icon =
                 new Label("💉");
 
+
         icon.setStyle(
                 "-fx-font-size: 25px;"
         );
@@ -1014,8 +1306,11 @@ public class MotherVaccination {
 
         Label title =
                 new Label(
-                        vaccination.getVaccineName()
+                        vaccineName == null
+                                ? "Vaccination"
+                                : vaccineName
                 );
+
 
         title.setStyle(
                 "-fx-font-size: 15px;" +
@@ -1032,10 +1327,14 @@ public class MotherVaccination {
 
         Label desc =
                 new Label(
-                        vaccination.getDescription()
+                        vaccination.getDescription() == null
+                                ? "No description available."
+                                : vaccination.getDescription()
                 );
 
+
         desc.setWrapText(true);
+
 
         desc.setStyle(
                 "-fx-font-size: 12px;" +
@@ -1045,8 +1344,11 @@ public class MotherVaccination {
 
         Label status =
                 new Label(
-                        vaccination.getStatus()
+                        vaccination.getStatus() == null
+                                ? "Unknown"
+                                : vaccination.getStatus()
                 );
+
 
         status.setStyle(
                 "-fx-text-fill: " + color + ";" +
@@ -1085,18 +1387,21 @@ public class MotherVaccination {
     // =========================================================
 
     private HBox createVaccineRow(
-            Vaccination vaccination) {
+            MotherVaccinationmodel vaccination) {
 
         HBox row =
                 new HBox(15);
+
 
         row.setAlignment(
                 Pos.CENTER_LEFT
         );
 
+
         row.setPadding(
                 new Insets(12)
         );
+
 
         row.setStyle(
                 "-fx-background-color: #FAF8FB;" +
@@ -1106,6 +1411,7 @@ public class MotherVaccination {
 
         Label icon =
                 new Label("💉");
+
 
         icon.setStyle(
                 "-fx-font-size: 22px;"
@@ -1118,8 +1424,11 @@ public class MotherVaccination {
 
         Label name =
                 new Label(
-                        vaccination.getVaccineName()
+                        vaccination.getVaccineName() == null
+                                ? "Vaccination"
+                                : vaccination.getVaccineName()
                 );
+
 
         name.setStyle(
                 "-fx-font-size: 14px;" +
@@ -1130,10 +1439,14 @@ public class MotherVaccination {
 
         Label desc =
                 new Label(
-                        vaccination.getDescription()
+                        vaccination.getDescription() == null
+                                ? "No description available."
+                                : vaccination.getDescription()
                 );
 
+
         desc.setWrapText(true);
+
 
         desc.setStyle(
                 "-fx-font-size: 11px;" +
@@ -1153,19 +1466,24 @@ public class MotherVaccination {
         );
 
 
+        String status =
+                vaccination.getStatus() == null
+                        ? "Unknown"
+                        : vaccination.getStatus();
+
+
+        String statusColor =
+                getStatusColor(status);
+
+
         Label statusLabel =
-                new Label(
-                        vaccination.getStatus()
-                );
+                new Label(status);
+
 
         statusLabel.setStyle(
                 "-fx-background-color: white;" +
-                "-fx-border-color: " + getStatusColor(
-                        vaccination.getStatus()
-                ) + ";" +
-                "-fx-text-fill: " + getStatusColor(
-                        vaccination.getStatus()
-                ) + ";" +
+                "-fx-border-color: " + statusColor + ";" +
+                "-fx-text-fill: " + statusColor + ";" +
                 "-fx-border-radius: 12;" +
                 "-fx-background-radius: 12;" +
                 "-fx-padding: 6px 10px;" +
@@ -1210,13 +1528,16 @@ public class MotherVaccination {
             return GREEN;
         }
 
+
         if ("Due Soon".equalsIgnoreCase(status)) {
             return "#C7821B";
         }
 
+
         if ("Consult Doctor".equalsIgnoreCase(status)) {
             return PURPLE;
         }
+
 
         return PINK;
     }
@@ -1231,13 +1552,16 @@ public class MotherVaccination {
         HBox box =
                 new HBox(15);
 
+
         box.setAlignment(
                 Pos.CENTER_LEFT
         );
 
+
         box.setPadding(
                 new Insets(18)
         );
+
 
         box.setStyle(
                 "-fx-background-color: #FFFDF4;" +
@@ -1249,6 +1573,7 @@ public class MotherVaccination {
 
         Label icon =
                 new Label("🔔");
+
 
         icon.setStyle(
                 "-fx-font-size: 30px;"
@@ -1264,6 +1589,7 @@ public class MotherVaccination {
                         "Vaccination Reminder"
                 );
 
+
         title.setStyle(
                 "-fx-font-size: 16px;" +
                 "-fx-font-weight: bold;" +
@@ -1276,7 +1602,9 @@ public class MotherVaccination {
                         "Keep your vaccination record updated and follow the recommended schedule."
                 );
 
+
         message.setWrapText(true);
+
 
         message.setStyle(
                 "-fx-font-size: 12px;" +
@@ -1305,7 +1633,7 @@ public class MotherVaccination {
         reminder.setOnAction(e ->
                 showInfo(
                         "Reminder",
-                        "Reminder will be connected with your vaccination data."
+                        "Vaccination reminder will be connected with your vaccination data."
                 )
         );
 
@@ -1342,6 +1670,7 @@ public class MotherVaccination {
         HBox top =
                 new HBox(15);
 
+
         top.setAlignment(
                 Pos.CENTER_LEFT
         );
@@ -1349,6 +1678,7 @@ public class MotherVaccination {
 
         Label icon =
                 new Label("👩‍⚕️");
+
 
         icon.setStyle(
                 "-fx-font-size: 38px;"
@@ -1364,6 +1694,7 @@ public class MotherVaccination {
                         "Need help with vaccination?"
                 );
 
+
         title.setStyle(
                 "-fx-font-size: 18px;" +
                 "-fx-font-weight: bold;" +
@@ -1376,7 +1707,9 @@ public class MotherVaccination {
                         "Consult a doctor to understand which vaccines are suitable for you and your baby."
                 );
 
+
         description.setWrapText(true);
+
 
         description.setStyle(
                 "-fx-font-size: 13px;" +
@@ -1437,6 +1770,7 @@ public class MotherVaccination {
         HBox heading =
                 new HBox(10);
 
+
         heading.setAlignment(
                 Pos.CENTER_LEFT
         );
@@ -1447,7 +1781,9 @@ public class MotherVaccination {
                         iconType
                 );
 
+
         icon.setSize("18");
+
 
         icon.setFill(
                 Color.web(PURPLE)
@@ -1456,6 +1792,7 @@ public class MotherVaccination {
 
         Label title =
                 new Label(text);
+
 
         title.setStyle(
                 "-fx-font-size: 18px;" +
@@ -1483,11 +1820,14 @@ public class MotherVaccination {
         VBox card =
                 new VBox();
 
+
         card.setSpacing(12);
+
 
         card.setPadding(
                 new Insets(18)
         );
+
 
         card.setStyle(
                 "-fx-background-color: white;" +
@@ -1510,6 +1850,7 @@ public class MotherVaccination {
 
         Button button =
                 new Button(text);
+
 
         button.setStyle(
                 "-fx-background-color: linear-gradient(" +
@@ -1535,6 +1876,7 @@ public class MotherVaccination {
 
         Button button =
                 new Button(text);
+
 
         button.setStyle(
                 "-fx-background-color: white;" +
@@ -1562,6 +1904,7 @@ public class MotherVaccination {
         Button button =
                 new Button(text);
 
+
         button.setStyle(
                 "-fx-background-color: white;" +
                 "-fx-text-fill: " + PINK + ";" +
@@ -1583,10 +1926,11 @@ public class MotherVaccination {
     // =========================================================
 
     private void showVaccinationInfo(
-            Vaccination vaccination) {
+            MotherVaccinationmodel vaccination) {
 
         String dueDate =
-                vaccination.getDueDate() == null
+                vaccination.getDueDate() == null ||
+                vaccination.getDueDate().isEmpty()
                         ? "Not available yet"
                         : vaccination.getDueDate();
 
@@ -1598,31 +1942,61 @@ public class MotherVaccination {
                         : vaccination.getCompletedDate();
 
 
+        String person =
+                vaccination.getPerson() == null
+                        ? "Unknown"
+                        : vaccination.getPerson();
+
+
+        String vaccineName =
+                vaccination.getVaccineName() == null
+                        ? "Vaccination"
+                        : vaccination.getVaccineName();
+
+
+        String dose =
+                vaccination.getDose() == null
+                        ? "Not available"
+                        : vaccination.getDose();
+
+
+        String status =
+                vaccination.getStatus() == null
+                        ? "Unknown"
+                        : vaccination.getStatus();
+
+
+        String description =
+                vaccination.getDescription() == null
+                        ? "No description available."
+                        : vaccination.getDescription();
+
+
         String message =
-                "For: " + vaccination.getPerson() +
+                "For: " + person +
                 "\n\n" +
-                "Vaccine: " + vaccination.getVaccineName() +
+                "Vaccine: " + vaccineName +
                 "\n" +
-                "Dose: " + vaccination.getDose() +
+                "Dose: " + dose +
                 "\n" +
                 "Due Date: " + dueDate +
                 "\n" +
                 "Completed Date: " + completedDate +
                 "\n" +
-                "Status: " + vaccination.getStatus() +
+                "Status: " + status +
                 "\n\n" +
-                vaccination.getDescription();
+                description;
 
 
         showInfo(
-                vaccination.getVaccineName(),
+                vaccineName,
                 message
         );
     }
 
 
     // =========================================================
-    // INFO
+    // INFO ALERT
     // =========================================================
 
     private void showInfo(
@@ -1633,6 +2007,7 @@ public class MotherVaccination {
                 new Alert(
                         Alert.AlertType.INFORMATION
                 );
+
 
         alert.setTitle(title);
 

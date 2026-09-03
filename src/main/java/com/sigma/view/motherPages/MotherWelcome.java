@@ -1,10 +1,11 @@
 package com.sigma.view.motherPages;
 
 import java.time.LocalDate;
+import java.time.Period;
 
+import com.sigma.controller.MotherWlcController;
 import com.sigma.model.MotherWlcModel;
 
-import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -24,17 +25,29 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
-public class MotherWelcome extends Application {
-        public static Stage motherWelcomeStage;
-        private Scene motherWelcomeScene;
+public class MotherWelcome {
 
-    @Override
-    public void start(Stage motherWelcomeStage) throws Exception {
-        MotherWelcome.motherWelcomeStage = motherWelcomeStage;
+    public static Stage motherWelcomeStage;
 
-        // =========================
-        // LEFT SIDE - BRANDING
-        // =========================
+    private Scene motherWelcomeScene;
+
+    // =========================================================
+    // CONSTRUCTOR
+    // =========================================================
+
+    public MotherWelcome() {
+        createMotherWelcomePage();
+    }
+
+    // =========================================================
+    // CREATE MOTHER WELCOME PAGE
+    // =========================================================
+
+    private void createMotherWelcomePage() {
+
+        // =========================================================
+        // LEFT PANEL
+        // =========================================================
 
         VBox leftPanel = new VBox(20);
 
@@ -43,21 +56,25 @@ public class MotherWelcome extends Application {
         leftPanel.setPrefWidth(500);
         leftPanel.setMinWidth(450);
 
-        // Logo
         Image img = new Image(
                 getClass().getResource(
-                    "/assets/images/logo/logo.png"
+                        "/assets/images/logo/logo.png"
                 ).toExternalForm()
-            );
-            
+        );
+
         ImageView logo = new ImageView(img);
-            
+
         logo.setFitHeight(200);
         logo.setPreserveRatio(true);
+
         Label appName = new Label("MaaCare AI");
 
         appName.setFont(
-                Font.font("Arial", FontWeight.BOLD, 30)
+                Font.font(
+                        "Arial",
+                        FontWeight.BOLD,
+                        30
+                )
         );
 
         appName.setTextFill(
@@ -69,7 +86,11 @@ public class MotherWelcome extends Application {
         );
 
         tagline.setFont(
-                Font.font("Arial", FontWeight.NORMAL, 16)
+                Font.font(
+                        "Arial",
+                        FontWeight.NORMAL,
+                        16
+                )
         );
 
         tagline.setTextFill(
@@ -82,12 +103,15 @@ public class MotherWelcome extends Application {
                 javafx.scene.text.TextAlignment.CENTER
         );
 
-        Label welcomeText = new Label(
-                "Welcome, Mother! 💗"
-        );
+        Label welcomeText =
+                new Label("Welcome, Mother! 💗");
 
         welcomeText.setFont(
-                Font.font("Arial", FontWeight.BOLD, 24)
+                Font.font(
+                        "Arial",
+                        FontWeight.BOLD,
+                        24
+                )
         );
 
         welcomeText.setTextFill(
@@ -101,10 +125,9 @@ public class MotherWelcome extends Application {
                 welcomeText
         );
 
-
-        // =========================
-        // RIGHT SIDE - FORM
-        // =========================
+        // =========================================================
+        // FORM CARD
+        // =========================================================
 
         VBox formCard = new VBox(25);
 
@@ -115,113 +138,83 @@ public class MotherWelcome extends Application {
         formCard.setPrefWidth(650);
         formCard.setMaxWidth(650);
 
-
-        // =========================
-        // TITLE
-        // =========================
-
-        Label title = new Label(
-                "Let's get to know you"
-        );
+        Label title =
+                new Label("Let's get to know you");
 
         title.setFont(
-                Font.font("Arial", FontWeight.BOLD, 25)
+                Font.font(
+                        "Arial",
+                        FontWeight.BOLD,
+                        25
+                )
         );
 
         title.setTextFill(
                 Color.web("#333333")
         );
 
-
-        Label subtitle = new Label(
-                "Enter a few basic details to personalize your MaaCare journey."
-        );
+        Label subtitle =
+                new Label(
+                        "Enter a few basic details to personalize your MaaCare journey."
+                );
 
         subtitle.setFont(
-                Font.font("Arial", 14)
+                Font.font(
+                        "Arial",
+                        14
+                )
         );
 
         subtitle.setTextFill(
                 Color.web("#777777")
         );
 
-
-        // =========================
+        // =========================================================
         // BASIC INFORMATION
-        // =========================
+        // =========================================================
 
-        Label basicTitle = new Label(
-                "Basic Information"
-        );
+        Label basicTitle =
+                new Label("Basic Information");
 
         basicTitle.setFont(
-                Font.font("Arial", FontWeight.BOLD, 18)
+                Font.font(
+                        "Arial",
+                        FontWeight.BOLD,
+                        18
+                )
         );
 
         basicTitle.setTextFill(
                 Color.web("#B83B63")
         );
 
-
-        // Full Name
-
         TextField nameField = new TextField();
 
-        nameField.setPromptText(
-                "Full Name"
-        );
-
+        nameField.setPromptText("Full Name");
         nameField.setPrefWidth(280);
 
         styleTextField(nameField);
 
+        DatePicker dobDatePicker = new DatePicker();
 
-        // Date of Birth
-
-        DatePicker dobDatePicker =
-                new DatePicker();
-
-        dobDatePicker.setPromptText(
-                "Date of Birth"
-        );
-
+        dobDatePicker.setPromptText("Date of Birth");
         dobDatePicker.setPrefWidth(280);
 
-        styleDatePicker(
-                dobDatePicker
-        );
-
-
-        // Location
+        styleDatePicker(dobDatePicker);
 
         TextField locationField = new TextField();
 
         locationField.setPromptText("City / Location");
-
         locationField.setPrefWidth(280);
 
-        styleTextField(
-                locationField
-        );
+        styleTextField(locationField);
 
+        TextField weightField = new TextField();
 
-        // Weight
-
-        TextField weightField =
-                new TextField();
-
-        weightField.setPromptText(
-                "Weight (kg)"
-        );
-
+        weightField.setPromptText("Weight (kg)");
         weightField.setPrefWidth(280);
 
-        styleTextField(
-                weightField
-        );
-
-
-        // Blood Group
+        styleTextField(weightField);
 
         ComboBox<String> bloodGroupBox =
                 new ComboBox<>();
@@ -237,18 +230,10 @@ public class MotherWelcome extends Application {
                 "O-"
         );
 
-        bloodGroupBox.setPromptText(
-                "Blood Group"
-        );
-
+        bloodGroupBox.setPromptText("Blood Group");
         bloodGroupBox.setPrefWidth(280);
 
-        styleComboBox(
-                bloodGroupBox
-        );
-
-
-        // Medical Condition
+        styleComboBox(bloodGroupBox);
 
         ComboBox<String> medicalConditionBox =
                 new ComboBox<>();
@@ -268,19 +253,14 @@ public class MotherWelcome extends Application {
 
         medicalConditionBox.setPrefWidth(280);
 
-        styleComboBox(
-                medicalConditionBox
-        );
+        styleComboBox(medicalConditionBox);
 
-
-        // =========================
+        // =========================================================
         // PREGNANCY INFORMATION
-        // =========================
+        // =========================================================
 
         Label pregnancyTitle =
-                new Label(
-                        "Pregnancy Information"
-                );
+                new Label("Pregnancy Information");
 
         pregnancyTitle.setFont(
                 Font.font(
@@ -293,7 +273,6 @@ public class MotherWelcome extends Application {
         pregnancyTitle.setTextFill(
                 Color.web("#B83B63")
         );
-
 
         Label lmpLabel =
                 new Label(
@@ -312,7 +291,6 @@ public class MotherWelcome extends Application {
                 Color.web("#555555")
         );
 
-
         DatePicker lmpDatePicker =
                 new DatePicker();
 
@@ -320,14 +298,9 @@ public class MotherWelcome extends Application {
                 "Select LMP date"
         );
 
-        lmpDatePicker.setPrefWidth(
-                580
-        );
+        lmpDatePicker.setPrefWidth(580);
 
-        styleDatePicker(
-                lmpDatePicker
-        );
-
+        styleDatePicker(lmpDatePicker);
 
         Label eddLabel =
                 new Label(
@@ -346,7 +319,6 @@ public class MotherWelcome extends Application {
                 Color.web("#555555")
         );
 
-
         Label eddValue =
                 new Label(
                         "Will be calculated automatically"
@@ -364,10 +336,9 @@ public class MotherWelcome extends Application {
                 Color.web("#B83B63")
         );
 
-
-        // =========================
+        // =========================================================
         // EDD CALCULATION
-        // =========================
+        // =========================================================
 
         lmpDatePicker.setOnAction(event -> {
 
@@ -376,39 +347,42 @@ public class MotherWelcome extends Application {
 
             if (lmpDate != null) {
 
-                LocalDate eddDate =
-                        lmpDate.plusDays(280);
+                LocalDate today =
+                        LocalDate.now();
 
-                eddValue.setText(
-                        eddDate.getDayOfMonth()
-                                + " "
-                                + eddDate.getMonth()
-                                + " "
-                                + eddDate.getYear()
-                );
+                if (!lmpDate.isAfter(today)) {
+
+                    LocalDate eddDate =
+                            lmpDate.plusDays(280);
+
+                    eddValue.setText(
+                            eddDate.getDayOfMonth()
+                                    + " "
+                                    + eddDate.getMonth()
+                                    + " "
+                                    + eddDate.getYear()
+                    );
+
+                } else {
+
+                    eddValue.setText(
+                            "Invalid LMP date"
+                    );
+                }
             }
         });
 
-
-        // =========================
+        // =========================================================
         // CONTINUE BUTTON
-        // =========================
+        // =========================================================
 
         Button continueButton =
-                new Button(
-                        "Continue →"
-                );
+                new Button("Continue →");
 
-        continueButton.setPrefWidth(
-                200
-        );
-
-        continueButton.setPrefHeight(
-                45
-        );
+        continueButton.setPrefWidth(200);
+        continueButton.setPrefHeight(45);
 
         continueButton.setStyle(
-
                 "-fx-background-color: linear-gradient(to right, #F54B87, #9B4DCC);"
                         + "-fx-text-fill: white;"
                         + "-fx-font-weight: bold;"
@@ -419,116 +393,361 @@ public class MotherWelcome extends Application {
                         + "-fx-cursor: hand;"
         );
 
-
-        // =========================
-        // BUTTON ACTION
-        // =========================
+        // =========================================================
+        // CONTINUE BUTTON ACTION
+        // =========================================================
 
         continueButton.setOnAction(event -> {
 
-            String name =
-                    nameField.getText();
+            try {
 
-            LocalDate dob =
-                    dobDatePicker.getValue();
+                String name =
+                        nameField.getText().trim();
 
-            String location =
-                    locationField.getText();
+                LocalDate dob =
+                        dobDatePicker.getValue();
 
-            String weight =
-                    weightField.getText();
+                String location =
+                        locationField.getText().trim();
 
-            String bloodGroup =
-                    bloodGroupBox.getValue();
+                String weight =
+                        weightField.getText().trim();
 
-            String medicalCondition =
-                    medicalConditionBox.getValue();
+                String bloodGroup =
+                        bloodGroupBox.getValue();
 
-            LocalDate lmp =
-                    lmpDatePicker.getValue();
+                String medicalCondition =
+                        medicalConditionBox.getValue();
 
+                LocalDate lmp =
+                        lmpDatePicker.getValue();
 
-            if (name.isEmpty()
-                    || dob == null
-                    || location.isEmpty()
-                    || weight.isEmpty()
-                    || bloodGroup == null
-                    || medicalCondition == null
-                    || lmp == null) {
+                LocalDate today =
+                        LocalDate.now();
 
-                showError(
-                        "Please fill all required details."
+                // =================================================
+                // 1. EMPTY FIELD VALIDATION
+                // =================================================
+
+                if (name.isEmpty()
+                        || dob == null
+                        || location.isEmpty()
+                        || weight.isEmpty()
+                        || bloodGroup == null
+                        || medicalCondition == null
+                        || lmp == null) {
+
+                    showError(
+                            "Please fill all required details."
+                    );
+
+                    return;
+                }
+
+                // =================================================
+                // 2. NAME VALIDATION
+                // =================================================
+
+                if (!name.matches("[a-zA-Z ]+")) {
+
+                    showError(
+                            "Name should contain only letters and spaces."
+                    );
+
+                    return;
+                }
+
+                if (name.length() < 2) {
+
+                    showError(
+                            "Please enter a valid full name."
+                    );
+
+                    return;
+                }
+
+                // =================================================
+                // 3. LOCATION VALIDATION
+                // =================================================
+
+                if (!location.matches("[a-zA-Z ]+")) {
+
+                    showError(
+                            "City / Location should contain only letters and spaces."
+                    );
+
+                    return;
+                }
+
+                // =================================================
+                // 4. DOB VALIDATION
+                // =================================================
+
+                if (dob.isAfter(today)) {
+
+                    showError(
+                            "Date of Birth cannot be a future date."
+                    );
+
+                    return;
+                }
+
+                int age =
+                        Period.between(
+                                dob,
+                                today
+                        ).getYears();
+
+                if (age < 18) {
+
+                    showError(
+                            "Please enter a valid Date of Birth."
+                                    + "\nAge must be at least 18 years."
+                    );
+
+                    return;
+                }
+
+                if (age > 100) {
+
+                    showError(
+                            "Please enter a valid Date of Birth."
+                    );
+
+                    return;
+                }
+
+                // =================================================
+                // 5. WEIGHT VALIDATION
+                // =================================================
+
+                double weightValue;
+
+                try {
+
+                    if (!weight.matches(
+                            "\\d+(\\.\\d+)?"
+                    )) {
+
+                        showError(
+                                "Weight must contain numbers only."
+                        );
+
+                        return;
+                    }
+
+                    weightValue =
+                            Double.parseDouble(weight);
+
+                } catch (NumberFormatException e) {
+
+                    showError(
+                            "Please enter a valid weight."
+                    );
+
+                    return;
+                }
+
+                if (weightValue < 20
+                        || weightValue > 200) {
+
+                    showError(
+                            "Please enter a realistic weight between 20 kg and 200 kg."
+                    );
+
+                    return;
+                }
+
+                // =================================================
+                // 6. LMP FUTURE DATE
+                // =================================================
+
+                if (lmp.isAfter(today)) {
+
+                    showError(
+                            "LMP date cannot be a future date."
+                    );
+
+                    return;
+                }
+
+                // =================================================
+                // 7. LMP AFTER DOB
+                // =================================================
+
+                if (!lmp.isAfter(dob)) {
+
+                    showError(
+                            "LMP date must be after the Date of Birth."
+                    );
+
+                    return;
+                }
+
+                // =================================================
+                // 8. LMP TOO OLD
+                // =================================================
+
+                LocalDate earliestLmp =
+                        today.minusDays(294);
+
+                if (lmp.isBefore(earliestLmp)) {
+
+                    showError(
+                            "The LMP date is too old for the current pregnancy."
+                                    + "\nPlease enter the correct LMP date."
+                    );
+
+                    return;
+                }
+
+                // =================================================
+                // 9. CALCULATE EDD
+                // =================================================
+
+                LocalDate edd =
+                        lmp.plusDays(280);
+
+                // =================================================
+                // 10. CREATE MOTHER MODEL
+                // =================================================
+
+                MotherWlcModel motherModel =
+                        new MotherWlcModel(
+                                null,
+                                name,
+                                dob,
+                                location,
+                                weightValue,
+                                bloodGroup,
+                                medicalCondition,
+                                lmp,
+                                edd
+                        );
+
+                // =================================================
+                // 11. SAVE TO FIREBASE
+                // =================================================
+
+                MotherWlcController motherController =
+                        new MotherWlcController();
+
+                boolean saved =
+                        motherController.saveMotherData(
+                                motherModel
+                        );
+
+                // =================================================
+                // 12. SAVE FAILED
+                // =================================================
+
+                if (!saved) {
+
+                    showError(
+                            "Mother data could not be saved to Firebase."
+                    );
+
+                    return;
+                }
+
+                // =================================================
+                // 13. SUCCESS CONSOLE
+                // =================================================
+
+                System.out.println(
+                        "======================================"
                 );
 
-                return;
+                System.out.println(
+                        "Mother data saved successfully!"
+                );
+
+                System.out.println(
+                        "Mother ID: "
+                                + motherModel.getMotherId()
+                );
+
+                System.out.println(
+                        "Mother Name: "
+                                + motherModel.getName()
+                );
+
+                System.out.println(
+                        "Date of Birth: "
+                                + motherModel.getDateOfBirth()
+                );
+
+                System.out.println(
+                        "Location: "
+                                + motherModel.getLocation()
+                );
+
+                System.out.println(
+                        "Weight: "
+                                + motherModel.getWeight()
+                                + " kg"
+                );
+
+                System.out.println(
+                        "Blood Group: "
+                                + motherModel.getBloodGroup()
+                );
+
+                System.out.println(
+                        "Medical Condition: "
+                                + motherModel.getMedicalCondition()
+                );
+
+                System.out.println(
+                        "LMP: "
+                                + motherModel.getLmpDate()
+                );
+
+                System.out.println(
+                        "EDD: "
+                                + motherModel.getEddDate()
+                );
+
+                System.out.println(
+                        "======================================"
+                );
+
+                // =================================================
+                // 14. GO TO MOTHER DASHBOARD
+                // =================================================
+
+                MotherDashBoard dashboard =
+                        new MotherDashBoard(
+                                motherModel
+                        );
+
+                Scene dashboardScene =
+                        dashboard.getmotherDashboardScene();
+
+                Stage currentStage =
+                        (Stage) continueButton
+                                .getScene()
+                                .getWindow();
+
+                currentStage.setScene(
+                        dashboardScene
+                );
+
+                currentStage.setMaximized(true);
+
+            } catch (Exception e) {
+
+                e.printStackTrace();
+
+                showError(
+                        "Something went wrong while processing mother data."
+                );
             }
-
-
-            LocalDate edd =
-                    lmp.plusDays(280);
-
-            MotherWlcModel motherModel =
-                new MotherWlcModel(
-                name,
-                dob,
-                location,
-                Double.parseDouble(weight),
-                bloodGroup,
-                medicalCondition,
-                lmp,
-                edd
-        );
-
-
-            System.out.println(
-                    "Mother Name: " + name
-            );
-
-            System.out.println(
-                    "Date of Birth: " + dob
-            );
-
-            System.out.println(
-                    "Location: " + location
-            );
-
-            System.out.println(
-                    "Weight: " + weight + " kg"
-            );
-
-            System.out.println(
-                    "Blood Group: " + bloodGroup
-            );
-
-            System.out.println(
-                    "Medical Condition: "
-                            + medicalCondition
-            );
-
-            System.out.println(
-                    "LMP: " + lmp
-            );
-
-            System.out.println(
-                    "EDD: " + edd
-            );
-
-
-            // Dashboard navigation
-            MotherDashBoard dashboard =
-                new MotherDashBoard(motherModel);
-
-                motherWelcomeStage.setScene(
-                dashboard.getmotherDashboardScene()
-        );
-            
-            
         });
 
-
-        // =========================
+        // =========================================================
         // FORM ROWS
-        // =========================
+        // =========================================================
 
         HBox row1 =
                 new HBox(
@@ -541,7 +760,6 @@ public class MotherWelcome extends Application {
                 Pos.CENTER_LEFT
         );
 
-
         HBox row2 =
                 new HBox(
                         25,
@@ -552,7 +770,6 @@ public class MotherWelcome extends Application {
         row2.setAlignment(
                 Pos.CENTER_LEFT
         );
-
 
         HBox row3 =
                 new HBox(
@@ -565,40 +782,26 @@ public class MotherWelcome extends Application {
                 Pos.CENTER_LEFT
         );
 
-
-        // =========================
-        // ADD FORM CONTENT
-        // =========================
+        // =========================================================
+        // FORM CARD CONTENT
+        // =========================================================
 
         formCard.getChildren().addAll(
-
                 title,
                 subtitle,
-
                 basicTitle,
-
                 row1,
                 row2,
                 row3,
-
                 pregnancyTitle,
-
                 lmpLabel,
                 lmpDatePicker,
-
                 eddLabel,
                 eddValue,
-
                 continueButton
         );
 
-
-        // =========================
-        // FORM CARD STYLE
-        // =========================
-
         formCard.setStyle(
-
                 "-fx-background-color: rgba(255,255,255,0.95);"
                         + "-fx-background-radius: 20;"
                         + "-fx-border-color: #E7B8C5;"
@@ -606,10 +809,9 @@ public class MotherWelcome extends Application {
                         + "-fx-border-width: 1;"
         );
 
-
-        // =========================
-        // MAIN LAYOUT
-        // =========================
+        // =========================================================
+        // MAIN PANE
+        // =========================================================
 
         HBox mainPane =
                 new HBox(80);
@@ -627,22 +829,12 @@ public class MotherWelcome extends Application {
                 )
         );
 
-
-        
-
-        leftPanel.setAlignment(
-                Pos.CENTER
-        );
-
-
         mainPane.getChildren().addAll(
                 leftPanel,
                 formCard
         );
 
-
         mainPane.setStyle(
-
                 "-fx-background-color: linear-gradient("
                         + "to bottom right, "
                         + "#FFFFFF 0%, "
@@ -651,66 +843,52 @@ public class MotherWelcome extends Application {
                         + ");"
         );
 
-
-        // =========================
-        // SCROLL
-        // =========================
+        // =========================================================
+        // SCROLL PANE
+        // =========================================================
 
         ScrollPane scrollPane =
                 new ScrollPane(
                         mainPane
                 );
 
-        scrollPane.setFitToWidth(
-                true
-        );
-
-        scrollPane.setFitToHeight(
-                true
-        );
+        scrollPane.setFitToWidth(true);
+        scrollPane.setFitToHeight(true);
 
         scrollPane.setStyle(
                 "-fx-background-color: transparent;"
         );
 
-
-        // =========================
+        // =========================================================
         // SCENE
-        // =========================
+        // =========================================================
 
-        Scene motherWelcomeScene =
+        motherWelcomeScene =
                 new Scene(
                         scrollPane,
                         1200,
                         750
                 );
-
-
-                motherWelcomeStage.setTitle("MaaCare AI - Welcome Mother");
-                motherWelcomeStage.setScene(motherWelcomeScene);
-                
-                motherWelcomeStage.setMaximized(true);
-                
-                motherWelcomeStage.show();
-
-       
     }
 
+    // =============================================================
+    // GET MOTHER WELCOME SCENE
+    // =============================================================
 
-    // =========================
+    public Scene getMotherWelcomeScene() {
+        return motherWelcomeScene;
+    }
+
+    // =============================================================
     // TEXT FIELD STYLE
-    // =========================
+    // =============================================================
 
     private void styleTextField(
-            TextField field
-    ) {
+            TextField field) {
 
-        field.setPrefHeight(
-                42
-        );
+        field.setPrefHeight(42);
 
         field.setStyle(
-
                 "-fx-background-color: #FFF9FA;"
                         + "-fx-border-color: #E7B8C5;"
                         + "-fx-border-radius: 8;"
@@ -719,21 +897,16 @@ public class MotherWelcome extends Application {
         );
     }
 
-
-    // =========================
-    // COMBOBOX STYLE
-    // =========================
+    // =============================================================
+    // COMBO BOX STYLE
+    // =============================================================
 
     private void styleComboBox(
-            ComboBox<String> box
-    ) {
+            ComboBox<String> box) {
 
-        box.setPrefHeight(
-                42
-        );
+        box.setPrefHeight(42);
 
         box.setStyle(
-
                 "-fx-background-color: #FFF9FA;"
                         + "-fx-border-color: #E7B8C5;"
                         + "-fx-border-radius: 8;"
@@ -741,21 +914,16 @@ public class MotherWelcome extends Application {
         );
     }
 
-
-    // =========================
-    // DATEPICKER STYLE
-    // =========================
+    // =============================================================
+    // DATE PICKER STYLE
+    // =============================================================
 
     private void styleDatePicker(
-            DatePicker picker
-    ) {
+            DatePicker picker) {
 
-        picker.setPrefHeight(
-                42
-        );
+        picker.setPrefHeight(42);
 
         picker.setStyle(
-
                 "-fx-background-color: #FFF9FA;"
                         + "-fx-border-color: #E7B8C5;"
                         + "-fx-border-radius: 8;"
@@ -763,14 +931,12 @@ public class MotherWelcome extends Application {
         );
     }
 
-
-    // =========================
-    // ERROR MESSAGE
-    // =========================
+    // =============================================================
+    // ERROR ALERT
+    // =============================================================
 
     private void showError(
-            String message
-    ) {
+            String message) {
 
         Alert alert =
                 new Alert(
@@ -782,7 +948,7 @@ public class MotherWelcome extends Application {
         );
 
         alert.setHeaderText(
-                "Incomplete Information"
+                "Invalid Information"
         );
 
         alert.setContentText(

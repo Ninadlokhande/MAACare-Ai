@@ -1,10 +1,11 @@
-
 package com.sigma.view.motherPages;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import com.sigma.controller.MedicineReminderController;
 import com.sigma.model.MedicineReminderModel;
+import com.sigma.model.MotherWlcModel;
 
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
@@ -39,6 +40,20 @@ public class MotherMedicineReminder {
 
 
     // =========================================================
+    // MOTHER MODEL
+    // =========================================================
+
+    private final MotherWlcModel motherModel;
+
+
+    // =========================================================
+    // CONTROLLER
+    // =========================================================
+
+    private final MedicineReminderController controller;
+
+
+    // =========================================================
     // MEDICINE MODEL LIST
     // =========================================================
 
@@ -54,97 +69,245 @@ public class MotherMedicineReminder {
 
     private HBox summaryContainer;
 
+    private VBox upcomingRemindersContainer;
+
+    private VBox prescriptionMedicineList;
+
+    private Label prescriptionDoctorLabel;
+
+    private Label prescriptionDateLabel;
+
 
     // =========================================================
     // CONSTRUCTOR
     // =========================================================
 
-    public MotherMedicineReminder() {
+    public MotherMedicineReminder(
+            MotherWlcModel motherModel) {
 
-        initializeMedicineData();
+        this.motherModel = motherModel;
+
+        this.controller =
+                new MedicineReminderController();
+
+        loadMedicinesFromFirebase();
     }
 
 
     // =========================================================
-    // INITIALIZE MEDICINE DATA
+    // LOAD MEDICINES FROM FIREBASE
     // =========================================================
 
-    private void initializeMedicineData() {
+    private void loadMedicinesFromFirebase() {
 
-        medicines.add(
+        medicines.clear();
+
+        if (motherModel == null) {
+
+            System.out.println(
+                "Mother model is null."
+            );
+
+            loadDemoMedicines();
+
+            return;
+        }
+
+
+        String motherId =
+            motherModel.getMotherId();
+
+
+        if (motherId == null ||
+            motherId.trim().isEmpty()) {
+
+            System.out.println(
+                "Mother ID not available."
+            );
+
+            loadDemoMedicines();
+
+            return;
+        }
+
+
+        try {
+
+            List<MedicineReminderModel> firebaseMedicines =
+                controller.getMedicinesByMotherId(
+                    motherId
+                );
+
+
+            if (firebaseMedicines != null &&
+                !firebaseMedicines.isEmpty()) {
+
+                medicines.addAll(
+                    firebaseMedicines
+                );
+
+                System.out.println(
+                    "Firebase medicines loaded: "
+                    + medicines.size()
+                );
+
+            } else {
+
+                System.out.println(
+                    "No medicines found in Firebase."
+                );
+
+                loadDemoMedicines();
+            }
+
+
+        } catch (Exception e) {
+
+            System.out.println(
+                "Error loading medicines from Firebase."
+            );
+
+            e.printStackTrace();
+
+            // Firebase error झाल्यास UI blank ठेवायचा नाही
+            loadDemoMedicines();
+        }
+    }
+
+
+    // =========================================================
+    // DEMO MEDICINES
+    // =========================================================
+
+    private void loadDemoMedicines() {
+
+        medicines.clear();
+
+
+        // =====================================================
+        // DEMO MEDICINE 1
+        // =====================================================
+
+        MedicineReminderModel iron =
             new MedicineReminderModel(
+
                 "Iron + Folic Acid",
+
                 "Ferrous Ascorbate",
+
                 "Morning",
+
                 "8:00 AM",
+
                 "After Breakfast",
+
                 "1 Tablet",
+
                 "Once daily",
+
                 "Dr. Priya Sharma",
+
                 "10 Aug 2026",
+
                 true,
+
                 true,
+
                 true,
+
                 true
-            )
+            );
+
+
+        // Special ID to identify demo data
+        iron.setMedicineId(
+            "DEMO_MEDICINE_001"
         );
 
 
-        medicines.add(
+        if (motherModel != null) {
+
+            iron.setMotherId(
+                motherModel.getMotherId()
+            );
+        }
+
+
+        // =====================================================
+        // DEMO MEDICINE 2
+        // =====================================================
+
+        MedicineReminderModel calcium =
             new MedicineReminderModel(
+
                 "Calcium Tablet",
+
                 "Calcium + Vitamin D3",
+
                 "Afternoon",
+
                 "2:00 PM",
+
                 "After Lunch",
+
                 "1 Tablet",
+
                 "Once daily",
+
                 "Dr. Priya Sharma",
+
                 "10 Aug 2026",
+
                 true,
+
                 true,
+
                 true,
+
                 true
-            )
+            );
+
+
+        calcium.setMedicineId(
+            "DEMO_MEDICINE_002"
         );
 
 
-        medicines.add(
-            new MedicineReminderModel(
-                "Prenatal Vitamin",
-                "Multivitamin Supplement",
-                "Evening",
-                "6:00 PM",
-                "After Snack",
-                "1 Tablet",
-                "Once daily",
-                "Dr. Priya Sharma",
-                "10 Aug 2026",
-                false,
-                true,
-                true,
-                true
-            )
-        );
+        if (motherModel != null) {
+
+            calcium.setMotherId(
+                motherModel.getMotherId()
+            );
+        }
 
 
-        medicines.add(
-            new MedicineReminderModel(
-                "Progesterone",
-                "As prescribed by doctor",
-                "Night",
-                "9:00 PM",
-                "Before Sleep",
-                "1 Tablet",
-                "Once daily",
-                "Dr. Priya Sharma",
-                "10 Aug 2026",
-                false,
-                true,
-                true,
-                true
-            )
+        medicines.add(iron);
+
+        medicines.add(calcium);
+
+
+        System.out.println(
+            "Demo medicines loaded."
         );
+    }
+
+
+    // =========================================================
+    // CHECK DEMO MEDICINE
+    // =========================================================
+
+    private boolean isDemoMedicine(
+            MedicineReminderModel medicine) {
+
+        if (medicine == null ||
+            medicine.getMedicineId() == null) {
+
+            return false;
+        }
+
+
+        return medicine.getMedicineId()
+                .startsWith("DEMO_");
     }
 
 
@@ -219,7 +382,8 @@ public class MotherMedicineReminder {
         // SUMMARY
         // =====================================================
 
-        HBox summary = createSummarySection();
+        HBox summary =
+            createSummarySection();
 
         content.getChildren().add(summary);
 
@@ -396,7 +560,6 @@ public class MotherMedicineReminder {
         );
 
 
-        // Save reference for refresh
         summaryContainer = summary;
 
 
@@ -478,7 +641,6 @@ public class MotherMedicineReminder {
         ) {
 
             if (medicine.isTaken()) {
-
                 count++;
             }
         }
@@ -705,6 +867,26 @@ public class MotherMedicineReminder {
         medicineListContainer.getChildren().clear();
 
 
+        if (medicines.isEmpty()) {
+
+            Label empty =
+                new Label(
+                    "No medicines added yet."
+                );
+
+            empty.setStyle(
+                "-fx-font-size: 13px;" +
+                "-fx-text-fill: #77778D;"
+            );
+
+            medicineListContainer.getChildren().add(
+                empty
+            );
+
+            return;
+        }
+
+
         for (
             MedicineReminderModel medicine :
             medicines
@@ -746,10 +928,6 @@ public class MotherMedicineReminder {
         );
 
 
-        // =====================================================
-        // ICON
-        // =====================================================
-
         StackPane iconBox =
             new StackPane();
 
@@ -776,10 +954,6 @@ public class MotherMedicineReminder {
             iconLabel
         );
 
-
-        // =====================================================
-        // DETAILS
-        // =====================================================
 
         VBox details =
             new VBox();
@@ -834,10 +1008,6 @@ public class MotherMedicineReminder {
         );
 
 
-        // =====================================================
-        // TIME
-        // =====================================================
-
         VBox timeBox =
             new VBox();
 
@@ -877,10 +1047,6 @@ public class MotherMedicineReminder {
         );
 
 
-        // =====================================================
-        // STATUS BUTTON
-        // =====================================================
-
         Button status =
             new Button(
                 medicine.isTaken()
@@ -898,21 +1064,9 @@ public class MotherMedicineReminder {
         if (!medicine.isTaken()) {
 
             status.setOnAction(
-                e -> {
-
-                    medicine.setTaken(true);
-
-                    status.setText(
-                        "✓ Taken"
-                    );
-
-                    updateStatusButton(
-                        status,
-                        true
-                    );
-
-                    refreshSummarySection();
-                }
+                e -> markMedicineAsTaken(
+                    medicine
+                )
             );
         }
 
@@ -926,6 +1080,101 @@ public class MotherMedicineReminder {
 
 
         return row;
+    }
+
+
+    // =========================================================
+    // MARK MEDICINE AS TAKEN
+    // =========================================================
+
+    private void markMedicineAsTaken(
+            MedicineReminderModel medicine) {
+
+        // =====================================================
+        // DEMO MEDICINE
+        // =====================================================
+
+        if (isDemoMedicine(medicine)) {
+
+            medicine.setTaken(true);
+
+            refreshMedicineList();
+
+            refreshSummarySection();
+
+            refreshUpcomingReminders();
+
+            showMessage(
+                "Medicine Taken",
+                medicine.getMedicineName() +
+                " marked as taken successfully."
+            );
+
+            return;
+        }
+
+
+        // =====================================================
+        // FIREBASE MEDICINE
+        // =====================================================
+
+        String medicineId =
+            medicine.getMedicineId();
+
+
+        if (medicineId == null ||
+            medicineId.trim().isEmpty()) {
+
+            showMessage(
+                "Error",
+                "Medicine ID is missing."
+            );
+
+            return;
+        }
+
+
+        try {
+
+            boolean success =
+                controller.markAsTaken(
+                    medicineId
+                );
+
+
+            if (success) {
+
+                medicine.setTaken(true);
+
+                refreshMedicineList();
+
+                refreshSummarySection();
+
+                refreshUpcomingReminders();
+
+                showMessage(
+                    "Medicine Taken",
+                    medicine.getMedicineName() +
+                    " marked as taken successfully."
+                );
+
+            } else {
+
+                showMessage(
+                    "Error",
+                    "Unable to update medicine status."
+                );
+            }
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+            showMessage(
+                "Firebase Error",
+                "Unable to update medicine status."
+            );
+        }
     }
 
 
@@ -995,10 +1244,40 @@ public class MotherMedicineReminder {
         );
 
 
-        VBox reminders =
+        upcomingRemindersContainer =
             new VBox();
 
-        reminders.setSpacing(10);
+        upcomingRemindersContainer.setSpacing(10);
+
+
+        refreshUpcomingReminders();
+
+
+        card.getChildren().addAll(
+            title,
+            subtitle,
+            upcomingRemindersContainer
+        );
+
+
+        return card;
+    }
+
+
+    // =========================================================
+    // REFRESH UPCOMING
+    // =========================================================
+
+    private void refreshUpcomingReminders() {
+
+        if (upcomingRemindersContainer == null) {
+            return;
+        }
+
+
+        upcomingRemindersContainer
+            .getChildren()
+            .clear();
 
 
         for (
@@ -1008,14 +1287,20 @@ public class MotherMedicineReminder {
 
             if (!medicine.isTaken()) {
 
-                reminders.getChildren().add(
-                    createUpcomingRow(medicine)
-                );
+                upcomingRemindersContainer
+                    .getChildren()
+                    .add(
+                        createUpcomingRow(medicine)
+                    );
             }
         }
 
 
-        if (reminders.getChildren().isEmpty()) {
+        if (
+            upcomingRemindersContainer
+                .getChildren()
+                .isEmpty()
+        ) {
 
             Label allDone =
                 new Label(
@@ -1028,18 +1313,10 @@ public class MotherMedicineReminder {
                 "-fx-font-weight: bold;"
             );
 
-            reminders.getChildren().add(allDone);
+            upcomingRemindersContainer
+                .getChildren()
+                .add(allDone);
         }
-
-
-        card.getChildren().addAll(
-            title,
-            subtitle,
-            reminders
-        );
-
-
-        return card;
     }
 
 
@@ -1302,7 +1579,6 @@ public class MotherMedicineReminder {
                     ? true
                     : medicines.get(0)
                         .isNotificationsEnabled();
-
         }
 
         else if (optionType == 2) {
@@ -1312,7 +1588,6 @@ public class MotherMedicineReminder {
                     ? true
                     : medicines.get(0)
                         .isEarlyReminderEnabled();
-
         }
 
         else if (optionType == 3) {
@@ -1338,46 +1613,10 @@ public class MotherMedicineReminder {
 
 
         toggle.setOnAction(
-            e -> {
-
-                boolean newValue =
-                    toggle.getText().equals("OFF");
-
-                updateToggleButton(
-                    toggle,
-                    newValue
-                );
-
-
-                for (
-                    MedicineReminderModel medicine :
-                    medicines
-                ) {
-
-                    if (optionType == 1) {
-
-                        medicine.setNotificationsEnabled(
-                            newValue
-                        );
-
-                    }
-
-                    else if (optionType == 2) {
-
-                        medicine.setEarlyReminderEnabled(
-                            newValue
-                        );
-
-                    }
-
-                    else if (optionType == 3) {
-
-                        medicine.setDailySummaryEnabled(
-                            newValue
-                        );
-                    }
-                }
-            }
+            e -> updateReminderSetting(
+                optionType,
+                toggle
+            )
         );
 
 
@@ -1389,6 +1628,125 @@ public class MotherMedicineReminder {
 
 
         return row;
+    }
+
+
+    // =========================================================
+    // UPDATE REMINDER SETTING
+    // =========================================================
+
+    private void updateReminderSetting(
+            int optionType,
+            Button toggle) {
+
+        boolean newValue =
+            toggle.getText().equals("OFF");
+
+
+        if (medicines.isEmpty()) {
+
+            updateToggleButton(
+                toggle,
+                newValue
+            );
+
+            return;
+        }
+
+
+        try {
+
+            boolean success = true;
+
+
+            for (
+                MedicineReminderModel medicine :
+                medicines
+            ) {
+
+                // =============================================
+                // UPDATE LOCAL MODEL
+                // =============================================
+
+                if (optionType == 1) {
+
+                    medicine.setNotificationsEnabled(
+                        newValue
+                    );
+
+                }
+
+                else if (optionType == 2) {
+
+                    medicine.setEarlyReminderEnabled(
+                        newValue
+                    );
+
+                }
+
+                else if (optionType == 3) {
+
+                    medicine.setDailySummaryEnabled(
+                        newValue
+                    );
+                }
+
+
+                // =============================================
+                // DEMO MEDICINE
+                // =============================================
+
+                if (isDemoMedicine(medicine)) {
+                    continue;
+                }
+
+
+                // =============================================
+                // SAVE FIREBASE MEDICINE
+                // =============================================
+
+                boolean updated =
+                    controller.updateMedicine(
+                        medicine
+                    );
+
+
+                if (!updated) {
+
+                    success = false;
+                }
+            }
+
+
+            if (success) {
+
+                updateToggleButton(
+                    toggle,
+                    newValue
+                );
+
+                showMessage(
+                    "Reminder Settings",
+                    "Reminder setting updated successfully."
+                );
+
+            } else {
+
+                showMessage(
+                    "Error",
+                    "Unable to save reminder setting."
+                );
+            }
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+            showMessage(
+                "Firebase Error",
+                "Unable to save reminder setting."
+            );
+        }
     }
 
 
@@ -1461,45 +1819,37 @@ public class MotherMedicineReminder {
                     .getPrescribedDate();
 
 
-        Label doctor =
+        prescriptionDoctorLabel =
             new Label(
                 "👨‍⚕️ " + doctorName
             );
 
-        doctor.setStyle(
+        prescriptionDoctorLabel.setStyle(
             "-fx-font-size: 14px;" +
             "-fx-font-weight: bold;" +
             "-fx-text-fill: #24234F;"
         );
 
 
-        Label date =
+        prescriptionDateLabel =
             new Label(
                 "Prescribed on: " +
                 prescribedDate
             );
 
-        date.setStyle(
+        prescriptionDateLabel.setStyle(
             "-fx-font-size: 11px;" +
             "-fx-text-fill: #77778D;"
         );
 
 
-        VBox medicineList =
+        prescriptionMedicineList =
             new VBox();
 
-        medicineList.setSpacing(6);
+        prescriptionMedicineList.setSpacing(6);
 
 
-        for (
-            MedicineReminderModel medicine :
-            medicines
-        ) {
-
-            medicineList.getChildren().add(
-                createPrescriptionItem(medicine)
-            );
-        }
+        refreshPrescriptionList();
 
 
         Button view =
@@ -1515,14 +1865,98 @@ public class MotherMedicineReminder {
 
         card.getChildren().addAll(
             heading,
-            doctor,
-            date,
-            medicineList,
+            prescriptionDoctorLabel,
+            prescriptionDateLabel,
+            prescriptionMedicineList,
             view
         );
 
 
         return card;
+    }
+
+
+    // =========================================================
+    // REFRESH PRESCRIPTION
+    // =========================================================
+
+    private void refreshPrescriptionList() {
+
+        if (prescriptionMedicineList == null) {
+            return;
+        }
+
+
+        prescriptionMedicineList
+            .getChildren()
+            .clear();
+
+
+        if (medicines.isEmpty()) {
+
+            Label empty =
+                new Label(
+                    "No prescription details available."
+                );
+
+            empty.setStyle(
+                "-fx-font-size: 11px;" +
+                "-fx-text-fill: #77778D;"
+            );
+
+            prescriptionMedicineList
+                .getChildren()
+                .add(empty);
+
+        } else {
+
+            for (
+                MedicineReminderModel medicine :
+                medicines
+            ) {
+
+                prescriptionMedicineList
+                    .getChildren()
+                    .add(
+                        createPrescriptionItem(medicine)
+                    );
+            }
+        }
+
+
+        // =====================================================
+        // UPDATE DOCTOR + DATE
+        // =====================================================
+
+        if (prescriptionDoctorLabel != null) {
+
+            String doctorName =
+                medicines.isEmpty()
+                    ? "Doctor information unavailable"
+                    : medicines.get(0)
+                        .getPrescribedBy();
+
+
+            prescriptionDoctorLabel.setText(
+                "👨‍⚕️ " + doctorName
+            );
+        }
+
+
+        if (prescriptionDateLabel != null) {
+
+            String prescribedDate =
+                medicines.isEmpty()
+                    ? "Date unavailable"
+                    : medicines.get(0)
+                        .getPrescribedDate();
+
+
+            prescriptionDateLabel.setText(
+                "Prescribed on: " +
+                prescribedDate
+            );
+        }
     }
 
 
@@ -2094,10 +2528,6 @@ public class MotherMedicineReminder {
         );
 
 
-        // =====================================================
-        // NAME
-        // =====================================================
-
         Label nameLabel =
             createFormLabel("Medicine Name");
 
@@ -2109,10 +2539,6 @@ public class MotherMedicineReminder {
         );
 
 
-        // =====================================================
-        // TYPE
-        // =====================================================
-
         Label typeLabel =
             createFormLabel("Medicine Type");
 
@@ -2123,10 +2549,6 @@ public class MotherMedicineReminder {
             "e.g. Tablet / Capsule / Syrup"
         );
 
-
-        // =====================================================
-        // PERIOD
-        // =====================================================
 
         Label periodLabel =
             createFormLabel("Period");
@@ -2150,10 +2572,6 @@ public class MotherMedicineReminder {
         );
 
 
-        // =====================================================
-        // TIME
-        // =====================================================
-
         Label timeLabel =
             createFormLabel("Time");
 
@@ -2164,10 +2582,6 @@ public class MotherMedicineReminder {
             "e.g. 8:00 AM"
         );
 
-
-        // =====================================================
-        // INSTRUCTION
-        // =====================================================
 
         Label instructionLabel =
             createFormLabel("Instruction");
@@ -2180,10 +2594,6 @@ public class MotherMedicineReminder {
         );
 
 
-        // =====================================================
-        // DOSAGE
-        // =====================================================
-
         Label dosageLabel =
             createFormLabel("Dosage");
 
@@ -2194,10 +2604,6 @@ public class MotherMedicineReminder {
             "e.g. 1 Tablet"
         );
 
-
-        // =====================================================
-        // FREQUENCY
-        // =====================================================
 
         Label frequencyLabel =
             createFormLabel("Frequency");
@@ -2210,10 +2616,6 @@ public class MotherMedicineReminder {
         );
 
 
-        // =====================================================
-        // DOCTOR
-        // =====================================================
-
         Label doctorLabel =
             createFormLabel("Prescribed By");
 
@@ -2224,10 +2626,6 @@ public class MotherMedicineReminder {
             "e.g. Dr. Priya Sharma"
         );
 
-
-        // =====================================================
-        // DATE
-        // =====================================================
 
         Label dateLabel =
             createFormLabel("Prescribed Date");
@@ -2311,18 +2709,10 @@ public class MotherMedicineReminder {
             );
 
 
-        // =====================================================
-        // BUTTON ACTION
-        // =====================================================
-
         dialog.setResultConverter(
             button -> {
 
                 if (button == addButton) {
-
-                    // -----------------------------------------
-                    // VALIDATION
-                    // -----------------------------------------
 
                     if (
                         nameField.getText()
@@ -2352,31 +2742,18 @@ public class MotherMedicineReminder {
                             .trim().isEmpty()
                     ) {
 
-                        Alert alert =
-                            new Alert(
-                                Alert.AlertType.WARNING
-                            );
-
-                        alert.setTitle(
-                            "Missing Information"
-                        );
-
-                        alert.setHeaderText(null);
-
-                        alert.setContentText(
+                        showMessage(
+                            "Missing Information",
                             "Please fill all medicine details."
                         );
-
-                        alert.showAndWait();
-
 
                         return null;
                     }
 
 
-                    // -----------------------------------------
+                    // =================================================
                     // CREATE MODEL
-                    // -----------------------------------------
+                    // =================================================
 
                     MedicineReminderModel newMedicine =
                         new MedicineReminderModel(
@@ -2417,50 +2794,93 @@ public class MotherMedicineReminder {
                         );
 
 
-                    // -----------------------------------------
-                    // ADD TO MODEL LIST
-                    // -----------------------------------------
+                    // =================================================
+                    // SET MOTHER ID
+                    // =================================================
 
-                    medicines.add(
-                        newMedicine
-                    );
+                    if (
+                        motherModel == null ||
+                        motherModel.getMotherId() == null ||
+                        motherModel.getMotherId()
+                            .trim().isEmpty()
+                    ) {
 
-
-                    // -----------------------------------------
-                    // IMMEDIATELY REFRESH UI
-                    // -----------------------------------------
-
-                    refreshMedicineList();
-
-                    refreshSummarySection();
-
-
-                    // -----------------------------------------
-                    // SUCCESS MESSAGE
-                    // -----------------------------------------
-
-                    Alert success =
-                        new Alert(
-                            Alert.AlertType.INFORMATION
+                        showMessage(
+                            "Error",
+                            "Mother ID is not available."
                         );
 
-                    success.setTitle(
-                        "Medicine Added"
+                        return null;
+                    }
+
+
+                    newMedicine.setMotherId(
+                        motherModel.getMotherId()
                     );
 
-                    success.setHeaderText(
-                        "Medicine Added Successfully"
-                    );
 
-                    success.setContentText(
-                        newMedicine.getMedicineName() +
-                        " has been added to your medicine schedule."
-                    );
+                    // =================================================
+                    // SAVE TO FIREBASE
+                    // =================================================
 
-                    success.showAndWait();
+                    try {
+
+                        boolean saved =
+                            controller.saveMedicine(
+                                newMedicine
+                            );
 
 
-                    return addButton;
+                        if (!saved) {
+
+                            showMessage(
+                                "Save Failed",
+                                "Unable to save medicine to Firebase."
+                            );
+
+                            return null;
+                        }
+
+
+                        // =============================================
+                        // ADD ONLY AFTER FIREBASE SAVE SUCCESS
+                        // =============================================
+
+                        medicines.add(
+                            newMedicine
+                        );
+
+
+                        refreshMedicineList();
+
+                        refreshSummarySection();
+
+                        refreshUpcomingReminders();
+
+                        refreshPrescriptionList();
+
+
+                        showMessage(
+                            "Medicine Added",
+                            newMedicine.getMedicineName() +
+                            " has been added successfully."
+                        );
+
+
+                        return addButton;
+
+
+                    } catch (Exception ex) {
+
+                        ex.printStackTrace();
+
+                        showMessage(
+                            "Firebase Error",
+                            "Unable to save medicine."
+                        );
+
+                        return null;
+                    }
                 }
 
 
@@ -2500,14 +2920,7 @@ public class MotherMedicineReminder {
 
     private void openMotherSettings() {
 
-        /*
-         * Mother Settings page अजून तयार झालेला नाही.
-         *
-         * नंतर Mother Settings page तयार झाल्यावर
-         * इथे त्याचा navigation code add करू.
-         *
-         * सध्या intentionally कोणताही fake message नाही.
-         */
+        // Mother Settings navigation नंतर add करू.
     }
 
 
@@ -2638,5 +3051,28 @@ public class MotherMedicineReminder {
 
 
         return button;
+    }
+
+
+    // =========================================================
+    // MESSAGE
+    // =========================================================
+
+    private void showMessage(
+            String title,
+            String message) {
+
+        Alert alert =
+            new Alert(
+                Alert.AlertType.INFORMATION
+            );
+
+        alert.setTitle(title);
+
+        alert.setHeaderText(null);
+
+        alert.setContentText(message);
+
+        alert.showAndWait();
     }
 }

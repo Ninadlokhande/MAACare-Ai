@@ -1,20 +1,21 @@
 package com.sigma.view.motherPages;
-import com.sigma.model.MotherWlcModel;
+
 import com.sigma.model.MotherWlcModel;
 import com.sigma.view.scenesettings;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
-
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -23,21 +24,16 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.control.Label;
 
 public class MotherDashBoard {
 
     private Scene MotherdashboardScene;
 
     /*
-     * IMPORTANT
-     * ---------------------------------------------------------
-     * This is the common content area.
-     *
-     * Sidebar + Header remain same.
-     * Only this area changes when we click sidebar buttons.
+     * Firebase मधून आलेला Mother Model
      */
     private MotherWlcModel motherModel;
+
     private VBox mainContent;
 
     private final String PINK = "#E84A87";
@@ -46,12 +42,17 @@ public class MotherDashBoard {
 
 
     // =========================================================
-    // DASHBOARD SCENE
+    // CONSTRUCTOR
     // =========================================================
 
     public MotherDashBoard(MotherWlcModel motherModel) {
         this.motherModel = motherModel;
     }
+
+
+    // =========================================================
+    // DASHBOARD SCENE
+    // =========================================================
 
     public Scene getmotherDashboardScene() {
 
@@ -143,8 +144,6 @@ public class MotherDashBoard {
                     FontAwesomeIcon.HEART
                 );
 
-        
-
         Button appointmentButton =
                 createMenuButton(
                     "Appointments",
@@ -199,6 +198,16 @@ public class MotherDashBoard {
                     FontAwesomeIcon.COG
                 );
 
+        // =====================================================
+        // SETTINGS BUTTON
+        // =====================================================
+
+        Button settingsButton =
+                createMenuButton(
+                    "Settings",
+                    FontAwesomeIcon.COG
+                );
+
 
         // =====================================================
         // AI ASSISTANT STYLE
@@ -225,46 +234,24 @@ public class MotherDashBoard {
         // SIDEBAR ACTIONS
         // =====================================================
 
-        /*
-         * HOME / DASHBOARD
-         *
-         * Scene does NOT change.
-         * Only mainContent changes.
-         */
         dashboardButton.setOnAction(e -> {
-
             showDashboard();
-
         });
 
 
-        // =====================================================
-        // PREGNANCY TRACKER
-        // =====================================================
-
         pregnancyButton.setOnAction(e -> {
 
-                PregnancyTracker pregnancyTracker =
-                        new PregnancyTracker(motherModel);
-            
-                mainContent.getChildren().clear();
-            
-                mainContent.getChildren().add(
-                        pregnancyTracker.createPregnancyTrackingPage()
-                );
-            
-            });
+            PregnancyTracker pregnancyTracker =
+                    new PregnancyTracker(motherModel);
 
+            mainContent.getChildren().clear();
 
-        // =====================================================
-        // HEALTH RECORDS
-        // =====================================================
+            mainContent.getChildren().add(
+                    pregnancyTracker.createPregnancyTrackingPage()
+            );
 
-        
+        });
 
-        // =====================================================
-        // APPOINTMENTS
-        // =====================================================
 
         appointmentButton.setOnAction(e -> {
 
@@ -280,27 +267,18 @@ public class MotherDashBoard {
         });
 
 
-        // =====================================================
-        // MEDICINES
-        // =====================================================
-
         medicineButton.setOnAction(e -> {
 
-            MotherMedicineReminder medicineReminder =
-                    new MotherMedicineReminder();
-
+                MotherMedicineReminder medicinePage =
+                new MotherMedicineReminder(motherModel);
+            
             mainContent.getChildren().clear();
-
+            
             mainContent.getChildren().add(
-                    medicineReminder.createMedicineReminderPage()
+                medicinePage.createMedicineReminderPage()
             );
-
         });
 
-
-        // =====================================================
-        // DIET & NUTRITION
-        // =====================================================
 
         nutritionButton.setOnAction(e -> {
 
@@ -316,10 +294,6 @@ public class MotherDashBoard {
         });
 
 
-        // =====================================================
-        // BABY CARE
-        // =====================================================
-
         babyButton.setOnAction(e -> {
 
             MotherBabyCare babyCare =
@@ -333,10 +307,6 @@ public class MotherDashBoard {
 
         });
 
-
-        // =====================================================
-        // VACCINATION
-        // =====================================================
 
         vaccinationButton.setOnAction(e -> {
 
@@ -352,27 +322,19 @@ public class MotherDashBoard {
         });
 
 
-        // =====================================================
-        // REPORTS
-        // =====================================================
-
         reportsButton.setOnAction(e -> {
 
-            MotherReports reports =
-                    new MotherReports();
-
-            mainContent.getChildren().clear();
-
-            mainContent.getChildren().add(
-                    reports.createReportsPage()
-            );
+                MotherReports reports =
+                new MotherReports(motherModel);
+        
+        mainContent.getChildren().clear();
+        
+        mainContent.getChildren().add(
+            reports.createReportsPage()
+        );
 
         });
 
-
-        // =====================================================
-        // EMERGENCY
-        // =====================================================
 
         emergencyButton.setOnAction(e -> {
 
@@ -388,10 +350,6 @@ public class MotherDashBoard {
         });
 
 
-        // =====================================================
-        // GOVERNMENT SCHEMES
-        // =====================================================
-
         schemesButton.setOnAction(e -> {
 
             GovernmentSchemes schemes =
@@ -406,10 +364,6 @@ public class MotherDashBoard {
         });
 
 
-        // =====================================================
-        // AI ASSISTANT
-        // =====================================================
-
         aiButton.setOnAction(e -> {
 
             MotherAiAssistant aiAssistant =
@@ -419,6 +373,24 @@ public class MotherDashBoard {
 
             mainContent.getChildren().add(
                     aiAssistant.createAIAssistantPage()
+            );
+
+        });
+
+
+        // =====================================================
+        // SETTINGS ACTION
+        // =====================================================
+
+        settingsButton.setOnAction(e -> {
+
+            MotherSettings settings =
+                    new MotherSettings(motherModel);
+
+            mainContent.getChildren().clear();
+
+            mainContent.getChildren().add(
+                    settings.createSettingsPage()
             );
 
         });
@@ -442,7 +414,8 @@ public class MotherDashBoard {
                 reportsButton,
                 emergencyButton,
                 schemesButton,
-                aiButton
+                aiButton,
+                settingsButton
         );
 
         root.setLeft(sidebar);
@@ -473,9 +446,16 @@ public class MotherDashBoard {
 
         welcomeBox.setSpacing(5);
 
+
+        /*
+         * Firebase मधून आलेले actual mother name
+         */
+        String motherName = getMotherName();
+
+
         Label welcomeText =
                 new Label(
-                    "Welcome back, Mother! 👋"
+                    "Welcome back, " + motherName + "! 👋"
                 );
 
         welcomeText.setStyle(
@@ -483,6 +463,7 @@ public class MotherDashBoard {
             "-fx-font-weight: bold;" +
             "-fx-text-fill: #24234F;"
         );
+
 
         Label subtitle =
                 new Label(
@@ -663,8 +644,16 @@ public class MotherDashBoard {
 
         profileBox.setSpacing(9);
 
+
+        /*
+         * Actual mother name चा first letter
+         */
+        String firstLetter =
+                motherName.substring(0, 1).toUpperCase();
+
+
         Label profileCircle =
-                new Label("M");
+                new Label(firstLetter);
 
         profileCircle.setAlignment(
                 Pos.CENTER
@@ -683,16 +672,19 @@ public class MotherDashBoard {
             "-fx-font-weight: bold;"
         );
 
+
         VBox profileText = new VBox();
 
+
         Label profileName =
-                new Label("Mother");
+                new Label(motherName);
 
         profileName.setStyle(
             "-fx-font-size: 15px;" +
             "-fx-font-weight: bold;" +
             "-fx-text-fill: #24234F;"
         );
+
 
         Label profileRole =
                 new Label("Patient");
@@ -702,15 +694,18 @@ public class MotherDashBoard {
             "-fx-text-fill: #77778D;"
         );
 
+
         profileText.getChildren().addAll(
                 profileName,
                 profileRole
         );
 
+
         profileBox.getChildren().addAll(
                 profileCircle,
                 profileText
         );
+
 
         profileBox.setOnMouseClicked(e ->
                 showProfile()
@@ -790,99 +785,139 @@ public class MotherDashBoard {
 
 
     // =========================================================
-    // SHOW DASHBOARD
+    // GET MOTHER NAME
     // =========================================================
 
-    private void  showProfile() {
+    private String getMotherName() {
+
+        if (motherModel == null) {
+            return "Mother";
+        }
+
+        String name = motherModel.getName();
+
+        if (name == null || name.trim().isEmpty()) {
+            return "Mother";
+        }
+
+        return name.trim();
+    }
+
+
+    // =========================================================
+    // PROFILE
+    // =========================================================
+
+    private void showProfile() {
+
         mainContent.getChildren().clear();
 
-    MotherProfile profile =
-            new MotherProfile(motherModel);
+        MotherProfile profile =
+                new MotherProfile(motherModel);
 
-    mainContent.getChildren().add(
-            profile.createProfilePage()
-    );
-}
+        mainContent.getChildren().add(
+                profile.createProfilePage()
+        );
+    }
 
-        // Pregnency Card //
 
-        private long getPregnancyDays() {
+    // =========================================================
+    // PREGNANCY CALCULATIONS
+    // =========================================================
 
-                if (motherModel == null || motherModel.getLmpDate() == null) {
-                    return 0;
-                }
-            
-                return ChronoUnit.DAYS.between(
-                        motherModel.getLmpDate(),
-                        LocalDate.now()
-                );
-            }
-            
-            
-            private int getPregnancyWeek() {
-            
-                long days = getPregnancyDays();
-            
-                if (days <= 0) {
-                    return 0;
-                }
-            
-                return (int) (days / 7);
-            }
-            
-            
-            private long getRemainingDays() {
-            
-                long pregnancyDays = getPregnancyDays();
-            
-                return Math.max(0, 280 - pregnancyDays);
-            }
-            
-            
-            private double getPregnancyProgress() {
-            
-                long pregnancyDays = getPregnancyDays();
-            
-                return Math.min(
-                        100,
-                        Math.max(
-                                0,
-                                (pregnancyDays * 100.0) / 280
-                        )
-                );
-            }
-            
-            
-            private String getTrimester(int week) {
-            
-                if (week <= 13) {
-                    return "1st Trimester";
-                }
-            
-                if (week <= 27) {
-                    return "2nd Trimester";
-                }
-            
-                return "3rd Trimester";
-            }
-            
-            
-            private String getWeekText(int week) {
-            
-                if (week == 1) {
-                    return "1st Week of Pregnancy";
-                }
-            
-                if (week == 2) {
-                    return "2nd Week of Pregnancy";
-                }
-            
-                if (week == 3) {
-                    return "3rd Week of Pregnancy";
-                }
-            
-                return week + "th Week of Pregnancy";
-            }
+    private long getPregnancyDays() {
+
+        if (motherModel == null ||
+                motherModel.getLmpDate() == null) {
+
+            return 0;
+        }
+
+        return ChronoUnit.DAYS.between(
+                motherModel.getLmpDate(),
+                LocalDate.now()
+        );
+    }
+
+
+    private int getPregnancyWeek() {
+
+        long days = getPregnancyDays();
+
+        if (days <= 0) {
+            return 0;
+        }
+
+        return (int) (days / 7);
+    }
+
+
+    private long getRemainingDays() {
+
+        long pregnancyDays =
+                getPregnancyDays();
+
+        return Math.max(
+                0,
+                280 - pregnancyDays
+        );
+    }
+
+
+    private double getPregnancyProgress() {
+
+        long pregnancyDays =
+                getPregnancyDays();
+
+        return Math.min(
+                100,
+                Math.max(
+                        0,
+                        (pregnancyDays * 100.0) / 280
+                )
+        );
+    }
+
+
+    private String getTrimester(int week) {
+
+        if (week <= 13) {
+            return "1st Trimester";
+        }
+
+        if (week <= 27) {
+            return "2nd Trimester";
+        }
+
+        return "3rd Trimester";
+    }
+
+
+    private String getWeekText(int week) {
+
+        if (week == 0) {
+            return "Pregnancy Not Started";
+        }
+
+        if (week == 1) {
+            return "1st Week of Pregnancy";
+        }
+
+        if (week == 2) {
+            return "2nd Week of Pregnancy";
+        }
+
+        if (week == 3) {
+            return "3rd Week of Pregnancy";
+        }
+
+        return week + "th Week of Pregnancy";
+    }
+
+
+    // =========================================================
+    // SHOW DASHBOARD
+    // =========================================================
 
     private void showDashboard() {
 
@@ -947,17 +982,20 @@ public class MotherDashBoard {
                     FontAwesomeIcon.CALENDAR
                 );
 
+
         Button reportButton =
                 createActionButton(
                     "Upload\nReports",
                     FontAwesomeIcon.UPLOAD
                 );
 
+
         Button medicineAction =
                 createActionButton(
                     "Medicine\nReminders",
                     FontAwesomeIcon.MEDKIT
                 );
+
 
         Button dietButton =
                 createActionButton(
@@ -966,7 +1004,9 @@ public class MotherDashBoard {
                 );
 
 
+        // =====================================================
         // QUICK ACTION NAVIGATION
+        // =====================================================
 
         bookButton.setOnAction(e -> {
 
@@ -980,32 +1020,30 @@ public class MotherDashBoard {
             );
 
         });
-        
 
 
         reportButton.setOnAction(e -> {
 
-            MotherReports reports =
-                    new MotherReports();
-
-            mainContent.getChildren().clear();
-
-            mainContent.getChildren().add(
-                    reports.createReportsPage()
-            );
+                MotherReports reports =
+                new MotherReports(motherModel);
+        
+        mainContent.getChildren().clear();
+        
+        mainContent.getChildren().add(
+            reports.createReportsPage()
+        );
 
         });
 
 
         medicineAction.setOnAction(e -> {
-
-            MotherMedicineReminder medicine =
-                    new MotherMedicineReminder();
-
+                MotherMedicineReminder medicinePage =
+                new MotherMedicineReminder(motherModel);
+            
             mainContent.getChildren().clear();
-
+            
             mainContent.getChildren().add(
-                    medicine.createMedicineReminderPage()
+                medicinePage.createMedicineReminderPage()
             );
 
         });
@@ -1023,8 +1061,6 @@ public class MotherDashBoard {
             );
 
         });
-
-        
 
 
         quickActions.getChildren().addAll(
@@ -1094,7 +1130,7 @@ public class MotherDashBoard {
 
 
     // =========================================================
-    // YOUR EXISTING METHODS BELOW THIS LINE
+    // PREGNANCY MAIN CARD
     // =========================================================
 
     private HBox createPregnancyMainCard() {
@@ -1141,12 +1177,14 @@ public class MotherDashBoard {
         );
 
 
-        int weekNumber = getPregnancyWeek();
+        int weekNumber =
+                getPregnancyWeek();
+
 
         Label week =
-        new Label(
-            getWeekText(weekNumber)
-        );
+                new Label(
+                    getWeekText(weekNumber)
+                );
 
         week.setStyle(
             "-fx-font-size: 28px;" +
@@ -1155,15 +1193,17 @@ public class MotherDashBoard {
         );
 
 
-        long remainingDays = getRemainingDays();
+        long remainingDays =
+                getRemainingDays();
+
 
         Label trimester =
-        new Label(
-            getTrimester(weekNumber)
-            + "   •   "
-            + remainingDays
-            + " Days to Go"
-        );
+                new Label(
+                    getTrimester(weekNumber)
+                    + "   •   "
+                    + remainingDays
+                    + " Days to Go"
+                );
 
         trimester.setStyle(
             "-fx-font-size: 16px;" +
@@ -1199,11 +1239,14 @@ public class MotherDashBoard {
         HBox progressFill =
                 new HBox();
 
-                double progress = getPregnancyProgress();
 
-                progressFill.setPrefWidth(
-                        430 * progress / 100
-                );
+        double progress =
+                getPregnancyProgress();
+
+
+        progressFill.setPrefWidth(
+                430 * progress / 100
+        );
 
         progressFill.setPrefHeight(12);
 
@@ -1220,12 +1263,12 @@ public class MotherDashBoard {
 
 
         Label completed =
-        new Label(
-            String.format(
-                "%.0f%% Completed",
-                progress
-            )
-        );
+                new Label(
+                    String.format(
+                        "%.0f%% Completed",
+                        progress
+                    )
+                );
 
         completed.setStyle(
             "-fx-font-size: 15px;" +
@@ -1239,17 +1282,19 @@ public class MotherDashBoard {
                     "View Details  →"
                 );
 
-                detailsButton.setOnAction(e -> {
 
-                        PregnancyTracker pregnancyTracker =
-                                new PregnancyTracker(motherModel);
-                    
-                        mainContent.getChildren().clear();
-                    
-                        mainContent.getChildren().add(
-                                pregnancyTracker.createPregnancyTrackingPage()
-                        );
-                    });
+        detailsButton.setOnAction(e -> {
+
+            PregnancyTracker pregnancyTracker =
+                    new PregnancyTracker(motherModel);
+
+            mainContent.getChildren().clear();
+
+            mainContent.getChildren().add(
+                    pregnancyTracker.createPregnancyTrackingPage()
+            );
+
+        });
 
 
         details.getChildren().addAll(
@@ -1262,6 +1307,10 @@ public class MotherDashBoard {
                 detailsButton
         );
 
+
+        // =====================================================
+        // MOTHER IMAGE
+        // =====================================================
 
         ImageView motherImage =
                 new ImageView();
@@ -1295,7 +1344,6 @@ public class MotherDashBoard {
             motherImage.setFitHeight(245);
 
             motherImage.setPreserveRatio(true);
-
         }
 
 
@@ -1326,12 +1374,17 @@ public class MotherDashBoard {
     }
 
 
+    // =========================================================
+    // PREGNANCY PROGRESS CARD
+    // =========================================================
+
     private VBox createPregnancyProgressCard() {
 
         VBox card =
                 createWhiteCard();
 
         card.setPrefHeight(225);
+
 
         HBox heading =
                 createCardHeading(
@@ -1361,12 +1414,15 @@ public class MotherDashBoard {
         );
 
 
-        int weekNumber = getPregnancyWeek();
+        int weekNumber =
+                getPregnancyWeek();
+
 
         Label week =
-        new Label(
-            getWeekText(weekNumber)
-        );
+                new Label(
+                    getWeekText(weekNumber)
+                );
+
         week.setStyle(
             "-fx-font-size: 24px;" +
             "-fx-font-weight: bold;" +
@@ -1375,9 +1431,9 @@ public class MotherDashBoard {
 
 
         Label trimester =
-        new Label(
-            getTrimester(weekNumber)
-        );
+                new Label(
+                    getTrimester(weekNumber)
+                );
 
         trimester.setStyle(
             "-fx-font-size: 15px;" +
@@ -1412,6 +1468,7 @@ public class MotherDashBoard {
         javafx.scene.control.Separator separator =
                 new javafx.scene.control.Separator();
 
+
         separator.setStyle(
             "-fx-background-color: #E7DCE8;"
         );
@@ -1427,6 +1484,9 @@ public class MotherDashBoard {
         );
 
 
+        /*
+         * Existing dashboard stats unchanged
+         */
         stats.getChildren().addAll(
 
                 createStat(
@@ -1461,6 +1521,10 @@ public class MotherDashBoard {
         return card;
     }
 
+
+    // =========================================================
+    // STAT
+    // =========================================================
 
     private VBox createStat(
             String value,
@@ -1511,6 +1575,10 @@ public class MotherDashBoard {
         return box;
     }
 
+
+    // =========================================================
+    // APPOINTMENT CARD
+    // =========================================================
 
     private VBox createAppointmentCard() {
 
@@ -1586,6 +1654,10 @@ public class MotherDashBoard {
     }
 
 
+    // =========================================================
+    // HEALTH TIP
+    // =========================================================
+
     private VBox createHealthTipCard() {
 
         VBox card =
@@ -1628,18 +1700,19 @@ public class MotherDashBoard {
                     "Explore More Tips  →"
                 );
 
+
         explore.setOnAction(e -> {
 
-        MotherAiAssistant aiAssistant =
-            new MotherAiAssistant();
+            MotherAiAssistant aiAssistant =
+                    new MotherAiAssistant();
 
-        mainContent.getChildren().clear();
+            mainContent.getChildren().clear();
 
-        mainContent.getChildren().add(
-            aiAssistant.createAIAssistantPage()
-    );
+            mainContent.getChildren().add(
+                    aiAssistant.createAIAssistantPage()
+            );
 
-});
+        });
 
 
         card.getChildren().addAll(
@@ -1651,6 +1724,10 @@ public class MotherDashBoard {
         return card;
     }
 
+
+    // =========================================================
+    // CARD HEADING
+    // =========================================================
 
     private HBox createCardHeading(
             String text,
@@ -1697,6 +1774,10 @@ public class MotherDashBoard {
     }
 
 
+    // =========================================================
+    // WHITE CARD
+    // =========================================================
+
     private VBox createWhiteCard() {
 
         VBox card =
@@ -1724,6 +1805,10 @@ public class MotherDashBoard {
         return card;
     }
 
+
+    // =========================================================
+    // MENU BUTTON
+    // =========================================================
 
     private Button createMenuButton(
             String text,
@@ -1804,6 +1889,10 @@ public class MotherDashBoard {
         return button;
     }
 
+
+    // =========================================================
+    // QUICK ACTION BUTTON
+    // =========================================================
 
     private Button createActionButton(
             String text,
@@ -1887,6 +1976,10 @@ public class MotherDashBoard {
     }
 
 
+    // =========================================================
+    // SMALL BUTTON
+    // =========================================================
+
     private Button createSmallButton(
             String text) {
 
@@ -1909,6 +2002,10 @@ public class MotherDashBoard {
     }
 
 
+    // =========================================================
+    // MESSAGE
+    // =========================================================
+
     private void showMessage(
             String pageName) {
 
@@ -1922,12 +2019,6 @@ public class MotherDashBoard {
     // BACK DASHBOARD
     // =========================================================
 
-    /*
-     * आता इथे Scene बदलायची गरज नाही.
-     *
-     * Dashboard button click केल्यावर
-     * showDashboard() call होईल.
-     */
     public void backDashMethod() {
 
         showDashboard();
