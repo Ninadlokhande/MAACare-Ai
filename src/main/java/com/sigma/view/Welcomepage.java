@@ -2,6 +2,7 @@
 package com.sigma.view;
 
 import com.sigma.view.adminpages.AdminDashboard;
+import com.sigma.view.trial.AiChatbotPage;
 
 import javafx.animation.FadeTransition;
 import javafx.animation.Interpolator;
@@ -33,6 +34,9 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 public class Welcomepage extends Application {
+
+        AiChatbotPage aiPage = new AiChatbotPage();
+
 
     // =========================================================
     // COMMON STAGE
@@ -563,7 +567,7 @@ public class Welcomepage extends Application {
                 scenesettings.rectanguler2d.getHeight());
 
         scene = sc;
-
+        
         stage.setScene(sc);
 
         stage.setTitle(
