@@ -171,7 +171,7 @@ public class PatientsPage {
                                         Double.MAX_VALUE);
 
                         table.setColumnResizePolicy(
-                                            TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
+                                        TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
 
                         table.setPlaceholder(
                                         new Label("No patients found."));
@@ -450,7 +450,7 @@ public class PatientsPage {
                         // =================================================
 
                         BorderPane page = new BorderPane();
-                            page.setLeft(DoctorDashboard.createSidebar("Patients"));
+                        page.setLeft(DoctorDashboard.createSidebar("Patients"));
                         page.setCenter(root);
 
                         DoctorDashboard.changeScene(

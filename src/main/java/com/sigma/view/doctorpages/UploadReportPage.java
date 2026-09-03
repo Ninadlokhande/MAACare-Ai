@@ -33,10 +33,14 @@ public class UploadReportPage {
         private static final String PAGE_BACKGROUND = "#FFF9FB";
 
         // ============================================================
-        // SHOW
+        // SHOW PAGE
         // ============================================================
 
         public static void show() {
+
+                // ========================================================
+                // GET SAME DASHBOARD STAGE
+                // ========================================================
 
                 Stage stage = DoctorDashboard.dashboardStage;
 
@@ -56,8 +60,7 @@ public class UploadReportPage {
                 BorderPane root = new BorderPane();
 
                 root.setStyle(
-                                "-fx-background-color: " +
-                                                PAGE_BACKGROUND + ";");
+                                "-fx-background-color: " + PAGE_BACKGROUND + ";");
 
                 // ========================================================
                 // HEADER
@@ -71,8 +74,7 @@ public class UploadReportPage {
 
                 VBox titleBox = new VBox(5);
 
-                Label title = new Label(
-                                "Upload Patient Report");
+                Label title = new Label("Upload Patient Report");
 
                 title.setFont(
                                 Font.font(
@@ -120,8 +122,7 @@ public class UploadReportPage {
                 card.setStyle(
                                 "-fx-background-color: white;" +
                                                 "-fx-background-radius: 18;" +
-                                                "-fx-border-color: " +
-                                                BORDER + ";" +
+                                                "-fx-border-color: " + BORDER + ";" +
                                                 "-fx-border-radius: 18;");
 
                 // ========================================================
@@ -130,8 +131,7 @@ public class UploadReportPage {
 
                 Label patientLabel = createLabel("Patient Name");
 
-                TextField patient = createTextField(
-                                "Enter patient name");
+                TextField patient = createTextField("Enter patient name");
 
                 // ========================================================
                 // REPORT NAME
@@ -139,8 +139,7 @@ public class UploadReportPage {
 
                 Label reportNameLabel = createLabel("Report Name");
 
-                TextField reportName = createTextField(
-                                "Enter report name");
+                TextField reportName = createTextField("Enter report name");
 
                 // ========================================================
                 // REPORT TYPE
@@ -164,13 +163,14 @@ public class UploadReportPage {
                 reportType.setPromptText(
                                 "Select report type");
 
-                reportType.setPrefWidth(700);
+                reportType.setMaxWidth(
+                                Double.MAX_VALUE);
+
                 reportType.setPrefHeight(42);
 
                 reportType.setStyle(
                                 "-fx-background-color: white;" +
-                                                "-fx-border-color: " +
-                                                BORDER + ";" +
+                                                "-fx-border-color: " + BORDER + ";" +
                                                 "-fx-border-radius: 9;" +
                                                 "-fx-background-radius: 9;" +
                                                 "-fx-font-family: Arial;" +
@@ -182,8 +182,7 @@ public class UploadReportPage {
 
                 Label fileLabel = createLabel("Report File");
 
-                TextField fileField = createTextField(
-                                "No file selected");
+                TextField fileField = createTextField("No file selected");
 
                 fileField.setEditable(false);
 
@@ -195,17 +194,15 @@ public class UploadReportPage {
                                 new Insets(0, 18, 0, 18));
 
                 chooseButton.setStyle(
-                                "-fx-background-color: " +
-                                                LIGHT_PURPLE + ";" +
-                                                "-fx-text-fill: " +
-                                                PURPLE + ";" +
+                                "-fx-background-color: " + LIGHT_PURPLE + ";" +
+                                                "-fx-text-fill: " + PURPLE + ";" +
                                                 "-fx-font-family: Arial;" +
                                                 "-fx-font-size: 13px;" +
                                                 "-fx-font-weight: bold;" +
                                                 "-fx-background-radius: 9;" +
-                                                "-fx-border-color: " +
-                                                BORDER + ";" +
-                                                "-fx-border-radius: 9;");
+                                                "-fx-border-color: " + BORDER + ";" +
+                                                "-fx-border-radius: 9;" +
+                                                "-fx-cursor: hand;");
 
                 HBox fileBox = new HBox(10);
 
@@ -218,6 +215,10 @@ public class UploadReportPage {
                                 chooseButton);
 
                 final File[] selectedFile = new File[1];
+
+                // ========================================================
+                // CHOOSE FILE
+                // ========================================================
 
                 chooseButton.setOnAction(e -> {
 
@@ -242,7 +243,8 @@ public class UploadReportPage {
                                                         "All Files",
                                                         "*.*"));
 
-                        File file = chooser.showOpenDialog(dialogStage);
+                        File file = chooser.showOpenDialog(
+                                        dialogStage);
 
                         if (file != null) {
 
@@ -267,26 +269,31 @@ public class UploadReportPage {
 
                 status.setValue("Pending");
 
-                status.setPrefWidth(700);
+                status.setMaxWidth(
+                                Double.MAX_VALUE);
+
                 status.setPrefHeight(42);
 
                 status.setStyle(
                                 "-fx-background-color: white;" +
-                                                "-fx-border-color: " +
-                                                BORDER + ";" +
+                                                "-fx-border-color: " + BORDER + ";" +
                                                 "-fx-border-radius: 9;" +
                                                 "-fx-background-radius: 9;" +
                                                 "-fx-font-family: Arial;" +
                                                 "-fx-font-size: 14px;");
 
                 // ========================================================
-                // BUTTONS
+                // BUTTON BOX
                 // ========================================================
 
                 HBox buttonBox = new HBox(12);
 
                 buttonBox.setAlignment(
                                 Pos.CENTER_RIGHT);
+
+                // ========================================================
+                // CANCEL BUTTON
+                // ========================================================
 
                 Button cancelButton = new Button("Cancel");
 
@@ -296,19 +303,21 @@ public class UploadReportPage {
                                 new Insets(0, 22, 0, 22));
 
                 cancelButton.setStyle(
-                                "-fx-background-color: " +
-                                                LIGHT_PURPLE + ";" +
-                                                "-fx-text-fill: " +
-                                                PURPLE + ";" +
+                                "-fx-background-color: " + LIGHT_PURPLE + ";" +
+                                                "-fx-text-fill: " + PURPLE + ";" +
                                                 "-fx-font-family: Arial;" +
                                                 "-fx-font-weight: bold;" +
                                                 "-fx-background-radius: 10;" +
-                                                "-fx-border-color: " +
-                                                BORDER + ";" +
-                                                "-fx-border-radius: 10;");
+                                                "-fx-border-color: " + BORDER + ";" +
+                                                "-fx-border-radius: 10;" +
+                                                "-fx-cursor: hand;");
 
                 cancelButton.setOnAction(
                                 e -> PatientReportsPage.show());
+
+                // ========================================================
+                // UPLOAD BUTTON
+                // ========================================================
 
                 Button uploadButton = new Button("Upload Report");
 
@@ -318,13 +327,13 @@ public class UploadReportPage {
                                 new Insets(0, 25, 0, 25));
 
                 uploadButton.setStyle(
-                                "-fx-background-color: " +
-                                                PURPLE + ";" +
+                                "-fx-background-color: " + PURPLE + ";" +
                                                 "-fx-text-fill: white;" +
                                                 "-fx-font-family: Arial;" +
                                                 "-fx-font-size: 14px;" +
                                                 "-fx-font-weight: bold;" +
-                                                "-fx-background-radius: 10;");
+                                                "-fx-background-radius: 10;" +
+                                                "-fx-cursor: hand;");
 
                 buttonBox.getChildren().addAll(
                                 cancelButton,
@@ -348,9 +357,9 @@ public class UploadReportPage {
 
                         String selectedStatus = status.getValue();
 
-                        // ----------------------------------------------------
+                        // ====================================================
                         // VALIDATION
-                        // ----------------------------------------------------
+                        // ====================================================
 
                         if (patientName.isEmpty()) {
 
@@ -359,6 +368,7 @@ public class UploadReportPage {
                                                 "Please enter patient name.");
 
                                 patient.requestFocus();
+
                                 return;
                         }
 
@@ -369,6 +379,7 @@ public class UploadReportPage {
                                                 "Please enter report name.");
 
                                 reportName.requestFocus();
+
                                 return;
                         }
 
@@ -391,9 +402,9 @@ public class UploadReportPage {
                                 return;
                         }
 
-                        // ----------------------------------------------------
-                        // CLOUDINARY UPLOAD
-                        // ----------------------------------------------------
+                        // ====================================================
+                        // UPLOADING
+                        // ====================================================
 
                         uploadButton.setDisable(true);
 
@@ -407,24 +418,28 @@ public class UploadReportPage {
                                 String uploadedFileUrl = uploader.imageUpload(
                                                 selectedFile[0]);
 
+                                // =================================================
+                                // CLOUDINARY RESULT
+                                // =================================================
+
                                 if (uploadedFileUrl == null ||
                                                 uploadedFileUrl.trim().isEmpty()) {
 
                                         uploadButton.setDisable(false);
+
                                         uploadButton.setText(
                                                         "Upload Report");
 
                                         showAlert(
                                                         Alert.AlertType.ERROR,
-                                                        "File upload failed. " +
-                                                                        "Please try again.");
+                                                        "File upload failed. Please try again.");
 
                                         return;
                                 }
 
-                                // ------------------------------------------------
+                                // =================================================
                                 // CREATE REPORT
-                                // ------------------------------------------------
+                                // =================================================
 
                                 PatientReport report = new PatientReport(
 
@@ -443,20 +458,25 @@ public class UploadReportPage {
 
                                                 uploadedFileUrl.trim());
 
-                                // ------------------------------------------------
+                                // =================================================
                                 // SAVE FIRESTORE
-                                // ------------------------------------------------
+                                // =================================================
 
                                 reportController.addReport(
                                                 report);
 
                                 uploadButton.setDisable(false);
+
                                 uploadButton.setText(
                                                 "Upload Report");
 
                                 showAlert(
                                                 Alert.AlertType.INFORMATION,
                                                 "Patient report uploaded successfully.");
+
+                                // =================================================
+                                // BACK TO REPORT PAGE
+                                // =================================================
 
                                 PatientReportsPage.show();
 
@@ -465,6 +485,7 @@ public class UploadReportPage {
                                 ex.printStackTrace();
 
                                 uploadButton.setDisable(false);
+
                                 uploadButton.setText(
                                                 "Upload Report");
 
@@ -476,7 +497,7 @@ public class UploadReportPage {
                 });
 
                 // ========================================================
-                // ADD FORM
+                // ADD FORM CONTENT
                 // ========================================================
 
                 card.getChildren().addAll(
@@ -507,26 +528,52 @@ public class UploadReportPage {
                 center.setPadding(
                                 new Insets(10, 35, 35, 35));
 
+                // ========================================================
+                // ROOT
+                // ========================================================
+
                 root.setTop(header);
-                root.setLeft(DoctorDashboard.createSidebar("Reports"));
+
+                root.setLeft(
+                                DoctorDashboard.createSidebar("Reports"));
+
                 root.setCenter(center);
 
-                stage.setScene(
-                                new Scene(root,
-                                                DoctorTheme.WIDTH,
-                                                DoctorTheme.HEIGHT));
+                // ========================================================
+                // IMPORTANT:
+                // NO FIXED WIDTH / HEIGHT
+                // NO DoctorTheme
+                // NO setStandardWindowSize()
+                // ========================================================
 
-                DoctorDashboard.setStandardWindowSize();
+                Scene scene = new Scene(root);
 
-                stage.show();
+                // ========================================================
+                // USE COMMON DASHBOARD STAGE
+                // This preserves:
+                // 1. Same window
+                // 2. Same width
+                // 3. Same height
+                // 4. Same position
+                // 5. Same maximized state
+                // ========================================================
+
+                DoctorDashboard.changeScene(scene);
         }
+
+        // ============================================================
+        // CREATE LABEL
+        // ============================================================
 
         private static Label createLabel(String text) {
 
                 Label label = new Label(text);
 
                 label.setFont(
-                                Font.font("Arial", FontWeight.BOLD, 14));
+                                Font.font(
+                                                "Arial",
+                                                FontWeight.BOLD,
+                                                14));
 
                 label.setTextFill(
                                 Color.web(DARK_TEXT));
@@ -534,23 +581,40 @@ public class UploadReportPage {
                 return label;
         }
 
-        private static TextField createTextField(String promptText) {
+        // ============================================================
+        // CREATE TEXT FIELD
+        // ============================================================
+
+        private static TextField createTextField(
+                        String promptText) {
 
                 TextField textField = new TextField();
 
-                textField.setPromptText(promptText);
+                textField.setPromptText(
+                                promptText);
+
                 textField.setPrefWidth(700);
+
                 textField.setPrefHeight(42);
+
+                textField.setMaxWidth(
+                                Double.MAX_VALUE);
+
                 textField.setStyle(
                                 "-fx-background-color: white;" +
                                                 "-fx-border-color: " + BORDER + ";" +
                                                 "-fx-border-radius: 9;" +
                                                 "-fx-background-radius: 9;" +
                                                 "-fx-font-family: Arial;" +
-                                                "-fx-font-size: 14px;");
+                                                "-fx-font-size: 14px;" +
+                                                "-fx-padding: 0 12;");
 
                 return textField;
         }
+
+        // ============================================================
+        // ALERT
+        // ============================================================
 
         private static void showAlert(
                         Alert.AlertType type,
