@@ -1,5 +1,6 @@
 package com.sigma.view.doctorpages;
 
+import com.sigma.view.scenesettings;
 import com.sigma.controller.doctorController.PatientReportController;
 import com.sigma.model.DoctorModel.PatientReport;
 
@@ -28,6 +29,9 @@ public class PatientReportsPage {
                 BorderPane root = new BorderPane();
 
                 Theme.applyBackground(root);
+
+                root.setMinWidth(0);
+                root.setMinHeight(0);
 
                 root.setPadding(
                                 new Insets(
@@ -87,6 +91,8 @@ public class PatientReportsPage {
                                 "Search report or patient...");
 
                 search.setPrefWidth(280);
+                search.setMaxWidth(Double.MAX_VALUE);
+                HBox.setHgrow(search, Priority.ALWAYS);
 
                 ComboBox<String> status = new ComboBox<>();
 
@@ -121,6 +127,9 @@ public class PatientReportsPage {
                 // =====================================================
 
                 table = new TableView<>();
+
+                table.setMaxWidth(Double.MAX_VALUE);
+                table.setMaxHeight(Double.MAX_VALUE);
 
                 table.setColumnResizePolicy(
                                 TableView.CONSTRAINED_RESIZE_POLICY);
@@ -304,6 +313,11 @@ public class PatientReportsPage {
                                 filter,
                                 table);
 
+                content.setFillWidth(true);
+                content.setMinWidth(0);
+                content.setMaxWidth(Double.MAX_VALUE);
+                content.setMaxHeight(Double.MAX_VALUE);
+
                 VBox.setVgrow(
                                 table,
                                 Priority.ALWAYS);
@@ -318,13 +332,21 @@ public class PatientReportsPage {
                                                 20,
                                                 0));
 
+                VBox.setVgrow(
+                                content,
+                                Priority.ALWAYS);
+
                 root.setCenter(content);
 
                 // =====================================================
                 // SCENE
                 // =====================================================
 
-                Scene scene = new Scene(root);
+                Scene scene = new Scene(
+                                root,
+                                scenesettings.rectanguler2d.getWidth(),
+                                scenesettings.rectanguler2d.getHeight()
+                );
 
                 DoctorDashboard.changeScene(
                                 scene);

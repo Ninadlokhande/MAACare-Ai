@@ -1,6 +1,7 @@
 package com.sigma.view.doctorpages;
 
 import com.sigma.model.DoctorModel.Patient;
+import com.sigma.view.scenesettings;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -51,7 +52,8 @@ public class AddPatientPage {
 
         VBox form = Theme.card();
 
-        form.setMaxWidth(850);
+        form.setMinWidth(650);
+        form.setMaxWidth(Double.MAX_VALUE);
 
         form.setPadding(
                 new Insets(28));
@@ -141,10 +143,14 @@ public class AddPatientPage {
         ColumnConstraints col1 = new ColumnConstraints();
 
         col1.setPercentWidth(50);
+        col1.setHgrow(Priority.ALWAYS);
+        col1.setFillWidth(true);
 
         ColumnConstraints col2 = new ColumnConstraints();
 
         col2.setPercentWidth(50);
+        col2.setHgrow(Priority.ALWAYS);
+        col2.setFillWidth(true);
 
         grid.getColumnConstraints()
                 .addAll(col1, col2);
@@ -323,11 +329,24 @@ public class AddPatientPage {
         StackPane center = new StackPane(form);
 
         center.setAlignment(
-                Pos.CENTER);
+                Pos.TOP_CENTER);
+
+        center.setPadding(
+                new Insets(5));
+
+        center.setMinWidth(0);
+        center.setMaxWidth(Double.MAX_VALUE);
 
         ScrollPane scroll = new ScrollPane(center);
 
         scroll.setFitToWidth(true);
+        scroll.setFitToHeight(false);
+
+        scroll.setHbarPolicy(
+                ScrollPane.ScrollBarPolicy.NEVER);
+
+        scroll.setVbarPolicy(
+                ScrollPane.ScrollBarPolicy.AS_NEEDED);
 
         scroll.setStyle(
                 "-fx-background-color: transparent;" +
@@ -345,7 +364,11 @@ public class AddPatientPage {
         // SCENE
         // =====================================================
 
-        Scene scene = new Scene(root);
+        Scene scene = new Scene(
+                root,
+                scenesettings.rectanguler2d.getWidth(),
+                scenesettings.rectanguler2d.getHeight()
+        );
 
         DoctorDashboard.changeScene(
                 scene);

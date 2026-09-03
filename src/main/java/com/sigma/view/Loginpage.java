@@ -2,6 +2,7 @@ package com.sigma.view;
 
 import com.sigma.controller.Controller;
 import com.sigma.view.adminpages.AdminDashboard;
+import com.sigma.view.doctorpages.DoctorDashboard;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -19,53 +20,31 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
-import com.sigma.view.Dashboard;
 
 public class Loginpage {
 
-    // =============================================================
+    // =========================================================
     // FIELDS
-    // =============================================================
+    // =========================================================
 
     private Scene loginpagScene;
 
-    public String role = "";
+    private String role = "";
 
-    Controller controller = new Controller();
+    private final Controller controller = new Controller();
 
+    // Admin security code
+    private static final String ADMIN_SECURITY_CODE = "12345";
 
-    /*
-     * =============================================================
-     * FUTURE ROLE PAGE REFERENCES
-     * =============================================================
-     *
-     * Keep these commented for now.
-     *
-     * When the respective page/dashboard is created, uncomment
-     * the required field and use it after successful login.
-     *
-     * Example:
-     *
-     * private MotherDashboard motherDashboard;
-     * private DoctorDashboard doctorDashboard;
-     * private HospitalDashboard hospitalDashboard;
-     * private AshaDashboard ashaDashboard;
-     * private AmbulanceDashboard ambulanceDashboard;
-     *
-     * Loginpage itself does NOT need to keep AdminDashboard.
-     * AdminDashboard is created once after successful admin login.
-     */
-
-
-    // =============================================================
+    // =========================================================
     // LOGIN PAGE
-    // =============================================================
+    // =========================================================
 
     public Scene gotologinpage() {
 
-        // =========================================================
+        // =====================================================
         // ROOT
-        // =========================================================
+        // =====================================================
 
         BorderPane root = new BorderPane();
 
@@ -78,10 +57,9 @@ public class Loginpage {
                         ");"
         );
 
-
-        // =========================================================
-        // LEFT SIDE - BRANDING
-        // =========================================================
+        // =====================================================
+        // LEFT SIDE
+        // =====================================================
 
         VBox leftSide = new VBox(18);
 
@@ -93,77 +71,66 @@ public class Loginpage {
 
         leftSide.setPrefWidth(550);
 
-
-        // =========================================================
+        // =====================================================
         // LOGO
-        // =========================================================
+        // =====================================================
 
-      String IMAGE_PATH =
-             "file:Maacare-Ai\\src\\main\\resources\\assets\\images\\logo\\logo.png";
-         //  String IMAGE_PATH="asssets\\images\\logo\\logo.png";
+        String IMAGE_PATH =
+                "file:Maacare-Ai\\src\\main\\resources\\assets\\images\\logo\\logo.png";
 
-        Image logoImage =
-                new Image(IMAGE_PATH);
+        Image logoImage = new Image(IMAGE_PATH);
 
         ImageView logoView =
                 new ImageView(logoImage);
 
         logoView.setPreserveRatio(true);
-
         logoView.setSmooth(true);
 
         logoView.fitWidthProperty().bind(
                 leftSide.widthProperty().multiply(0.75)
         );
 
+        // =====================================================
+        // STATUS
+        // =====================================================
 
-        // =========================================================
-        // LOGIN STATUS
-        // =========================================================
+        Text loginStatus = new Text("");
 
-        Text logininfo =
-                new Text("");
-
-        logininfo.setStyle(
-                "-fx-fill: #13cee3;" +
-                        "-fx-font-size: 16px;" +
+        loginStatus.setStyle(
+                "-fx-fill: #D82F82;" +
+                        "-fx-font-size: 15px;" +
                         "-fx-font-weight: bold;"
         );
 
+        loginStatus.setWrappingWidth(430);
 
-        // =========================================================
-        // TITLE
-        // =========================================================
+        // =====================================================
+        // BRAND
+        // =====================================================
 
         Text brandName =
                 new Text("MaaCare AI");
 
         brandName.setStyle(
-                "-fx-fill: linear-gradient(to right, #E84A87, #9B4DCC);" +
+                "-fx-fill: #9B4DCC;" +
                         "-fx-font-size: 48px;" +
                         "-fx-font-weight: bold;"
         );
 
-
-        // =========================================================
-        // TAGLINE
-        // =========================================================
-
-        Text tagline1 =
+        Text tagline =
                 new Text(
                         "Care for Mom. Care for Baby. Care for Life."
                 );
 
-        tagline1.setStyle(
+        tagline.setStyle(
                 "-fx-fill: #24234F;" +
                         "-fx-font-size: 16px;" +
                         "-fx-font-weight: bold;"
         );
 
-
-        // =========================================================
+        // =====================================================
         // DESCRIPTION
-        // =========================================================
+        // =====================================================
 
         Text description1 =
                 new Text(
@@ -176,46 +143,42 @@ public class Loginpage {
                         "-fx-font-weight: bold;"
         );
 
-
-        Text descriptionPink =
+        Text description2 =
                 new Text(
                         " Mother & Child"
                 );
 
-        descriptionPink.setStyle(
+        description2.setStyle(
                 "-fx-fill: #E84A87;" +
                         "-fx-font-size: 20px;" +
                         "-fx-font-weight: bold;"
         );
 
-
-        Text description2 =
+        Text description3 =
                 new Text(
                         " Healthcare"
                 );
 
-        description2.setStyle(
+        description3.setStyle(
                 "-fx-fill: #24234F;" +
                         "-fx-font-size: 20px;" +
                         "-fx-font-weight: bold;"
         );
 
-
         HBox description =
                 new HBox(
                         description1,
-                        descriptionPink,
-                        description2
+                        description2,
+                        description3
                 );
 
         description.setAlignment(
                 Pos.CENTER
         );
 
-
-        // =========================================================
+        // =====================================================
         // INFO
-        // =========================================================
+        // =====================================================
 
         Text info =
                 new Text(
@@ -227,7 +190,6 @@ public class Loginpage {
                         "-fx-font-size: 16px;"
         );
 
-
         Text smallInfo =
                 new Text(
                         "Because every mom and baby deserves the best care."
@@ -238,10 +200,9 @@ public class Loginpage {
                         "-fx-font-size: 14px;"
         );
 
-
-        // =========================================================
+        // =====================================================
         // FEATURES
-        // =========================================================
+        // =====================================================
 
         HBox features =
                 new HBox(25);
@@ -255,6 +216,7 @@ public class Loginpage {
         );
 
         features.getChildren().addAll(
+
                 createFeature(
                         "♥",
                         "Pregnancy",
@@ -277,31 +239,23 @@ public class Loginpage {
                         "▣",
                         "Doctor &",
                         "Hospital"
-                ),
-
-                createFeature(
-                        "✚",
-                        "Emergency",
-                        "Support"
                 )
         );
-
 
         leftSide.getChildren().addAll(
                 logoView,
                 brandName,
-                tagline1,
+                tagline,
                 description,
                 info,
                 smallInfo,
                 features,
-                logininfo
+                loginStatus
         );
 
-
-        // =========================================================
+        // =====================================================
         // RIGHT SIDE
-        // =========================================================
+        // =====================================================
 
         StackPane rightSide =
                 new StackPane();
@@ -315,10 +269,9 @@ public class Loginpage {
                 )
         );
 
-
-        // =========================================================
+        // =====================================================
         // LOGIN CARD
-        // =========================================================
+        // =====================================================
 
         VBox loginCard =
                 new VBox(18);
@@ -337,7 +290,6 @@ public class Loginpage {
         );
 
         loginCard.setMaxWidth(800);
-
         loginCard.setMaxHeight(850);
 
         loginCard.setStyle(
@@ -348,10 +300,9 @@ public class Loginpage {
                         "-fx-border-radius: 25px;"
         );
 
-
-        // =========================================================
-        // LOGIN HEADING
-        // =========================================================
+        // =====================================================
+        // HEADING
+        // =====================================================
 
         Text welcome =
                 new Text(
@@ -364,7 +315,6 @@ public class Loginpage {
                         "-fx-font-weight: bold;"
         );
 
-
         Text loginInfo =
                 new Text(
                         "Login to your MaaCare AI account"
@@ -375,10 +325,9 @@ public class Loginpage {
                         "-fx-font-size: 16px;"
         );
 
-
-        // =========================================================
-        // ROLE SELECTION
-        // =========================================================
+        // =====================================================
+        // ROLE TITLE
+        // =====================================================
 
         Text roleTitle =
                 new Text(
@@ -391,16 +340,18 @@ public class Loginpage {
                         "-fx-font-weight: bold;"
         );
 
-
-        Text forgot =
+        Text selectedRole =
                 new Text("");
 
-        forgot.setStyle(
+        selectedRole.setStyle(
                 "-fx-fill: #D82F82;" +
                         "-fx-font-size: 14px;" +
                         "-fx-font-weight: bold;"
         );
 
+        // =====================================================
+        // ROLE BUTTONS
+        // =====================================================
 
         HBox roles =
                 new HBox(12);
@@ -409,134 +360,9 @@ public class Loginpage {
                 Pos.CENTER
         );
 
-
-        // =========================================================
-        // MOTHER
-        // =========================================================
-
-        Button mother =
-                createRoleButton(
-                        "🤱\nMother\nFamily"
-                );
-
-        mother.setOnAction(e -> {
-
-            role = "mother";
-
-            forgot.setText(
-                    "Role : Mother"
-            );
-        });
-
-
-        // =========================================================
-        // DOCTOR
-        // =========================================================
-
-        Button doctor =
-                createRoleButton(
-                        "🧑‍⚕️\nDoctor"
-                );
-
-        doctor.setOnAction(e -> {
-
-            role = "doctor";
-
-            forgot.setText(
-                    "Role : Doctor"
-            );
-        });
-
-
-        // =========================================================
-        // HOSPITAL
-        // =========================================================
-
-        Button hospital =
-                createRoleButton(
-                        "🏥\nHospital"
-                );
-
-        hospital.setOnAction(e -> {
-
-            role = "hospital";
-
-            forgot.setText(
-                    "Role : Hospital"
-            );
-        });
-
-
-        // =========================================================
-        // ASHA
-        // =========================================================
-
-        Button asha =
-                createRoleButton(
-                        "👩\nASHA Worker"
-                );
-
-        asha.setOnAction(e -> {
-
-            role = "asha";
-
-            forgot.setText(
-                    "Role : ASHA WORKER"
-            );
-        });
-
-
-        // =========================================================
-        // AMBULANCE
-        // =========================================================
-
-        Button ambulance =
-                createRoleButton(
-                        "🚑\nAmbulance"
-                );
-
-        ambulance.setOnAction(e -> {
-
-            role = "ambulance";
-
-            forgot.setText(
-                    "Role : Ambulance / Hospital"
-            );
-        });
-
-
-        // =========================================================
-        // ADMIN
-        // =========================================================
-
-        Button admin =
-                createRoleButton(
-                        "🧑‍💻\nAdmin"
-                );
-
-        admin.setOnAction(e -> {
-
-            role = "admin";
-
-            forgot.setText(
-                    "Role : ADMIN"
-            );
-        });
-
-
-        roles.getChildren().addAll(
-                mother,
-                doctor,
-                hospital,
-                asha,
-                ambulance,
-                admin
-        );
-
-
-        // =========================================================
+        // =====================================================
         // EMAIL
-        // =========================================================
+        // =====================================================
 
         TextField email =
                 new TextField();
@@ -557,10 +383,9 @@ public class Loginpage {
                         "-fx-padding: 0 18px;"
         );
 
-
-        // =========================================================
+        // =====================================================
         // PASSWORD
-        // =========================================================
+        // =====================================================
 
         PasswordField password =
                 new PasswordField();
@@ -581,10 +406,36 @@ public class Loginpage {
                         "-fx-padding: 0 18px;"
         );
 
+        // =====================================================
+        // ADMIN SECURITY CODE
+        // =====================================================
 
-        // =========================================================
+        PasswordField securityCode =
+                new PasswordField();
+
+        securityCode.setPromptText(
+                "Admin Security Code"
+        );
+
+        securityCode.setPrefHeight(55);
+
+        securityCode.setStyle(
+                "-fx-background-color: white;" +
+                        "-fx-border-color: #DDD9E6;" +
+                        "-fx-border-width: 1px;" +
+                        "-fx-border-radius: 12px;" +
+                        "-fx-background-radius: 12px;" +
+                        "-fx-font-size: 16px;" +
+                        "-fx-padding: 0 18px;"
+        );
+
+        // Hidden until Admin is selected
+        securityCode.setVisible(false);
+        securityCode.setManaged(false);
+
+        // =====================================================
         // REMEMBER ME
-        // =========================================================
+        // =====================================================
 
         CheckBox remember =
                 new CheckBox(
@@ -595,7 +446,6 @@ public class Loginpage {
                 "-fx-text-fill: #666680;" +
                         "-fx-font-size: 14px;"
         );
-
 
         HBox options =
                 new HBox();
@@ -613,471 +463,135 @@ public class Loginpage {
                 remember
         );
 
+        // =====================================================
+        // MOTHER
+        // =====================================================
 
-        // =========================================================
+        Button mother =
+                createRoleButton(
+                        "🤱\nMother\nFamily"
+                );
+
+        mother.setOnAction(e -> {
+
+            role = "mother";
+
+            selectedRole.setText(
+                    "Role : Mother"
+            );
+
+            securityCode.clear();
+            securityCode.setVisible(false);
+            securityCode.setManaged(false);
+        });
+
+        // =====================================================
+        // DOCTOR
+        // =====================================================
+
+        Button doctor =
+                createRoleButton(
+                        "🧑‍⚕️\nDoctor"
+                );
+
+        doctor.setOnAction(e -> {
+
+            role = "doctor";
+
+            selectedRole.setText(
+                    "Role : Doctor"
+            );
+
+            securityCode.clear();
+            securityCode.setVisible(false);
+            securityCode.setManaged(false);
+        });
+
+        // =====================================================
+        // HOSPITAL
+        // =====================================================
+
+        Button hospital =
+                createRoleButton(
+                        "🏥\nHospital"
+                );
+
+        hospital.setOnAction(e -> {
+
+            role = "hospital";
+
+            selectedRole.setText(
+                    "Role : Hospital"
+            );
+
+            securityCode.clear();
+            securityCode.setVisible(false);
+            securityCode.setManaged(false);
+        });
+
+        // =====================================================
+        // ASHA WORKER
+        // =====================================================
+
+        Button asha =
+                createRoleButton(
+                        "👩\nASHA Worker"
+                );
+
+        asha.setOnAction(e -> {
+
+            role = "asha";
+
+            selectedRole.setText(
+                    "Role : ASHA Worker"
+            );
+
+            securityCode.clear();
+            securityCode.setVisible(false);
+            securityCode.setManaged(false);
+        });
+
+        // =====================================================
+        // ADMIN
+        // =====================================================
+
+        Button admin =
+                createRoleButton(
+                        "🧑‍💻\nAdmin"
+                );
+
+        admin.setOnAction(e -> {
+
+            role = "admin";
+
+            selectedRole.setText(
+                    "Role : Admin"
+            );
+
+            securityCode.setVisible(true);
+            securityCode.setManaged(true);
+        });
+
+        // =====================================================
+        // ADD ROLE BUTTONS
+        // =====================================================
+
+        roles.getChildren().addAll(
+                mother,
+                doctor,
+                hospital,
+                asha,
+                admin
+        );
+
+        // =====================================================
         // LOGIN BUTTON
-        // =========================================================
+        // =====================================================
 
         Button login =
                 new Button(
                         "🔒   Login"
                 );
-
-
-        login.setOnAction(e -> {
-
-            System.out.println(
-                    "Login button pressed"
-            );
-
-            System.out.println(
-                    "Selected role : " + role
-            );
-
-            System.out.println(
-                    "Email : " + email.getText()
-            );
-
-
-            // =====================================================
-            // VALIDATION
-            // =====================================================
-
-            if (role.isBlank()) {
-
-                logininfo.setText(
-                        "Please select your role"
-                );
-
-                System.out.println(
-                        "[LOGIN] No role selected"
-                );
-
-                return;
-            }
-
-
-            if (email.getText().isBlank()) {
-
-                logininfo.setText(
-                        "Please enter your email"
-                );
-
-                System.out.println(
-                        "[LOGIN] Email is empty"
-                );
-
-                return;
-            }
-
-
-            if (password.getText().isBlank()) {
-
-                logininfo.setText(
-                        "Please enter your password"
-                );
-
-                System.out.println(
-                        "[LOGIN] Password is empty"
-                );
-
-                return;
-            }
-
-
-            // =====================================================
-            // AUTHENTICATION
-            // =====================================================
-
-            System.out.println(
-                    "[LOGIN] Authenticating user..."
-            );
-
-
-            boolean flag =
-                    controller.signin(
-                            email.getText(),
-                            password.getText()
-                    );
-
-
-            // =====================================================
-            // AUTHENTICATION SUCCESS
-            // =====================================================
-
-            if (flag) {
-
-                System.out.println(
-                        "[LOGIN] Authentication successful"
-                );
-
-                logininfo.setText(
-                        "Login successful"
-                );
-
-
-                // =================================================
-                // ADMIN
-                // =================================================
-
-                if (role.equals("admin")) {
-
-                    System.out.println(
-                            "[LOGIN] Admin role verified"
-                    );
-
-                    System.out.println(
-                            "[LOGIN] Opening Admin Dashboard..."
-                    );
-
-
-                    /*
-                     * Loginpage creates AdminDashboard here.
-                     *
-                     * This is intentional because Loginpage is
-                     * only responsible for login/navigation.
-                     *
-                     * AdminDashboard itself is responsible for
-                     * keeping its internal pages alive.
-                     */
-
-                    AdminDashboard adminDashboard =
-                            new AdminDashboard();
-
-
-                    /*
-                     * Get AdminDashboard scene.
-                     */
-
-                    Scene adminDashboardScene =
-                            adminDashboard.gotoAdminDashboard();
-
-
-                    /*
-                     * Replace login scene.
-                     */
-
-                    Welcomepage.stage.setScene(
-                            adminDashboardScene
-                    );
-
-
-                    Welcomepage.stage.setMaximized(
-                            true
-                    );
-
-
-                    System.out.println(
-                            "[LOGIN] Admin Dashboard opened"
-                    );
-
-
-                    email.clear();
-
-                    password.clear();
-
-
-                    return;
-                }
-
-
-                // =================================================
-                // MOTHER
-                // =================================================
-
-                if (role.equals("mother")) {
-
-                    System.out.println(
-                            "[LOGIN] Mother role verified"
-                    );
-
-
-                    /*
-                     * =================================================
-                     * TODO - MOTHER NAVIGATION
-                     * =================================================
-                     *
-                     * When Mother Dashboard is ready:
-                     *
-                     * MotherDashboard motherDashboard =
-                     *         new MotherDashboard();
-                     *
-                     * Scene motherScene =
-                     *         motherDashboard.gotoMotherDashboard();
-                     *
-                     * Welcomepage.stage.setScene(motherScene);
-                     *
-                     * Welcomepage.stage.setMaximized(true);
-                     */
-
-
-                    logininfo.setText(
-                            "Mother page not connected yet"
-                    );
-
-                    System.out.println(
-                            "[LOGIN] Mother page not connected yet"
-                    );
-
-                    return;
-                }
-
-
-                // =================================================
-                // DOCTOR
-                // =================================================
-
-                if (role.equals("doctor")) {
-
-                    System.out.println(
-                            "[LOGIN] Doctor role verified"
-                    );
-
-
-                    /*
-                     * =================================================
-                     * TODO - DOCTOR NAVIGATION
-                     * =================================================
-                     *
-                     * When Doctor Dashboard is ready:
-                     *
-                     * DoctorDashboard doctorDashboard =
-                     *         new DoctorDashboard();
-                     *
-                     * Scene doctorScene =
-                     *         doctorDashboard.gotoDoctorDashboard();
-                     *
-                     * Welcomepage.stage.setScene(doctorScene);
-                     *
-                     * Welcomepage.stage.setMaximized(true);
-                     */
-
-
-                    logininfo.setText(
-                            "Doctor page not connected yet"
-                    );
-
-                    System.out.println(
-                            "[LOGIN] Doctor page not connected yet"
-                    );
-
-                    return;
-                }
-
-
-                // =================================================
-                // HOSPITAL
-                // =================================================
-
-             /*   if (role.equals("hospital")) {
-
-                    System.out.println(
-                            "[LOGIN] Hospital role verified"
-                    );
-
-
-                    
-                     * =================================================
-                     * TODO - HOSPITAL NAVIGATION
-                     * =================================================
-                     *
-                     * When Hospital Dashboard is ready:
-                     *
-                     * HospitalDashboard hospitalDashboard =
-                     *         new HospitalDashboard();
-                     *
-                     * Scene hospitalScene =
-                     *         hospitalDashboard.gotoHospitalDashboard();
-                     *
-                     * Welcomepage.stage.setScene(hospitalScene);
-                     *
-                     * Welcomepage.stage.setMaximized(true);
-                     
-
-
-                    logininfo.setText(
-                            "Hospital page not connected yet"
-                    );
-
-                    System.out.println(
-                            "[LOGIN] Hospital page not connected yet"
-                    );
-
-                    return;
-                }*/  
-
-if (role.equals("hospital")) {
-
-    System.out.println(
-            "[LOGIN] Hospital role verified"
-    );
-
-    System.out.println(
-            "[LOGIN] Opening Hospital Dashboard..."
-    );
-
-    Dashboard dashboard = new Dashboard();
-
-    dashboard.show(
-            Welcomepage.stage
-    );
-
-    Welcomepage.stage.setMaximized(
-            true
-    );
-
-    System.out.println(
-            "[LOGIN] Hospital Dashboard opened"
-    );
-
-    email.clear();
-    password.clear();
-
-    return;
-}
-
-
-
-
-
-
-
-                // =================================================
-                // ASHA WORKER
-                // =================================================
-               // =================================================
-// ASHA WORKER
-// =================================================
-
-if (role.equals("asha")) {
-
-    System.out.println(
-            "[LOGIN] ASHA Worker role verified"
-    );
-
-    System.out.println(
-            "[LOGIN] Opening ASHA Worker Dashboard..."
-    );
-
-    try {
-
-        Asha_workerdashboard ashaDashboard =
-                new Asha_workerdashboard();
-
-        Scene ashaScene =
-                ashaDashboard.run();
-
-        Welcomepage.stage.setScene(
-                ashaScene
-        );
-
-        Welcomepage.stage.setMaximized(
-                true
-        );
-
-        System.out.println(
-                "[LOGIN] ASHA Worker Dashboard opened"
-        );
-
-        email.clear();
-        password.clear();
-
-    } catch (Exception ex) {
-
-        ex.printStackTrace();
-
-        logininfo.setText(
-                "Unable to open ASHA Worker Dashboard"
-        );
-
-        System.out.println(
-                "[LOGIN] Error opening ASHA Dashboard"
-        );
-    }
-
-    return;
-}
-
-              // ==========================================
-                     
-                            
-
-
-                // =================================================
-                // AMBULANCE
-                // =================================================
-
-                if (role.equals("ambulance")) {
-
-                    System.out.println(
-                            "[LOGIN] Ambulance role verified"
-                    );
-
-
-                    /*
-                     * =================================================
-                     * TODO - AMBULANCE NAVIGATION
-                     * =================================================
-                     *
-                     * When Ambulance Dashboard is ready:
-                     *
-                     * AmbulanceDashboard ambulanceDashboard =
-                     *         new AmbulanceDashboard();
-                     *
-                     * Scene ambulanceScene =
-                     *         ambulanceDashboard.gotoAmbulanceDashboard();
-                     *
-                     * Welcomepage.stage.setScene(ambulanceScene);
-                     *
-                     * Welcomepage.stage.setMaximized(true);
-                     */
-
-
-                    logininfo.setText(
-                            "Ambulance page not connected yet"
-                    );
-
-                    System.out.println(
-                            "[LOGIN] Ambulance page not connected yet"
-                    );
-
-                    return;
-                }
-
-
-                // =================================================
-                // UNKNOWN ROLE
-                // =================================================
-
-                System.out.println(
-                        "[LOGIN] Unknown role: " + role
-                );
-
-                logininfo.setText(
-                        "Invalid role selected"
-                );
-
-
-            } else {
-
-                // =================================================
-                // AUTHENTICATION FAILED
-                // =================================================
-
-                System.out.println(
-                        "[LOGIN] Authentication failed"
-                );
-
-                logininfo.setText(
-                        "Invalid credentials. Try again."
-                );
-
-                email.clear();
-
-                password.clear();
-            }
-        });
-
 
         login.setMaxWidth(
                 Double.MAX_VALUE
@@ -1097,10 +611,327 @@ if (role.equals("asha")) {
                         "-fx-cursor: hand;"
         );
 
+        // =====================================================
+        // LOGIN ACTION
+        // =====================================================
 
-        // =========================================================
+        login.setOnAction(e -> {
+
+            loginStatus.setText("");
+
+            String enteredEmail =
+                    email.getText().trim();
+
+            String enteredPassword =
+                    password.getText();
+
+            // =================================================
+            // ROLE VALIDATION
+            // =================================================
+
+            if (role == null ||
+                    role.isBlank()) {
+
+                loginStatus.setText(
+                        "Please select your role"
+                );
+
+                return;
+            }
+
+            // =================================================
+            // EMAIL VALIDATION
+            // =================================================
+
+            if (enteredEmail.isBlank()) {
+
+                loginStatus.setText(
+                        "Please enter your email"
+                );
+
+                email.requestFocus();
+
+                return;
+            }
+
+            // =================================================
+            // PASSWORD VALIDATION
+            // =================================================
+
+            if (enteredPassword.isBlank()) {
+
+                loginStatus.setText(
+                        "Please enter your password"
+                );
+
+                password.requestFocus();
+
+                return;
+            }
+
+            // =================================================
+            // ADMIN SECURITY CODE
+            // =================================================
+
+            if (role.equals("admin")) {
+
+                if (securityCode.getText().isBlank()) {
+
+                    loginStatus.setText(
+                            "Please enter Admin Security Code"
+                    );
+
+                    securityCode.requestFocus();
+
+                    return;
+                }
+
+                if (!securityCode.getText().equals(
+                        ADMIN_SECURITY_CODE
+                )) {
+
+                    loginStatus.setText(
+                            "Invalid Admin Security Code"
+                    );
+
+                    securityCode.clear();
+
+                    securityCode.requestFocus();
+
+                    return;
+                }
+            }
+
+            // =================================================
+            // FIREBASE AUTHENTICATION
+            // =================================================
+
+            System.out.println(
+                    "[LOGIN] Authenticating..."
+            );
+
+            boolean authenticated;
+
+            try {
+
+                authenticated =
+                        controller.signin(
+                                enteredEmail,
+                                enteredPassword
+                        );
+
+            } catch (Exception ex) {
+
+                ex.printStackTrace();
+
+                loginStatus.setText(
+                        "Authentication error. Please try again."
+                );
+
+                return;
+            }
+
+            // =================================================
+            // AUTHENTICATION FAILED
+            // =================================================
+
+            if (!authenticated) {
+
+                System.out.println(
+                        "[LOGIN] Authentication failed"
+                );
+
+                loginStatus.setText(
+                        "Invalid email or password."
+                );
+
+                password.clear();
+
+                return;
+            }
+
+            // =================================================
+            // AUTHENTICATION SUCCESS
+            // =================================================
+
+            System.out.println(
+                    "[LOGIN] Authentication successful"
+            );
+
+            try {
+
+                // =================================================
+                // ADMIN
+                // =================================================
+
+                if (role.equals("admin")) {
+
+                    System.out.println(
+                            "[LOGIN] Opening Admin Dashboard..."
+                    );
+
+                    AdminDashboard adminDashboard =
+                            new AdminDashboard();
+
+                    Scene adminScene =
+                            adminDashboard.gotoAdminDashboard();
+
+                    Welcomepage.stage.setScene(
+                            adminScene
+                    );
+
+                    Welcomepage.stage.setMaximized(
+                            true
+                    );
+
+                    System.out.println(
+                            "[LOGIN] Admin Dashboard opened"
+                    );
+                }
+
+                // =================================================
+                // DOCTOR
+                // =================================================
+
+                else if (role.equals("doctor")) {
+
+                    System.out.println(
+                            "[LOGIN] Opening Doctor Dashboard..."
+                    );
+
+                    DoctorDashboard doctorDashboard =
+                            new DoctorDashboard();
+
+                    Scene doctorScene =
+                            doctorDashboard.gotoDoctorDashboard();
+
+                    Welcomepage.stage.setScene(
+                            doctorScene
+                    );
+
+                    Welcomepage.stage.setMaximized(
+                            true
+                    );
+
+                    System.out.println(
+                            "[LOGIN] Doctor Dashboard opened"
+                    );
+                }
+
+                // =================================================
+                // HOSPITAL
+                // =================================================
+
+                else if (role.equals("hospital")) {
+
+                    System.out.println(
+                            "[LOGIN] Opening Hospital Dashboard..."
+                    );
+
+                    Dashboard dashboard =
+                            new Dashboard();
+
+                    dashboard.show(
+                            Welcomepage.stage
+                    );
+
+                    Welcomepage.stage.setMaximized(
+                            true
+                    );
+
+                    System.out.println(
+                            "[LOGIN] Hospital Dashboard opened"
+                    );
+                }
+
+                // =================================================
+                // ASHA WORKER
+                // =================================================
+
+                else if (role.equals("asha")) {
+
+                    System.out.println(
+                            "[LOGIN] Opening ASHA Dashboard..."
+                    );
+
+                    Asha_workerdashboard ashaDashboard =
+                            new Asha_workerdashboard();
+
+                    Scene ashaScene =
+                            ashaDashboard.run();
+
+                    Welcomepage.stage.setScene(
+                            ashaScene
+                    );
+
+                    Welcomepage.stage.setMaximized(
+                            true
+                    );
+
+                    System.out.println(
+                            "[LOGIN] ASHA Dashboard opened"
+                    );
+                }
+
+                // =================================================
+                // MOTHER
+                // =================================================
+
+                else if (role.equals("mother")) {
+
+                    /*
+                     * Mother Dashboard has not yet been created.
+                     */
+
+                    loginStatus.setText(
+                            "Mother Dashboard is not connected yet."
+                    );
+
+                    System.out.println(
+                            "[LOGIN] Mother Dashboard not available"
+                    );
+
+                    return;
+                }
+
+                // =================================================
+                // UNKNOWN ROLE
+                // =================================================
+
+                else {
+
+                    loginStatus.setText(
+                            "Invalid role selected."
+                    );
+
+                    return;
+                }
+
+                // =================================================
+                // CLEAR LOGIN FIELDS
+                // =================================================
+
+                email.clear();
+                password.clear();
+                securityCode.clear();
+
+            } catch (Exception ex) {
+
+                ex.printStackTrace();
+
+                loginStatus.setText(
+                        "Unable to open dashboard."
+                );
+
+                System.out.println(
+                        "[LOGIN] Dashboard opening failed"
+                );
+            }
+        });
+
+        // =====================================================
         // OR
-        // =========================================================
+        // =====================================================
 
         Text or =
                 new Text("OR");
@@ -1111,79 +942,20 @@ if (role.equals("asha")) {
                         "-fx-font-weight: bold;"
         );
 
+        // =====================================================
+        // SIGN UP
+        // =====================================================
 
-        // =========================================================
-        // SIGN UP BUTTON
-        // =========================================================
-
-        Button google =
+        Button signUp =
                 new Button("Sign Up");
 
-
-        google.setOnAction(e -> {
-
-            System.out.println(
-                    role
-            );
-
-            System.out.println(
-                    "sign up button pressed"
-            );
-
-            System.out.println(
-                    email
-            );
-
-            System.out.println(
-                    password
-            );
-
-
-            if (!role.isBlank()
-                    && !email.getText().isBlank()
-                    && !password.getText().isBlank()) {
-
-
-                controller.signup(
-                        email.getText(),
-                        password.getText()
-                );
-
-
-                if (controller.status_code == 200) {
-
-                    logininfo.setText(
-                            "Sign up successful. Login to continue"
-                    );
-
-                    email.clear();
-
-                    password.clear();
-
-
-                } else if (controller.status_code == 400) {
-
-                    logininfo.setText(
-                            "Email exists. Sign up with another email / login"
-                    );
-                }
-
-            } else {
-
-                logininfo.setText(
-                        "Select role and enter email/password"
-                );
-            }
-        });
-
-
-        google.setMaxWidth(
+        signUp.setMaxWidth(
                 Double.MAX_VALUE
         );
 
-        google.setPrefHeight(52);
+        signUp.setPrefHeight(52);
 
-        google.setStyle(
+        signUp.setStyle(
                 "-fx-background-color: white;" +
                         "-fx-text-fill: #49308C;" +
                         "-fx-font-size: 16px;" +
@@ -1195,10 +967,88 @@ if (role.equals("asha")) {
                         "-fx-cursor: hand;"
         );
 
+        signUp.setOnAction(e -> {
 
-        // =========================================================
+            if (role == null ||
+                    role.isBlank()) {
+
+                loginStatus.setText(
+                        "Please select your role first."
+                );
+
+                return;
+            }
+
+            String enteredEmail =
+                    email.getText().trim();
+
+            String enteredPassword =
+                    password.getText();
+
+            if (enteredEmail.isBlank()) {
+
+                loginStatus.setText(
+                        "Please enter your email."
+                );
+
+                email.requestFocus();
+
+                return;
+            }
+
+            if (enteredPassword.isBlank()) {
+
+                loginStatus.setText(
+                        "Please enter your password."
+                );
+
+                password.requestFocus();
+
+                return;
+            }
+
+            try {
+
+                controller.signup(
+                        enteredEmail,
+                        enteredPassword
+                );
+
+                if (controller.status_code == 200) {
+
+                    loginStatus.setText(
+                            "Sign up successful. Login to continue."
+                    );
+
+                    password.clear();
+
+                } else if (
+                        controller.status_code == 400) {
+
+                    loginStatus.setText(
+                            "Email already exists. Please login."
+                    );
+
+                } else {
+
+                    loginStatus.setText(
+                            "Sign up failed."
+                    );
+                }
+
+            } catch (Exception ex) {
+
+                ex.printStackTrace();
+
+                loginStatus.setText(
+                        "Unable to create account."
+                );
+            }
+        });
+
+        // =====================================================
         // CREATE ACCOUNT
-        // =========================================================
+        // =====================================================
 
         HBox createAccount =
                 new HBox(6);
@@ -1206,7 +1056,6 @@ if (role.equals("asha")) {
         createAccount.setAlignment(
                 Pos.CENTER
         );
-
 
         Text accountText =
                 new Text(
@@ -1217,7 +1066,6 @@ if (role.equals("asha")) {
                 "-fx-fill: #77778D;" +
                         "-fx-font-size: 14px;"
         );
-
 
         Text createText =
                 new Text(
@@ -1230,28 +1078,32 @@ if (role.equals("asha")) {
                         "-fx-font-weight: bold;"
         );
 
-
         createAccount.getChildren().addAll(
                 accountText,
                 createText
         );
 
-
-        // =========================================================
-        // ADD EVERYTHING TO LOGIN CARD
-        // =========================================================
+        // =====================================================
+        // LOGIN CARD CONTENT
+        // =====================================================
 
         loginCard.getChildren().addAll(
+
                 welcome,
+
                 loginInfo,
 
                 roleTitle,
+
                 roles,
 
-                forgot,
+                selectedRole,
 
                 email,
+
                 password,
+
+                securityCode,
 
                 options,
 
@@ -1259,20 +1111,22 @@ if (role.equals("asha")) {
 
                 or,
 
-                google,
+                signUp,
 
                 createAccount
         );
 
+        // =====================================================
+        // RIGHT SIDE
+        // =====================================================
 
         rightSide.getChildren().add(
                 loginCard
         );
 
-
-        // =========================================================
-        // ROOT LAYOUT
-        // =========================================================
+        // =====================================================
+        // ROOT
+        // =====================================================
 
         root.setLeft(
                 leftSide
@@ -1282,16 +1136,14 @@ if (role.equals("asha")) {
                 rightSide
         );
 
-
         BorderPane.setAlignment(
                 leftSide,
                 Pos.CENTER
         );
 
-
-        // =========================================================
+        // =====================================================
         // SCENE
-        // =========================================================
+        // =====================================================
 
         loginpagScene =
                 new Scene(
@@ -1300,14 +1152,12 @@ if (role.equals("asha")) {
                         scenesettings.rectanguler2d.getHeight()
                 );
 
-
         return loginpagScene;
     }
 
-
-    // =============================================================
-    // FEATURE CREATION
-    // =============================================================
+    // =========================================================
+    // FEATURE
+    // =========================================================
 
     private VBox createFeature(
             String symbol,
@@ -1323,7 +1173,6 @@ if (role.equals("asha")) {
                         "-fx-font-weight: bold;"
         );
 
-
         Text text1 =
                 new Text(line1);
 
@@ -1332,7 +1181,6 @@ if (role.equals("asha")) {
                         "-fx-font-size: 13px;" +
                         "-fx-font-weight: bold;"
         );
-
 
         Text text2 =
                 new Text(line2);
@@ -1343,7 +1191,6 @@ if (role.equals("asha")) {
                         "-fx-font-weight: bold;"
         );
 
-
         VBox box =
                 new VBox(2);
 
@@ -1351,21 +1198,18 @@ if (role.equals("asha")) {
                 Pos.CENTER
         );
 
-
         box.getChildren().addAll(
                 icon,
                 text1,
                 text2
         );
 
-
         return box;
     }
 
-
-    // =============================================================
+    // =========================================================
     // ROLE BUTTON
-    // =============================================================
+    // =========================================================
 
     private Button createRoleButton(
             String text) {
@@ -1373,13 +1217,15 @@ if (role.equals("asha")) {
         Button button =
                 new Button(text);
 
-
         button.setPrefWidth(105);
 
         button.setPrefHeight(100);
 
         button.setWrapText(true);
 
+        button.setTextAlignment(
+                TextAlignment.CENTER
+        );
 
         button.setStyle(
                 "-fx-background-color: white;" +
@@ -1392,7 +1238,6 @@ if (role.equals("asha")) {
                         "-fx-border-width: 1px;" +
                         "-fx-cursor: hand;"
         );
-
 
         button.setOnMouseEntered(e -> {
 
@@ -1409,7 +1254,6 @@ if (role.equals("asha")) {
             );
         });
 
-
         button.setOnMouseExited(e -> {
 
             button.setStyle(
@@ -1424,14 +1268,6 @@ if (role.equals("asha")) {
                             "-fx-cursor: hand;"
             );
         });
-
-
-        button.setWrapText(true);
-
-        button.setTextAlignment(
-                TextAlignment.CENTER
-        );
-
 
         return button;
     }
