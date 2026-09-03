@@ -19,15 +19,15 @@ public class PatientFeedbackPage {
     // COLORS
     // =========================================================
 
-    private static final String PRIMARY = "#9B4DCC";
+        private static final String PRIMARY = "#E84A87";
 
-    private static final String LIGHT_PURPLE = "#F3ECFF";
+        private static final String LIGHT_PURPLE = "#FFE3EE";
 
-    private static final String TEXT = "#24234F";
+        private static final String TEXT = "#3B2140";
 
-    private static final String SECONDARY = "#77778D";
+        private static final String SECONDARY = "#806A78";
 
-    private static final String BORDER = "#E7DCE8";
+        private static final String BORDER = "#F0D8E3";
 
     // =========================================================
     // DATA
@@ -105,7 +105,7 @@ public class PatientFeedbackPage {
         BorderPane root = new BorderPane();
 
         root.setStyle(
-                "-fx-background-color: #FAF8FF;");
+                "-fx-background-color: #FFF9FB;");
 
         // =====================================================
         // HEADER

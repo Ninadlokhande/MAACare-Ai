@@ -23,13 +23,13 @@ public class DoctorAppointmentsPage {
         // =========================================================
 
         private static final String PINK = "#E84A87";
-        private static final String LIGHT_PINK = "#FFEAF3";
-        private static final String PURPLE = "#754CE0";
-        private static final String LIGHT_PURPLE = "#F3ECFF";
-        private static final String DARK_TEXT = "#172554";
-        private static final String SECONDARY = "#64748B";
-        private static final String BORDER = "#E8E8F0";
-        private static final String PAGE_BACKGROUND = "#FAF9FC";
+        private static final String LIGHT_PINK = "#FFF0F6";
+        private static final String PURPLE = "#C5306D";
+        private static final String LIGHT_PURPLE = "#FFE3EE";
+        private static final String DARK_TEXT = "#3B2140";
+        private static final String SECONDARY = "#806A78";
+        private static final String BORDER = "#F0D8E3";
+        private static final String PAGE_BACKGROUND = "#FFF9FB";
 
         // =========================================================
         // TABLE
@@ -148,27 +148,14 @@ public class DoctorAppointmentsPage {
                 // BACK
                 // =====================================================
 
-                Button back = new Button("← Back to Dashboard");
-
-                back.setStyle(
-                                "-fx-background-color: " + LIGHT_PINK + ";"
-                                                + "-fx-text-fill: " + PINK + ";"
-                                                + "-fx-font-weight: bold;"
-                                                + "-fx-background-radius: 8;"
-                                                + "-fx-padding: 10 16 10 16;"
-                                                + "-fx-cursor: hand;");
-
-                back.setOnAction(
-                                e -> DoctorDashboard.showDashboard());
-
                 header.getChildren().addAll(
                                 titleBox,
                                 spacer,
                                 refreshButton,
-                                add,
-                                back);
+                                add);
 
                 root.setTop(header);
+                root.setLeft(DoctorDashboard.createSidebar("Appointments"));
 
                 // =====================================================
                 // FILTER BOX
@@ -248,7 +235,7 @@ public class DoctorAppointmentsPage {
                                 Priority.ALWAYS);
 
                 table.setColumnResizePolicy(
-                                TableView.CONSTRAINED_RESIZE_POLICY);
+                                TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
 
                 table.setStyle(
                                 "-fx-background-color: white;"

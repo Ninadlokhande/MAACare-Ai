@@ -3,7 +3,6 @@ package com.sigma.dao.doctorDao;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QuerySnapshot;
-import com.google.cloud.firestore.SetOptions;
 import com.sigma.model.DoctorModel.FeedbackModel;
 
 import java.util.ArrayList;
@@ -54,6 +53,8 @@ public class FeedbackDAO {
                     .document()
                     .getId();
 
+            String resolvedDoctorUid = resolveDoctorUid(doctorUid);
+
             Map<String, Object> data = new HashMap<>();
 
             data.put(
@@ -62,7 +63,7 @@ public class FeedbackDAO {
 
             data.put(
                     "doctorUid",
-                    doctorUid.trim());
+                    resolvedDoctorUid);
 
             data.put(
                     "patientUid",
@@ -115,7 +116,54 @@ public class FeedbackDAO {
 
             return false;
         }
-    }
+        }
+
+        private String resolveDoctorUid(String doctorValue) {
+
+                                String value = doctorValue == null ? "" : doctorValue.trim();
+
+                                if (value.isEmpty()) {
+                                                return value;
+                                }
+
+                try {
+                        DocumentSnapshot directDocument = db.collection("doctors")
+                                        .document(value)
+                                        .get()
+                                        .get();
+
+                        if (directDocument.exists()) {
+                                return directDocument.getId();
+                        }
+
+                        QuerySnapshot snapshot = db.collection("doctors")
+                                        .get()
+                                        .get();
+
+                        for (DocumentSnapshot document : snapshot.getDocuments()) {
+                                String firstName = safe(document.getString("firstName"));
+                                String lastName = safe(document.getString("lastName"));
+                                String name = safe(document.getString("name"));
+                                String fullName = (firstName + " " + lastName).trim();
+
+                                if (value.equalsIgnoreCase(name)
+                                                || value.equalsIgnoreCase(fullName)
+                                                || value.equalsIgnoreCase(firstName)
+                                                || value.equalsIgnoreCase(document.getString("doctorId"))) {
+                                        return document.getId();
+                                }
+                        }
+                } catch (Exception e) {
+                        System.out.println("[FEEDBACK DAO] Doctor UID resolution failed: "
+                                        + e.getMessage());
+                }
+
+                return value;
+        }
+
+        private String safe(String value) {
+                return value == null ? "" : value.trim();
+        }
 
     // =========================================================
     // GET ALL FEEDBACK FOR DOCTOR

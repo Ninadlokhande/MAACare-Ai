@@ -632,9 +632,6 @@ public class Loginpage {
                                                 Welcomepage.stage.setScene(
                                                                 adminDashboardScene);
 
-                                                Welcomepage.stage.setMaximized(
-                                                                true);
-
                                                 email.clear();
                                                 password.clear();
 
@@ -709,23 +706,12 @@ public class Loginpage {
                                                 // -------------------------------------------------
 
                                                 DoctorDashboard.showDashboard(
+                                                                Welcomepage.stage,
                                                                 doctorUid);
 
                                                 // -------------------------------------------------
                                                 // MAXIMIZE DASHBOARD
                                                 // -------------------------------------------------
-
-                                                if (DoctorDashboard.dashboardStage != null) {
-
-                                                        DoctorDashboard.dashboardStage
-                                                                        .setMaximized(true);
-
-                                                        DoctorDashboard.dashboardStage
-                                                                        .toFront();
-
-                                                        DoctorDashboard.dashboardStage
-                                                                        .requestFocus();
-                                                }
 
                                                 // -------------------------------------------------
                                                 // CLEAR LOGIN

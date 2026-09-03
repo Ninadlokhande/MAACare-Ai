@@ -5,7 +5,6 @@ import com.sigma.controller.doctorController.SettingsController;
 import com.sigma.model.DoctorModel.Settings;
 
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -18,16 +17,15 @@ public class SettingsPage {
         // ================= COLORS =================
 
         private static final String PINK = "#E84A87";
-        private static final String DARK_PINK = "#D93678";
-        private static final String LIGHT_PINK = "#FFEAF3";
+        private static final String DARK_PINK = "#C5306D";
+        private static final String LIGHT_PINK = "#FFF0F6";
 
-        private static final String PURPLE = "#9B4DCC";
-        private static final String LIGHT_PURPLE = "#F3ECFF";
+        private static final String PURPLE = "#E84A87";
+        private static final String LIGHT_PURPLE = "#FFE3EE";
 
-        private static final String TEXT = "#24234F";
-        private static final String SECONDARY = "#77778D";
-        private static final String BORDER = "#E7DCE8";
-        private static final String WHITE = "#FFFFFF";
+        private static final String TEXT = "#3B2140";
+        private static final String SECONDARY = "#806A78";
+        private static final String BORDER = "#F0D8E3";
 
         private final SettingsController controller;
 
@@ -108,7 +106,7 @@ public class SettingsPage {
                 BorderPane root = new BorderPane();
 
                 root.setStyle(
-                                "-fx-background-color: #FAF9FC;");
+                                "-fx-background-color: #FFF9FB;");
 
                 // ================= HEADER =================
 
@@ -127,8 +125,6 @@ public class SettingsPage {
                                                 + BORDER + "; "
                                                 + "-fx-border-width: "
                                                 + "0 0 1 0;");
-
-                Button backButton = createBackButton();
 
                 Label title = new Label("Settings");
 
@@ -154,7 +150,6 @@ public class SettingsPage {
 
                 header.getChildren()
                                 .addAll(
-                                                backButton,
                                                 title,
                                                 subtitle);
 
@@ -227,6 +222,7 @@ public class SettingsPage {
                                                 + "-fx-border-color: transparent;");
 
                 root.setCenter(scrollPane);
+                root.setLeft(DoctorDashboard.createSidebar("Settings"));
 
                 loadSettings();
 
@@ -1304,29 +1300,6 @@ public class SettingsPage {
                                                 + "-fx-font-family: Arial; "
                                                 + "-fx-font-weight: bold; "
                                                 + "-fx-background-radius: 8;");
-
-                return button;
-        }
-
-        // =========================================================
-        // BACK BUTTON
-        // =========================================================
-
-        private Button createBackButton() {
-
-                Button button = new Button(
-                                "← Back to Dashboard");
-
-                button.setStyle(
-                                "-fx-background-color: transparent; "
-                                                + "-fx-text-fill: "
-                                                + PURPLE + "; "
-                                                + "-fx-font-family: Arial; "
-                                                + "-fx-font-weight: bold; "
-                                                + "-fx-font-size: 13px;");
-
-                button.setOnAction(
-                                e -> DoctorDashboard.showDashboard());
 
                 return button;
         }

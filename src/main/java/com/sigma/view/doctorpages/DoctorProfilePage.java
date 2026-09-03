@@ -10,7 +10,6 @@ import com.sigma.controller.doctorController.DoctorProfileController;
 import com.sigma.controller.doctorController.ImageUploadController;
 import com.sigma.model.DoctorModel.DoctorProfileModel;
 
-import javafx.animation.FadeTransition;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -25,7 +24,6 @@ import javafx.scene.control.DatePicker;
 import javafx.stage.FileChooser;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -36,7 +34,6 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -47,19 +44,17 @@ public class DoctorProfilePage {
         // THEME
         // =========================================================
 
-        private static final String BACKGROUND = "#F8F5FF";
-        private static final String WHITE = "#FFFFFF";
+        private static final String BACKGROUND = "#FFF9FB";
 
-        private static final String PURPLE = "#9B4DCC";
-        private static final String DARK_PURPLE = "#7540A8";
-        private static final String LIGHT_PURPLE = "#F3ECFF";
+        private static final String PURPLE = "#E84A87";
+        private static final String LIGHT_PURPLE = "#FFE3EE";
 
         private static final String PINK = "#E84A87";
         private static final String LIGHT_PINK = "#FFEAF3";
 
-        private static final String DARK_TEXT = "#24234F";
-        private static final String SECONDARY_TEXT = "#77778D";
-        private static final String BORDER = "#E7DCE8";
+        private static final String DARK_TEXT = "#3B2140";
+        private static final String SECONDARY_TEXT = "#806A78";
+        private static final String BORDER = "#F0D8E3";
 
         // =========================================================
         // STAGE / FIREBASE
@@ -112,18 +107,18 @@ public class DoctorProfilePage {
         public DoctorProfilePage(Stage dashboardStage, String doctorUid) {
 
                 this.dashboardStage = dashboardStage;
-                this.doctorUid = doctorUid;
+                this.doctorUid = doctorUid == null ? "" : doctorUid.trim();
 
                 this.db = FirebaseConfig.getFirestore();
 
                 this.controller = new DoctorProfileController(
                                 db,
-                                doctorUid);
+                                this.doctorUid);
 
                 this.imageUploadController = new ImageUploadController();
 
                 System.out.println(
-                                "[DOCTOR PROFILE PAGE] UID = " + doctorUid);
+                                "[DOCTOR PROFILE PAGE] UID = " + this.doctorUid);
         }
 
         // =========================================================
@@ -153,6 +148,7 @@ public class DoctorProfilePage {
                 HBox header = createHeader();
 
                 root.setTop(header);
+                root.setLeft(DoctorDashboard.createSidebar("Settings"));
 
                 // =====================================================
                 // CONTENT
@@ -273,26 +269,6 @@ public class DoctorProfilePage {
                                                 "-fx-border-color: " + BORDER + ";" +
                                                 "-fx-border-width: 0 0 1 0;");
 
-                Button backButton = new Button(
-                                "← Back to Dashboard");
-
-                backButton.setStyle(
-                                "-fx-background-color: " + LIGHT_PURPLE + ";" +
-                                                "-fx-text-fill: " + PURPLE + ";" +
-                                                "-fx-font-size: 14px;" +
-                                                "-fx-font-weight: bold;" +
-                                                "-fx-padding: 10px 18px;" +
-                                                "-fx-background-radius: 9px;" +
-                                                "-fx-cursor: hand;");
-
-                backButton.setOnAction(e -> {
-
-                        stopPhotoRefresh();
-
-                        DoctorDashboard.showDashboard();
-
-                });
-
                 Label title = new Label(
                                 "Doctor Profile");
 
@@ -315,7 +291,6 @@ public class DoctorProfilePage {
                                                 "-fx-font-size: 12px;");
 
                 header.getChildren().addAll(
-                                backButton,
                                 title,
                                 spacer,
                                 uidLabel);
@@ -756,7 +731,7 @@ public class DoctorProfilePage {
                 field.setPrefHeight(42);
 
                 field.setStyle(
-                                "-fx-background-color: #FCFAFF;" +
+                                "-fx-background-color: #FFF9FB;" +
                                                 "-fx-border-color: " + BORDER + ";" +
                                                 "-fx-border-radius: 9px;" +
                                                 "-fx-background-radius: 9px;" +
@@ -777,7 +752,7 @@ public class DoctorProfilePage {
                 comboBox.setPrefHeight(42);
 
                 comboBox.setStyle(
-                                "-fx-background-color: #FCFAFF;" +
+                                "-fx-background-color: #FFF9FB;" +
                                                 "-fx-border-color: " + BORDER + ";" +
                                                 "-fx-border-radius: 9px;" +
                                                 "-fx-background-radius: 9px;" +
@@ -794,7 +769,7 @@ public class DoctorProfilePage {
                 datePicker.setPrefHeight(42);
 
                 datePicker.setStyle(
-                                "-fx-background-color: #FCFAFF;" +
+                                "-fx-background-color: #FFF9FB;" +
                                                 "-fx-border-color: " + BORDER + ";" +
                                                 "-fx-border-radius: 9px;" +
                                                 "-fx-background-radius: 9px;" +
@@ -1118,8 +1093,14 @@ public class DoctorProfilePage {
                         protected String call()
                                         throws Exception {
 
+                                String profileUid = doctorUid;
+
+                                if (profileUid == null || profileUid.isEmpty()) {
+                                        return "";
+                                }
+
                                 DocumentSnapshot document = db.collection("doctors")
-                                                .document(doctorUid)
+                                                .document(profileUid)
                                                 .get()
                                                 .get(
                                                                 10,

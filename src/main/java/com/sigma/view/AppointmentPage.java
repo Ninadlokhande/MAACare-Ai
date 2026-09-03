@@ -1,10 +1,8 @@
 package com.sigma.view;
 
 
-import com.sigma.config.FirebaseConfig;
 import com.sigma.model.Appointment;
 
- import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -14,11 +12,12 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.stage.Stage;
 import javafx.collections.transformation.FilteredList;
 import com.sigma.controller.HospitalController.AppointmentController;
+import com.sigma.view.doctorpages.PatientFeedbackPage;
 
 
 
@@ -27,7 +26,6 @@ import com.sigma.controller.HospitalController.AppointmentController;
 public class AppointmentPage{
 
         private final String PINK="#E91E63";
-        private final String LIGHT_PINK="#FFF0F6";
         private final String BORDER="#E8E8EF";
         private final String TEXT="#25253A";
         private final String MUTED="#777789";
@@ -383,7 +381,7 @@ datePicker.valueProperty().addListener(
         table.setPrefHeight(500);
 
         table.setColumnResizePolicy(
-        TableView.CONSTRAINED_RESIZE_POLICY
+        TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN
         );
         
 
@@ -578,12 +576,16 @@ actionCol.setCellFactory(column ->
             private final Button delete =
                     new Button("▢");
 
+            private final Button feedback =
+                    new Button("★");
+
             private final HBox box =
                     new HBox(
                             5,
                             view,
                             edit,
-                            delete
+                            delete,
+                            feedback
                     );
 
             {
@@ -621,6 +623,15 @@ actionCol.setCellFactory(column ->
                         "#FFF0F0",
                         "#D94A5A"
                 );
+
+                styleActionButton(
+                        feedback,
+                        "#FFF0F6",
+                        PINK
+                );
+
+                feedback.setTooltip(
+                        new Tooltip("Give Feedback"));
 
                 // =================================================
                 // VIEW BUTTON
@@ -788,6 +799,24 @@ controller.getAllAppointments()
                                 }
                             });
                 });
+
+                                feedback.setOnAction(e -> {
+
+                                        int index = getIndex();
+
+                                        if (index < 0 || index >= getTableView().getItems().size()) {
+                                                return;
+                                        }
+
+                                        Appointment appointment = getTableView().getItems().get(index);
+                                        Stage feedbackStage = (Stage) feedback.getScene().getWindow();
+
+                                        new PatientFeedbackPage(
+                                                        feedbackStage,
+                                                        appointment.getDoctor(),
+                                                        "",
+                                                        appointment.getPatient()).show();
+                                });
             }
 
             @Override
@@ -1033,17 +1062,6 @@ for (Appointment appointment : data) {
     }
 }
 
-
-          Appointment appointment =
-                    new Appointment(
-                            String.valueOf(nextNumber),
-                            patientField.getText(),
-                            doctorField.getText(),
-                            dateField.getText(),
-                            timeField.getText(),
-                            departmentField.getText(),
-                            statusField.getValue()
-                    );
 
          //   data.add(appointment);
 

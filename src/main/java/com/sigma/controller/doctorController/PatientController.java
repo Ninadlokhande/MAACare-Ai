@@ -19,7 +19,7 @@ public class PatientController {
 
     private static final String COLLECTION = "patients";
 
-    // Default doctor ID for now
+    // Default doctor ID
     private static final String DEFAULT_DOCTOR_ID = "D001";
 
     private final ObservableList<Patient> patients;
@@ -27,6 +27,10 @@ public class PatientController {
     private final Map<Patient, String> documentIds;
 
     private final Firestore firestore;
+
+    // =========================================================
+    // CONSTRUCTOR
+    // =========================================================
 
     public PatientController() {
 
@@ -40,7 +44,7 @@ public class PatientController {
     }
 
     // =========================================================
-    // LOAD PATIENTS FROM FIRESTORE
+    // LOAD PATIENTS
     // =========================================================
 
     public void loadPatients() {
@@ -48,7 +52,10 @@ public class PatientController {
         try {
 
             if (firestore == null) {
-                System.out.println("[PATIENT] Firestore is not initialized.");
+
+                System.out.println(
+                        "[PATIENT] Firestore is not initialized.");
+
                 return;
             }
 
@@ -62,6 +69,7 @@ public class PatientController {
                     .getDocuments();
 
             LocalDate today = LocalDate.now();
+
             LocalDate sevenDaysAgo = today.minusDays(6);
 
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -69,23 +77,37 @@ public class PatientController {
             for (QueryDocumentSnapshot doc : documents) {
 
                 String patientId = getString(doc, "patientId");
+
                 String doctorId = getString(doc, "doctorId");
 
                 String name = getString(doc, "name");
+
                 String age = getString(doc, "age");
+
                 String gender = getString(doc, "gender");
+
                 String contact = getString(doc, "contact");
 
                 String lastVisit = getString(doc, "lastVisit");
+
                 String nextVisit = getString(doc, "nextVisit");
 
                 String createdDate = getString(doc, "createdDate");
 
+                // If patientId is missing
                 if (patientId.isEmpty()) {
+
                     patientId = doc.getId();
                 }
 
+                // If doctorId is missing
+                if (doctorId.isEmpty()) {
+
+                    doctorId = DEFAULT_DOCTOR_ID;
+                }
+
                 Patient patient = new Patient(
+
                         patientId,
                         doctorId,
                         name,
@@ -99,17 +121,21 @@ public class PatientController {
 
                 patients.add(patient);
 
-                documentIds.put(patient, doc.getId());
+                documentIds.put(
+                        patient,
+                        doc.getId());
 
-                // ---------------------------------------------
+                // =================================================
                 // NEW PATIENTS THIS WEEK
-                // ---------------------------------------------
+                // =================================================
 
                 if (!createdDate.isEmpty()) {
 
                     try {
 
-                        LocalDate created = LocalDate.parse(createdDate, formatter);
+                        LocalDate created = LocalDate.parse(
+                                createdDate,
+                                formatter);
 
                         if (!created.isBefore(sevenDaysAgo)
                                 && !created.isAfter(today)) {
@@ -118,7 +144,8 @@ public class PatientController {
                         }
 
                     } catch (Exception ignored) {
-                        // Invalid date will simply be ignored
+
+                        // Ignore invalid date
                     }
                 }
             }
@@ -142,7 +169,7 @@ public class PatientController {
     }
 
     // =========================================================
-    // FIRESTORE FIELD READER
+    // FIRESTORE STRING READER
     // =========================================================
 
     private String getString(
@@ -151,7 +178,7 @@ public class PatientController {
 
         try {
 
-            Object value = doc.get(field);
+            Object value = doc.getData().get(field);
 
             return value == null
                     ? ""
@@ -168,6 +195,7 @@ public class PatientController {
     // =========================================================
 
     public Patient addPatient(
+
             String doctorId,
             String name,
             String age,
@@ -186,21 +214,48 @@ public class PatientController {
                 return null;
             }
 
-            // Default doctor ID
+            // =================================================
+            // DOCTOR ID
+            // =================================================
+
             if (doctorId == null
                     || doctorId.trim().isEmpty()) {
 
                 doctorId = DEFAULT_DOCTOR_ID;
             }
 
-            name = name == null ? "" : name.trim();
-            age = age == null ? "" : age.trim();
-            gender = gender == null ? "" : gender.trim();
-            contact = contact == null ? "" : contact.trim();
-            lastVisit = lastVisit == null ? "" : lastVisit.trim();
-            nextVisit = nextVisit == null ? "" : nextVisit.trim();
+            // =================================================
+            // CLEAN VALUES
+            // =================================================
 
-            // Required fields
+            name = name == null
+                    ? ""
+                    : name.trim();
+
+            age = age == null
+                    ? ""
+                    : age.trim();
+
+            gender = gender == null
+                    ? ""
+                    : gender.trim();
+
+            contact = contact == null
+                    ? ""
+                    : contact.trim();
+
+            lastVisit = lastVisit == null
+                    ? ""
+                    : lastVisit.trim();
+
+            nextVisit = nextVisit == null
+                    ? ""
+                    : nextVisit.trim();
+
+            // =================================================
+            // VALIDATION
+            // =================================================
+
             if (name.isEmpty()
                     || age.isEmpty()
                     || gender.isEmpty()
@@ -212,37 +267,73 @@ public class PatientController {
                 return null;
             }
 
-            // ---------------------------------------------
-            // CREATE FIRESTORE DOCUMENT
-            // ---------------------------------------------
+            // =================================================
+            // CREATE DOCUMENT
+            // =================================================
 
-            DocumentReference docRef = firestore.collection(COLLECTION).document();
+            DocumentReference docRef = firestore.collection(COLLECTION)
+                    .document();
 
             String patientId = docRef.getId();
 
             String createdDate = LocalDate.now().format(
-                    DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+                    DateTimeFormatter.ofPattern(
+                            "yyyy-MM-dd"));
+
+            // =================================================
+            // FIRESTORE DATA
+            // =================================================
 
             Map<String, Object> data = new HashMap<>();
 
-            data.put("patientId", patientId);
-            data.put("doctorId", doctorId);
-            data.put("name", name);
-            data.put("age", age);
-            data.put("gender", gender);
-            data.put("contact", contact);
-            data.put("lastVisit", lastVisit);
-            data.put("nextVisit", nextVisit);
-            data.put("createdDate", createdDate);
+            data.put(
+                    "patientId",
+                    patientId);
 
-            // Save to Firestore
+            data.put(
+                    "doctorId",
+                    doctorId);
+
+            data.put(
+                    "name",
+                    name);
+
+            data.put(
+                    "age",
+                    age);
+
+            data.put(
+                    "gender",
+                    gender);
+
+            data.put(
+                    "contact",
+                    contact);
+
+            data.put(
+                    "lastVisit",
+                    lastVisit);
+
+            data.put(
+                    "nextVisit",
+                    nextVisit);
+
+            data.put(
+                    "createdDate",
+                    createdDate);
+
+            // =================================================
+            // SAVE FIRESTORE
+            // =================================================
+
             docRef.set(data).get();
 
-            // ---------------------------------------------
-            // CREATE LOCAL PATIENT OBJECT
-            // ---------------------------------------------
+            // =================================================
+            // LOCAL OBJECT
+            // =================================================
 
             Patient patient = new Patient(
+
                     patientId,
                     doctorId,
                     name,
@@ -254,14 +345,12 @@ public class PatientController {
                     "",
                     createdDate);
 
-            // Add to observable list
             patients.add(patient);
 
             documentIds.put(
                     patient,
                     patientId);
 
-            // New patient this week
             newPatientsThisWeek.add(patient);
 
             System.out.println(
@@ -282,12 +371,11 @@ public class PatientController {
     }
 
     // =========================================================
-    // SIMPLE ADD PATIENT METHOD
+    // SIMPLE ADD PATIENT
     // =========================================================
-    // This method avoids getDefaultDoctorId() error.
-    // AddPatientPage can directly use this method.
 
     public Patient addPatient(
+
             String name,
             String age,
             String gender,
@@ -296,7 +384,9 @@ public class PatientController {
             String nextVisit) {
 
         return addPatient(
+
                 DEFAULT_DOCTOR_ID,
+
                 name,
                 age,
                 gender,
@@ -306,17 +396,20 @@ public class PatientController {
     }
 
     // =========================================================
-    // OPTIONAL SIMPLE VERSION
+    // OPTIONAL ADD PATIENT
     // =========================================================
 
     public Patient addPatient(
+
             String name,
             String age,
             String gender,
             String contact) {
 
         return addPatient(
+
                 DEFAULT_DOCTOR_ID,
+
                 name,
                 age,
                 gender,
@@ -326,7 +419,7 @@ public class PatientController {
     }
 
     // =========================================================
-    // REFRESH PATIENTS
+    // REFRESH
     // =========================================================
 
     public void refreshPatients() {
@@ -335,7 +428,7 @@ public class PatientController {
     }
 
     // =========================================================
-    // GET ALL PATIENTS
+    // GET PATIENTS
     // =========================================================
 
     public ObservableList<Patient> getPatients() {
@@ -344,7 +437,7 @@ public class PatientController {
     }
 
     // =========================================================
-    // GET NEW PATIENTS THIS WEEK
+    // NEW PATIENTS THIS WEEK
     // =========================================================
 
     public ObservableList<Patient> getNewPatientsThisWeek() {
@@ -358,7 +451,7 @@ public class PatientController {
     }
 
     // =========================================================
-    // TOTAL PATIENT COUNT
+    // PATIENT COUNT
     // =========================================================
 
     public int getPatientCount() {
@@ -367,11 +460,10 @@ public class PatientController {
     }
 
     // =========================================================
-    // SEARCH PATIENTS
+    // SEARCH
     // =========================================================
 
-    public ObservableList<Patient> searchPatients(
-            String keyword) {
+    public ObservableList<Patient> searchPatients(String keyword) {
 
         ObservableList<Patient> result = FXCollections.observableArrayList();
 
@@ -379,6 +471,7 @@ public class PatientController {
                 || keyword.trim().isEmpty()) {
 
             result.addAll(patients);
+
             return result;
         }
 
@@ -386,21 +479,22 @@ public class PatientController {
 
         for (Patient patient : patients) {
 
-            if (patient.getName()
-                    .toLowerCase()
-                    .contains(search)
+            String patientName = safe(patient.getName())
+                    .toLowerCase();
 
-                    || patient.getContact()
-                            .toLowerCase()
-                            .contains(search)
+            String patientContact = safe(patient.getContact())
+                    .toLowerCase();
 
-                    || patient.getAge()
-                            .toLowerCase()
-                            .contains(search)
+            String patientAge = safe(patient.getAge())
+                    .toLowerCase();
 
-                    || patient.getGender()
-                            .toLowerCase()
-                            .contains(search)) {
+            String patientGender = safe(patient.getGender())
+                    .toLowerCase();
+
+            if (patientName.contains(search)
+                    || patientContact.contains(search)
+                    || patientAge.contains(search)
+                    || patientGender.contains(search)) {
 
                 result.add(patient);
             }
@@ -413,23 +507,23 @@ public class PatientController {
     // FILTER BY GENDER
     // =========================================================
 
-    public ObservableList<Patient> filterByGender(
-            String gender) {
+    public ObservableList<Patient> filterByGender(String gender) {
 
         ObservableList<Patient> result = FXCollections.observableArrayList();
 
         if (gender == null
-                || gender.equalsIgnoreCase("All")
-                || gender.trim().isEmpty()) {
+                || gender.trim().isEmpty()
+                || gender.equalsIgnoreCase("All")) {
 
             result.addAll(patients);
+
             return result;
         }
 
         for (Patient patient : patients) {
 
             if (gender.equalsIgnoreCase(
-                    patient.getGender())) {
+                    safe(patient.getGender()))) {
 
                 result.add(patient);
             }
@@ -452,8 +546,9 @@ public class PatientController {
                 "[PATIENT] View patient: "
                         + patient.getName());
 
-        // Your existing PatientDetails page
-        // can be opened from here.
+        /*
+         * PatientDetails page can be connected here.
+         */
     }
 
     // =========================================================
@@ -470,15 +565,67 @@ public class PatientController {
                 "[PATIENT] Edit patient: "
                         + patient.getName());
 
-        // Edit functionality can be connected
-        // to Firestore update later.
+        /*
+         * Edit functionality can be connected here.
+         */
     }
 
     // =========================================================
     // DELETE PATIENT
     // =========================================================
 
-    public boolean deletePatient(Patient patient) {
+        public boolean updatePatient(
+                        Patient patient,
+                        String name,
+                        String age,
+                        String gender,
+                        String contact,
+                        String lastVisit,
+                        String nextVisit) {
+
+                try {
+                        if (firestore == null || patient == null) {
+                                return false;
+                        }
+
+                        String documentId = documentIds.get(patient);
+                        if (documentId == null || documentId.isEmpty()) {
+                                documentId = patient.getPatientId();
+                        }
+                        if (documentId == null || documentId.isEmpty()) {
+                                return false;
+                        }
+
+                        Map<String, Object> data = new HashMap<>();
+                        data.put("name", name);
+                        data.put("age", age);
+                        data.put("gender", gender);
+                        data.put("contact", contact);
+                        data.put("lastVisit", lastVisit);
+                        data.put("nextVisit", nextVisit);
+
+                        firestore.collection(COLLECTION)
+                                        .document(documentId)
+                                        .update(data)
+                                        .get();
+
+                        patient.setName(name);
+                        patient.setAge(age);
+                        patient.setGender(gender);
+                        patient.setContact(contact);
+                        patient.setLastVisit(lastVisit);
+                        patient.setNextVisit(nextVisit);
+                        return true;
+
+                } catch (Exception e) {
+                        System.out.println("[PATIENT ERROR] Unable to update patient.");
+                        e.printStackTrace();
+                        return false;
+                }
+        }
+
+        public boolean deletePatient(
+            Patient patient) {
 
         try {
 
@@ -502,15 +649,16 @@ public class PatientController {
                 return false;
             }
 
-            // Delete from Firestore
             firestore.collection(COLLECTION)
                     .document(documentId)
                     .delete()
                     .get();
 
-            // Delete from local list
             patients.remove(patient);
-            newPatientsThisWeek.remove(patient);
+
+            newPatientsThisWeek.remove(
+                    patient);
+
             documentIds.remove(patient);
 
             System.out.println(
@@ -537,5 +685,16 @@ public class PatientController {
     public String getDefaultDoctorId() {
 
         return DEFAULT_DOCTOR_ID;
+    }
+
+    // =========================================================
+    // SAFE
+    // =========================================================
+
+    private String safe(String value) {
+
+        return value == null
+                ? ""
+                : value;
     }
 }

@@ -481,7 +481,9 @@ public class DoctorProfileDAO {
                         DocumentSnapshot document,
                         String field) {
 
-                String value = document.getString(field);
+                Map<String, Object> data = document.getData();
+                Object rawValue = data == null ? null : data.get(field);
+                String value = rawValue == null ? null : String.valueOf(rawValue);
 
                 return value == null
                                 ? ""
