@@ -1,5 +1,6 @@
 package com.sigma.view;
 
+import com.sigma.config.DoctorModule.FirebaseConfig;
 import com.sigma.controller.Controller;
 import com.sigma.view.adminpages.AdminDashboard;
 import com.sigma.view.doctorpages.DoctorDashboard;
@@ -28,13 +29,13 @@ import java.util.prefs.Preferences;
 public class Loginpage {
         public BorderPane loginroot ;
 
-    // =========================================================
-    // FIELDS
-    // =========================================================
+        // =============================================================
+        // FIELDS
+        // =============================================================
 
-    private Scene loginpagScene;
+        private Scene loginpagScene;
 
-    private String role = "";
+        public String role = "";
 
     private final Controller controller = new Controller();
 
@@ -54,316 +55,254 @@ public class Loginpage {
     private static final String PREF_PASSWORD = "login_password";
     private static final String PREF_ROLE = "login_role";
 
-    // Admin security code
-    private static final String ADMIN_SECURITY_CODE = "12345";
+        // =============================================================
+        // LOGIN PAGE
+        // =============================================================
 
-    // =========================================================
-    // LOGIN PAGE
-    // =========================================================
+        public Scene gotologinpage() {
 
-    public Scene gotologinpage() {
-
-        // =====================================================
-        // ROOT
-        // =====================================================
+                // =========================================================
+                // ROOT
+                // =========================================================
 
         BorderPane root = new BorderPane();
 
 
-        root.setStyle(
-                "-fx-background-color: linear-gradient(" +
-                        "to bottom right, " +
-                        "#FFFFFF 0%, " +
-                        "#FFF4F8 50%, " +
-                        "#F1E8FF 100%" +
-                        ");"
-        );
+                root.setStyle(
+                                "-fx-background-color: linear-gradient(" +
+                                                "to bottom right, " +
+                                                "#FFFFFF 0%, " +
+                                                "#FFF4F8 50%, " +
+                                                "#F1E8FF 100%" +
+                                                ");");
 
-        // =====================================================
-        // LEFT SIDE
-        // =====================================================
+                // =========================================================
+                // LEFT SIDE
+                // =========================================================
 
-        VBox leftSide = new VBox(18);
+                VBox leftSide = new VBox(18);
 
-        leftSide.setAlignment(Pos.CENTER);
+                leftSide.setAlignment(Pos.CENTER);
 
-        leftSide.setPadding(
-                new Insets(40, 50, 40, 60)
-        );
+                leftSide.setPadding(
+                                new Insets(40, 50, 40, 60));
 
-        leftSide.setPrefWidth(550);
+                leftSide.setPrefWidth(550);
 
-        // =====================================================
-        // LOGO
-        // =====================================================
+                // =========================================================
+                // LOGO
+                // =========================================================
 
-        String IMAGE_PATH =
-                "file:Maacare-Ai\\src\\main\\resources\\assets\\images\\logo\\logo.png";
+                String IMAGE_PATH = "file:Maacare-Ai\\src\\main\\resources\\assets\\images\\logo\\logo.png";
 
-        Image logoImage = new Image(IMAGE_PATH);
+                Image logoImage = new Image(IMAGE_PATH);
 
-        ImageView logoView =
-                new ImageView(logoImage);
+                ImageView logoView = new ImageView(logoImage);
 
-        logoView.setPreserveRatio(true);
-        logoView.setSmooth(true);
+                logoView.setPreserveRatio(true);
+                logoView.setSmooth(true);
 
-        logoView.fitWidthProperty().bind(
-                leftSide.widthProperty().multiply(0.75)
-        );
+                logoView.fitWidthProperty().bind(
+                                leftSide.widthProperty().multiply(0.75));
 
-        // =====================================================
-        // STATUS
-        // =====================================================
+                // =========================================================
+                // LOGIN STATUS
+                // =========================================================
 
-        Text loginStatus = new Text("");
+                Text logininfo = new Text("");
 
-        loginStatus.setStyle(
-                "-fx-fill: #D82F82;" +
-                        "-fx-font-size: 15px;" +
-                        "-fx-font-weight: bold;"
-        );
+                logininfo.setStyle(
+                                "-fx-fill: #13CEE3;" +
+                                                "-fx-font-size: 16px;" +
+                                                "-fx-font-weight: bold;");
 
-        loginStatus.setWrappingWidth(430);
+                // =========================================================
+                // TITLE
+                // =========================================================
 
-        // =====================================================
-        // BRAND
-        // =====================================================
+                Text brandName = new Text("MaaCare AI");
 
-        Text brandName =
-                new Text("MaaCare AI");
+                brandName.setStyle(
+                                "-fx-fill: linear-gradient(to right, #E84A87, #9B4DCC);" +
+                                                "-fx-font-size: 48px;" +
+                                                "-fx-font-weight: bold;");
 
-        brandName.setStyle(
-                "-fx-fill: #9B4DCC;" +
-                        "-fx-font-size: 48px;" +
-                        "-fx-font-weight: bold;"
-        );
+                // =========================================================
+                // TAGLINE
+                // =========================================================
 
-        Text tagline =
-                new Text(
-                        "Care for Mom. Care for Baby. Care for Life."
-                );
+                Text tagline1 = new Text(
+                                "Care for Mom. Care for Baby. Care for Life.");
 
-        tagline.setStyle(
-                "-fx-fill: #24234F;" +
-                        "-fx-font-size: 16px;" +
-                        "-fx-font-weight: bold;"
-        );
+                tagline1.setStyle(
+                                "-fx-fill: #24234F;" +
+                                                "-fx-font-size: 16px;" +
+                                                "-fx-font-weight: bold;");
 
-        // =====================================================
-        // DESCRIPTION
-        // =====================================================
+                // =========================================================
+                // DESCRIPTION
+                // =========================================================
 
-        Text description1 =
-                new Text(
-                        "Your AI-Powered Companion for"
-                );
+                Text description1 = new Text(
+                                "Your AI-Powered Companion for");
 
-        description1.setStyle(
-                "-fx-fill: #24234F;" +
-                        "-fx-font-size: 20px;" +
-                        "-fx-font-weight: bold;"
-        );
+                description1.setStyle(
+                                "-fx-fill: #24234F;" +
+                                                "-fx-font-size: 20px;" +
+                                                "-fx-font-weight: bold;");
 
-        Text description2 =
-                new Text(
-                        " Mother & Child"
-                );
+                Text descriptionPink = new Text(
+                                " Mother & Child");
 
-        description2.setStyle(
-                "-fx-fill: #E84A87;" +
-                        "-fx-font-size: 20px;" +
-                        "-fx-font-weight: bold;"
-        );
+                descriptionPink.setStyle(
+                                "-fx-fill: #E84A87;" +
+                                                "-fx-font-size: 20px;" +
+                                                "-fx-font-weight: bold;");
 
-        Text description3 =
-                new Text(
-                        " Healthcare"
-                );
+                Text description2 = new Text(
+                                " Healthcare");
 
-        description3.setStyle(
-                "-fx-fill: #24234F;" +
-                        "-fx-font-size: 20px;" +
-                        "-fx-font-weight: bold;"
-        );
+                description2.setStyle(
+                                "-fx-fill: #24234F;" +
+                                                "-fx-font-size: 20px;" +
+                                                "-fx-font-weight: bold;");
 
-        HBox description =
-                new HBox(
-                        description1,
-                        description2,
-                        description3
-                );
+                HBox description = new HBox(
+                                description1,
+                                descriptionPink,
+                                description2);
 
-        description.setAlignment(
-                Pos.CENTER
-        );
+                description.setAlignment(Pos.CENTER);
 
-        // =====================================================
-        // INFO
-        // =====================================================
+                // =========================================================
+                // INFO
+                // =========================================================
 
-        Text info =
-                new Text(
-                        "Track. Monitor. Get AI Guidance."
-                );
+                Text info = new Text(
+                                "Track. Monitor. Get AI Guidance.");
 
-        info.setStyle(
-                "-fx-fill: #666680;" +
-                        "-fx-font-size: 16px;"
-        );
+                info.setStyle(
+                                "-fx-fill: #666680;" +
+                                                "-fx-font-size: 16px;");
 
-        Text smallInfo =
-                new Text(
-                        "Because every mom and baby deserves the best care."
-                );
+                Text smallInfo = new Text(
+                                "Because every mom and baby deserves the best care.");
 
-        smallInfo.setStyle(
-                "-fx-fill: #77778D;" +
-                        "-fx-font-size: 14px;"
-        );
+                smallInfo.setStyle(
+                                "-fx-fill: #77778D;" +
+                                                "-fx-font-size: 14px;");
 
-        // =====================================================
-        // FEATURES
-        // =====================================================
+                // =========================================================
+                // FEATURES
+                // =========================================================
 
-        HBox features =
-                new HBox(25);
+                HBox features = new HBox(25);
 
-        features.setAlignment(
-                Pos.CENTER
-        );
+                features.setAlignment(Pos.CENTER);
 
-        features.setPadding(
-                new Insets(20, 0, 0, 0)
-        );
+                features.setPadding(
+                                new Insets(20, 0, 0, 0));
 
-        features.getChildren().addAll(
+                features.getChildren().addAll(
 
-                createFeature(
-                        "♥",
-                        "Pregnancy",
-                        "Tracking"
-                ),
+                                createFeature(
+                                                "♥",
+                                                "Pregnancy",
+                                                "Tracking"),
 
-                createFeature(
-                        "✚",
-                        "Health",
-                        "Records"
-                ),
+                                createFeature(
+                                                "✚",
+                                                "Health",
+                                                "Records"),
 
-                createFeature(
-                        "✦",
-                        "AI Health",
-                        "Assistant"
-                ),
+                                createFeature(
+                                                "✦",
+                                                "AI Health",
+                                                "Assistant"),
 
-                createFeature(
-                        "▣",
-                        "Doctor &",
-                        "Hospital"
-                )
-        );
+                                createFeature(
+                                                "▣",
+                                                "Doctor &",
+                                                "Hospital"),
 
-        leftSide.getChildren().addAll(
-                logoView,
-                brandName,
-                tagline,
-                description,
-                info,
-                smallInfo,
-                features,
-                loginStatus
-        );
+                                createFeature(
+                                                "✚",
+                                                "Emergency",
+                                                "Support"));
 
-        // =====================================================
-        // RIGHT SIDE
-        // =====================================================
+                leftSide.getChildren().addAll(
+                                logoView,
+                                brandName,
+                                tagline1,
+                                description,
+                                info,
+                                smallInfo,
+                                features,
+                                logininfo);
 
-        StackPane rightSide =
-                new StackPane();
+                // =========================================================
+                // RIGHT SIDE
+                // =========================================================
 
-        rightSide.setPadding(
-                new Insets(
-                        40,
-                        70,
-                        40,
-                        40
-                )
-        );
+                StackPane rightSide = new StackPane();
 
-        // =====================================================
-        // LOGIN CARD
-        // =====================================================
+                rightSide.setPadding(
+                                new Insets(40, 70, 40, 40));
 
-        VBox loginCard =
-                new VBox(18);
+                // =========================================================
+                // LOGIN CARD
+                // =========================================================
 
-        loginCard.setAlignment(
-                Pos.TOP_CENTER
-        );
+                VBox loginCard = new VBox(18);
 
-        loginCard.setPadding(
-                new Insets(
-                        35,
-                        40,
-                        30,
-                        40
-                )
-        );
+                loginCard.setAlignment(Pos.TOP_CENTER);
 
-        loginCard.setMaxWidth(800);
-        loginCard.setMaxHeight(850);
+                loginCard.setPadding(
+                                new Insets(35, 40, 30, 40));
 
-        loginCard.setStyle(
-                "-fx-background-color: rgba(255,255,255,0.94);" +
-                        "-fx-background-radius: 25px;" +
-                        "-fx-border-color: rgba(220,200,230,0.45);" +
-                        "-fx-border-width: 1px;" +
-                        "-fx-border-radius: 25px;"
-        );
+                loginCard.setMaxWidth(800);
 
-        // =====================================================
-        // HEADING
-        // =====================================================
+                loginCard.setMaxHeight(850);
 
-        Text welcome =
-                new Text(
-                        "Welcome Back!"
-                );
+                loginCard.setStyle(
+                                "-fx-background-color: rgba(255,255,255,0.94);" +
+                                                "-fx-background-radius: 25px;" +
+                                                "-fx-border-color: rgba(220,200,230,0.45);" +
+                                                "-fx-border-width: 1px;" +
+                                                "-fx-border-radius: 25px;");
 
-        welcome.setStyle(
-                "-fx-fill: #24234F;" +
-                        "-fx-font-size: 32px;" +
-                        "-fx-font-weight: bold;"
-        );
+                // =========================================================
+                // HEADING
+                // =========================================================
 
-        Text loginInfo =
-                new Text(
-                        "Login to your MaaCare AI account"
-                );
+                Text welcome = new Text(
+                                "Welcome Back!");
 
-        loginInfo.setStyle(
-                "-fx-fill: #666680;" +
-                        "-fx-font-size: 16px;"
-        );
+                welcome.setStyle(
+                                "-fx-fill: #24234F;" +
+                                                "-fx-font-size: 32px;" +
+                                                "-fx-font-weight: bold;");
 
-        // =====================================================
-        // ROLE TITLE
-        // =====================================================
+                Text loginInfo = new Text(
+                                "Login to your MaaCare AI account");
 
-        Text roleTitle =
-                new Text(
-                        "Select Your Role"
-                );
+                loginInfo.setStyle(
+                                "-fx-fill: #666680;" +
+                                                "-fx-font-size: 16px;");
 
-        roleTitle.setStyle(
-                "-fx-fill: #7B3FC6;" +
-                        "-fx-font-size: 19px;" +
-                        "-fx-font-weight: bold;"
-        );
+                // =========================================================
+                // ROLE
+                // =========================================================
 
-        Text selectedRole =
-                new Text("");
+                Text roleTitle = new Text(
+                                "Select Your Role");
+
+                roleTitle.setStyle(
+                                "-fx-fill: #7B3FC6;" +
+                                                "-fx-font-size: 19px;" +
+                                                "-fx-font-weight: bold;");
+
+                Text forgot = new Text("");
 
         selectedRole.setStyle(
                 "-fx-fill: #D82F82;" +
@@ -586,9 +525,9 @@ public class Loginpage {
                         "🤱\nMother\nFamily"
                 );
 
-        mother.setOnAction(e -> {
+                mother.setOnAction(e -> {
 
-            role = "mother";
+                        role = "mother";
 
             selectedRole.setText(
                     "Role : Mother"
@@ -608,22 +547,19 @@ public class Loginpage {
             }
         });
 
-        // =====================================================
-        // DOCTOR
-        // =====================================================
+                // =========================================================
+                // DOCTOR
+                // =========================================================
 
-        Button doctor =
-                createRoleButton(
-                        "🧑‍⚕️\nDoctor"
-                );
+                Button doctor = createRoleButton(
+                                "🧑‍⚕️\nDoctor");
 
-        doctor.setOnAction(e -> {
+                doctor.setOnAction(e -> {
 
-            role = "doctor";
+                        role = "doctor";
 
-            selectedRole.setText(
-                    "Role : Doctor"
-            );
+                        forgot.setText(
+                                        "Role : Doctor");
 
             securityCode.clear();
             securityCode.setVisible(false);
@@ -639,18 +575,16 @@ public class Loginpage {
             }
         });
 
-        // =====================================================
-        // HOSPITAL
-        // =====================================================
+                // =========================================================
+                // HOSPITAL
+                // =========================================================
 
-        Button hospital =
-                createRoleButton(
-                        "🏥\nHospital"
-                );
+                Button hospital = createRoleButton(
+                                "🏥\nHospital");
 
-        hospital.setOnAction(e -> {
+                hospital.setOnAction(e -> {
 
-            role = "hospital";
+                        role = "hospital";
 
             selectedRole.setText(
                     "Role : Hospital"
@@ -679,9 +613,9 @@ public class Loginpage {
                         "👩\nASHA Worker"
                 );
 
-        asha.setOnAction(e -> {
+                asha.setOnAction(e -> {
 
-            role = "asha";
+                        role = "asha";
 
             selectedRole.setText(
                     "Role : ASHA Worker"
@@ -710,9 +644,9 @@ public class Loginpage {
                         "🧑‍💻\nAdmin"
                 );
 
-        admin.setOnAction(e -> {
+                admin.setOnAction(e -> {
 
-            role = "admin";
+                        role = "admin";
 
             selectedRole.setText(
                     "Role : Admin"
@@ -736,40 +670,33 @@ public class Loginpage {
         // ADD ROLE BUTTONS
         // =====================================================
 
-        roles.getChildren().addAll(
-                mother,
-                doctor,
-                hospital,
-                asha,
-                admin
-        );
+                roles.getChildren().addAll(
+                                mother,
+                                doctor,
+                                hospital,
+                                asha,
+                                ambulance,
+                                admin);
 
-        // =====================================================
-        // LOGIN BUTTON
-        // =====================================================
+                // =========================================================
+                // EMAIL
+                // =========================================================
 
-        Button login =
-                new Button(
-                        "🔒   Login"
-                );
+                TextField email = new TextField();
 
-        login.setMaxWidth(
-                Double.MAX_VALUE
-        );
+                email.setPromptText(
+                                "Email / Phone Number");
 
-        login.setPrefHeight(55);
+                email.setPrefHeight(55);
 
-        login.setStyle(
-                "-fx-background-color: linear-gradient(" +
-                        "to right, #F54B87, #9B4DCC" +
-                        ");" +
-                        "-fx-text-fill: white;" +
-                        "-fx-font-size: 17px;" +
-                        "-fx-font-weight: bold;" +
-                        "-fx-background-radius: 12px;" +
-                        "-fx-border-radius: 12px;" +
-                        "-fx-cursor: hand;"
-        );
+                email.setStyle(
+                                "-fx-background-color: white;" +
+                                                "-fx-border-color: #DDD9E6;" +
+                                                "-fx-border-width: 1px;" +
+                                                "-fx-border-radius: 12px;" +
+                                                "-fx-background-radius: 12px;" +
+                                                "-fx-font-size: 16px;" +
+                                                "-fx-padding: 0 18px;");
 
         // =====================================================
         // LOGIN ACTION
@@ -1089,36 +1016,45 @@ public class Loginpage {
 
                     password.clear();
 
-                } else if (
-                        controller.status_code == 400) {
+                                } else {
 
-                    loginStatus.setText(
-                            "Email already exists. Please login."
-                    );
+                                        String error = controller.getLastError();
 
-                } else {
+                                        logininfo.setText(
+                                                        error == null ||
+                                                                        error.isBlank()
+                                                                                        ? "Sign up failed."
+                                                                                        : error);
+                                }
 
-                    loginStatus.setText(
-                            "Sign up failed."
-                    );
-                }
+                        } else {
 
-            } catch (Exception ex) {
+                                logininfo.setText(
+                                                "Select role and enter email/password");
+                        }
+                });
 
-                ex.printStackTrace();
+                google.setMaxWidth(
+                                Double.MAX_VALUE);
 
-                loginStatus.setText(
-                        "Unable to create account."
-                );
-            }
-        });
+                google.setPrefHeight(52);
 
-        // =====================================================
-        // CREATE ACCOUNT
-        // =====================================================
+                google.setStyle(
+                                "-fx-background-color: white;" +
+                                                "-fx-text-fill: #49308C;" +
+                                                "-fx-font-size: 16px;" +
+                                                "-fx-font-weight: bold;" +
+                                                "-fx-border-color: #9B4DCC;" +
+                                                "-fx-border-width: 1px;" +
+                                                "-fx-border-radius: 12px;" +
+                                                "-fx-background-radius: 12px;" +
+                                                "-fx-cursor: hand;");
 
-        HBox createAccount =
-                new HBox(6);
+                // =========================================================
+                // CREATE ACCOUNT
+                // =========================================================
+
+                HBox createAccount = new HBox(6);
 
         createAccountBox = createAccount;
 
@@ -1131,21 +1067,17 @@ public class Loginpage {
                         "Don't have an account?"
                 );
 
-        accountText.setStyle(
-                "-fx-fill: #77778D;" +
-                        "-fx-font-size: 14px;"
-        );
+                accountText.setStyle(
+                                "-fx-fill: #77778D;" +
+                                                "-fx-font-size: 14px;");
 
-        Text createText =
-                new Text(
-                        " Sign up"
-                );
+                Text createText = new Text(
+                                " Sign up");
 
-        createText.setStyle(
-                "-fx-fill: #D82F82;" +
-                        "-fx-font-size: 14px;" +
-                        "-fx-font-weight: bold;"
-        );
+                createText.setStyle(
+                                "-fx-fill: #D82F82;" +
+                                                "-fx-font-size: 14px;" +
+                                                "-fx-font-weight: bold;");
 
         createAccount.getChildren().addAll(
                 accountText,
@@ -1169,59 +1101,46 @@ public class Loginpage {
         // LOGIN CARD CONTENT
         // =====================================================
 
-        loginCard.getChildren().addAll(
+                loginCard.getChildren().addAll(
 
-                welcome,
+                                welcome,
+                                loginInfo,
 
-                loginInfo,
+                                roleTitle,
+                                roles,
 
-                roleTitle,
-
-                roles,
-
-                selectedRole,
+                                forgot,
 
                 email,
 
                 passwordBox,
 
-                securityCode,
+                                forgotPassword,
 
-                options,
+                                options,
 
-                login,
+                                login,
 
-                or,
+                                or,
 
-                signUp,
+                                google,
 
-                createAccount
-        );
+                                createAccount);
 
-        // =====================================================
-        // RIGHT SIDE
-        // =====================================================
+                rightSide.getChildren()
+                                .add(loginCard);
 
-        rightSide.getChildren().add(
-                loginCard
-        );
+                // =========================================================
+                // ROOT
+                // =========================================================
 
-        // =====================================================
-        // ROOT
-        // =====================================================
+                root.setLeft(leftSide);
 
-        root.setLeft(
-                leftSide
-        );
+                root.setCenter(rightSide);
 
-        root.setCenter(
-                rightSide
-        );
-
-        BorderPane.setAlignment(
-                leftSide,
-                Pos.CENTER
-        );
+                BorderPane.setAlignment(
+                                leftSide,
+                                Pos.CENTER);
 
         // =====================================================
         // SCENE
@@ -1406,119 +1325,103 @@ public class Loginpage {
         }
     }
 
-    // =========================================================
-    // FEATURE
-    // =========================================================
+        // =============================================================
+        // FEATURE CREATION
+        // =============================================================
 
-    private VBox createFeature(
-            String symbol,
-            String line1,
-            String line2) {
+        private VBox createFeature(
+                        String symbol,
+                        String line1,
+                        String line2) {
 
-        Text icon =
-                new Text(symbol);
+                Text icon = new Text(symbol);
 
-        icon.setStyle(
-                "-fx-fill: #E84A87;" +
-                        "-fx-font-size: 25px;" +
-                        "-fx-font-weight: bold;"
-        );
+                icon.setStyle(
+                                "-fx-fill: #E84A87;" +
+                                                "-fx-font-size: 25px;" +
+                                                "-fx-font-weight: bold;");
 
-        Text text1 =
-                new Text(line1);
+                Text text1 = new Text(line1);
 
-        text1.setStyle(
-                "-fx-fill: #24234F;" +
-                        "-fx-font-size: 13px;" +
-                        "-fx-font-weight: bold;"
-        );
+                text1.setStyle(
+                                "-fx-fill: #24234F;" +
+                                                "-fx-font-size: 13px;" +
+                                                "-fx-font-weight: bold;");
 
-        Text text2 =
-                new Text(line2);
+                Text text2 = new Text(line2);
 
-        text2.setStyle(
-                "-fx-fill: #24234F;" +
-                        "-fx-font-size: 13px;" +
-                        "-fx-font-weight: bold;"
-        );
+                text2.setStyle(
+                                "-fx-fill: #24234F;" +
+                                                "-fx-font-size: 13px;" +
+                                                "-fx-font-weight: bold;");
 
-        VBox box =
-                new VBox(2);
+                VBox box = new VBox(2);
 
-        box.setAlignment(
-                Pos.CENTER
-        );
+                box.setAlignment(
+                                Pos.CENTER);
 
-        box.getChildren().addAll(
-                icon,
-                text1,
-                text2
-        );
+                box.getChildren()
+                                .addAll(
+                                                icon,
+                                                text1,
+                                                text2);
 
-        return box;
-    }
+                return box;
+        }
 
-    // =========================================================
-    // ROLE BUTTON
-    // =========================================================
+        // =============================================================
+        // ROLE BUTTON
+        // =============================================================
 
-    private Button createRoleButton(
-            String text) {
+        private Button createRoleButton(
+                        String text) {
 
-        Button button =
-                new Button(text);
+                Button button = new Button(text);
 
-        button.setPrefWidth(105);
+                button.setPrefWidth(105);
 
-        button.setPrefHeight(100);
+                button.setPrefHeight(100);
 
-        button.setWrapText(true);
+                button.setWrapText(true);
 
-        button.setTextAlignment(
-                TextAlignment.CENTER
-        );
+                button.setStyle(
+                                "-fx-background-color: white;" +
+                                                "-fx-text-fill: #24234F;" +
+                                                "-fx-font-size: 13px;" +
+                                                "-fx-font-weight: bold;" +
+                                                "-fx-background-radius: 12px;" +
+                                                "-fx-border-color: #E2DFEA;" +
+                                                "-fx-border-radius: 12px;" +
+                                                "-fx-border-width: 1px;" +
+                                                "-fx-cursor: hand;");
 
-        button.setStyle(
-                "-fx-background-color: white;" +
-                        "-fx-text-fill: #24234F;" +
-                        "-fx-font-size: 13px;" +
-                        "-fx-font-weight: bold;" +
-                        "-fx-background-radius: 12px;" +
-                        "-fx-border-color: #E2DFEA;" +
-                        "-fx-border-radius: 12px;" +
-                        "-fx-border-width: 1px;" +
-                        "-fx-cursor: hand;"
-        );
+                button.setOnMouseEntered(e -> {
 
-        button.setOnMouseEntered(e -> {
+                        button.setStyle(
+                                        "-fx-background-color: #FFF0F6;" +
+                                                        "-fx-text-fill: #C92F78;" +
+                                                        "-fx-font-size: 13px;" +
+                                                        "-fx-font-weight: bold;" +
+                                                        "-fx-background-radius: 12px;" +
+                                                        "-fx-border-color: #F54B87;" +
+                                                        "-fx-border-radius: 12px;" +
+                                                        "-fx-border-width: 2px;" +
+                                                        "-fx-cursor: hand;");
+                });
 
-            button.setStyle(
-                    "-fx-background-color: #FFF0F6;" +
-                            "-fx-text-fill: #C92F78;" +
-                            "-fx-font-size: 13px;" +
-                            "-fx-font-weight: bold;" +
-                            "-fx-background-radius: 12px;" +
-                            "-fx-border-color: #F54B87;" +
-                            "-fx-border-radius: 12px;" +
-                            "-fx-border-width: 2px;" +
-                            "-fx-cursor: hand;"
-            );
-        });
+                button.setOnMouseExited(e -> {
 
-        button.setOnMouseExited(e -> {
-
-            button.setStyle(
-                    "-fx-background-color: white;" +
-                            "-fx-text-fill: #24234F;" +
-                            "-fx-font-size: 13px;" +
-                            "-fx-font-weight: bold;" +
-                            "-fx-background-radius: 12px;" +
-                            "-fx-border-color: #E2DFEA;" +
-                            "-fx-border-radius: 12px;" +
-                            "-fx-border-width: 1px;" +
-                            "-fx-cursor: hand;"
-            );
-        });
+                        button.setStyle(
+                                        "-fx-background-color: white;" +
+                                                        "-fx-text-fill: #24234F;" +
+                                                        "-fx-font-size: 13px;" +
+                                                        "-fx-font-weight: bold;" +
+                                                        "-fx-background-radius: 12px;" +
+                                                        "-fx-border-color: #E2DFEA;" +
+                                                        "-fx-border-radius: 12px;" +
+                                                        "-fx-border-width: 1px;" +
+                                                        "-fx-cursor: hand;");
+                });
 
         return button;
     }

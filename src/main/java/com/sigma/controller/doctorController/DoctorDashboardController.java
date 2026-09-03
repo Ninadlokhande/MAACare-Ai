@@ -1,86 +1,79 @@
 package com.sigma.controller.doctorController;
 
+import com.sigma.dao.doctorDao.DoctorDashboardDAO;
+import com.sigma.model.DoctorModel.DoctorDashboardModel;
+
 public class DoctorDashboardController {
 
-    // =====================================================
-    // DASHBOARD DATA
-    // =====================================================
+    private final DoctorDashboardDAO dashboardDAO;
 
-    public int getTodayAppointments() {
-        return 18;
+    public DoctorDashboardController() {
+        dashboardDAO = new DoctorDashboardDAO();
+
+        System.out.println("[DOCTOR CONTROLLER] Controller initialized");
     }
 
-    public int getNewPatientsThisWeek() {
-        return 6;
+    // =========================================================
+    // GET DASHBOARD DATA
+    // =========================================================
+
+    public DoctorDashboardModel getDashboardData() {
+
+        try {
+
+            DoctorDashboardModel data = dashboardDAO.getDashboardData();
+
+            System.out.println(
+                    "[DOCTOR CONTROLLER] Dashboard data loaded");
+
+            return data;
+
+        } catch (Exception e) {
+
+            System.out.println(
+                    "[DOCTOR CONTROLLER] Failed to load dashboard data");
+
+            e.printStackTrace();
+
+            return null;
+        }
     }
 
-    public int getReportsThisWeek() {
-        return 32;
-    }
-
-    public double getAverageRating() {
-        return 4.8;
-    }
-
-    // =====================================================
+    // =========================================================
     // DASHBOARD ACTIONS
-    // =====================================================
+    // =========================================================
 
     public void addAppointment() {
 
         System.out.println(
-                "Opening Add Appointment...");
-
-        // Later:
-        // DoctorAppointmentsPage.show();
+                "[DOCTOR] Opening Add Appointment...");
     }
 
     public void addPatient() {
 
         System.out.println(
-                "Opening Add Patient...");
-
-        // Later:
-        // PatientsPage.show();
+                "[DOCTOR] Opening Add Patient...");
     }
 
     public void writePrescription() {
 
         System.out.println(
-                "Opening Prescription...");
-
-        // Later:
-        // PrescriptionPage.show();
+                "[DOCTOR] Opening Prescription...");
     }
 
     public void uploadReport() {
 
         System.out.println(
-                "Opening Upload Report...");
-
-        // Later:
-        // PatientReportsPage.show();
+                "[DOCTOR] Opening Upload Report...");
     }
 
     public void sendMessage() {
 
         System.out.println(
-                "Opening Messages...");
-
-        // Later:
-        // MessagesPage.show();
+                "[DOCTOR] Opening Messages...");
     }
 
-    // =====================================================
-    // LOGOUT
-    // =====================================================
-
-    public void logout() {
-
-        System.out.println(
-                "Doctor logged out.");
-
-        // Later:
-        // LoginPage.show();
-    }
+    // =========================================================
+    // LOGOUT REMOVED
+    // =========================================================
 }

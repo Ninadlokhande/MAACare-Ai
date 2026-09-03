@@ -1,7 +1,7 @@
+
 package com.sigma.view;
 
 import com.sigma.view.adminpages.AdminDashboard;
-import com.sigma.view.trial.ImageUplaodTrial;
 
 import javafx.animation.FadeTransition;
 import javafx.animation.Interpolator;
@@ -34,19 +34,27 @@ import javafx.util.Duration;
 
 public class Welcomepage extends Application {
 
-    public static String Stage;
+    // =========================================================
+    // COMMON STAGE
+    // =========================================================
 
-    private Scene testingScene;
     public static Stage stage;
+
     private Scene scene;
 
     private SVGPath wave1;
     private SVGPath wave2;
 
+    // =========================================================
+    // START
+    // =========================================================
+
     @Override
     public void start(Stage primaryStage) {
 
         stage = primaryStage;
+
+        primaryStage.setTitle("MaaCare AI");
 
         primaryStage.setMinWidth(1000);
         primaryStage.setMinHeight(650);
@@ -59,13 +67,12 @@ public class Welcomepage extends Application {
         StackPane root = new StackPane();
 
         root.setStyle(
-            "-fx-background-color: linear-gradient(" +
-            "to bottom right, " +
-            "#FFFFFF 0%, " +
-            "#FFF4F8 50%, " +
-            "#F0E7FF 100%" +
-            ");"
-        );
+                "-fx-background-color: linear-gradient(" +
+                        "to bottom right, " +
+                        "#FFFFFF 0%, " +
+                        "#FFF4F8 50%, " +
+                        "#F0E7FF 100%" +
+                        ");");
 
         // =========================================================
         // BACKGROUND GLOW 1
@@ -74,33 +81,27 @@ public class Welcomepage extends Application {
         Circle glow1 = new Circle();
 
         glow1.radiusProperty().bind(
-            root.heightProperty().multiply(0.30)
-        );
+                root.heightProperty().multiply(0.30));
 
         glow1.setFill(
-            new RadialGradient(
-                0,
-                0,
-                0.5,
-                0.5,
-                1,
-                true,
-                CycleMethod.NO_CYCLE,
-                new Stop(
-                    0,
-                    Color.web("#FFD1E3", 0.55)
-                ),
-                new Stop(
-                    1,
-                    Color.TRANSPARENT
-                )
-            )
-        );
+                new RadialGradient(
+                        0,
+                        0,
+                        0.5,
+                        0.5,
+                        1,
+                        true,
+                        CycleMethod.NO_CYCLE,
+                        new Stop(
+                                0,
+                                Color.web("#FFD1E3", 0.55)),
+                        new Stop(
+                                1,
+                                Color.TRANSPARENT)));
 
         StackPane.setAlignment(
-            glow1,
-            Pos.TOP_LEFT
-        );
+                glow1,
+                Pos.TOP_LEFT);
 
         // =========================================================
         // BACKGROUND GLOW 2
@@ -109,33 +110,27 @@ public class Welcomepage extends Application {
         Circle glow2 = new Circle();
 
         glow2.radiusProperty().bind(
-            root.heightProperty().multiply(0.25)
-        );
+                root.heightProperty().multiply(0.25));
 
         glow2.setFill(
-            new RadialGradient(
-                0,
-                0,
-                0.5,
-                0.5,
-                1,
-                true,
-                CycleMethod.NO_CYCLE,
-                new Stop(
-                    0,
-                    Color.web("#DCCBFF", 0.50)
-                ),
-                new Stop(
-                    1,
-                    Color.TRANSPARENT
-                )
-            )
-        );
+                new RadialGradient(
+                        0,
+                        0,
+                        0.5,
+                        0.5,
+                        1,
+                        true,
+                        CycleMethod.NO_CYCLE,
+                        new Stop(
+                                0,
+                                Color.web("#DCCBFF", 0.50)),
+                        new Stop(
+                                1,
+                                Color.TRANSPARENT)));
 
         StackPane.setAlignment(
-            glow2,
-            Pos.BOTTOM_RIGHT
-        );
+                glow2,
+                Pos.BOTTOM_RIGHT);
 
         // =========================================================
         // WAVE 1
@@ -144,27 +139,22 @@ public class Welcomepage extends Application {
         wave1 = new SVGPath();
 
         wave1.setFill(
-            new LinearGradient(
-                0,
-                0,
-                1,
-                0,
-                true,
-                CycleMethod.NO_CYCLE,
-                new Stop(
-                    0,
-                    Color.web("#F54B87", 0.40)
-                ),
-                new Stop(
-                    0.5,
-                    Color.web("#E78BC0", 0.30)
-                ),
-                new Stop(
-                    1,
-                    Color.web("#9B4DCC", 0.40)
-                )
-            )
-        );
+                new LinearGradient(
+                        0,
+                        0,
+                        1,
+                        0,
+                        true,
+                        CycleMethod.NO_CYCLE,
+                        new Stop(
+                                0,
+                                Color.web("#F54B87", 0.40)),
+                        new Stop(
+                                0.5,
+                                Color.web("#E78BC0", 0.30)),
+                        new Stop(
+                                1,
+                                Color.web("#9B4DCC", 0.40))));
 
         // =========================================================
         // WAVE 2
@@ -173,27 +163,22 @@ public class Welcomepage extends Application {
         wave2 = new SVGPath();
 
         wave2.setFill(
-            new LinearGradient(
-                0,
-                0,
-                1,
-                0,
-                true,
-                CycleMethod.NO_CYCLE,
-                new Stop(
-                    0,
-                    Color.web("#FFB5D0", 0.30)
-                ),
-                new Stop(
-                    0.5,
-                    Color.web("#E4B8F0", 0.25)
-                ),
-                new Stop(
-                    1,
-                    Color.web("#B99BEA", 0.30)
-                )
-            )
-        );
+                new LinearGradient(
+                        0,
+                        0,
+                        1,
+                        0,
+                        true,
+                        CycleMethod.NO_CYCLE,
+                        new Stop(
+                                0,
+                                Color.web("#FFB5D0", 0.30)),
+                        new Stop(
+                                0.5,
+                                Color.web("#E4B8F0", 0.25)),
+                        new Stop(
+                                1,
+                                Color.web("#B99BEA", 0.30))));
 
         // =========================================================
         // MAIN BORDERPANE
@@ -202,149 +187,111 @@ public class Welcomepage extends Application {
         BorderPane borderPane = new BorderPane();
 
         borderPane.setPadding(
-            new Insets(
-                30,
-                60,
-                30,
-                60
-            )
-        );
+                new Insets(
+                        30,
+                        60,
+                        30,
+                        60));
 
         // =========================================================
         // LOGO
         // =========================================================
 
-        var logoResource =
-            getClass().getResource(
-                "/assets/images/logo/logo.png"
-            );
+        var logoResource = getClass().getResource(
+                "/assets/images/logo/logo.png");
 
         if (logoResource == null) {
 
             System.out.println(
-                "ERROR: logo.png not found!"
-            );
+                    "ERROR: logo.png not found!");
 
             return;
         }
 
-        Image logoImage =
-            new Image(
-                logoResource.toExternalForm()
-            );
+        Image logoImage = new Image(
+                logoResource.toExternalForm());
 
-        ImageView logoView =
-            new ImageView(logoImage);
+        ImageView logoView = new ImageView(logoImage);
 
         logoView.setPreserveRatio(true);
         logoView.setSmooth(true);
 
-        // RESPONSIVE LOGO SIZE
-
         logoView.fitHeightProperty().bind(
-            root.heightProperty().multiply(0.30)
-        );
+                root.heightProperty().multiply(0.30));
 
         // =========================================================
         // GET STARTED BUTTON
         // =========================================================
 
-        Button GetStartedbtn =
-            new Button(" Get Started");
+        Button getStartedBtn = new Button(" Get Started");
 
-        GetStartedbtn.setStyle(
-            "-fx-background-color: linear-gradient(to right, #F54B87, #9B4DCC);" +
-            "-fx-text-fill: white;" +
-            "-fx-font-weight: bold;" +
-            "-fx-font-size: 17px;" +
-            "-fx-padding: 14px 45px;" +
-            "-fx-background-radius: 30px;" +
-            "-fx-border-radius: 30px;" +
-            "-fx-cursor: hand;"
-        );
+        getStartedBtn.setStyle(
+                "-fx-background-color: linear-gradient(to right, #F54B87, #9B4DCC);" +
+                        "-fx-text-fill: white;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-font-size: 17px;" +
+                        "-fx-padding: 14px 45px;" +
+                        "-fx-background-radius: 30px;" +
+                        "-fx-border-radius: 30px;" +
+                        "-fx-cursor: hand;");
 
         // =========================================================
         // BUTTON HOVER
         // =========================================================
 
-        GetStartedbtn.setOnMouseEntered(e ->
-            GetStartedbtn.setStyle(
+        getStartedBtn.setOnMouseEntered(e -> getStartedBtn.setStyle(
                 "-fx-background-color: linear-gradient(to right, #E83F7C, #8B42BD);" +
-                "-fx-text-fill: white;" +
-                "-fx-font-weight: bold;" +
-                "-fx-font-size: 17px;" +
-                "-fx-padding: 14px 45px;" +
-                "-fx-background-radius: 30px;" +
-                "-fx-border-radius: 30px;" +
-                "-fx-cursor: hand;"
-            )
-        );
+                        "-fx-text-fill: white;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-font-size: 17px;" +
+                        "-fx-padding: 14px 45px;" +
+                        "-fx-background-radius: 30px;" +
+                        "-fx-border-radius: 30px;" +
+                        "-fx-cursor: hand;"));
 
-        GetStartedbtn.setOnMouseExited(e ->
-            GetStartedbtn.setStyle(
+        getStartedBtn.setOnMouseExited(e -> getStartedBtn.setStyle(
                 "-fx-background-color: linear-gradient(to right, #F54B87, #9B4DCC);" +
-                "-fx-text-fill: white;" +
-                "-fx-font-weight: bold;" +
-                "-fx-font-size: 17px;" +
-                "-fx-padding: 14px 45px;" +
-                "-fx-background-radius: 30px;" +
-                "-fx-border-radius: 30px;" +
-                "-fx-cursor: hand;"
-            )
-        );
+                        "-fx-text-fill: white;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-font-size: 17px;" +
+                        "-fx-padding: 14px 45px;" +
+                        "-fx-background-radius: 30px;" +
+                        "-fx-border-radius: 30px;" +
+                        "-fx-cursor: hand;"));
 
         // =========================================================
         // GET STARTED ACTION
         // =========================================================
-        //
-        // WelcomePage is only responsible for opening the next
-        // Scene.
-        //
-        // AdminDashboard creates its own BorderPane and Scene.
-        //
-        // =========================================================
 
-        GetStartedbtn.setOnAction(e -> {
+        getStartedBtn.setOnAction(e -> {
 
             try {
 
                 System.out.println(
-                    "[WELCOME] Opening Login page ."
-                );
+                        "[WELCOME] Opening Login page...");
 
-                AdminDashboard adminDashboard =
-                    new AdminDashboard();
                 Loginpage loginpage = new Loginpage();
+
                 Scene loginScene = loginpage.gotologinpage();
 
-                /*
-                 * AdminDashboard creates its own Scene.
-                 */
-                Scene adminScene =
-                    adminDashboard.gotoAdminDashboard();
+                if (loginScene != null) {
 
-                /*
-                 * Replace the WelcomePage Scene.
-                 */
-                primaryStage.setScene(
-                    loginScene
-                );
+                    primaryStage.setScene(
+                            loginScene);
 
-                primaryStage.setMaximized(
-                    true
-                );
+                    primaryStage.setMaximized(
+                            true);
 
-                primaryStage.show();
+                    primaryStage.show();
 
-                System.out.println(
-                    "[WELCOME] Admin Dashboard opened successfully."
-                );
+                    System.out.println(
+                            "[WELCOME] Login page opened successfully.");
+                }
 
             } catch (Exception ex) {
 
                 System.out.println(
-                    "[WELCOME] Failed to open Admin Dashboard."
-                );
+                        "[WELCOME] Failed to open Login page.");
 
                 ex.printStackTrace();
             }
@@ -354,178 +301,144 @@ public class Welcomepage extends Application {
         // LOGO SHADOW
         // =========================================================
 
-        DropShadow logoShadow =
-            new DropShadow();
+        DropShadow logoShadow = new DropShadow();
 
         logoShadow.setRadius(25);
         logoShadow.setSpread(0.08);
         logoShadow.setOffsetY(8);
 
         logoShadow.setColor(
-            Color.web(
-                "#C94C91",
-                0.22
-            )
-        );
+                Color.web(
+                        "#C94C91",
+                        0.22));
 
         logoView.setEffect(
-            logoShadow
-        );
+                logoShadow);
 
         // =========================================================
         // MAIN TEXT
         // =========================================================
 
-        Text text1 =
-            new Text("");
+        Text text1 = new Text("");
 
         text1.setStyle(
-            "-fx-fill: #24234F;" +
-            "-fx-font-weight: bold;" +
-            "-fx-font-size: 20px;"
-        );
+                "-fx-fill: #24234F;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-font-size: 20px;");
 
-        Text pinkText =
-            new Text(
-                "Smart Care for Every Mother & Baby"
-            );
+        Text pinkText = new Text(
+                "Smart Care for Every Mother & Baby");
 
         pinkText.setStyle(
-            "-fx-fill: #E84A87;" +
-            "-fx-font-weight: bold;" +
-            "-fx-font-size: 36px;"
-        );
+                "-fx-fill: #E84A87;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-font-size: 36px;");
 
-        Text text2 =
-            new Text("");
+        Text text2 = new Text("");
 
         text2.setStyle(
-            "-fx-fill: #24234F;" +
-            "-fx-font-weight: bold;" +
-            "-fx-font-size: 20px;"
-        );
+                "-fx-fill: #24234F;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-font-size: 20px;");
 
-        TextFlow annotation =
-            new TextFlow(
+        TextFlow annotation = new TextFlow(
                 text1,
                 pinkText,
-                text2
-            );
+                text2);
 
         annotation.setTextAlignment(
-            TextAlignment.CENTER
-        );
+                TextAlignment.CENTER);
 
         annotation.setMaxWidth(
-            700
-        );
+                700);
 
         // =========================================================
         // EXTRA INFORMATION
         // =========================================================
 
-        Text extraInfo =
-            new Text(
-                "Track Pregnency . AI Heath Assistant . Hospital Booking ."
-            );
+        Text extraInfo = new Text(
+                "Track Pregnancy . AI Health Assistant . Hospital Booking .");
 
         extraInfo.setStyle(
-            "-fx-fill: #666680;" +
-            "-fx-font-size: 20px;" +
-            "-fx-font-weight: normal;"
-        );
+                "-fx-fill: #666680;" +
+                        "-fx-font-size: 20px;" +
+                        "-fx-font-weight: normal;");
 
-        Text smallInfo =
-            new Text(
-                "Mother Care . Baby Care . Goverment Schemes"
-            );
+        Text smallInfo = new Text(
+                "Mother Care . Baby Care . Government Schemes");
 
         smallInfo.setStyle(
-            "-fx-fill: #77778D;" +
-            "-fx-font-size: 20px;"
-        );
+                "-fx-fill: #77778D;" +
+                        "-fx-font-size: 20px;");
 
         // =========================================================
         // CONTENT BOX
         // =========================================================
 
-        VBox logoSideBox =
-            new VBox(
+        VBox logoSideBox = new VBox(
                 14,
                 logoView,
                 annotation,
                 extraInfo,
                 smallInfo,
-                GetStartedbtn
-            );
+                getStartedBtn);
 
         logoSideBox.setAlignment(
-            Pos.CENTER
-        );
+                Pos.CENTER);
 
         logoSideBox.setPadding(
-            new Insets(20)
-        );
+                new Insets(20));
 
         logoSideBox.setMaxWidth(
-            750
-        );
+                750);
 
         logoSideBox.setMaxHeight(
-            Double.MAX_VALUE
-        );
+                Double.MAX_VALUE);
 
         // =========================================================
         // RESPONSIVE SPACING
         // =========================================================
 
         logoSideBox.spacingProperty().bind(
-            root.heightProperty().multiply(0.018)
-        );
+                root.heightProperty().multiply(0.018));
 
         // =========================================================
-        // PUT CONTENT IN CENTER
+        // CENTER CONTENT
         // =========================================================
 
         borderPane.setCenter(
-            logoSideBox
-        );
+                logoSideBox);
 
         // =========================================================
         // ADD BACKGROUND + CONTENT
         // =========================================================
 
         root.getChildren().addAll(
-            glow1,
-            glow2,
-            wave1,
-            wave2,
-            borderPane
-        );
+                glow1,
+                glow2,
+                wave1,
+                wave2,
+                borderPane);
 
         // =========================================================
         // RESPONSIVE WAVES
         // =========================================================
 
         root.widthProperty().addListener(
-            (observable, oldValue, newValue) -> {
+                (observable, oldValue, newValue) -> {
 
-                updateWaves(
-                    newValue.doubleValue(),
-                    root.getHeight()
-                );
-            }
-        );
+                    updateWaves(
+                            newValue.doubleValue(),
+                            root.getHeight());
+                });
 
         root.heightProperty().addListener(
-            (observable, oldValue, newValue) -> {
+                (observable, oldValue, newValue) -> {
 
-                updateWaves(
-                    root.getWidth(),
-                    newValue.doubleValue()
-                );
-            }
-        );
+                    updateWaves(
+                            root.getWidth(),
+                            newValue.doubleValue());
+                });
 
         // =========================================================
         // LOGO INTRO ANIMATION
@@ -536,20 +449,16 @@ public class Welcomepage extends Application {
         logoView.setScaleX(0.75);
         logoView.setScaleY(0.75);
 
-        FadeTransition logoFade =
-            new FadeTransition(
+        FadeTransition logoFade = new FadeTransition(
                 Duration.seconds(1.3),
-                logoView
-            );
+                logoView);
 
         logoFade.setFromValue(0);
         logoFade.setToValue(1);
 
-        ScaleTransition logoScale =
-            new ScaleTransition(
+        ScaleTransition logoScale = new ScaleTransition(
                 Duration.seconds(1.3),
-                logoView
-            );
+                logoView);
 
         logoScale.setFromX(0.75);
         logoScale.setFromY(0.75);
@@ -558,24 +467,19 @@ public class Welcomepage extends Application {
         logoScale.setToY(1);
 
         logoScale.setInterpolator(
-            Interpolator.EASE_OUT
-        );
+                Interpolator.EASE_OUT);
 
-        ParallelTransition logoIntro =
-            new ParallelTransition(
+        ParallelTransition logoIntro = new ParallelTransition(
                 logoFade,
-                logoScale
-            );
+                logoScale);
 
         // =========================================================
-        // FLOATING LOGO ANIMATION
+        // FLOATING LOGO
         // =========================================================
 
-        TranslateTransition floating =
-            new TranslateTransition(
+        TranslateTransition floating = new TranslateTransition(
                 Duration.seconds(3),
-                logoView
-            );
+                logoView);
 
         floating.setFromY(0);
         floating.setToY(-10);
@@ -583,16 +487,13 @@ public class Welcomepage extends Application {
         floating.setAutoReverse(true);
 
         floating.setCycleCount(
-            TranslateTransition.INDEFINITE
-        );
+                TranslateTransition.INDEFINITE);
 
         floating.setInterpolator(
-            Interpolator.EASE_BOTH
-        );
+                Interpolator.EASE_BOTH);
 
         logoIntro.setOnFinished(
-            event -> floating.play()
-        );
+                event -> floating.play());
 
         logoIntro.play();
 
@@ -604,29 +505,23 @@ public class Welcomepage extends Application {
         extraInfo.setOpacity(0);
         smallInfo.setOpacity(0);
 
-        FadeTransition annotationFade =
-            new FadeTransition(
+        FadeTransition annotationFade = new FadeTransition(
                 Duration.seconds(0.9),
-                annotation
-            );
+                annotation);
 
         annotationFade.setFromValue(0);
         annotationFade.setToValue(1);
 
-        FadeTransition infoFade =
-            new FadeTransition(
+        FadeTransition infoFade = new FadeTransition(
                 Duration.seconds(0.9),
-                extraInfo
-            );
+                extraInfo);
 
         infoFade.setFromValue(0);
         infoFade.setToValue(1);
 
-        FadeTransition smallFade =
-            new FadeTransition(
+        FadeTransition smallFade = new FadeTransition(
                 Duration.seconds(0.9),
-                smallInfo
-            );
+                smallInfo);
 
         smallFade.setFromValue(0);
         smallFade.setToValue(1);
@@ -635,32 +530,26 @@ public class Welcomepage extends Application {
         // TEXT DELAY
         // =========================================================
 
-        javafx.animation.PauseTransition delay =
-            new javafx.animation.PauseTransition(
-                Duration.seconds(0.8)
-            );
+        javafx.animation.PauseTransition delay = new javafx.animation.PauseTransition(
+                Duration.seconds(0.8));
 
         delay.setOnFinished(
-            event -> {
+                event -> {
 
-                annotationFade.play();
+                    annotationFade.play();
 
-                javafx.animation.PauseTransition delay2 =
-                    new javafx.animation.PauseTransition(
-                        Duration.seconds(0.25)
-                    );
+                    javafx.animation.PauseTransition delay2 = new javafx.animation.PauseTransition(
+                            Duration.seconds(0.25));
 
-                delay2.setOnFinished(
-                    event2 -> {
+                    delay2.setOnFinished(
+                            event2 -> {
 
-                        infoFade.play();
-                        smallFade.play();
-                    }
-                );
+                                infoFade.play();
+                                smallFade.play();
+                            });
 
-                delay2.play();
-            }
-        );
+                    delay2.play();
+                });
 
         delay.play();
 
@@ -668,18 +557,17 @@ public class Welcomepage extends Application {
         // WELCOME PAGE SCENE
         // =========================================================
 
-        Scene sc =
-            new Scene(
+        Scene sc = new Scene(
                 root,
                 scenesettings.rectanguler2d.getWidth(),
-                scenesettings.rectanguler2d.getHeight()
-            );
+                scenesettings.rectanguler2d.getHeight());
+
+        scene = sc;
 
         stage.setScene(sc);
 
         stage.setTitle(
-            "MaaCare AI"
-        );
+                "MaaCare AI");
 
         // =========================================================
         // WINDOW SETTINGS
@@ -689,8 +577,6 @@ public class Welcomepage extends Application {
         stage.setMinHeight(800);
         stage.setMaximized(true);
 
-        scene = sc;
-
         stage.show();
 
         // =========================================================
@@ -698,9 +584,67 @@ public class Welcomepage extends Application {
         // =========================================================
 
         updateWaves(
-            root.getWidth(),
-            root.getHeight()
-        );
+                root.getWidth(),
+                root.getHeight());
+    }
+
+    // =============================================================
+    // SHOW WELCOME PAGE
+    // =============================================================
+
+    public static void show() {
+
+        try {
+
+            // -----------------------------------------------------
+            // If common stage already exists
+            // -----------------------------------------------------
+
+            if (stage != null) {
+
+                /*
+                 * New WelcomePage scene तयार करण्यासाठी
+                 * start() पुन्हा call केला आहे.
+                 *
+                 * त्यामुळे:
+                 * Doctor Dashboard
+                 * ↓
+                 * Logout
+                 * ↓
+                 * Welcome Page
+                 */
+
+                Welcomepage welcomePage = new Welcomepage();
+
+                welcomePage.start(stage);
+
+                stage.setTitle(
+                        "MaaCare AI");
+
+                stage.setMaximized(true);
+
+                stage.show();
+
+                return;
+            }
+
+            // -----------------------------------------------------
+            // If stage does not exist
+            // -----------------------------------------------------
+
+            Stage newStage = new Stage();
+
+            Welcomepage welcomePage = new Welcomepage();
+
+            welcomePage.start(newStage);
+
+        } catch (Exception ex) {
+
+            System.out.println(
+                    "[WELCOME] Failed to show Welcome Page.");
+
+            ex.printStackTrace();
+        }
     }
 
     // =============================================================
@@ -711,10 +655,8 @@ public class Welcomepage extends Application {
             double width,
             double height) {
 
-        if (
-            width <= 0 ||
-            height <= 0
-        ) {
+        if (width <= 0 ||
+                height <= 0) {
             return;
         }
 
@@ -722,104 +664,100 @@ public class Welcomepage extends Application {
         // WAVE 1
         // =========================================================
 
-        double startY1 =
-            height * 0.77;
+        double startY1 = height * 0.77;
 
         wave1.setContent(
-            "M 0 " +
-            startY1 +
+                "M 0 " +
+                        startY1 +
 
-            " C " +
-            (width * 0.16) +
-            " " +
-            (height * 0.65) +
+                        " C " +
+                        (width * 0.16) +
+                        " " +
+                        (height * 0.65) +
 
-            ", " +
-            (width * 0.30) +
-            " " +
-            (height * 0.88) +
+                        ", " +
+                        (width * 0.30) +
+                        " " +
+                        (height * 0.88) +
 
-            ", " +
-            (width * 0.50) +
-            " " +
-            (height * 0.73) +
+                        ", " +
+                        (width * 0.50) +
+                        " " +
+                        (height * 0.73) +
 
-            " C " +
-            (width * 0.67) +
-            " " +
-            (height * 0.60) +
+                        " C " +
+                        (width * 0.67) +
+                        " " +
+                        (height * 0.60) +
 
-            ", " +
-            (width * 0.83) +
-            " " +
-            (height * 0.84) +
+                        ", " +
+                        (width * 0.83) +
+                        " " +
+                        (height * 0.84) +
 
-            ", " +
-            width +
-            " " +
-            (height * 0.69) +
+                        ", " +
+                        width +
+                        " " +
+                        (height * 0.69) +
 
-            " L " +
-            width +
-            " " +
-            height +
+                        " L " +
+                        width +
+                        " " +
+                        height +
 
-            " L 0 " +
-            height +
+                        " L 0 " +
+                        height +
 
-            " Z"
-        );
+                        " Z");
 
         // =========================================================
         // WAVE 2
         // =========================================================
 
-        double startY2 =
-            height * 0.82;
+        double startY2 = height * 0.82;
 
         wave2.setContent(
-            "M 0 " +
-            startY2 +
+                "M 0 " +
+                        startY2 +
 
-            " C " +
-            (width * 0.18) +
-            " " +
-            (height * 0.72) +
+                        " C " +
+                        (width * 0.18) +
+                        " " +
+                        (height * 0.72) +
 
-            ", " +
-            (width * 0.34) +
-            " " +
-            (height * 0.91) +
+                        ", " +
+                        (width * 0.34) +
+                        " " +
+                        (height * 0.91) +
 
-            ", " +
-            (width * 0.53) +
-            " " +
-            (height * 0.78) +
+                        ", " +
+                        (width * 0.53) +
+                        " " +
+                        (height * 0.78) +
 
-            " C " +
-            (width * 0.70) +
-            " " +
-            (height * 0.66) +
+                        " C " +
+                        (width * 0.70) +
+                        " " +
+                        (height * 0.66) +
 
-            ", " +
-            (width * 0.86) +
-            " " +
-            (height * 0.88) +
+                        ", " +
+                        (width * 0.86) +
+                        " " +
+                        (height * 0.88) +
 
-            ", " +
-            width +
-            " " +
-            (height * 0.75) +
+                        ", " +
+                        width +
+                        " " +
+                        (height * 0.75) +
 
-            " L " +
-            width +
-            " " +
-            height +
+                        " L " +
+                        width +
+                        " " +
+                        height +
 
-            " L 0 " +
-            height +
+                        " L 0 " +
+                        height +
 
-            " Z"
-        );
+                        " Z");
     }
 }

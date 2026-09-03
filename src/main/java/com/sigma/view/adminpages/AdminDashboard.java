@@ -843,7 +843,7 @@ public class AdminDashboard {
         VBox usersCard =
             createStatCard(
                 "Total Users",
-                "12,450",
+                "124",
                 "+12.5% this month"
             );
 
@@ -851,7 +851,7 @@ public class AdminDashboard {
         VBox doctorsCard =
             createStatCard(
                 "Doctors",
-                "184",
+                "57",
                 "+8.3% this month"
             );
 
@@ -859,7 +859,7 @@ public class AdminDashboard {
         VBox hospitalsCard =
             createStatCard(
                 "Hospitals",
-                "42",
+                "35",
                 "+5.2% this month"
             );
 
