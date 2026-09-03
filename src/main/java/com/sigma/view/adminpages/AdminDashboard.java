@@ -1,5 +1,6 @@
 package com.sigma.view.adminpages;
-
+import com.sigma.view.Loginpage;
+import com.sigma.view.Welcomepage;
 import com.sigma.view.scenesettings;
 
 import javafx.geometry.Insets;
@@ -73,7 +74,7 @@ public class AdminDashboard {
     private BorderPane root;
 
     private Scene adminDashboardScene;
-
+    private Scene loginpageScene = new Loginpage().gotologinpage();
 
     // =========================================================
     // DASHBOARD CENTER
@@ -115,6 +116,8 @@ public class AdminDashboard {
     private Node profileRoot;
 
     private Node settingsRoot;
+    
+
 
 
     // =========================================================
@@ -276,9 +279,17 @@ public class AdminDashboard {
         );
 
 
+
         // =====================================================
         // SIDEBAR BUTTONS
         // =====================================================
+
+        Button Logout =
+            createSideButton(
+                "↩",
+                "Logout",
+                true
+            );
 
         Button dashboard =
             createSideButton(
@@ -344,7 +355,9 @@ public class AdminDashboard {
 
             profile,
 
-            settings
+            settings,
+
+            Logout
         };
 
 
@@ -539,6 +552,24 @@ public class AdminDashboard {
         });
 
 
+        Logout.setOnAction(e -> {
+
+    System.out.println("[ADMIN] Logging out...");
+
+    // Return to the real Login Scene.
+    // Do not place the login root inside the Admin Dashboard center,
+    // otherwise the Admin sidebar remains visible.
+    if (Welcomepage.stage != null) {
+
+        Welcomepage.stage.setScene(loginpageScene);
+        Welcomepage.stage.setMaximized(false);
+        Welcomepage.stage.centerOnScreen();
+    }
+
+    System.out.println("[ADMIN] Logout successful");
+});
+
+
         // =====================================================
         // NEW MEMBER
         // =====================================================
@@ -694,23 +725,24 @@ public class AdminDashboard {
         // ADD BUTTONS TO SIDEBAR
         // =====================================================
 
-        sidebar.getChildren().addAll(
+     sidebar.getChildren().addAll(
 
-            logoBox,
+    logoBox,
 
-            dashboard,
+    dashboard,
 
-            newMember,
+    newMember,
 
-            approvals,
+    approvals,
 
-            analytics,
+    analytics,
 
-            profile,
+    profile,
 
-            settings
-        );
+    settings,
 
+    Logout
+);
 
         // =====================================================
         // SET BORDERPANE

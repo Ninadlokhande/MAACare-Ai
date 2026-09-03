@@ -3,10 +3,13 @@ package com.sigma.view;
 import com.sigma.controller.Controller;
 import com.sigma.view.adminpages.AdminDashboard;
 import com.sigma.view.doctorpages.DoctorDashboard;
+import com.sigma.view.Dashboard;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.ProgressIndicator;
+import javafx.concurrent.Task;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.PasswordField;
@@ -20,8 +23,10 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
+import java.util.prefs.Preferences;
 
 public class Loginpage {
+        public BorderPane loginroot ;
 
     // =========================================================
     // FIELDS
@@ -32,6 +37,22 @@ public class Loginpage {
     private String role = "";
 
     private final Controller controller = new Controller();
+
+    // Login controls whose visibility depends on the selected role.
+    private Button signUpButton;
+    private Text orText;
+    private HBox createAccountBox;
+
+    private StackPane loadingOverlay;
+    private BorderPane loginRootForLoading;
+
+    // Remember Me storage (local to this computer)
+    private static final Preferences LOGIN_PREFS =
+            Preferences.userNodeForPackage(Loginpage.class);
+    private static final String PREF_REMEMBER = "remember_login";
+    private static final String PREF_EMAIL = "login_email";
+    private static final String PREF_PASSWORD = "login_password";
+    private static final String PREF_ROLE = "login_role";
 
     // Admin security code
     private static final String ADMIN_SECURITY_CODE = "12345";
@@ -47,6 +68,7 @@ public class Loginpage {
         // =====================================================
 
         BorderPane root = new BorderPane();
+
 
         root.setStyle(
                 "-fx-background-color: linear-gradient(" +
@@ -390,21 +412,106 @@ public class Loginpage {
         PasswordField password =
                 new PasswordField();
 
+        TextField visiblePassword =
+                new TextField();
+
         password.setPromptText(
                 "Password"
         );
 
-        password.setPrefHeight(55);
+        visiblePassword.setPromptText(
+                "Password"
+        );
 
-        password.setStyle(
+        password.setPrefHeight(55);
+        visiblePassword.setPrefHeight(55);
+
+        String passwordStyle =
                 "-fx-background-color: white;" +
                         "-fx-border-color: #DDD9E6;" +
                         "-fx-border-width: 1px;" +
                         "-fx-border-radius: 12px;" +
                         "-fx-background-radius: 12px;" +
                         "-fx-font-size: 16px;" +
-                        "-fx-padding: 0 18px;"
+                        "-fx-padding: 0 18px;";
+
+        password.setStyle(passwordStyle);
+        visiblePassword.setStyle(passwordStyle);
+
+        visiblePassword.setVisible(false);
+        visiblePassword.setManaged(false);
+
+        Button showPassword =
+                new Button("Show");
+
+        showPassword.setPrefHeight(45);
+        showPassword.setMinWidth(65);
+        showPassword.setStyle(
+                "-fx-background-color: transparent;" +
+                        "-fx-text-fill: #713CC3;" +
+                        "-fx-font-size: 13px;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-cursor: hand;"
         );
+
+        HBox passwordBox =
+                new HBox(5);
+
+        passwordBox.setAlignment(Pos.CENTER);
+        HBox.setHgrow(password, Priority.ALWAYS);
+        HBox.setHgrow(visiblePassword, Priority.ALWAYS);
+
+        passwordBox.getChildren().addAll(
+                password,
+                visiblePassword,
+                showPassword
+        );
+
+        // Keep both password fields synchronized while typing.
+        final boolean[] syncingPassword = {false};
+
+        password.textProperty().addListener((obs, oldValue, newValue) -> {
+            if (!syncingPassword[0] && !visiblePassword.isVisible()) {
+                syncingPassword[0] = true;
+                visiblePassword.setText(newValue);
+                syncingPassword[0] = false;
+            }
+        });
+
+        visiblePassword.textProperty().addListener((obs, oldValue, newValue) -> {
+            if (!syncingPassword[0] && visiblePassword.isVisible()) {
+                syncingPassword[0] = true;
+                password.setText(newValue);
+                syncingPassword[0] = false;
+            }
+        });
+
+        showPassword.setOnAction(e -> {
+            if (visiblePassword.isVisible()) {
+                syncingPassword[0] = true;
+                password.setText(visiblePassword.getText());
+                syncingPassword[0] = false;
+
+                visiblePassword.setVisible(false);
+                visiblePassword.setManaged(false);
+                password.setVisible(true);
+                password.setManaged(true);
+                showPassword.setText("Show");
+            } else {
+                syncingPassword[0] = true;
+                visiblePassword.setText(password.getText());
+                syncingPassword[0] = false;
+
+                password.setVisible(false);
+                password.setManaged(false);
+                visiblePassword.setVisible(true);
+                visiblePassword.setManaged(true);
+                showPassword.setText("Hide");
+
+                visiblePassword.requestFocus();
+                visiblePassword.positionCaret(visiblePassword.getText().length());
+            }
+        });
 
         // =====================================================
         // ADMIN SECURITY CODE
@@ -463,6 +570,13 @@ public class Loginpage {
                 remember
         );
 
+        // Remove saved credentials immediately when Remember Me is unchecked.
+        remember.setOnAction(e -> {
+            if (!remember.isSelected()) {
+                clearRememberedLogin();
+            }
+        });
+
         // =====================================================
         // MOTHER
         // =====================================================
@@ -483,6 +597,15 @@ public class Loginpage {
             securityCode.clear();
             securityCode.setVisible(false);
             securityCode.setManaged(false);
+
+            if (signUpButton != null) {
+                orText.setVisible(true);
+                orText.setManaged(true);
+                signUpButton.setVisible(true);
+                signUpButton.setManaged(true);
+                createAccountBox.setVisible(true);
+                createAccountBox.setManaged(true);
+            }
         });
 
         // =====================================================
@@ -505,6 +628,15 @@ public class Loginpage {
             securityCode.clear();
             securityCode.setVisible(false);
             securityCode.setManaged(false);
+
+            if (signUpButton != null) {
+                orText.setVisible(true);
+                orText.setManaged(true);
+                signUpButton.setVisible(true);
+                signUpButton.setManaged(true);
+                createAccountBox.setVisible(true);
+                createAccountBox.setManaged(true);
+            }
         });
 
         // =====================================================
@@ -527,6 +659,15 @@ public class Loginpage {
             securityCode.clear();
             securityCode.setVisible(false);
             securityCode.setManaged(false);
+
+            if (signUpButton != null) {
+                orText.setVisible(true);
+                orText.setManaged(true);
+                signUpButton.setVisible(true);
+                signUpButton.setManaged(true);
+                createAccountBox.setVisible(true);
+                createAccountBox.setManaged(true);
+            }
         });
 
         // =====================================================
@@ -549,6 +690,15 @@ public class Loginpage {
             securityCode.clear();
             securityCode.setVisible(false);
             securityCode.setManaged(false);
+
+            if (signUpButton != null) {
+                orText.setVisible(true);
+                orText.setManaged(true);
+                signUpButton.setVisible(true);
+                signUpButton.setManaged(true);
+                createAccountBox.setVisible(true);
+                createAccountBox.setManaged(true);
+            }
         });
 
         // =====================================================
@@ -570,6 +720,16 @@ public class Loginpage {
 
             securityCode.setVisible(true);
             securityCode.setManaged(true);
+
+            // Admin accounts are login-only. Hide all sign-up controls.
+            if (signUpButton != null) {
+                orText.setVisible(false);
+                orText.setManaged(false);
+                signUpButton.setVisible(false);
+                signUpButton.setManaged(false);
+                createAccountBox.setVisible(false);
+                createAccountBox.setManaged(false);
+            }
         });
 
         // =====================================================
@@ -623,19 +783,16 @@ public class Loginpage {
                     email.getText().trim();
 
             String enteredPassword =
-                    password.getText();
+                    visiblePassword.isVisible()
+                            ? visiblePassword.getText()
+                            : password.getText();
 
             // =================================================
             // ROLE VALIDATION
             // =================================================
 
-            if (role == null ||
-                    role.isBlank()) {
-
-                loginStatus.setText(
-                        "Please select your role"
-                );
-
+            if (role == null || role.isBlank()) {
+                loginStatus.setText("Please select your role");
                 return;
             }
 
@@ -644,13 +801,8 @@ public class Loginpage {
             // =================================================
 
             if (enteredEmail.isBlank()) {
-
-                loginStatus.setText(
-                        "Please enter your email"
-                );
-
+                loginStatus.setText("Please enter your email");
                 email.requestFocus();
-
                 return;
             }
 
@@ -659,13 +811,8 @@ public class Loginpage {
             // =================================================
 
             if (enteredPassword.isBlank()) {
-
-                loginStatus.setText(
-                        "Please enter your password"
-                );
-
+                loginStatus.setText("Please enter your password");
                 password.requestFocus();
-
                 return;
             }
 
@@ -676,257 +823,171 @@ public class Loginpage {
             if (role.equals("admin")) {
 
                 if (securityCode.getText().isBlank()) {
-
-                    loginStatus.setText(
-                            "Please enter Admin Security Code"
-                    );
-
+                    loginStatus.setText("Please enter Admin Security Code");
                     securityCode.requestFocus();
-
                     return;
                 }
 
-                if (!securityCode.getText().equals(
-                        ADMIN_SECURITY_CODE
-                )) {
-
-                    loginStatus.setText(
-                            "Invalid Admin Security Code"
-                    );
-
+                if (!securityCode.getText().equals(ADMIN_SECURITY_CODE)) {
+                    loginStatus.setText("Invalid Admin Security Code");
                     securityCode.clear();
-
                     securityCode.requestFocus();
-
                     return;
                 }
             }
 
             // =================================================
-            // FIREBASE AUTHENTICATION
+            // SHOW LOADING SCREEN
             // =================================================
 
-            System.out.println(
-                    "[LOGIN] Authenticating..."
-            );
+            setLoginLoading(true, loginStatus);
 
-            boolean authenticated;
+            System.out.println("[LOGIN] Authenticating...");
 
-            try {
+            Task<Boolean> loginTask = new Task<>() {
+                @Override
+                protected Boolean call() throws Exception {
+                    return controller.signin(enteredEmail, enteredPassword);
+                }
+            };
 
-                authenticated =
-                        controller.signin(
-                                enteredEmail,
-                                enteredPassword
+            loginTask.setOnSucceeded(event -> {
+
+                boolean authenticated = loginTask.getValue();
+
+                if (!authenticated) {
+
+                    System.out.println("[LOGIN] Authentication failed");
+                    loginStatus.setText("Invalid email or password.");
+                    password.clear();
+                    visiblePassword.clear();
+                    setLoginLoading(false, loginStatus);
+                    return;
+                }
+
+                System.out.println("[LOGIN] Authentication successful");
+
+                // Remember credentials only after a successful login.
+                saveRememberedLogin(
+                        remember.isSelected(),
+                        enteredEmail,
+                        enteredPassword,
+                        role
+                );
+
+                try {
+
+                    if (role.equals("admin")) {
+
+                        System.out.println("[LOGIN] Opening Admin Dashboard...");
+
+                        AdminDashboard adminDashboard =
+                                new AdminDashboard();
+
+                        Scene adminScene =
+                                adminDashboard.gotoAdminDashboard();
+
+                        Welcomepage.stage.setScene(adminScene);
+                        Welcomepage.stage.setMaximized(true);
+
+                        System.out.println("[LOGIN] Admin Dashboard opened");
+                    }
+
+                    else if (role.equals("doctor")) {
+
+                        System.out.println("[LOGIN] Opening Doctor Dashboard...");
+
+                        DoctorDashboard doctorDashboard =
+                                new DoctorDashboard();
+
+                        Scene doctorScene =
+                                doctorDashboard.gotoDoctorDashboard();
+
+                        Welcomepage.stage.setScene(doctorScene);
+                        Welcomepage.stage.setMaximized(true);
+
+                        System.out.println("[LOGIN] Doctor Dashboard opened");
+                    }
+
+                    else if (role.equals("hospital")) {
+
+                        System.out.println("[LOGIN] Opening Hospital Dashboard...");
+
+                        Dashboard dashboard = new Dashboard();
+                        dashboard.show(Welcomepage.stage);
+                        Welcomepage.stage.setMaximized(true);
+
+                        System.out.println("[LOGIN] Hospital Dashboard opened");
+                    }
+
+                    else if (role.equals("asha")) {
+
+                        System.out.println("[LOGIN] Opening ASHA Dashboard...");
+
+                        Asha_workerdashboard ashaDashboard =
+                                new Asha_workerdashboard();
+
+                        Scene ashaScene = ashaDashboard.run();
+
+                        Welcomepage.stage.setScene(ashaScene);
+                        Welcomepage.stage.setMaximized(true);
+
+                        System.out.println("[LOGIN] ASHA Dashboard opened");
+                    }
+
+                    else if (role.equals("mother")) {
+
+                        loginStatus.setText(
+                                "Mother Dashboard is not connected yet."
                         );
 
-            } catch (Exception ex) {
+                        System.out.println(
+                                "[LOGIN] Mother Dashboard not available"
+                        );
 
-                ex.printStackTrace();
+                        setLoginLoading(false, loginStatus);
+                        return;
+                    }
+
+                    else {
+                        loginStatus.setText("Invalid role selected.");
+                        setLoginLoading(false, loginStatus);
+                        return;
+                    }
+
+                    email.clear();
+                    password.clear();
+                    visiblePassword.clear();
+                    securityCode.clear();
+
+                } catch (Exception ex) {
+
+                    ex.printStackTrace();
+
+                    loginStatus.setText("Unable to open dashboard.");
+                    System.out.println("[LOGIN] Dashboard opening failed");
+                    setLoginLoading(false, loginStatus);
+                }
+            });
+
+            loginTask.setOnFailed(event -> {
+
+                Throwable ex = loginTask.getException();
+
+                if (ex != null) {
+                    ex.printStackTrace();
+                }
 
                 loginStatus.setText(
                         "Authentication error. Please try again."
                 );
 
-                return;
-            }
+                setLoginLoading(false, loginStatus);
+            });
 
-            // =================================================
-            // AUTHENTICATION FAILED
-            // =================================================
-
-            if (!authenticated) {
-
-                System.out.println(
-                        "[LOGIN] Authentication failed"
-                );
-
-                loginStatus.setText(
-                        "Invalid email or password."
-                );
-
-                password.clear();
-
-                return;
-            }
-
-            // =================================================
-            // AUTHENTICATION SUCCESS
-            // =================================================
-
-            System.out.println(
-                    "[LOGIN] Authentication successful"
-            );
-
-            try {
-
-                // =================================================
-                // ADMIN
-                // =================================================
-
-                if (role.equals("admin")) {
-
-                    System.out.println(
-                            "[LOGIN] Opening Admin Dashboard..."
-                    );
-
-                    AdminDashboard adminDashboard =
-                            new AdminDashboard();
-
-                    Scene adminScene =
-                            adminDashboard.gotoAdminDashboard();
-
-                    Welcomepage.stage.setScene(
-                            adminScene
-                    );
-
-                    Welcomepage.stage.setMaximized(
-                            true
-                    );
-
-                    System.out.println(
-                            "[LOGIN] Admin Dashboard opened"
-                    );
-                }
-
-                // =================================================
-                // DOCTOR
-                // =================================================
-
-                else if (role.equals("doctor")) {
-
-                    System.out.println(
-                            "[LOGIN] Opening Doctor Dashboard..."
-                    );
-
-                    DoctorDashboard doctorDashboard =
-                            new DoctorDashboard();
-
-                    Scene doctorScene =
-                            doctorDashboard.gotoDoctorDashboard();
-
-                    Welcomepage.stage.setScene(
-                            doctorScene
-                    );
-
-                    Welcomepage.stage.setMaximized(
-                            true
-                    );
-
-                    System.out.println(
-                            "[LOGIN] Doctor Dashboard opened"
-                    );
-                }
-
-                // =================================================
-                // HOSPITAL
-                // =================================================
-
-                else if (role.equals("hospital")) {
-
-                    System.out.println(
-                            "[LOGIN] Opening Hospital Dashboard..."
-                    );
-
-                    Dashboard dashboard =
-                            new Dashboard();
-
-                    dashboard.show(
-                            Welcomepage.stage
-                    );
-
-                    Welcomepage.stage.setMaximized(
-                            true
-                    );
-
-                    System.out.println(
-                            "[LOGIN] Hospital Dashboard opened"
-                    );
-                }
-
-                // =================================================
-                // ASHA WORKER
-                // =================================================
-
-                else if (role.equals("asha")) {
-
-                    System.out.println(
-                            "[LOGIN] Opening ASHA Dashboard..."
-                    );
-
-                    Asha_workerdashboard ashaDashboard =
-                            new Asha_workerdashboard();
-
-                    Scene ashaScene =
-                            ashaDashboard.run();
-
-                    Welcomepage.stage.setScene(
-                            ashaScene
-                    );
-
-                    Welcomepage.stage.setMaximized(
-                            true
-                    );
-
-                    System.out.println(
-                            "[LOGIN] ASHA Dashboard opened"
-                    );
-                }
-
-                // =================================================
-                // MOTHER
-                // =================================================
-
-                else if (role.equals("mother")) {
-
-                    /*
-                     * Mother Dashboard has not yet been created.
-                     */
-
-                    loginStatus.setText(
-                            "Mother Dashboard is not connected yet."
-                    );
-
-                    System.out.println(
-                            "[LOGIN] Mother Dashboard not available"
-                    );
-
-                    return;
-                }
-
-                // =================================================
-                // UNKNOWN ROLE
-                // =================================================
-
-                else {
-
-                    loginStatus.setText(
-                            "Invalid role selected."
-                    );
-
-                    return;
-                }
-
-                // =================================================
-                // CLEAR LOGIN FIELDS
-                // =================================================
-
-                email.clear();
-                password.clear();
-                securityCode.clear();
-
-            } catch (Exception ex) {
-
-                ex.printStackTrace();
-
-                loginStatus.setText(
-                        "Unable to open dashboard."
-                );
-
-                System.out.println(
-                        "[LOGIN] Dashboard opening failed"
-                );
-            }
+            Thread loginThread = new Thread(loginTask, "Firebase-Login-Thread");
+            loginThread.setDaemon(true);
+            loginThread.start();
         });
 
         // =====================================================
@@ -935,6 +996,8 @@ public class Loginpage {
 
         Text or =
                 new Text("OR");
+
+        orText = or;
 
         or.setStyle(
                 "-fx-fill: #666680;" +
@@ -948,6 +1011,8 @@ public class Loginpage {
 
         Button signUp =
                 new Button("Sign Up");
+
+        signUpButton = signUp;
 
         signUp.setMaxWidth(
                 Double.MAX_VALUE
@@ -983,7 +1048,9 @@ public class Loginpage {
                     email.getText().trim();
 
             String enteredPassword =
-                    password.getText();
+                    visiblePassword.isVisible()
+                            ? visiblePassword.getText()
+                            : password.getText();
 
             if (enteredEmail.isBlank()) {
 
@@ -1053,6 +1120,8 @@ public class Loginpage {
         HBox createAccount =
                 new HBox(6);
 
+        createAccountBox = createAccount;
+
         createAccount.setAlignment(
                 Pos.CENTER
         );
@@ -1083,6 +1152,19 @@ public class Loginpage {
                 createText
         );
 
+        // Restore previously remembered login information.
+        loadRememberedLogin(
+                email,
+                password,
+                visiblePassword,
+                remember,
+                mother,
+                doctor,
+                hospital,
+                asha,
+                admin
+        );
+
         // =====================================================
         // LOGIN CARD CONTENT
         // =====================================================
@@ -1101,7 +1183,7 @@ public class Loginpage {
 
                 email,
 
-                password,
+                passwordBox,
 
                 securityCode,
 
@@ -1144,15 +1226,184 @@ public class Loginpage {
         // =====================================================
         // SCENE
         // =====================================================
+        // =====================================================
+        // LOADING OVERLAY
+        // =====================================================
+
+        StackPane loadingOverlay =
+                createLoadingOverlay();
+
+        loadingOverlay.setVisible(false);
+        loadingOverlay.setManaged(false);
+
+        StackPane sceneRoot =
+                new StackPane(root, loadingOverlay);
+
+        // The BorderPane is still kept for getRoot() compatibility.
+        loginroot = root;
 
         loginpagScene =
                 new Scene(
-                        root,
+                        sceneRoot,
                         scenesettings.rectanguler2d.getWidth(),
                         scenesettings.rectanguler2d.getHeight()
                 );
 
+        // Store the overlay so login actions can control it.
+        this.loadingOverlay = loadingOverlay;
+        this.loginRootForLoading = root;
+
         return loginpagScene;
+    }
+
+    // =========================================================
+    // REMEMBER ME
+    // =========================================================
+
+    private void saveRememberedLogin(
+            boolean rememberMe,
+            String email,
+            String password,
+            String selectedRole) {
+
+        if (!rememberMe) {
+            clearRememberedLogin();
+            return;
+        }
+
+        if (email == null || email.isBlank()
+                || password == null || password.isBlank()
+                || selectedRole == null || selectedRole.isBlank()) {
+            return;
+        }
+
+        LOGIN_PREFS.putBoolean(PREF_REMEMBER, true);
+        LOGIN_PREFS.put(PREF_EMAIL, email);
+        LOGIN_PREFS.put(PREF_PASSWORD, password);
+        LOGIN_PREFS.put(PREF_ROLE, selectedRole);
+
+        try {
+            LOGIN_PREFS.flush();
+        } catch (Exception ignored) {
+        }
+    }
+
+    private void clearRememberedLogin() {
+        LOGIN_PREFS.remove(PREF_REMEMBER);
+        LOGIN_PREFS.remove(PREF_EMAIL);
+        LOGIN_PREFS.remove(PREF_PASSWORD);
+        LOGIN_PREFS.remove(PREF_ROLE);
+
+        try {
+            LOGIN_PREFS.flush();
+        } catch (Exception ignored) {
+        }
+    }
+
+    private void loadRememberedLogin(
+            TextField email,
+            PasswordField password,
+            TextField visiblePassword,
+            CheckBox remember,
+            Button mother,
+            Button doctor,
+            Button hospital,
+            Button asha,
+            Button admin) {
+
+        if (!LOGIN_PREFS.getBoolean(PREF_REMEMBER, false)) {
+            return;
+        }
+
+        String savedEmail = LOGIN_PREFS.get(PREF_EMAIL, "");
+        String savedPassword = LOGIN_PREFS.get(PREF_PASSWORD, "");
+        String savedRole = LOGIN_PREFS.get(PREF_ROLE, "");
+
+        if (savedEmail.isBlank() || savedPassword.isBlank()
+                || savedRole.isBlank()) {
+            clearRememberedLogin();
+            return;
+        }
+
+        email.setText(savedEmail);
+        password.setText(savedPassword);
+        visiblePassword.setText(savedPassword);
+        remember.setSelected(true);
+
+        switch (savedRole) {
+            case "mother" -> mother.fire();
+            case "doctor" -> doctor.fire();
+            case "hospital" -> hospital.fire();
+            case "asha" -> asha.fire();
+            case "admin" -> admin.fire();
+            default -> clearRememberedLogin();
+        }
+    }
+
+    // =========================================================
+    // LOADING STATE
+    // =========================================================
+
+    private StackPane createLoadingOverlay() {
+
+        StackPane overlay = new StackPane();
+
+        overlay.setStyle(
+                "-fx-background-color: rgba(255,255,255,0.96);"
+        );
+
+        VBox loadingBox = new VBox(15);
+        loadingBox.setAlignment(Pos.CENTER);
+
+        ProgressIndicator progress =
+                new ProgressIndicator();
+
+        progress.setPrefSize(65, 65);
+        progress.setProgress(-1);
+
+        Text loadingTitle =
+                new Text("Signing you in...");
+
+        loadingTitle.setStyle(
+                "-fx-fill: #24234F;" +
+                        "-fx-font-size: 22px;" +
+                        "-fx-font-weight: bold;"
+        );
+
+        Text loadingText =
+                new Text("Connecting to MaaCare AI. Please wait...");
+
+        loadingText.setStyle(
+                "-fx-fill: #77778D;" +
+                        "-fx-font-size: 14px;"
+        );
+
+        loadingBox.getChildren().addAll(
+                progress,
+                loadingTitle,
+                loadingText
+        );
+
+        overlay.getChildren().add(loadingBox);
+
+        return overlay;
+    }
+
+    private void setLoginLoading(
+            boolean loading,
+            Text loginStatus) {
+
+        if (loadingOverlay == null || loginRootForLoading == null) {
+            return;
+        }
+
+        loadingOverlay.setVisible(loading);
+        loadingOverlay.setManaged(loading);
+        loginRootForLoading.setDisable(loading);
+
+        if (loading) {
+            loginStatus.setText("");
+        }
     }
 
     // =========================================================
@@ -1270,5 +1521,9 @@ public class Loginpage {
         });
 
         return button;
+    }
+
+    public BorderPane getRoot() {
+        return loginroot;
     }
 }
