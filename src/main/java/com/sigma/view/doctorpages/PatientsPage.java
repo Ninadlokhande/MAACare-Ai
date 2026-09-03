@@ -1,5 +1,6 @@
 package com.sigma.view.doctorpages;
 
+import com.sigma.view.scenesettings;
 import com.sigma.model.DoctorModel.Patient;
 
 import javafx.collections.FXCollections;
@@ -26,6 +27,10 @@ public class PatientsPage {
 
                 root.setPadding(
                                 new Insets(28, 35, 28, 35));
+
+                root.setFillWidth(true);
+                root.setMinWidth(0);
+                root.setMaxWidth(Double.MAX_VALUE);
 
                 Theme.applyBackground(root);
 
@@ -77,6 +82,8 @@ public class PatientsPage {
                                 "Search patient name or ID...");
 
                 search.setPrefWidth(280);
+                search.setMaxWidth(Double.MAX_VALUE);
+                HBox.setHgrow(search, Priority.ALWAYS);
 
                 ComboBox<String> gender = new ComboBox<>();
 
@@ -108,6 +115,9 @@ public class PatientsPage {
                 // =====================================================
 
                 table = new TableView<>();
+
+                table.setMaxWidth(Double.MAX_VALUE);
+                table.setMaxHeight(Double.MAX_VALUE);
 
                 table.setColumnResizePolicy(
                                 TableView.CONSTRAINED_RESIZE_POLICY);
@@ -328,7 +338,11 @@ public class PatientsPage {
                 // SCENE
                 // =====================================================
 
-                Scene patientsScene = new Scene(root);
+                Scene patientsScene = new Scene(
+                                root,
+                                scenesettings.rectanguler2d.getWidth(),
+                                scenesettings.rectanguler2d.getHeight()
+                );
 
                 DoctorDashboard.changeScene(
                                 patientsScene);

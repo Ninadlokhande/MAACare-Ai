@@ -1,6 +1,7 @@
 package com.sigma.view.doctorpages;
 
 import com.sigma.model.DoctorModel.DoctorAppointment;
+import com.sigma.view.scenesettings;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -20,6 +21,10 @@ public class DoctorAppointmentsPage {
                                                 35,
                                                 28,
                                                 35));
+
+                root.setFillWidth(true);
+                root.setMinWidth(0);
+                root.setMaxWidth(Double.MAX_VALUE);
 
                 Theme.applyBackground(root);
 
@@ -74,6 +79,8 @@ public class DoctorAppointmentsPage {
                                 "Search patient...");
 
                 search.setPrefWidth(230);
+                search.setMaxWidth(Double.MAX_VALUE);
+                HBox.setHgrow(search, Priority.ALWAYS);
 
                 ComboBox<String> status = new ComboBox<>();
 
@@ -112,6 +119,13 @@ public class DoctorAppointmentsPage {
                 // =================================================
 
                 TableView<DoctorAppointment> table = new TableView<>();
+
+                table.setMaxWidth(Double.MAX_VALUE);
+                table.setMaxHeight(Double.MAX_VALUE);
+
+                VBox.setVgrow(
+                                table,
+                                Priority.ALWAYS);
 
                 table.setColumnResizePolicy(
                                 TableView.CONSTRAINED_RESIZE_POLICY);
@@ -293,10 +307,6 @@ public class DoctorAppointmentsPage {
                                                 "Refunded",
                                                 "◉"));
 
-                VBox.setVgrow(
-                                table,
-                                Priority.ALWAYS);
-
                 root.getChildren().addAll(
                                 header,
                                 filters,
@@ -306,7 +316,11 @@ public class DoctorAppointmentsPage {
                 // NEW SCENE
                 // =================================================
 
-                Scene appointmentsScene = new Scene(root);
+                Scene appointmentsScene = new Scene(
+                                root,
+                                scenesettings.rectanguler2d.getWidth(),
+                                scenesettings.rectanguler2d.getHeight()
+                );
 
                 // =================================================
                 // RUNNABLE
