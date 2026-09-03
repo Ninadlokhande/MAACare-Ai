@@ -1,4 +1,3 @@
-
 package com.sigma.view;
 
 import com.sigma.config.DoctorModule.FirebaseConfig;
@@ -22,6 +21,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
+import javafx.stage.Screen;
 
 public class Loginpage {
 
@@ -79,7 +79,6 @@ public class Loginpage {
                 ImageView logoView = new ImageView(logoImage);
 
                 logoView.setPreserveRatio(true);
-
                 logoView.setSmooth(true);
 
                 logoView.fitWidthProperty().bind(
@@ -152,8 +151,7 @@ public class Loginpage {
                                 descriptionPink,
                                 description2);
 
-                description.setAlignment(
-                                Pos.CENTER);
+                description.setAlignment(Pos.CENTER);
 
                 // =========================================================
                 // INFO
@@ -179,8 +177,7 @@ public class Loginpage {
 
                 HBox features = new HBox(25);
 
-                features.setAlignment(
-                                Pos.CENTER);
+                features.setAlignment(Pos.CENTER);
 
                 features.setPadding(
                                 new Insets(20, 0, 0, 0));
@@ -237,8 +234,7 @@ public class Loginpage {
 
                 VBox loginCard = new VBox(18);
 
-                loginCard.setAlignment(
-                                Pos.TOP_CENTER);
+                loginCard.setAlignment(Pos.TOP_CENTER);
 
                 loginCard.setPadding(
                                 new Insets(35, 40, 30, 40));
@@ -294,8 +290,7 @@ public class Loginpage {
 
                 HBox roles = new HBox(12);
 
-                roles.setAlignment(
-                                Pos.CENTER);
+                roles.setAlignment(Pos.CENTER);
 
                 // =========================================================
                 // MOTHER
@@ -505,12 +500,12 @@ public class Loginpage {
                         if (reset) {
 
                                 logininfo.setText(
-                                                "Password reset email sent. "
-                                                                + "Check your email.");
+                                                "Password reset email sent. " +
+                                                                "Check your email.");
 
                                 System.out.println(
-                                                "[FORGOT PASSWORD] "
-                                                                + "Reset email sent successfully.");
+                                                "[FORGOT PASSWORD] " +
+                                                                "Reset email sent successfully.");
 
                         } else {
 
@@ -641,7 +636,6 @@ public class Loginpage {
                                                                 true);
 
                                                 email.clear();
-
                                                 password.clear();
 
                                                 System.out.println(
@@ -670,19 +664,7 @@ public class Loginpage {
                                         try {
 
                                                 // -------------------------------------------------
-                                                // IMPORTANT
-                                                // -------------------------------------------------
-                                                // We are NOT using:
-                                                //
-                                                // FirebaseAuth.getInstance()
-                                                // getCurrentUser()
-                                                // getUid()
-                                                //
-                                                // because your Firebase library setup is giving
-                                                // compilation errors for these methods.
-                                                //
-                                                // Controller.signin() has already authenticated
-                                                // the user.
+                                                // GET DOCTOR UID
                                                 // -------------------------------------------------
 
                                                 String doctorUid = FirebaseConfig.getCurrentDoctorUid();
@@ -723,7 +705,7 @@ public class Loginpage {
                                                                 doctorUid);
 
                                                 // -------------------------------------------------
-                                                // OPEN DASHBOARD
+                                                // OPEN DOCTOR DASHBOARD
                                                 // -------------------------------------------------
 
                                                 DoctorDashboard.showDashboard(
@@ -750,7 +732,6 @@ public class Loginpage {
                                                 // -------------------------------------------------
 
                                                 email.clear();
-
                                                 password.clear();
 
                                                 System.out.println(
@@ -912,17 +893,21 @@ public class Loginpage {
                                 if (signupSuccess) {
 
                                         logininfo.setText(
-                                                        "Sign up successful. "
-                                                                        + "Login to continue");
+                                                        "Sign up successful. " +
+                                                                        "Login to continue");
 
                                         email.clear();
-
                                         password.clear();
 
                                 } else {
 
+                                        String error = controller.getLastError();
+
                                         logininfo.setText(
-                                                        controller.getLastError());
+                                                        error == null ||
+                                                                        error.isBlank()
+                                                                                        ? "Sign up failed."
+                                                                                        : error);
                                 }
 
                         } else {
@@ -1013,11 +998,9 @@ public class Loginpage {
                 // ROOT
                 // =========================================================
 
-                root.setLeft(
-                                leftSide);
+                root.setLeft(leftSide);
 
-                root.setCenter(
-                                rightSide);
+                root.setCenter(rightSide);
 
                 BorderPane.setAlignment(
                                 leftSide,
@@ -1026,11 +1009,22 @@ public class Loginpage {
                 // =========================================================
                 // SCENE
                 // =========================================================
+                // FIXED:
+                // Removed scenesettings.rectanguler2d
+                // =========================================================
+
+                double screenWidth = Screen.getPrimary()
+                                .getVisualBounds()
+                                .getWidth();
+
+                double screenHeight = Screen.getPrimary()
+                                .getVisualBounds()
+                                .getHeight();
 
                 loginpagScene = new Scene(
                                 root,
-                                scenesettings.rectanguler2d.getWidth(),
-                                scenesettings.rectanguler2d.getHeight());
+                                screenWidth,
+                                screenHeight);
 
                 return loginpagScene;
         }

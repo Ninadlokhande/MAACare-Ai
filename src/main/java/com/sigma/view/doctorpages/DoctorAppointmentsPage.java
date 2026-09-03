@@ -240,6 +240,13 @@ public class DoctorAppointmentsPage {
 
                 table = new TableView<>();
 
+                table.setMaxWidth(Double.MAX_VALUE);
+                table.setMaxHeight(Double.MAX_VALUE);
+
+                VBox.setVgrow(
+                                table,
+                                Priority.ALWAYS);
+
                 table.setColumnResizePolicy(
                                 TableView.CONSTRAINED_RESIZE_POLICY);
 

@@ -45,13 +45,14 @@
             <artifactId>cloudinary-http5</artifactId>
             <version>2.3.2</version>
         </dependency>
-        <!-- FIREBASE ADMIN SDK FIRESTORE -->
+
         <dependency>
             <groupId>com.google.firebase</groupId>
             <artifactId>firebase-admin</artifactId>
             <version>9.7.0</version>
         </dependency>
     </dependencies>
+
 
     <build>
 

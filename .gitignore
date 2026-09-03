@@ -20,3 +20,4 @@ Thumbs.db
 
 # Firebase service account credentials - never commit
 src/main/resources/serviceAccountKey.json
+serviceAccountkey.json
