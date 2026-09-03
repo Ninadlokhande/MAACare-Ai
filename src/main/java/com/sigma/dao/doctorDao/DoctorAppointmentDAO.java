@@ -1,4 +1,4 @@
-package com.sigma.dao;
+package com.sigma.dao.doctorDao;
 
 import com.sigma.model.DoctorModel.DoctorAppointment;
 

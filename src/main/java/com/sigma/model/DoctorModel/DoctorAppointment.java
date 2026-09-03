@@ -1,3 +1,4 @@
+
 package com.sigma.model.DoctorModel;
 
 import javafx.beans.property.SimpleStringProperty;
@@ -5,12 +6,59 @@ import javafx.beans.property.StringProperty;
 
 public class DoctorAppointment {
 
+    private final StringProperty appointmentId;
+    private final StringProperty doctorId;
+    private final StringProperty patientId;
+    private final StringProperty date;
     private final StringProperty time;
     private final StringProperty patient;
     private final StringProperty type;
     private final StringProperty status;
     private final StringProperty payment;
     private final StringProperty action;
+
+    public DoctorAppointment(
+            String appointmentId,
+            String doctorId,
+            String patientId,
+            String date,
+            String time,
+            String patient,
+            String type,
+            String status,
+            String payment,
+            String action) {
+
+        this.appointmentId = new SimpleStringProperty(
+                appointmentId == null ? "" : appointmentId);
+
+        this.doctorId = new SimpleStringProperty(
+                doctorId == null ? "" : doctorId);
+
+        this.patientId = new SimpleStringProperty(
+                patientId == null ? "" : patientId);
+
+        this.date = new SimpleStringProperty(
+                date == null ? "" : date);
+
+        this.time = new SimpleStringProperty(
+                time == null ? "" : time);
+
+        this.patient = new SimpleStringProperty(
+                patient == null ? "" : patient);
+
+        this.type = new SimpleStringProperty(
+                type == null ? "" : type);
+
+        this.status = new SimpleStringProperty(
+                status == null ? "" : status);
+
+        this.payment = new SimpleStringProperty(
+                payment == null ? "" : payment);
+
+        this.action = new SimpleStringProperty(
+                action == null ? "View" : action);
+    }
 
     public DoctorAppointment(
             String time,
@@ -20,22 +68,34 @@ public class DoctorAppointment {
             String payment,
             String action) {
 
-        this.time = new SimpleStringProperty(time);
-
-        this.patient = new SimpleStringProperty(patient);
-
-        this.type = new SimpleStringProperty(type);
-
-        this.status = new SimpleStringProperty(status);
-
-        this.payment = new SimpleStringProperty(payment);
-
-        this.action = new SimpleStringProperty(action);
+        this(
+                "",
+                "",
+                "",
+                "",
+                time,
+                patient,
+                type,
+                status,
+                payment,
+                action);
     }
 
-    // =====================================================
-    // GETTERS
-    // =====================================================
+    public String getAppointmentId() {
+        return appointmentId.get();
+    }
+
+    public String getDoctorId() {
+        return doctorId.get();
+    }
+
+    public String getPatientId() {
+        return patientId.get();
+    }
+
+    public String getDate() {
+        return date.get();
+    }
 
     public String getTime() {
         return time.get();
@@ -61,9 +121,21 @@ public class DoctorAppointment {
         return action.get();
     }
 
-    // =====================================================
-    // PROPERTY METHODS
-    // =====================================================
+    public StringProperty appointmentIdProperty() {
+        return appointmentId;
+    }
+
+    public StringProperty doctorIdProperty() {
+        return doctorId;
+    }
+
+    public StringProperty patientIdProperty() {
+        return patientId;
+    }
+
+    public StringProperty dateProperty() {
+        return date;
+    }
 
     public StringProperty timeProperty() {
         return time;
@@ -89,31 +161,58 @@ public class DoctorAppointment {
         return action;
     }
 
-    // =====================================================
-    // SETTERS
-    // =====================================================
-
-    public void setTime(String time) {
-        this.time.set(time);
+    public void setAppointmentId(String value) {
+        appointmentId.set(value == null ? "" : value);
     }
 
-    public void setPatient(String patient) {
-        this.patient.set(patient);
+    public void setDoctorId(String value) {
+        doctorId.set(value == null ? "" : value);
     }
 
-    public void setType(String type) {
-        this.type.set(type);
+    public void setPatientId(String value) {
+        patientId.set(value == null ? "" : value);
     }
 
-    public void setStatus(String status) {
-        this.status.set(status);
+    public void setDate(String value) {
+        date.set(value == null ? "" : value);
     }
 
-    public void setPayment(String payment) {
-        this.payment.set(payment);
+    public void setTime(String value) {
+        time.set(value == null ? "" : value);
     }
 
-    public void setAction(String action) {
-        this.action.set(action);
+    public void setPatient(String value) {
+        patient.set(value == null ? "" : value);
+    }
+
+    public void setType(String value) {
+        type.set(value == null ? "" : value);
+    }
+
+    public void setStatus(String value) {
+        status.set(value == null ? "" : value);
+    }
+
+    public void setPayment(String value) {
+        payment.set(value == null ? "" : value);
+    }
+
+    public void setAction(String value) {
+        action.set(value == null ? "View" : value);
+    }
+
+    @Override
+    public String toString() {
+        return "DoctorAppointment{" +
+                "appointmentId='" + getAppointmentId() + '\'' +
+                ", doctorId='" + getDoctorId() + '\'' +
+                ", patientId='" + getPatientId() + '\'' +
+                ", date='" + getDate() + '\'' +
+                ", time='" + getTime() + '\'' +
+                ", patient='" + getPatient() + '\'' +
+                ", type='" + getType() + '\'' +
+                ", status='" + getStatus() + '\'' +
+                ", payment='" + getPayment() + '\'' +
+                '}';
     }
 }

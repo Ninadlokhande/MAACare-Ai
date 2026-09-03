@@ -1,6 +1,7 @@
+
 package com.sigma.model.DoctorModel;
 
-public class DoctorBasicInformationModel {
+public class DoctorProfileModel {
 
     // =====================================================
     // PERSONAL INFORMATION
@@ -39,14 +40,14 @@ public class DoctorBasicInformationModel {
     // DEFAULT CONSTRUCTOR
     // =====================================================
 
-    public DoctorBasicInformationModel() {
+    public DoctorProfileModel() {
     }
 
     // =====================================================
     // PARAMETERIZED CONSTRUCTOR
     // =====================================================
 
-    public DoctorBasicInformationModel(
+    public DoctorProfileModel(
             String firstName,
             String lastName,
             String gender,
@@ -189,7 +190,12 @@ public class DoctorBasicInformationModel {
     // =====================================================
 
     public String getFullName() {
-        return firstName + " " + lastName;
+
+        String first = firstName == null ? "" : firstName.trim();
+
+        String last = lastName == null ? "" : lastName.trim();
+
+        return (first + " " + last).trim();
     }
 
     // =====================================================
@@ -198,7 +204,8 @@ public class DoctorBasicInformationModel {
 
     @Override
     public String toString() {
-        return "DoctorBasicInformation{" +
+
+        return "DoctorProfileModel{" +
                 "firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", gender='" + gender + '\'' +
