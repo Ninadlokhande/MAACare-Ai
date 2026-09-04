@@ -1,8 +1,11 @@
 package com.sigma.view.motherPages;
+import com.sigma.ai.AIAssistant;
+import javafx.concurrent.Task;
+import javafx.scene.control.ProgressIndicator;
+import javafx.scene.text.Text;
 
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
-import javafx.scene.control.ButtonType;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -23,6 +26,7 @@ import javafx.scene.paint.Color;
 // =============================================================
 
 public class MotherNutritionDiet {
+    private final AIAssistant assistant = new AIAssistant();
 
     private final String PINK = "#E84A87";
     private final String DARK = "#24234F";
@@ -2694,7 +2698,7 @@ public class MotherNutritionDiet {
         Dialog<Void> dialog =
             createInfoDialog(
                 "👩‍⚕️ Consult Nutritionist",
-                "Get guidance for a personalized nutrition plan based on your pregnancy and health profile."
+                "Get AI-powered nutrition guidance from MaaCare AI."
             );
 
         VBox root =
@@ -2706,41 +2710,271 @@ public class MotherNutritionDiet {
 
         details.setSpacing(14);
 
-        details.getChildren().add(
-            createNutritionistInfo(
-                "👩‍⚕️",
-                "Personalized Nutrition Guidance",
-                "A nutrition professional can help you plan balanced meals according to your nutritional needs, food preferences and healthcare advice."
-            )
+        // =====================================================
+        // AI RESPONSE AREA
+        // =====================================================
+
+        StackPane aiPane =
+            new StackPane();
+
+        VBox aiTipsBox =
+            new VBox(14);
+
+        aiTipsBox.setFillWidth(true);
+        aiTipsBox.setPadding(new Insets(4));
+
+        Text initialText =
+            new Text(
+                "🤖 MaaCare AI is preparing your nutrition guidance..."
+            );
+
+        initialText.setStyle(
+            "-fx-font-size: 14px;" +
+            "-fx-fill: #77778D;"
         );
 
-        details.getChildren().add(
-            createNutritionistInfo(
-                "📋",
-                "What to Discuss",
-                "Pregnancy stage, current diet, food preferences, allergies, supplements and any nutrition-related concerns."
-            )
+        aiTipsBox.getChildren().add(initialText);
+
+        ScrollPane aiScroll =
+            new ScrollPane(aiTipsBox);
+
+        aiScroll.setFitToWidth(true);
+        aiScroll.setPannable(true);
+        aiScroll.setPrefHeight(300);
+
+        aiScroll.setHbarPolicy(
+            ScrollPane.ScrollBarPolicy.NEVER
         );
 
-        details.getChildren().add(
-            createNutritionistInfo(
-                "🥗",
-                "Personal Diet Plan",
-                "Your plan can include meal timing, food variety, healthy snack options and nutrient-focused choices."
-            )
+        aiScroll.setVbarPolicy(
+            ScrollPane.ScrollBarPolicy.AS_NEEDED
         );
 
-        details.getChildren().add(
-            createNutritionistInfo(
-                "💗",
-                "Important",
-                "For pregnancy-specific medical or nutritional concerns, always follow advice from your doctor or qualified healthcare professional."
-            )
+        aiScroll.setStyle(
+            "-fx-background-color: transparent;" +
+            "-fx-background: transparent;" +
+            "-fx-border-color: transparent;"
         );
+
+        // =====================================================
+        // PROGRESS INDICATOR
+        // =====================================================
+
+        ProgressIndicator nutritionProgress =
+            new ProgressIndicator();
+
+        nutritionProgress.setProgress(-1);
+
+        nutritionProgress.setPrefSize(55, 55);
+        nutritionProgress.setMinSize(55, 55);
+        nutritionProgress.setMaxSize(55, 55);
+
+        nutritionProgress.setStyle(
+            "-fx-progress-color: #9B4DCC;"
+        );
+
+        Text thinkingText =
+            new Text(
+                "MaaCare AI is thinking..."
+            );
+
+        thinkingText.setStyle(
+            "-fx-font-size: 14px;" +
+            "-fx-font-weight: bold;" +
+            "-fx-fill: #713CC3;"
+        );
+
+        VBox loadingBox =
+            new VBox(
+                10,
+                nutritionProgress,
+                thinkingText
+            );
+
+        loadingBox.setAlignment(Pos.CENTER);
+
+        loadingBox.setPadding(
+            new Insets(22, 30, 22, 30)
+        );
+
+        loadingBox.setMaxWidth(250);
+        loadingBox.setMaxHeight(140);
+
+        loadingBox.setStyle(
+            "-fx-background-color: rgba(255,255,255,0.97);" +
+            "-fx-background-radius: 18px;" +
+            "-fx-border-color: #E5DDED;" +
+            "-fx-border-radius: 18px;" +
+            "-fx-effect: dropshadow(gaussian, rgba(70,50,90,0.20), 18, 0.18, 0, 5);"
+        );
+
+        aiPane.getChildren().addAll(
+            aiScroll,
+            loadingBox
+        );
+
+        StackPane.setAlignment(
+            loadingBox,
+            Pos.CENTER
+        );
+
+        // =====================================================
+        // HARD-CODED AI PROMPT
+        // =====================================================
+
+        String prompt =
+            "You are MaaCare AI, a pregnancy nutrition specialist.\n\n" +
+
+            "Generate exactly 5 useful, practical and safe nutrition tips " +
+            "for a pregnant woman.\n\n" +
+
+            "Cover a useful mixture of:\n" +
+            "- Balanced pregnancy nutrition\n" +
+            "- Protein-rich foods\n" +
+            "- Iron and folate\n" +
+            "- Calcium\n" +
+            "- Fruits and vegetables\n" +
+            "- Hydration\n" +
+            "- Healthy meals and snacks\n\n" +
+
+            "Each tip must contain an emoji, a short title and a concise " +
+            "useful explanation.\n\n" +
+
+            "Safety rules:\n" +
+            "- Do not diagnose medical conditions.\n" +
+            "- Do not prescribe medicines.\n" +
+            "- Do not tell the user to stop prescribed medicines or supplements.\n" +
+            "- For individualized medical concerns, recommend consulting a qualified healthcare professional.\n\n" +
+
+            "STRICT OUTPUT FORMAT:\n" +
+            "Return exactly 5 lines and nothing else.\n" +
+            "Every line MUST use this format:\n" +
+            "TIP|emoji|title|description\n\n" +
+
+            "Example:\n" +
+            "TIP|🥗|Eat a Variety of Foods|Include vegetables, fruits, whole grains and protein-rich foods in your meals.\n\n" +
+
+            "Do not use Markdown.\n" +
+            "Do not use headings.\n" +
+            "Do not use tables.\n" +
+            "Do not use HTML.\n" +
+            "Do not use image URLs.\n" +
+            "Do not include images.\n" +
+            "Do not add an introduction or conclusion.\n" +
+            "Do not use the | character inside the title or description.";
+
+        // =====================================================
+        // AI TASK
+        // =====================================================
+
+        Task<String> task =
+            new Task<>() {
+
+                @Override
+                protected String call() {
+                    return assistant.ask(prompt);
+                }
+            };
+
+        // =====================================================
+        // AI SUCCESS
+        // =====================================================
+
+        task.setOnSucceeded(e -> {
+
+            loadingBox.setVisible(false);
+            loadingBox.setManaged(false);
+
+            aiTipsBox.getChildren().clear();
+
+            String response =
+                task.getValue();
+
+            if (response == null ||
+                response.isBlank()) {
+
+                Text error =
+                    new Text(
+                        "Unable to generate nutrition guidance. Please try again."
+                    );
+
+                error.setStyle(
+                    "-fx-font-size: 14px;" +
+                    "-fx-fill: #B42318;"
+                );
+
+                aiTipsBox.getChildren().add(error);
+
+                return;
+            }
+
+            displayNutritionAITips(
+                response,
+                aiTipsBox
+            );
+        });
+
+        // =====================================================
+        // AI FAILURE
+        // =====================================================
+
+        task.setOnFailed(e -> {
+
+            loadingBox.setVisible(false);
+            loadingBox.setManaged(false);
+
+            aiTipsBox.getChildren().clear();
+
+            Throwable error =
+                task.getException();
+
+            String message =
+                "Unable to connect to MaaCare AI. Please try again.";
+
+            if (error != null &&
+                error.getMessage() != null &&
+                !error.getMessage().isBlank()) {
+
+                message =
+                    "Unable to get AI nutrition guidance:\n" +
+                    cleanAIResponse(error.getMessage());
+            }
+
+            Text errorText =
+                new Text(message);
+
+            errorText.setWrappingWidth(500);
+
+            errorText.setStyle(
+                "-fx-font-size: 14px;" +
+                "-fx-fill: #B42318;"
+            );
+
+            aiTipsBox.getChildren().add(
+                errorText
+            );
+        });
+
+        // =====================================================
+        // START AI THREAD
+        // =====================================================
+
+        Thread thread =
+            new Thread(
+                task,
+                "MaaCare-Nutrition-AI-Thread"
+            );
+
+        thread.setDaemon(true);
+        thread.start();
+
+        // =====================================================
+        // REQUEST CONSULTATION BUTTON
+        // =====================================================
 
         Button request =
             createGradientButton(
-                "Request Nutrition Consultation"
+                "📋 Request Nutrition Consultation"
             );
 
         request.setOnAction(e -> {
@@ -2752,18 +2986,42 @@ public class MotherNutritionDiet {
             request.setDisable(true);
         });
 
-        details.getChildren().add(
+        // =====================================================
+        // ADD CONTENT
+        // =====================================================
+
+        details.getChildren().addAll(
+            aiPane,
             request
         );
+
+        VBox.setVgrow(
+            aiPane,
+            Priority.ALWAYS
+        );
+
+        // =====================================================
+        // OUTER SCROLL
+        // =====================================================
 
         ScrollPane scroll =
             new ScrollPane(details);
 
         scroll.setFitToWidth(true);
+        scroll.setPannable(true);
         scroll.setPrefHeight(430);
+
+        scroll.setHbarPolicy(
+            ScrollPane.ScrollBarPolicy.NEVER
+        );
+
+        scroll.setVbarPolicy(
+            ScrollPane.ScrollBarPolicy.AS_NEEDED
+        );
 
         scroll.setStyle(
             "-fx-background-color: transparent;" +
+            "-fx-background: transparent;" +
             "-fx-border-color: transparent;"
         );
 
@@ -2774,6 +3032,215 @@ public class MotherNutritionDiet {
 
         dialog.showAndWait();
     }
+
+
+    // =========================================================
+    // DISPLAY AI NUTRITION TIPS
+    // =========================================================
+
+    private void displayNutritionAITips(
+            String response,
+            VBox container) {
+
+        if (response == null ||
+            response.isBlank()) {
+
+            return;
+        }
+
+        String cleaned =
+            response
+                .replace("\r\n", "\n")
+                .replace('\r', '\n');
+
+        String[] lines =
+            cleaned.split("\n");
+
+        int tipCount = 0;
+
+        for (String rawLine : lines) {
+
+            String line =
+                rawLine.trim();
+
+            if (line.isEmpty()) {
+                continue;
+            }
+
+            // Remove accidental code fences
+            if (line.equals("```") ||
+                line.startsWith("```")) {
+
+                continue;
+            }
+
+            line =
+                cleanAIText(line);
+
+            String[] parts =
+                line.split("\\|", 4);
+
+            if (parts.length < 4) {
+                continue;
+            }
+
+            if (!parts[0]
+                    .trim()
+                    .equalsIgnoreCase("TIP")) {
+
+                continue;
+            }
+
+            String emoji =
+                cleanAIText(parts[1]);
+
+            String title =
+                cleanAIText(parts[2]);
+
+            String description =
+                cleanAIText(parts[3]);
+
+            if (title.isBlank() ||
+                description.isBlank()) {
+
+                continue;
+            }
+
+            HBox tip =
+                createNutritionistInfo(
+                    emoji,
+                    title,
+                    description
+                );
+
+            container.getChildren().add(
+                tip
+            );
+
+            tipCount++;
+
+            if (tipCount >= 5) {
+                break;
+            }
+        }
+
+        // =====================================================
+        // FALLBACK
+        // =====================================================
+
+        if (tipCount == 0) {
+
+            String fallbackText =
+                cleanAIResponse(response);
+
+            if (fallbackText.isBlank()) {
+
+                fallbackText =
+                    "Unable to format the nutrition guidance. Please try again.";
+            }
+
+            Text fallback =
+                new Text(fallbackText);
+
+            fallback.setWrappingWidth(500);
+
+            fallback.setStyle(
+                "-fx-font-size: 14px;" +
+                "-fx-fill: #333333;"
+            );
+
+            container.getChildren().add(
+                fallback
+            );
+        }
+    }
+
+
+    // =========================================================
+    // CLEAN INDIVIDUAL AI TEXT
+    // =========================================================
+
+    private String cleanAIText(
+            String text) {
+
+        if (text == null) {
+            return "";
+        }
+
+        return text
+            // Remove Markdown images but preserve alt text
+            .replaceAll(
+                "!\\[([^]]*)\\]\\([^)]*\\)",
+                "$1"
+            )
+
+            // Remove Markdown links but preserve visible text
+            .replaceAll(
+                "\\[([^]]+)\\]\\([^)]*\\)",
+                "$1"
+            )
+
+            // Remove HTML tags
+            .replaceAll(
+                "<[^>]*>",
+                ""
+            )
+
+            // Remove Markdown emphasis
+            .replace("**", "")
+            .replace("__", "")
+
+            // Remove inline code markers
+            .replace("`", "")
+
+            // Remove code fences
+            .replace("```", "")
+
+            .trim();
+    }
+
+
+    // =========================================================
+    // CLEAN COMPLETE AI RESPONSE
+    // =========================================================
+
+    private String cleanAIResponse(
+            String response) {
+
+        if (response == null) {
+            return "";
+        }
+
+        return response
+            // Remove Markdown images
+            .replaceAll(
+                "!\\[([^]]*)\\]\\([^)]*\\)",
+                "$1"
+            )
+
+            // Remove Markdown links
+            .replaceAll(
+                "\\[([^]]+)\\]\\([^)]*\\)",
+                "$1"
+            )
+
+            // Remove HTML
+            .replaceAll(
+                "<[^>]*>",
+                ""
+            )
+
+            // Remove Markdown emphasis
+            .replace("**", "")
+            .replace("__", "")
+
+            // Remove code markers
+            .replace("```", "")
+            .replace("`", "")
+
+            .trim();
+    }
+
 
     // =========================================================
     // DIALOG SECTION

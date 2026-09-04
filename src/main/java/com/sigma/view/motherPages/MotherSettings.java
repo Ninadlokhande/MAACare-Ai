@@ -315,10 +315,29 @@ public class MotherSettings {
                 if (response ==
                         javafx.scene.control.ButtonType.OK) {
 
-                    showAlert(
-                            Alert.AlertType.INFORMATION,
-                            "Logout feature will be connected here."
-                    );
+                    // Go back to the Login page
+                    try {
+                        com.sigma.view.Loginpage loginPage =
+                                new com.sigma.view.Loginpage();
+
+                        javafx.scene.Scene loginScene =
+                                loginPage.gotologinpage();
+
+                        javafx.stage.Stage currentStage =
+                                (javafx.stage.Stage) logoutButton
+                                        .getScene()
+                                        .getWindow();
+
+                        currentStage.setScene(loginScene);
+                        currentStage.setMaximized(true);
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+
+                        showAlert(
+                                Alert.AlertType.ERROR,
+                                "Unable to open the Login page."
+                        );
+                    }
                 }
             });
 
