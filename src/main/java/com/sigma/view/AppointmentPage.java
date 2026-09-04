@@ -26,14 +26,37 @@ import com.sigma.controller.HospitalController.AppointmentController;
 
 public class AppointmentPage{
 
-        private final String PINK="#E91E63";
+      /*   private final String PINK="#E91E63";
         private final String LIGHT_PINK="#FFF0F6";
         private final String BORDER="#E8E8EF";
         private final String TEXT="#25253A";
         private final String MUTED="#777789";
          
        
-       private static final String BG="#F7EAF5";
+       private static final String BG="#F7EAF5";*/ 
+
+
+
+// private static final String PINK = "#FADBE7";
+ /*private static final String PINK = "#E98FB3";
+
+private static final String LIGHT_PINK = "#FFEAF3";
+private static final String BORDER = "#E7DCE8";
+private static final String TEXT = "#24234F";
+private static final String MUTED = "#77778D";
+private static final String BG = "#FFFFFF"; */
+
+
+
+private static final String PINK = "#E98FB3";
+private static final String ICON_PINK = "#D85A8A";
+
+
+private static final String LIGHT_PINK = "#FFEAF3";
+private static final String BORDER = "#E7DCE8";
+private static final String TEXT = "#24234F";
+private static final String MUTED = "#77778D";
+private static final String BG = "#FFFFFF";
        
 
          
@@ -75,7 +98,7 @@ private Label pendingValueLabel;
 private void createAppointmentPage() { 
 
 
-        Content = new VBox(0);
+      /*   Content = new VBox(0);
                 Content.setBackground( 
                        new Background(
                         new BackgroundFill(
@@ -86,7 +109,18 @@ private void createAppointmentPage() {
                                 
                         )
                 )
-                );
+                );*/  
+
+
+                Content = new VBox(0);
+
+Content.setStyle(
+    "-fx-background-color: linear-gradient(" +
+    "to bottom right, " +
+    "#FFFFFF 0%, " +
+    "#FFF6FA 55%, " +
+    "#F3ECFF 100%);"
+);
 
 
         // =====================================================
@@ -147,7 +181,9 @@ private void createAppointmentPage() {
 
         search.setStyle(
                 "-fx-background-color: white;" +
-                "-fx-border-color: #E5E5EC;" +
+              //  "-fx-border-color: #E5E5EC;" +
+                "-fx-border-color: " + BORDER + ";" +
+
                 "-fx-border-radius: 8;" +
                 "-fx-background-radius: 8;" +
                 "-fx-padding: 0 12;"
@@ -237,7 +273,9 @@ private void createAppointmentPage() {
                 "Total Appointments",
                 "24",
                 "This Month",
-                "#FDE8F1"
+              "#FDE8F1"
+           // "#F0ECFF"
+
         );
 
      
@@ -250,7 +288,8 @@ VBox todayCard = createStatCard(
                     java.time.format.DateTimeFormatter
                         .ofPattern("dd MMM yyyy")
                 ),
-        "#F0ECFF"
+       "#F0ECFF"
+    // "#E8F8EF"
 );
 
 
@@ -260,7 +299,8 @@ VBox todayCard = createStatCard(
                 "Confirmed",
                 "0",
                 "This Month",
-                "#E8F8EF"
+              "#E8F8EF"
+           //   "#FFF4EF"
         );
 
         VBox pendingCard = createStatCard(
@@ -330,7 +370,10 @@ datePicker.valueProperty().addListener(
 
         newAppointment.setTextFill(
                 Color.WHITE
-        );
+        ); 
+
+     /*   newAppointment.setTextFill(
+                Color.web(TEXT));*/
 
         newAppointment.setFont(
                 Font.font(
@@ -345,7 +388,12 @@ datePicker.valueProperty().addListener(
         );
 
         newAppointment.setStyle(
-                "-fx-background-color: " + PINK + ";" +
+             //   "-fx-background-color: " + PINK + ";" +
+                        //   "-fx-background-color: #E98FB3;" +
+                           "-fx-background-color: #E91E63;" +
+
+
+
                 "-fx-background-radius: 7;" +
                 "-fx-border-radius: 7;"
         );
@@ -1181,7 +1229,9 @@ updateTodayAppointments(java.time.LocalDate.now());
         );
 
         iconLabel.setTextFill(
-                Color.web(PINK)
+                Color.web(//PINK
+                        ICON_PINK
+                )
         );
 
         StackPane iconBox =
@@ -1294,7 +1344,8 @@ if (title.equals("Total Appointments")) {
 
         card.setStyle(
                 "-fx-background-color: white;" +
-                "-fx-border-color: #E8E8EF;" +
+              //  "-fx-border-color: #E8E8EF;" +
+                "-fx-border-color: " + BORDER + ";" +
                 "-fx-border-radius: 10;" +
                 "-fx-background-radius: 10;"
         );
@@ -1332,7 +1383,7 @@ if (title.equals("Total Appointments")) {
         button.setStyle(
                 "-fx-background-color: " +
                 background + ";" +
-                "-fx-border-color: #E8E8EF;" +
+                "-fx-border-color: " + BORDER + ";" +
                 "-fx-border-radius: 5;" +
                 "-fx-background-radius: 5;"
         );

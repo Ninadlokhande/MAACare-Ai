@@ -2,22 +2,27 @@ package com.sigma.view;
 
 import com.sigma.model.Labrecords;
 import com.sigma.controller.HospitalController.LabrecordsController;
+
+import java.awt.Desktop;
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
 import java.util.List;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
-//import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import javafx.stage.Stage;
-import javafx.collections.transformation.FilteredList;
+import javafx.stage.FileChooser;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -28,9 +33,8 @@ public class LabrecordsPage {
     // COLORS
     // =========================================================
 
-    
-       private static final String BG="#F7EAF5";
-      private static final String WHITE = "#FFFFFF";
+    private static final String BG = "#F7EAF5";
+    private static final String WHITE = "#FFFFFF";
     private static final String NAVY = "#17184F";
     private static final String PINK = "#E83E83";
     private static final String LIGHT_PINK = "#FFF0F7";
@@ -40,35 +44,46 @@ public class LabrecordsPage {
     private static final String BORDER = "#E9E6EF";
     private static final String GREY = "#77758A";
 
-    // =====================================================
-// DYNAMIC STAT CARD LABELS
-// =====================================================
+    // =========================================================
+    // STAT LABELS
+    // =========================================================
 
-private Label totalReportsLabel;
-private Label pendingReportsLabel;
-private Label completedReportsLabel;
-private Label todayReportsLabel;
+    private Label totalReportsLabel;
+    private Label pendingReportsLabel;
+    private Label completedReportsLabel;
+    private Label todayReportsLabel;
 
+    // =========================================================
+    // VARIABLES
+    // =========================================================
 
-  private BorderPane root; 
-  private ObservableList<Labrecords> data =
-        FXCollections.observableArrayList();
+    private BorderPane root;
 
-  private LabrecordsController controller=new LabrecordsController();
+    private ObservableList<Labrecords> data =
+            FXCollections.observableArrayList();
 
-  public LabrecordsPage(){ 
+    private LabrecordsController controller =
+            new LabrecordsController();
+
+    // =========================================================
+    // CONSTRUCTOR
+    // =========================================================
+
+    public LabrecordsPage() {
         createView();
-  }
- 
+    }
 
-  private void createView(){ 
-        root=new BorderPane();
-        root.setStyle("-fx-background-color: " + BG + ";");
-  
+    // =========================================================
+    // CREATE VIEW
+    // =========================================================
 
-        // =====================================================
-        // MAIN CONTENT
-        // =====================================================
+    private void createView() {
+
+        root = new BorderPane();
+
+        root.setStyle(
+                "-fx-background-color: " + BG + ";"
+        );
 
         VBox mainContent = new VBox(18);
 
@@ -81,14 +96,6 @@ private Label todayReportsLabel;
         // =====================================================
 
         BorderPane header = new BorderPane();
-
-        header.setPadding(
-                new Insets(0, 0, 5, 0)
-        );
-
-        // -----------------------------------------------------
-        // TITLE
-        // -----------------------------------------------------
 
         VBox titleBox = new VBox(5);
 
@@ -126,36 +133,42 @@ private Label todayReportsLabel;
                 subtitle
         );
 
-        
-// =====================================================
-// ADD LAB RECORD BUTTON
-// =====================================================
-
-Button addLabButton =
-        new Button("+ Add Lab Record");
-
-addLabButton.setFont(
-        Font.font(
-                "Arial",
-                FontWeight.BOLD,
-                13
-        )
-);
-
-addLabButton.setCursor(Cursor.HAND);
-
-addLabButton.setStyle(
-        "-fx-background-color: " + PINK + ";" +
-        "-fx-text-fill: white;" +
-        "-fx-background-radius: 8;" +
-        "-fx-border-radius: 8;" +
-        "-fx-padding: 10 16;"
-);
-
-
-
         header.setLeft(titleBox);
-        //header.setRight(backButton);
+
+        // =====================================================
+        // ADD BUTTON
+        // =====================================================
+
+        Button addLabButton =
+                new Button("+ Add Lab Record");
+
+        addLabButton.setFont(
+                Font.font(
+                        "Arial",
+                        FontWeight.BOLD,
+                        13
+                )
+        );
+
+        addLabButton.setCursor(Cursor.HAND);
+
+        addLabButton.setStyle(
+                "-fx-background-color: " + PINK + ";" +
+                "-fx-text-fill: white;" +
+                "-fx-background-radius: 8;" +
+                "-fx-border-radius: 8;" +
+                "-fx-padding: 10 16;"
+        );
+
+        HBox addButtonBox = new HBox();
+
+        addButtonBox.setAlignment(
+                Pos.CENTER_RIGHT
+        );
+
+        addButtonBox.getChildren().add(
+                addLabButton
+        );
 
         // =====================================================
         // SUMMARY CARDS
@@ -167,7 +180,7 @@ addLabButton.setStyle(
 
         VBox totalCard =
                 createStatCard(
-                       "▣",
+                        "▣",
                         "0",
                         "Total Reports",
                         "↗  All Time",
@@ -206,20 +219,10 @@ addLabButton.setStyle(
                 pendingCard,
                 completedCard,
                 todayCard
-        );  
-
-// ===================================================== // ADD LAB RECORD BUTTON BOX // =====================================================
- 
-HBox addButtonBox = new HBox();
- 
-addButtonBox.setAlignment( Pos.CENTER_RIGHT );
- 
-addButtonBox.getChildren().add( addLabButton );
-
-
+        );
 
         // =====================================================
-        // SEARCH + FILTER AREA
+        // SEARCH AND FILTER
         // =====================================================
 
         HBox filterBox = new HBox(20);
@@ -239,10 +242,6 @@ addButtonBox.getChildren().add( addLabButton );
                 "-fx-background-radius: 12;"
         );
 
-        // =====================================================
-        // SEARCH FIELD
-        // =====================================================
-
         TextField searchField =
                 new TextField();
 
@@ -251,6 +250,7 @@ addButtonBox.getChildren().add( addLabButton );
         );
 
         searchField.setPrefHeight(45);
+
         searchField.setPrefWidth(470);
 
         searchField.setStyle(
@@ -261,10 +261,6 @@ addButtonBox.getChildren().add( addLabButton );
                 "-fx-font-size: 14;" +
                 "-fx-padding: 0 15;"
         );
-
-        // =====================================================
-        // DEPARTMENT FILTER
-        // =====================================================
 
         ComboBox<String> departmentBox =
                 new ComboBox<>();
@@ -282,11 +278,8 @@ addButtonBox.getChildren().add( addLabButton );
         );
 
         departmentBox.setPrefWidth(220);
-        departmentBox.setPrefHeight(45);
 
-        // =====================================================
-        // STATUS FILTER
-        // =====================================================
+        departmentBox.setPrefHeight(45);
 
         ComboBox<String> statusBox =
                 new ComboBox<>();
@@ -302,9 +295,14 @@ addButtonBox.getChildren().add( addLabButton );
         );
 
         statusBox.setPrefWidth(220);
+
         statusBox.setPrefHeight(45);
 
-        
+        filterBox.getChildren().addAll(
+                searchField,
+                departmentBox,
+                statusBox
+        );
 
         // =====================================================
         // TABLE
@@ -327,7 +325,7 @@ addButtonBox.getChildren().add( addLabButton );
         );
 
         // =====================================================
-        // NO COLUMN
+        // TABLE COLUMNS
         // =====================================================
 
         TableColumn<Labrecords, String> numberColumn =
@@ -339,20 +337,12 @@ addButtonBox.getChildren().add( addLabButton );
 
         numberColumn.setPrefWidth(70);
 
-        // =====================================================
-        // PATIENT NAME
-        // =====================================================
-
         TableColumn<Labrecords, String> patientColumn =
                 new TableColumn<>("Patient Name");
 
         patientColumn.setCellValueFactory(
                 new PropertyValueFactory<>("PatientName")
         );
-
-        // =====================================================
-        // TEST NAME
-        // =====================================================
 
         TableColumn<Labrecords, String> testColumn =
                 new TableColumn<>("Test Name");
@@ -361,20 +351,12 @@ addButtonBox.getChildren().add( addLabButton );
                 new PropertyValueFactory<>("TestName")
         );
 
-        // =====================================================
-        // DEPARTMENT
-        // =====================================================
-
         TableColumn<Labrecords, String> departmentColumn =
                 new TableColumn<>("Department");
 
         departmentColumn.setCellValueFactory(
                 new PropertyValueFactory<>("Department")
         );
-
-        // =====================================================
-        // DATE
-        // =====================================================
 
         TableColumn<Labrecords, String> dateColumn =
                 new TableColumn<>("Date");
@@ -383,10 +365,6 @@ addButtonBox.getChildren().add( addLabButton );
                 new PropertyValueFactory<>("Date")
         );
 
-        // =====================================================
-        // STATUS
-        // =====================================================
-
         TableColumn<Labrecords, String> statusColumn =
                 new TableColumn<>("Status");
 
@@ -394,716 +372,1006 @@ addButtonBox.getChildren().add( addLabButton );
                 new PropertyValueFactory<>("Status")
         );
 
-        // =====================================================
-        // RESULTS
-        // =====================================================
-
         TableColumn<Labrecords, String> resultsColumn =
                 new TableColumn<>("Results");
 
         resultsColumn.setCellValueFactory(
-                new PropertyValueFactory<>("Results")  
-
-   );   
-// =====================================================
-// ACTION COLUMN
-// =====================================================
-
-TableColumn<Labrecords, Void> actionColumn =
-        new TableColumn<>("Action");
-
-actionColumn.setCellFactory(column ->
-        new TableCell<Labrecords, Void>() {
-
-            private final Button view =
-                    new Button("◉");
-
-            private final Button edit =
-                    new Button("✎");
-
-            private final Button delete =
-                    new Button("▢");
-
-            private final HBox box =
-                    new HBox(5, view, edit, delete);
-
-            {
-                box.setAlignment(Pos.CENTER);
-
-                view.setCursor(Cursor.HAND);
-                edit.setCursor(Cursor.HAND);
-                delete.setCursor(Cursor.HAND);
-
-                // VIEW STYLE
-                view.setStyle(
-                        "-fx-background-color: #FFF0F7;" +
-                        "-fx-text-fill: " + PINK + ";" +
-                        "-fx-border-color: #E9E6EF;" +
-                        "-fx-border-radius: 5;" +
-                        "-fx-background-radius: 5;"
-                );
-
-                // EDIT STYLE
-                edit.setStyle(
-                        "-fx-background-color: #EEF5FF;" +
-                        "-fx-text-fill: #3274C6;" +
-                        "-fx-border-color: #E9E6EF;" +
-                        "-fx-border-radius: 5;" +
-                        "-fx-background-radius: 5;"
-                );
-
-                // DELETE STYLE
-                delete.setStyle(
-                        "-fx-background-color: #FFF0F0;" +
-                        "-fx-text-fill: #D94A5A;" +
-                        "-fx-border-color: #E9E6EF;" +
-                        "-fx-border-radius: 5;" +
-                        "-fx-background-radius: 5;"
-                );
-
-                // =================================================
-                // VIEW
-                // =================================================
-
-                view.setOnAction(e -> {
-
-                    Labrecords record =
-                            getTableView()
-                                    .getItems()
-                                    .get(getIndex());
-
-                    Alert alert =
-                            new Alert(Alert.AlertType.INFORMATION);
-
-                    alert.setTitle("Lab Report Details");
-                    alert.setHeaderText("Lab Report Information");
-
-                    alert.setContentText(
-                            "Patient: "
-                            + record.getPatientName()
-                            + "\n\nTest: "
-                            + record.getTestName()
-                            + "\n\nDepartment: "
-                            + record.getDepartment()
-                            + "\n\nDate: "
-                            + record.getDate()
-                            + "\n\nStatus: "
-                            + record.getStatus()
-                            + "\n\nResults: "
-                            + record.getResults()
-                    );
-
-                    alert.showAndWait();
-                });
-
-                // =================================================
-                // EDIT
-                // =================================================
-
-                edit.setOnAction(e -> {
-
-                    Labrecords record =
-                            getTableView()
-                                    .getItems()
-                                    .get(getIndex());
-
-                    ChoiceDialog<String> dialog =
-                            new ChoiceDialog<>(
-                                    record.getStatus(),
-                                    "Completed",
-                                    "Pending"
-                            );
-
-                    dialog.setTitle("Edit Lab Report");
-                    dialog.setHeaderText(
-                            "Change Report Status"
-                    );
-                    dialog.setContentText(
-                            "Select Status:"
-                    );
-
-                    dialog.showAndWait()
-                            .ifPresent(newStatus -> {
-
-                              //  record.setStatus(newStatus);
-
-                             //    getTableView().refresh(); 
-
-record.setStatus(newStatus);
-
-// Firebase मध्ये update
-controller.updateLabrecord(
-        record.getNumber(),
-        record.getPatientName(),
-        record.getTestName(),
-        record.getDepartment(),
-        record.getDate(),
-        record.getStatus(),
-        record.getResults()
-);
-
-getTableView().refresh();
-updateStatCards();
-
-                            });
-                });
-
-                // =================================================
-                // DELETE
-                // =================================================
-
-                delete.setOnAction(e -> {
-
-                    Labrecords record =
-                            getTableView()
-                                    .getItems()
-                                    .get(getIndex());
-
-                    Alert confirmation =
-                            new Alert(
-                                    Alert.AlertType.CONFIRMATION
-                            );
-
-                    confirmation.setTitle(
-                            "Delete Lab Report"
-                    );
-
-                    confirmation.setHeaderText(
-                            "Delete Lab Report?"
-                    );
-
-                    confirmation.setContentText(
-                            "Are you sure you want to delete the report of "
-                            + record.getPatientName()
-                            + "?"
-                    );
-
-                    confirmation.showAndWait()
-                            .ifPresent(response -> {
-
-                              /*  if (response == ButtonType.OK) {
-
-                                  //  data.remove(record);
-
-                                    getTableView()
-                                            .getItems()
-                                            .remove(record);*/
-                                if (response == ButtonType.OK) {
-
-    // Firebase madhun delete
-    controller.deleteLabrecord(
-            record.getNumber()
-    );
-
-    // Table madhun delete
-    data.remove(record);
-updateStatCards();
-    table.refresh();
-}
-                            });
-                });
-            }
-
-            @Override
-            protected void updateItem(
-                    Void item,
-                    boolean empty
-            ) {
-
-                super.updateItem(item, empty);
-
-                if (empty) {
-                    setGraphic(null);
-                } else {
-                    setGraphic(box);
-                }
-            }
-        }
-);
-
-
-
-        // =====================================================
-        // ADD TABLE COLUMNS
-        // =====================================================
-
-       table.getColumns().addAll(
-              numberColumn,
-             patientColumn,
-             testColumn,
-             departmentColumn,
-               dateColumn,
-               statusColumn,
-               resultsColumn,
-               actionColumn
-      );
-
-
-
-        
-
-     
-List<Labrecords> firebaseData =
-        controller.getAllLabrecords();
-data.clear();
-data.addAll(firebaseData);
-updateStatCards();
-
-
-     //  table.setItems(data);  
-// =====================================================
-// FILTERED LIST
-// =====================================================
-
-FilteredList<Labrecords> filteredData =
-        new FilteredList<>(
-                data,
-                record -> true
+                new PropertyValueFactory<>("Results")
         );
 
-table.setItems(filteredData);
+        // =====================================================
+        // ACTION COLUMN
+        // =====================================================
 
+        TableColumn<Labrecords, Void> actionColumn =
+                new TableColumn<>("Action");
 
-addLabButton.setOnAction(e -> {
+        actionColumn.setCellFactory(column ->
+                new TableCell<Labrecords, Void>() {
 
-    Dialog<ButtonType> dialog =
-            new Dialog<>();
+                    private final Button view =
+                            new Button("◉");
 
-    dialog.setTitle("Add Lab Record");
-    dialog.setHeaderText(
-            "Enter Lab Record Details"
-    );
+                    private final Button edit =
+                            new Button("✎");
 
-    GridPane form =
-            new GridPane();
+                    private final Button delete =
+                            new Button("▢");
 
-    form.setHgap(12);
-    form.setVgap(12);
-    form.setPadding(
-            new Insets(20)
-    );
+                    private final HBox box =
+                            new HBox(
+                                    5,
+                                    view,
+                                    edit,
+                                    delete
+                            );
 
-    // =================================================
-    // PATIENT NAME
-    // =================================================
-
-    TextField patientField =
-            new TextField();
-
-    patientField.setPromptText(
-            "Patient Name"
-    );
-
-    // =================================================
-    // TEST NAME
-    // =================================================
-
-    TextField testField =
-            new TextField();
-
-    testField.setPromptText(
-            "Test Name"
-    );
-
-    // =================================================
-    // DEPARTMENT
-    // =================================================
-
-    ComboBox<String> departmentField =
-            new ComboBox<>();
-
-    departmentField.getItems().addAll(
-            "Hematology",
-            "Biochemistry",
-            "Immunology",
-            "Pathology"
-    );
-
-    departmentField.setPromptText(
-            "Select Department"
-    );
-
-    // =================================================
-    // DATE
-    // =================================================
-
-    TextField dateField =
-            new TextField();
-
-    dateField.setPromptText(
-            "e.g. 25 Aug 2026 | 10:30 AM"
-    );
-
-    // =================================================
-    // STATUS
-    // =================================================
-
-    ComboBox<String> statusField =
-            new ComboBox<>();
-
-    statusField.getItems().addAll(
-            "Completed",
-            "Pending"
-    );
-
-    statusField.setValue(
-            "Pending"
-    );
-
-    // =================================================
-    // RESULTS
-    // =================================================
-
-    TextField resultsField =
-            new TextField();
-
-    resultsField.setPromptText(
-            "Results"
-    );
-
-    // =================================================
-    // FORM
-    // =================================================
-
-    form.add(
-            new Label("Patient Name:"),
-            0, 0
-    );
-
-    form.add(
-            patientField,
-            1, 0
-    );
-
-    form.add(
-            new Label("Test Name:"),
-            0, 1
-    );
-
-    form.add(
-            testField,
-            1, 1
-    );
-
-    form.add(
-            new Label("Department:"),
-            0, 2
-    );
-
-    form.add(
-            departmentField,
-            1, 2
-    );
-
-    form.add(
-            new Label("Date:"),
-            0, 3
-    );
-
-    form.add(
-            dateField,
-            1, 3
-    );
-
-    form.add(
-            new Label("Status:"),
-            0, 4
-    );
-
-    form.add(
-            statusField,
-            1, 4
-    );
-
-    form.add(
-            new Label("Results:"),
-            0, 5
-    );
-
-    form.add(
-            resultsField,
-            1, 5
-    );
-
-    // =================================================
-    // FIELD WIDTH
-    // =================================================
-
-    patientField.setPrefWidth(280);
-    testField.setPrefWidth(280);
-    departmentField.setPrefWidth(280);
-    dateField.setPrefWidth(280);
-    statusField.setPrefWidth(280);
-    resultsField.setPrefWidth(280);
-
-    // =================================================
-    // ADD BUTTON
-    // =================================================
-
-    ButtonType addButton =
-            new ButtonType(
-                    "Add Record",
-                    ButtonBar.ButtonData.OK_DONE
-            );
-
-    dialog.getDialogPane()
-            .getButtonTypes()
-            .addAll(
-                    addButton,
-                    ButtonType.CANCEL
-            );
-
-    dialog.getDialogPane()
-            .setContent(form);
-
-    // =================================================
-    // RESULT
-    // =================================================
-
-    dialog.setResultConverter(button -> {
-
-        if (button == addButton) {
-
-            // =========================================
-            // VALIDATION
-            // =========================================
-
-            if (
-                    patientField.getText()
-                            .trim()
-                            .isEmpty()
-                    ||
-                    testField.getText()
-                            .trim()
-                            .isEmpty()
-                    ||
-                    departmentField.getValue()
-                            == null
-                    ||
-                    dateField.getText()
-                            .trim()
-                            .isEmpty()
-                    ||
-                    resultsField.getText()
-                            .trim()
-                            .isEmpty()
-            ) {
-
-                Alert warning =
-                        new Alert(
-                                Alert.AlertType.WARNING
+                    {
+                        box.setAlignment(
+                                Pos.CENTER
                         );
 
-                warning.setTitle(
-                        "Missing Information"
-                );
+                        view.setCursor(
+                                Cursor.HAND
+                        );
 
-                warning.setHeaderText(
-                        "Please fill all fields"
-                );
+                        edit.setCursor(
+                                Cursor.HAND
+                        );
 
-                warning.showAndWait();
+                        delete.setCursor(
+                                Cursor.HAND
+                        );
 
-                return null;
-            }
+                        view.setStyle(
+                                "-fx-background-color: #FFF0F7;" +
+                                "-fx-text-fill: " + PINK + ";" +
+                                "-fx-border-color: #E9E6EF;" +
+                                "-fx-border-radius: 5;" +
+                                "-fx-background-radius: 5;"
+                        );
 
-            // =========================================
-            // AUTOMATIC NUMBER
-            // =========================================
+                        edit.setStyle(
+                                "-fx-background-color: #EEF5FF;" +
+                                "-fx-text-fill: #3274C6;" +
+                                "-fx-border-color: #E9E6EF;" +
+                                "-fx-border-radius: 5;" +
+                                "-fx-background-radius: 5;"
+                        );
 
-/*String newNumber =
-                    String.valueOf(
-                            data.size() + 1
-                    );*/ 
-int maxNumber = 0;
+                        delete.setStyle(
+                                "-fx-background-color: #FFF0F0;" +
+                                "-fx-text-fill: #D94A5A;" +
+                                "-fx-border-color: #E9E6EF;" +
+                                "-fx-border-radius: 5;" +
+                                "-fx-background-radius: 5;"
+                        );
 
-for (Labrecords record : data) {
+                        // =================================================
+                        // VIEW
+                        // =================================================
 
-    try {
+                        view.setOnAction(e -> {
 
-        int currentNumber =
-                Integer.parseInt(
-                        record.getNumber()
-                );
+                            Labrecords record =
+                                    getTableView()
+                                            .getItems()
+                                            .get(getIndex());
 
-        if (currentNumber > maxNumber) {
-            maxNumber = currentNumber;
-        }
+                            Dialog<ButtonType> viewDialog =
+                                    new Dialog<>();
 
-    } catch (NumberFormatException ex) {
-        // Invalid number ignore
-    }
-}
+                            viewDialog.setTitle(
+                                    "Lab Report Details"
+                            );
 
-String newNumber =
-        String.valueOf(maxNumber + 1);
+                            viewDialog.setHeaderText(
+                                    "Lab Report Information"
+                            );
 
+                            VBox content =
+                                    new VBox(12);
 
-            // =========================================
-            // NEW LAB RECORD
-            // =========================================
+                            content.setPadding(
+                                    new Insets(20)
+                            );
 
-            Labrecords newRecord =
-                    new Labrecords(
+                            Label patientLabel =
+                                    new Label(
+                                            "Patient: "
+                                                    + record.getPatientName()
+                                    );
 
-                            newNumber,
+                            Label testLabel =
+                                    new Label(
+                                            "Test: "
+                                                    + record.getTestName()
+                                    );
 
-                            patientField
-                                    .getText()
-                                    .trim(),
+                            Label departmentLabel =
+                                    new Label(
+                                            "Department: "
+                                                    + record.getDepartment()
+                                    );
 
-                            testField
-                                    .getText()
-                                    .trim(),
+                            Label dateLabel =
+                                    new Label(
+                                            "Date: "
+                                                    + record.getDate()
+                                    );
 
-                            departmentField
-                                    .getValue(),
+                            Label statusLabel =
+                                    new Label(
+                                            "Status: "
+                                                    + record.getStatus()
+                                    );
 
-                            dateField
-                                    .getText()
-                                    .trim(),
+                            Label resultsLabel =
+                                    new Label(
+                                            "Results: "
+                                                    + record.getResults()
+                                    );
 
-                            statusField
-                                    .getValue(),
+                            content.getChildren().addAll(
+                                    patientLabel,
+                                    testLabel,
+                                    departmentLabel,
+                                    dateLabel,
+                                    statusLabel,
+                                    resultsLabel
+                            );
 
-                            resultsField
-                                    .getText()
-                                    .trim()
-                    );
-// =========================================
-// SAVE TO FIREBASE
-// =========================================
+                            // =================================================
+                            // DOCUMENT BUTTON
+                            // =================================================
 
-controller.addLabrecord(
-        newRecord.getNumber(),
-        newRecord.getPatientName(),
-        newRecord.getTestName(),
-        newRecord.getDepartment(),
-        newRecord.getDate(),
-        newRecord.getStatus(),
-        newRecord.getResults()
-);
+                            String documentUrl =
+                                    record.getDocumentUrl();
 
-// =========================================
-// ADD TO LOCAL TABLE
-// =========================================
+                            Button viewDocumentButton =
+                                    new Button(
+                                            "View Document"
+                                    );
 
-data.add(newRecord);
+                            viewDocumentButton.setCursor(
+                                    Cursor.HAND
+                            );
 
-updateStatCards();
-filteredData.setPredicate(filteredData.getPredicate());
-table.refresh();
+                            viewDocumentButton.setStyle(
+                                    "-fx-background-color: "
+                                            + PINK + ";" +
+                                    "-fx-text-fill: white;" +
+                                    "-fx-font-weight: bold;" +
+                                    "-fx-background-radius: 7;" +
+                                    "-fx-padding: 9 15;"
+                            );
 
+                            if (
+                                    documentUrl == null
+                                    || documentUrl.trim().isEmpty()
+                            ) {
 
-// =========================================
-// REFRESH TABLE
-// =========================================
+                                viewDocumentButton.setDisable(
+                                        true
+                                );
 
-filteredData.setPredicate(filteredData.getPredicate());
-table.refresh();
+                                viewDocumentButton.setText(
+                                        "No Document Available"
+                                );
 
+                            } else {
 
-           // table.refresh();
+                                viewDocumentButton.setOnAction(
+                                        event -> openDocument(
+                                                documentUrl
+                                        )
+                                );
+                            }
 
-            return button;
-        }
+                            content.getChildren().add(
+                                    viewDocumentButton
+                            );
 
-        return null;
-    });
+                            viewDialog.getDialogPane()
+                                    .setContent(
+                                            content
+                                    );
 
-    dialog.showAndWait();
-});
+                            viewDialog.getDialogPane()
+                                    .getButtonTypes()
+                                    .add(
+                                            ButtonType.CLOSE
+                                    );
 
+                            viewDialog.showAndWait();
+                        });
 
+                        // =================================================
+                        // EDIT
+                        // =================================================
 
-        
+                        edit.setOnAction(e -> {
 
-        
-// =====================================================
-// BED BOOKING STYLE FILTERING
-// =====================================================
+                            Labrecords record =
+                                    getTableView()
+                                            .getItems()
+                                            .get(getIndex());
 
-Runnable updateFilter = () -> {
+                            ChoiceDialog<String> dialog =
+                                    new ChoiceDialog<>(
+                                            record.getStatus(),
+                                            "Completed",
+                                            "Pending"
+                                    );
 
-    String searchText =
-            searchField.getText()
-                    .trim()
-                    .toLowerCase();
+                            dialog.setTitle(
+                                    "Edit Lab Report"
+                            );
 
-    String selectedDepartment =
-            departmentBox.getValue();
+                            dialog.setHeaderText(
+                                    "Change Report Status"
+                            );
 
-    String selectedStatus =
-            statusBox.getValue();
+                            dialog.setContentText(
+                                    "Select Status:"
+                            );
 
-    filteredData.setPredicate(record -> {
+                            dialog.showAndWait()
+                                    .ifPresent(
+                                            newStatus -> {
 
-        boolean searchMatch =
-                searchText.isEmpty()
-                ||
-                record.getPatientName()
-                        .toLowerCase()
-                        .contains(searchText)
-                ||
-                record.getTestName()
-                        .toLowerCase()
-                        .contains(searchText);
+                                                record.setStatus(
+                                                        newStatus
+                                                );
 
-        boolean departmentMatch =
-                selectedDepartment.equals(
-                        "All Departments"
-                )
-                ||
-                record.getDepartment()
-                        .equals(selectedDepartment);
+                                                controller.updateLabrecord(
+                                                        record.getNumber(),
+                                                        record.getPatientName(),
+                                                        record.getTestName(),
+                                                        record.getDepartment(),
+                                                        record.getDate(),
+                                                        record.getStatus(),
+                                                        record.getResults(),
+                                                        record.getDocumentUrl()
+                                                );
 
-        boolean statusMatch =
-                selectedStatus.equals(
-                        "All Status"
-                )
-                ||
-                record.getStatus()
-                        .equals(selectedStatus);
+                                                getTableView()
+                                                        .refresh();
 
-        return searchMatch
-                && departmentMatch
-                && statusMatch;
-    });
-};
+                                                updateStatCards();
+                                            }
+                                    );
+                        });
 
-searchField.textProperty().addListener(
-        (observable, oldValue, newValue) ->
-                updateFilter.run()
-);
+                        // =================================================
+                        // DELETE
+                        // =================================================
 
-departmentBox.valueProperty().addListener(
-        (observable, oldValue, newValue) ->
-                updateFilter.run()
-);
+                        delete.setOnAction(e -> {
 
-statusBox.valueProperty().addListener(
-        (observable, oldValue, newValue) ->
-                updateFilter.run()
-);
+                            Labrecords record =
+                                    getTableView()
+                                            .getItems()
+                                            .get(getIndex());
 
+                            Alert confirmation =
+                                    new Alert(
+                                            Alert.AlertType.CONFIRMATION
+                                    );
 
+                            confirmation.setTitle(
+                                    "Delete Lab Report"
+                            );
 
+                            confirmation.setHeaderText(
+                                    "Delete Lab Report?"
+                            );
 
+                            confirmation.setContentText(
+                                    "Are you sure you want to delete the report of "
+                                            + record.getPatientName()
+                                            + "?"
+                            );
 
+                            confirmation.showAndWait()
+                                    .ifPresent(
+                                            response -> {
 
+                                                if (
+                                                        response
+                                                                == ButtonType.OK
+                                                ) {
 
+                                                    controller.deleteLabrecord(
+                                                            record.getNumber()
+                                                    );
 
-filterBox.getChildren().addAll(
-        searchField,
-        departmentBox,
-        statusBox
-);
+                                                    data.remove(
+                                                            record
+                                                    );
 
+                                                    updateStatCards();
 
+                                                    table.refresh();
+                                                }
+                                            }
+                                    );
+                        });
+                    }
 
+                    @Override
+                    protected void updateItem(
+                            Void item,
+                            boolean empty
+                    ) {
+
+                        super.updateItem(
+                                item,
+                                empty
+                        );
+
+                        if (empty) {
+
+                            setGraphic(null);
+
+                        } else {
+
+                            setGraphic(box);
+                        }
+                    }
+                }
+        );
+
+        table.getColumns().addAll(
+                numberColumn,
+                patientColumn,
+                testColumn,
+                departmentColumn,
+                dateColumn,
+                statusColumn,
+                resultsColumn,
+                actionColumn
+        );
 
         // =====================================================
-        // TABLE ROW HOVER
+        // LOAD FIREBASE DATA
+        // =====================================================
+
+        List<Labrecords> firebaseData =
+                controller.getAllLabrecords();
+
+        data.clear();
+
+        data.addAll(
+                firebaseData
+        );
+
+        FilteredList<Labrecords> filteredData =
+                new FilteredList<>(
+                        data,
+                        record -> true
+                );
+
+        table.setItems(
+                filteredData
+        );
+
+        updateStatCards();
+
+        // =====================================================
+        // ADD LAB RECORD
+        // =====================================================
+
+        addLabButton.setOnAction(e -> {
+
+            Dialog<ButtonType> dialog =
+                    new Dialog<>();
+
+            dialog.setTitle(
+                    "Add Lab Record"
+            );
+
+            dialog.setHeaderText(
+                    "Enter Lab Record Details"
+            );
+
+            GridPane form =
+                    new GridPane();
+
+            form.setHgap(12);
+
+            form.setVgap(12);
+
+            form.setPadding(
+                    new Insets(20)
+            );
+
+            // =================================================
+            // FIELDS
+            // =================================================
+
+            TextField patientField =
+                    new TextField();
+
+            patientField.setPromptText(
+                    "Patient Name"
+            );
+
+            TextField testField =
+                    new TextField();
+
+            testField.setPromptText(
+                    "Test Name"
+            );
+
+            ComboBox<String> departmentField =
+                    new ComboBox<>();
+
+            departmentField.getItems().addAll(
+                    "Hematology",
+                    "Biochemistry",
+                    "Immunology",
+                    "Pathology"
+            );
+
+            departmentField.setPromptText(
+                    "Select Department"
+            );
+
+            TextField dateField =
+                    new TextField();
+
+            dateField.setPromptText(
+                    "e.g. 04 Sep 2026 | 10:30 AM"
+            );
+
+            ComboBox<String> statusField =
+                    new ComboBox<>();
+
+            statusField.getItems().addAll(
+                    "Completed",
+                    "Pending"
+            );
+
+            statusField.setValue(
+                    "Pending"
+            );
+
+            TextField resultsField =
+                    new TextField();
+
+            resultsField.setPromptText(
+                    "Results"
+            );
+
+            // =================================================
+            // DOCUMENT
+            // =================================================
+
+            Label documentLabel =
+                    new Label(
+                            "No document selected"
+                    );
+
+            documentLabel.setTextFill(
+                    Color.web(GREY)
+            );
+
+            Button chooseDocumentButton =
+                    new Button(
+                            "Choose Document"
+                    );
+
+            chooseDocumentButton.setCursor(
+                    Cursor.HAND
+            );
+
+            chooseDocumentButton.setStyle(
+                    "-fx-background-color: #FFF0F7;" +
+                    "-fx-text-fill: " + PINK + ";" +
+                    "-fx-border-color: " + BORDER + ";" +
+                    "-fx-border-radius: 6;" +
+                    "-fx-background-radius: 6;" +
+                    "-fx-padding: 8 12;"
+            );
+
+            final File[] selectedDocument =
+                    new File[1];
+
+            chooseDocumentButton.setOnAction(
+                    event -> {
+
+                        FileChooser fileChooser =
+                                new FileChooser();
+
+                        fileChooser.setTitle(
+                                "Select Lab Report Document"
+                        );
+
+                        fileChooser.getExtensionFilters()
+                                .addAll(
+
+                                        new FileChooser.ExtensionFilter(
+                                                "PDF Documents",
+                                                "*.pdf"
+                                        ),
+
+                                        new FileChooser.ExtensionFilter(
+                                                "Word Documents",
+                                                "*.doc",
+                                                "*.docx"
+                                        ),
+
+                                        new FileChooser.ExtensionFilter(
+                                                "Text Documents",
+                                                "*.txt"
+                                        ),
+
+                                        new FileChooser.ExtensionFilter(
+                                                "All Files",
+                                                "*.*"
+                                        )
+                                );
+
+                        File file =
+                                fileChooser.showOpenDialog(
+                                        dialog.getOwner()
+                                );
+
+                        if (file != null) {
+
+                            selectedDocument[0] =
+                                    file;
+
+                            documentLabel.setText(
+                                    file.getName()
+                            );
+                        }
+                    }
+            );
+
+            // =================================================
+            // FORM
+            // =================================================
+
+            form.add(
+                    new Label("Patient Name:"),
+                    0,
+                    0
+            );
+
+            form.add(
+                    patientField,
+                    1,
+                    0
+            );
+
+            form.add(
+                    new Label("Test Name:"),
+                    0,
+                    1
+            );
+
+            form.add(
+                    testField,
+                    1,
+                    1
+            );
+
+            form.add(
+                    new Label("Department:"),
+                    0,
+                    2
+            );
+
+            form.add(
+                    departmentField,
+                    1,
+                    2
+            );
+
+            form.add(
+                    new Label("Date:"),
+                    0,
+                    3
+            );
+
+            form.add(
+                    dateField,
+                    1,
+                    3
+            );
+
+            form.add(
+                    new Label("Status:"),
+                    0,
+                    4
+            );
+
+            form.add(
+                    statusField,
+                    1,
+                    4
+            );
+
+            form.add(
+                    new Label("Results:"),
+                    0,
+                    5
+            );
+
+            form.add(
+                    resultsField,
+                    1,
+                    5
+            );
+
+            form.add(
+                    new Label("Document:"),
+                    0,
+                    6
+            );
+
+            HBox documentBox =
+                    new HBox(10);
+
+            documentBox.setAlignment(
+                    Pos.CENTER_LEFT
+            );
+
+            documentBox.getChildren().addAll(
+                    chooseDocumentButton,
+                    documentLabel
+            );
+
+            form.add(
+                    documentBox,
+                    1,
+                    6
+            );
+
+            patientField.setPrefWidth(280);
+            testField.setPrefWidth(280);
+            departmentField.setPrefWidth(280);
+            dateField.setPrefWidth(280);
+            statusField.setPrefWidth(280);
+            resultsField.setPrefWidth(280);
+
+            // =================================================
+            // DIALOG BUTTONS
+            // =================================================
+
+            ButtonType addButton =
+                    new ButtonType(
+                            "Add Record",
+                            ButtonBar.ButtonData.OK_DONE
+                    );
+
+            dialog.getDialogPane()
+                    .getButtonTypes()
+                    .addAll(
+                            addButton,
+                            ButtonType.CANCEL
+                    );
+
+            dialog.getDialogPane()
+                    .setContent(form);
+
+            // =================================================
+            // RESULT CONVERTER
+            // =================================================
+
+            dialog.setResultConverter(
+                    button -> {
+
+                        if (button == addButton) {
+
+                            // =================================
+                            // VALIDATION
+                            // =================================
+
+                            if (
+                                    patientField.getText()
+                                            .trim()
+                                            .isEmpty()
+                                    ||
+                                    testField.getText()
+                                            .trim()
+                                            .isEmpty()
+                                    ||
+                                    departmentField.getValue()
+                                            == null
+                                    ||
+                                    dateField.getText()
+                                            .trim()
+                                            .isEmpty()
+                                    ||
+                                    resultsField.getText()
+                                            .trim()
+                                            .isEmpty()
+                            ) {
+
+                                Alert warning =
+                                        new Alert(
+                                                Alert.AlertType.WARNING
+                                        );
+
+                                warning.setTitle(
+                                        "Missing Information"
+                                );
+
+                                warning.setHeaderText(
+                                        "Please fill all fields"
+                                );
+
+                                warning.showAndWait();
+
+                                return null;
+                            }
+
+                            // =================================
+                            // GENERATE NUMBER
+                            // =================================
+
+                            int maxNumber = 0;
+
+                            for (
+                                    Labrecords record :
+                                    data
+                            ) {
+
+                                try {
+
+                                    int currentNumber =
+                                            Integer.parseInt(
+                                                    record.getNumber()
+                                            );
+
+                                    if (
+                                            currentNumber
+                                                    > maxNumber
+                                    ) {
+
+                                        maxNumber =
+                                                currentNumber;
+                                    }
+
+                                } catch (
+                                        NumberFormatException ex
+                                ) {
+
+                                    // Ignore invalid number
+                                }
+                            }
+
+                            String newNumber =
+                                    String.valueOf(
+                                            maxNumber + 1
+                                    );
+
+                            // =================================
+                            // UPLOAD DOCUMENT
+                            // =================================
+
+                            String documentUrl = "";
+
+                            if (
+                                    selectedDocument[0]
+                                            != null
+                            ) {
+
+                                try {
+
+                                    documentUrl =
+                                            controller
+                                                    .uploadLabReportDocument(
+                                                            selectedDocument[0]
+                                                    );
+
+                                } catch (
+                                        IOException ex
+                                ) {
+
+                                    Alert error =
+                                            new Alert(
+                                                    Alert.AlertType.ERROR
+                                            );
+
+                                    error.setTitle(
+                                            "Upload Error"
+                                    );
+
+                                    error.setHeaderText(
+                                            "Document upload failed"
+                                    );
+
+                                    error.setContentText(
+                                            ex.getMessage()
+                                    );
+
+                                    error.showAndWait();
+
+                                    return null;
+                                }
+                            }
+
+                            // =================================
+                            // CREATE RECORD
+                            // =================================
+
+                            Labrecords newRecord =
+                                    new Labrecords(
+
+                                            newNumber,
+
+                                            patientField
+                                                    .getText()
+                                                    .trim(),
+
+                                            testField
+                                                    .getText()
+                                                    .trim(),
+
+                                            departmentField
+                                                    .getValue(),
+
+                                            dateField
+                                                    .getText()
+                                                    .trim(),
+
+                                            statusField
+                                                    .getValue(),
+
+                                            resultsField
+                                                    .getText()
+                                                    .trim(),
+
+                                            documentUrl
+                                    );
+
+                            // =================================
+                            // SAVE TO FIREBASE
+                            // =================================
+
+                            controller.addLabrecord(
+                                    newRecord.getNumber(),
+                                    newRecord.getPatientName(),
+                                    newRecord.getTestName(),
+                                    newRecord.getDepartment(),
+                                    newRecord.getDate(),
+                                    newRecord.getStatus(),
+                                    newRecord.getResults(),
+                                    newRecord.getDocumentUrl()
+                            );
+
+                            // =================================
+                            // ADD TO TABLE
+                            // =================================
+
+                            data.add(
+                                    newRecord
+                            );
+
+                            updateStatCards();
+
+                            table.refresh();
+
+                            return button;
+                        }
+
+                        return null;
+                    }
+            );
+
+            dialog.showAndWait();
+        });
+
+        // =====================================================
+        // FILTERING
+        // =====================================================
+
+        Runnable updateFilter = () -> {
+
+            String searchText =
+                    searchField.getText()
+                            .trim()
+                            .toLowerCase();
+
+            String selectedDepartment =
+                    departmentBox.getValue();
+
+            String selectedStatus =
+                    statusBox.getValue();
+
+            filteredData.setPredicate(
+                    record -> {
+
+                        boolean searchMatch =
+                                searchText.isEmpty()
+
+                                ||
+
+                                (
+                                        record.getPatientName()
+                                                != null
+                                        &&
+                                        record.getPatientName()
+                                                .toLowerCase()
+                                                .contains(
+                                                        searchText
+                                                )
+                                )
+
+                                ||
+
+                                (
+                                        record.getTestName()
+                                                != null
+                                        &&
+                                        record.getTestName()
+                                                .toLowerCase()
+                                                .contains(
+                                                        searchText
+                                                )
+                                );
+
+                        boolean departmentMatch =
+                                selectedDepartment.equals(
+                                        "All Departments"
+                                )
+                                ||
+                                (
+                                        record.getDepartment()
+                                                != null
+                                        &&
+                                        record.getDepartment()
+                                                .equals(
+                                                        selectedDepartment
+                                                )
+                                );
+
+                        boolean statusMatch =
+                                selectedStatus.equals(
+                                        "All Status"
+                                )
+                                ||
+                                (
+                                        record.getStatus()
+                                                != null
+                                        &&
+                                        record.getStatus()
+                                                .equals(
+                                                        selectedStatus
+                                                )
+                                );
+
+                        return searchMatch
+                                && departmentMatch
+                                && statusMatch;
+                    }
+            );
+        };
+
+        searchField.textProperty()
+                .addListener(
+                        (observable, oldValue, newValue) ->
+                                updateFilter.run()
+                );
+
+        departmentBox.valueProperty()
+                .addListener(
+                        (observable, oldValue, newValue) ->
+                                updateFilter.run()
+                );
+
+        statusBox.valueProperty()
+                .addListener(
+                        (observable, oldValue, newValue) ->
+                                updateFilter.run()
+                );
+
+        // =====================================================
+        // ROW HOVER
         // =====================================================
 
         table.setRowFactory(tv -> {
@@ -1131,7 +1399,7 @@ filterBox.getChildren().addAll(
         });
 
         // =====================================================
-        // ADD ALL CONTENT
+        // ADD CONTENT
         // =====================================================
 
         mainContent.getChildren().addAll(
@@ -1142,345 +1410,380 @@ filterBox.getChildren().addAll(
                 table
         );
 
-        //root.setCenter(mainContent);
-        root.setCenter(mainContent);
-
-        // =====================================================
-        // SCENE
-        // =====================================================
-
-      /*  Scene scene =
-              new Scene(
-                        root,
-                        1500,
-                        800
-                );
-
-        stage.setScene(scene);
-
-        stage.setTitle(
-                "MaaCareAI - Lab Records"
-        );*/
-
-      //  stage.show();
+        root.setCenter(
+                mainContent
+        );
     }
 
     // =========================================================
-    // FILTER METHOD
+    // OPEN DOCUMENT
     // =========================================================
 
-    private void applyFilter(
-            TableView<Labrecords> table,
-            ObservableList<Labrecords> data,
-            String searchText,
-            String selectedDepartment,
-            String selectedStatus
+    private void openDocument(
+            String documentUrl
     ) {
 
-        String search =
-                searchText == null
-                        ? ""
-                        : searchText.toLowerCase();
-
-        ObservableList<Labrecords> filtered =
-                FXCollections.observableArrayList();
-
-        for (Labrecords record : data) {
-
-            boolean searchMatch =
-                    record.getPatientName()
-                            .toLowerCase()
-                            .contains(search)
-                    ||
-                    record.getTestName()
-                            .toLowerCase()
-                            .contains(search);
-
-            boolean departmentMatch =
-                    selectedDepartment.equals(
-                            "All Departments"
-                    )
-                    ||
-                    record.getDepartment()
-                            .equals(selectedDepartment);
-
-            boolean statusMatch =
-                    selectedStatus.equals(
-                            "All Status"
-                    )
-                    ||
-                    record.getStatus()
-                            .equals(selectedStatus);
+        try {
 
             if (
-                    searchMatch
-                    && departmentMatch
-                    && statusMatch
+                    documentUrl == null
+                    || documentUrl.trim().isEmpty()
             ) {
 
-                filtered.add(record);
-            }
-        }
-
-        table.setItems(filtered);  
-    }
-
-    // =========================================================
-    // STAT CARD METHOD
-    // =========================================================
-
-   
-private VBox createStatCard(
-        String symbol,
-        String number,
-        String title,
-        String bottomText,
-        String color
-) {
-
-    VBox card =
-            new VBox(8);
-
-    card.setPadding(
-            new Insets(18)
-    );
-
-    card.setPrefHeight(155);
-    card.setPrefWidth(260);
-
-    card.setStyle(
-            "-fx-background-color: white;" +
-            "-fx-border-color: " + BORDER + ";" +
-            "-fx-border-radius: 14;" +
-            "-fx-background-radius: 14;"
-    );
-
-    // =====================================================
-    // TOP ROW - SYMBOL + NUMBER
-    // =====================================================
-
-    HBox topRow =
-            new HBox(12);
-
-    topRow.setAlignment(
-            Pos.CENTER_LEFT
-    );
-
-    Label symbolLabel =
-            new Label(symbol);
-
-    symbolLabel.setFont(
-            Font.font(
-                    "Arial",
-                    FontWeight.BOLD,
-                    24
-            )
-    );
-
-    symbolLabel.setTextFill(
-            Color.web(color)
-    );
-
-    symbolLabel.setStyle(
-            "-fx-background-color: " + LIGHT_PINK + ";" +
-            "-fx-background-radius: 10;" +
-            "-fx-padding: 8 12;"
-    );
-
-    Label numberLabel =
-            new Label(number);
-            if (title.equals("Total Reports")) {
-    totalReportsLabel = numberLabel;
-}
-else if (title.equals("Pending Reports")) {
-    pendingReportsLabel = numberLabel;
-}
-else if (title.equals("Completed Reports")) {
-    completedReportsLabel = numberLabel;
-}
-else if (title.equals("Today's Reports")) {
-    todayReportsLabel = numberLabel;
-}
-
-    numberLabel.setFont(
-            Font.font(
-                    "Arial",
-                    FontWeight.BOLD,
-                    30
-            )
-    );
-
-    numberLabel.setTextFill(
-            Color.web(NAVY)
-    );
-
-    topRow.getChildren().addAll(
-            symbolLabel,
-            numberLabel
-    );
-
-    // =====================================================
-    // TITLE
-    // =====================================================
-
-    Label titleLabel =
-            new Label(title);
-
-    titleLabel.setFont(
-            Font.font(
-                    "Arial",
-                    FontWeight.BOLD,
-                    15
-            )
-    );
-
-    titleLabel.setTextFill(
-            Color.web(NAVY)
-    );
-
-    // =====================================================
-    // BOTTOM TEXT
-    // =====================================================
-
-    Label bottomLabel =
-            new Label(bottomText);
-
-    bottomLabel.setFont(
-            Font.font(
-                    "Arial",
-                    FontWeight.BOLD,
-                    13
-            )
-    );
-
-    bottomLabel.setTextFill(
-            Color.web(color)
-    );
-
-    card.getChildren().addAll(
-            topRow,
-            titleLabel,
-            bottomLabel
-    );
-
-    return card;  
-}  
-
-// =========================================================
-// UPDATE LAB RECORD STAT CARDS
-// =========================================================
-
-private void updateStatCards() {
-
-    // Firebase मधून latest data घ्या
-    List<Labrecords> records =
-            controller.getAllLabrecords();
-
-    int total = records.size();
-
-    int pending = 0;
-    int completed = 0;
-    int today = 0;
-
-    LocalDate todayDate = LocalDate.now();
-
-    for (Labrecords record : records) {
-
-        // ---------------------------------------------
-        // STATUS COUNT
-        // ---------------------------------------------
-
-        if (record.getStatus() != null) {
-
-            if (record.getStatus()
-                    .equalsIgnoreCase("Pending")) {
-
-                pending++;
-
-            }
-            else if (record.getStatus()
-                    .equalsIgnoreCase("Completed")) {
-
-                completed++;
-            }
-        }
-
-        // ---------------------------------------------
-        // TODAY'S REPORT COUNT
-        // ---------------------------------------------
-
-        if (record.getDate() != null) {
-
-            String dateText =
-                    record.getDate().trim();
-
-            try {
-
-                // Example:
-                // 29 Aug 2026 | 10:30 AM
-
-                String datePart =
-                        dateText.split("\\|")[0].trim();
-
-                DateTimeFormatter formatter =
-                        DateTimeFormatter.ofPattern(
-                                "dd MMM yyyy"
+                Alert alert =
+                        new Alert(
+                                Alert.AlertType.WARNING
                         );
 
-                LocalDate recordDate =
-                        LocalDate.parse(
-                                datePart,
-                                formatter
-                        );
-
-                if (recordDate.equals(todayDate)) {
-                    today++;
-                }
-
-            }
-            catch (DateTimeParseException ex) {
-
-                System.out.println(
-                        "Invalid lab record date: "
-                        + dateText
+                alert.setTitle(
+                        "Document"
                 );
+
+                alert.setHeaderText(
+                        "No document available"
+                );
+
+                alert.showAndWait();
+
+                return;
             }
+
+            if (
+                    Desktop.isDesktopSupported()
+                    &&
+                    Desktop.getDesktop()
+                            .isSupported(
+                                    Desktop.Action.BROWSE
+                            )
+            ) {
+
+                Desktop.getDesktop()
+                        .browse(
+                                new URI(
+                                        documentUrl
+                                )
+                        );
+
+            } else {
+
+                Alert alert =
+                        new Alert(
+                                Alert.AlertType.ERROR
+                        );
+
+                alert.setTitle(
+                        "Cannot Open Document"
+                );
+
+                alert.setHeaderText(
+                        "Browser could not be opened"
+                );
+
+                alert.showAndWait();
+            }
+
+        } catch (Exception ex) {
+
+            Alert alert =
+                    new Alert(
+                            Alert.AlertType.ERROR
+                    );
+
+            alert.setTitle(
+                    "Document Error"
+            );
+
+            alert.setHeaderText(
+                    "Unable to open document"
+            );
+
+            alert.setContentText(
+                    ex.getMessage()
+            );
+
+            alert.showAndWait();
         }
     }
 
-    // ---------------------------------------------
-    // UPDATE UI
-    // ---------------------------------------------
+    // =========================================================
+    // STAT CARD
+    // =========================================================
 
-    totalReportsLabel.setText(
-            String.valueOf(total)
-    );
+    private VBox createStatCard(
+            String symbol,
+            String number,
+            String title,
+            String bottomText,
+            String color
+    ) {
 
-    pendingReportsLabel.setText(
-            String.valueOf(pending)
-    );
+        VBox card =
+                new VBox(8);
 
-    completedReportsLabel.setText(
-            String.valueOf(completed)
-    );
+        card.setPadding(
+                new Insets(18)
+        );
 
-    todayReportsLabel.setText(
-            String.valueOf(today)
-    );
+        card.setPrefHeight(155);
+
+        card.setPrefWidth(260);
+
+        card.setStyle(
+                "-fx-background-color: white;" +
+                "-fx-border-color: " + BORDER + ";" +
+                "-fx-border-radius: 14;" +
+                "-fx-background-radius: 14;"
+        );
+
+        HBox topRow =
+                new HBox(12);
+
+        topRow.setAlignment(
+                Pos.CENTER_LEFT
+        );
+
+        Label symbolLabel =
+                new Label(symbol);
+
+        symbolLabel.setFont(
+                Font.font(
+                        "Arial",
+                        FontWeight.BOLD,
+                        24
+                )
+        );
+
+        symbolLabel.setTextFill(
+                Color.web(color)
+        );
+
+        symbolLabel.setStyle(
+                "-fx-background-color: " + LIGHT_PINK + ";" +
+                "-fx-background-radius: 10;" +
+                "-fx-padding: 8 12;"
+        );
+
+        Label numberLabel =
+                new Label(number);
+
+        if (
+                title.equals(
+                        "Total Reports"
+                )
+        ) {
+
+            totalReportsLabel =
+                    numberLabel;
+
+        } else if (
+                title.equals(
+                        "Pending Reports"
+                )
+        ) {
+
+            pendingReportsLabel =
+                    numberLabel;
+
+        } else if (
+                title.equals(
+                        "Completed Reports"
+                )
+        ) {
+
+            completedReportsLabel =
+                    numberLabel;
+
+        } else if (
+                title.equals(
+                        "Today's Reports"
+                )
+        ) {
+
+            todayReportsLabel =
+                    numberLabel;
+        }
+
+        numberLabel.setFont(
+                Font.font(
+                        "Arial",
+                        FontWeight.BOLD,
+                        30
+                )
+        );
+
+        numberLabel.setTextFill(
+                Color.web(NAVY)
+        );
+
+        topRow.getChildren().addAll(
+                symbolLabel,
+                numberLabel
+        );
+
+        Label titleLabel =
+                new Label(title);
+
+        titleLabel.setFont(
+                Font.font(
+                        "Arial",
+                        FontWeight.BOLD,
+                        15
+                )
+        );
+
+        titleLabel.setTextFill(
+                Color.web(NAVY)
+        );
+
+        Label bottomLabel =
+                new Label(bottomText);
+
+        bottomLabel.setFont(
+                Font.font(
+                        "Arial",
+                        FontWeight.BOLD,
+                        13
+                )
+        );
+
+        bottomLabel.setTextFill(
+                Color.web(color)
+        );
+
+        card.getChildren().addAll(
+                topRow,
+                titleLabel,
+                bottomLabel
+        );
+
+        return card;
+    }
+
+    // =========================================================
+    // UPDATE STAT CARDS
+    // =========================================================
+
+    private void updateStatCards() {
+
+        List<Labrecords> records =
+                controller.getAllLabrecords();
+
+        int total =
+                records.size();
+
+        int pending = 0;
+        int completed = 0;
+        int today = 0;
+
+        LocalDate todayDate =
+                LocalDate.now();
+
+        for (
+                Labrecords record :
+                records
+        ) {
+
+            if (
+                    record.getStatus()
+                            != null
+            ) {
+
+                if (
+                        record.getStatus()
+                                .equalsIgnoreCase(
+                                        "Pending"
+                                )
+                ) {
+
+                    pending++;
+
+                } else if (
+                        record.getStatus()
+                                .equalsIgnoreCase(
+                                        "Completed"
+                                )
+                ) {
+
+                    completed++;
+                }
+            }
+
+            if (
+                    record.getDate()
+                            != null
+            ) {
+
+                String dateText =
+                        record.getDate()
+                                .trim();
+
+                try {
+
+                    String datePart =
+                            dateText
+                                    .split("\\|")[0]
+                                    .trim();
+
+                    DateTimeFormatter formatter =
+                            DateTimeFormatter.ofPattern(
+                                    "dd MMM yyyy"
+                            );
+
+                    LocalDate recordDate =
+                            LocalDate.parse(
+                                    datePart,
+                                    formatter
+                            );
+
+                    if (
+                            recordDate.equals(
+                                    todayDate
+                            )
+                    ) {
+
+                        today++;
+                    }
+
+                } catch (
+                        DateTimeParseException ex
+                ) {
+
+                    System.out.println(
+                            "Invalid lab record date: "
+                                    + dateText
+                    );
+                }
+            }
+        }
+
+        totalReportsLabel.setText(
+                String.valueOf(total)
+        );
+
+        pendingReportsLabel.setText(
+                String.valueOf(pending)
+        );
+
+        completedReportsLabel.setText(
+                String.valueOf(completed)
+        );
+
+        todayReportsLabel.setText(
+                String.valueOf(today)
+        );
+    }
+
+    // =========================================================
+    // GET VIEW
+    // =========================================================
+
+    public BorderPane getView() {
+
+        if (root == null) {
+
+            createView();
+        }
+
+        return root;
+    }
 }
-
-
-
-public BorderPane getView(){ 
-      //  return root;
-
-      if(root==null){ 
-        createView();
-      }
-      return root;
-}   
-
-}
-
-   
-    
