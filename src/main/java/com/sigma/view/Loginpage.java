@@ -3,7 +3,7 @@ package com.sigma.view;
 import com.sigma.controller.Controller;
 import com.sigma.view.adminpages.AdminDashboard;
 import com.sigma.view.doctorpages.DoctorDashboard;
-
+import com.sigma.view.motherPages.MotherWelcome;
 import javafx.concurrent.Task;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -997,27 +997,33 @@ else if (role.equals("doctor")) {
                     }
 
                     // =================================================
-                    // MOTHER
-                    // =================================================
+// MOTHER
+// =================================================
 
-                    else if (role.equals("mother")) {
+else if (role.equals("mother")) {
 
-                        // Mother dashboard has not been connected yet.
-                        loginStatus.setText(
-                                "Mother Dashboard is not connected yet."
-                        );
-
-                        System.out.println(
-                                "[LOGIN] Mother Dashboard not available"
-                        );
-
-                        setLoginLoading(
-                                false,
-                                loginStatus
-                        );
-
-                        return;
-                    }
+        System.out.println(
+                "[LOGIN] Opening Mother Welcome..."
+        );
+    
+        MotherWelcome motherWelcome =
+                new MotherWelcome();
+    
+        Scene motherScene =
+                motherWelcome.getMotherWelcomeScene();
+    
+        Welcomepage.stage.setScene(
+                motherScene
+        );
+    
+        Welcomepage.stage.setMaximized(
+                true
+        );
+    
+        System.out.println(
+                "[LOGIN] Mother Welcome opened"
+        );
+    }
 
                     else {
 
