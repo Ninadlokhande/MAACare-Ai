@@ -37,7 +37,7 @@ public class Dashboard  {
     // =====================================================
     // MAACARE AI COLOR PALETTE
     // =====================================================
-       private static final String BG="#F7EAF5";
+      /*  private static final String BG="#F7EAF5";
 
 
     private static final String WHITE = "#FFFFFF";
@@ -50,7 +50,30 @@ public class Dashboard  {
     private static final String BLUE = "#5578D6";
     private static final String ORANGE = "#F2A33A";
   private static final String BORDER = "#B8B3C2";
-  private static final String GREY = "#77758A";  
+  private static final String GREY = "#77758A"; */  
+
+
+  // =====================================================
+// MAACARE AI - MOTHER DASHBOARD THEME
+// =====================================================
+
+//private static final String BG = "#FFFFFF";
+private static final String BG = "#FDE7F0";
+
+
+private static final String WHITE = "#FFFFFF";
+
+private static final String NAVY = "#24234F";
+private static final String PINK = "#E84A87";
+private static final String LIGHT_PINK = "#FFEAF3";
+private static final String PURPLE = "#9B4DCC";
+
+private static final String GREEN = "#67C98F";
+private static final String BLUE = "#5578D6";
+private static final String ORANGE = "#F2A33A";
+
+private static final String BORDER = "#E7DCE8";
+private static final String GREY = "#77778D";
 
     // =====================================================
     // START
@@ -68,9 +91,18 @@ public class Dashboard  {
        //   BorderPane root = new BorderPane(); 
        root=new BorderPane();
 
-        root.setStyle(
+    /*     root.setStyle(
                 "-fx-background-color: " + BG + ";"
-        );
+        );*/ 
+
+root.setStyle(
+    "-fx-background-color: linear-gradient(" +
+    "to bottom right, " +
+    "#FFFFFF 0%, " +
+    "#FFF6FA 55%, " +
+    "#F3ECFF 100%);"
+);
+
 
         // =================================================
         // SIDEBAR
@@ -86,12 +118,19 @@ public class Dashboard  {
 
         sidebar.setSpacing(12);
 
-        sidebar.setStyle(
+      /*   sidebar.setStyle(
                 "-fx-background-color: " + BG + ";" +
                 "-fx-background-radius: 0 25 25 0;" +
                 "-fx-border-color: " + BORDER + ";" +
                 "-fx-border-radius: 0 25 25 0;"
-        );
+        );*/ 
+
+sidebar.setStyle(
+    "-fx-background-color: white;" +
+    "-fx-border-color: #E7DCE8;" +
+    "-fx-border-width: 0 1 0 0;"
+);
+
 
         // =================================================
         // LOGO
@@ -136,7 +175,7 @@ dashboardBtn.setOnAction(e -> {
 
 
         Button appointmentBtn =
-                menuButton("▣", "Appointments", true);
+                menuButton("▣", "Appointments", false);
 
         // =================================================
         // APPOINTMENTS NAVIGATION ONLY
@@ -166,7 +205,7 @@ appointmentBtn.setOnAction(e -> {
                 menuButton(
                         "⚗",
                         "Lab Records",
-                        true
+                        false
                 ); 
 
       
@@ -189,7 +228,7 @@ LabrecordsPage labPage =
                 menuButton(
                         "▤",
                         "Bed Booking",
-                        true
+                        false
                 );
              
 bedBtn.setOnAction(e->{ 
@@ -208,7 +247,7 @@ bedBtn.setOnAction(e->{
                 menuButton(
                         "✚",
                         "Emergency",
-                        true
+                        false
                 ); 
               
 
@@ -991,10 +1030,20 @@ deleteButton.setPrefHeight(35);
                     "-fx-border-color: #D1D5DB;" +
                     "-fx-border-radius: 10;"
             );*/ 
-row.setStyle(
+/*row.setStyle(
         "-fx-background-color: #F8F5FF;" +
         "-fx-background-radius: 12;" +
-        "-fx-border-color: #D8D1E8;" +
+       "-fx-border-color: #D8D1E8;" +
+
+        "-fx-border-radius: 12;" +
+        "-fx-padding: 12;"
+);  */ 
+
+
+row.setStyle(
+        "-fx-background-color: #FFF8FC;" +
+        "-fx-background-radius: 12;" +
+        "-fx-border-color: " + BORDER + ";" +
         "-fx-border-radius: 12;" +
         "-fx-padding: 12;"
 );
@@ -1049,9 +1098,16 @@ row.setStyle(
     content.setPadding(
             new Insets(5)
     );
-dialog.getDialogPane().setStyle(
+/*dialog.getDialogPane().setStyle(
         "-fx-background-color: #FFFFFF;"
+); */ 
+
+
+ dialog.getDialogPane().setStyle(
+        "-fx-background-color: #FFF6FA;"
 );
+
+
 
 
     dialog.getDialogPane()
@@ -1186,14 +1242,36 @@ dialog.getDialogPane().setStyle(
         );
 
         iconLabel.setTextFill(
-                Color.web(NAVY)
+              
+              //  Color.web(NAVY)
+                Color.web(PINK)
         );
 
         textLabel.setTextFill(
-                Color.web(NAVY)
+               // Color.web(NAVY)
+               Color.web(PINK)
         );
-    });
+    }); 
 
+
+
+button.setOnMouseExited(e -> {
+
+    button.setStyle(
+            "-fx-background-color: transparent;" +
+            "-fx-background-radius: 12;" +
+            "-fx-padding: 0 15;" +
+            "-fx-cursor: hand;"
+    );
+
+    iconLabel.setTextFill(
+            Color.web(NAVY)
+    );
+
+    textLabel.setTextFill(
+            Color.web(NAVY)
+    );
+});
 
          
 
@@ -2229,7 +2307,8 @@ private VBox createEmergencyPanel() {
     );
 
     badge.setStyle(
-            "-fx-background-color: #FFF0F7;" +
+          //  "-fx-background-color: #FFF0F7;" +
+          "-fx-background-color: " + LIGHT_PINK + ";" +
             "-fx-background-radius: 10;" +
             "-fx-padding: 7 12;"
     );
