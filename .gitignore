@@ -1,7 +1,7 @@
 # Environment files
 .env
 .env.*
-!.env.example
+
 
 # Maven build output
 target/
@@ -22,4 +22,7 @@ Thumbs.db
 serviceAccountkey.json
 src/main/resources/serviceAccountKey.json
 src/main/resources/ServiceAccountKey.json
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/Development
