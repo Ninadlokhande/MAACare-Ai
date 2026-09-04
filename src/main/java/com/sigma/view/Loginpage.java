@@ -1,9 +1,12 @@
 package com.sigma.view;
 
 import com.sigma.controller.Controller;
+import com.sigma.model.MotherWlcModel;
 import com.sigma.view.adminpages.AdminDashboard;
 import com.sigma.view.doctorpages.DoctorDashboard;
 import com.sigma.view.motherPages.MotherWelcome;
+import com.sigma.view.motherPages.MotherDashBoard;
+
 import javafx.concurrent.Task;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -13,14 +16,30 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
+import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
+import javafx.animation.FadeTransition;
+import javafx.animation.ParallelTransition;
+import javafx.animation.RotateTransition;
+import javafx.animation.ScaleTransition;
+import javafx.animation.TranslateTransition;
+import javafx.util.Duration;
+import javafx.animation.Interpolator;
+import javafx.animation.Timeline;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
 
 import java.util.prefs.Preferences;
 
@@ -80,7 +99,7 @@ public class Loginpage {
         // LEFT SIDE
         // =========================================================
 
-        VBox leftSide = new VBox(18);
+        VBox leftSide = new VBox(14);
 
         leftSide.setAlignment(Pos.CENTER);
 
@@ -105,7 +124,7 @@ public class Loginpage {
         logoView.setSmooth(true);
 
         logoView.fitWidthProperty().bind(
-                leftSide.widthProperty().multiply(0.6)
+                leftSide.widthProperty().multiply(0.75)
         );
 
         // =========================================================
@@ -223,10 +242,10 @@ public class Loginpage {
         );
 
         features.getChildren().addAll(
-                createFeature("♥", "Pregnancy", "Tracking"),
-                createFeature("✚", "Health", "Records"),
-                createFeature("✦", "AI Health", "Assistant"),
-                createFeature("▣", "Doctor &", "Hospital")
+                createFeature("🤰", "Pregnancy", "Tracking"),
+                createFeature("❤️", "Health", "Records"),
+                createFeature("🤖", "AI Health", "Assistant"),
+                createFeature("🏥", "Doctor &", "Hospital")
         );
 
         leftSide.getChildren().addAll(
@@ -265,6 +284,15 @@ public class Loginpage {
         loginCard.setMaxWidth(800);
         loginCard.setMaxHeight(850);
 
+      loginCard.setEffect(
+        new javafx.scene.effect.DropShadow(
+                28,
+                0,
+                10,
+                javafx.scene.paint.Color.rgb(0, 0, 0, 0.16)
+        )
+);
+
         loginCard.setStyle(
                 "-fx-background-color: rgba(255,255,255,0.94);" +
                         "-fx-background-radius: 25px;" +
@@ -278,7 +306,7 @@ public class Loginpage {
         // =========================================================
 
         Text welcome = new Text(
-                "Welcome Back!"
+                "👋  Welcome Back!"
         );
 
         welcome.setStyle(
@@ -301,7 +329,7 @@ public class Loginpage {
         // =========================================================
 
         Text roleTitle = new Text(
-                "Select Your Role"
+                "🎯  Select Your Role"
         );
 
         roleTitle.setStyle(
@@ -335,10 +363,12 @@ public class Loginpage {
         TextField email = new TextField();
 
         email.setPromptText(
-                "Email / Phone Number"
+                "📧  Email / Phone Number"
         );
 
         email.setPrefHeight(55);
+
+        addFieldMotion(email);
 
         email.setStyle(
                 "-fx-background-color: white;" +
@@ -358,8 +388,8 @@ public class Loginpage {
 
         TextField visiblePassword = new TextField();
 
-        password.setPromptText("Password");
-        visiblePassword.setPromptText("Password");
+        password.setPromptText("🔒  Password");
+        visiblePassword.setPromptText("🔒  Password");
 
         password.setPrefHeight(55);
         visiblePassword.setPrefHeight(55);
@@ -375,11 +405,13 @@ public class Loginpage {
 
         password.setStyle(passwordStyle);
         visiblePassword.setStyle(passwordStyle);
+        addFieldMotion(password);
+        addFieldMotion(visiblePassword);
 
         visiblePassword.setVisible(false);
         visiblePassword.setManaged(false);
 
-        Button showPassword = new Button("Show");
+        Button showPassword = new Button("👁  Show");
 
         showPassword.setPrefHeight(45);
         showPassword.setMinWidth(65);
@@ -391,6 +423,8 @@ public class Loginpage {
                         "-fx-font-weight: bold;" +
                         "-fx-cursor: hand;"
         );
+
+        addButtonMotion(showPassword, 1.08);
 
         HBox passwordBox = new HBox(5);
 
@@ -450,7 +484,7 @@ public class Loginpage {
                 password.setVisible(true);
                 password.setManaged(true);
 
-                showPassword.setText("Show");
+                showPassword.setText("👁  Show");
 
             } else {
 
@@ -466,7 +500,7 @@ public class Loginpage {
                 visiblePassword.setVisible(true);
                 visiblePassword.setManaged(true);
 
-                showPassword.setText("Hide");
+                showPassword.setText("🙈  Hide");
 
                 visiblePassword.requestFocus();
                 visiblePassword.positionCaret(
@@ -483,10 +517,12 @@ public class Loginpage {
                 new PasswordField();
 
         securityCode.setPromptText(
-                "Admin Security Code"
+                "🛡️  Admin Security Code"
         );
 
         securityCode.setPrefHeight(55);
+
+        addFieldMotion(securityCode);
 
         securityCode.setStyle(
                 "-fx-background-color: white;" +
@@ -502,26 +538,11 @@ public class Loginpage {
         securityCode.setManaged(false);
 
         // =========================================================
-        // LOGIN STATUS
-        // =========================================================
-
-        Text loginStatus =
-                new Text("");
-
-        loginStatus.setStyle(
-                "-fx-fill: #D82F82;" +
-                        "-fx-font-size: 13px;" +
-                        "-fx-font-weight: bold;"
-        );
-
-        loginStatus.setWrappingWidth(650);
-
-        // =========================================================
         // FORGOT PASSWORD
         // =========================================================
 
         Button forgotPassword =
-                new Button("Forgot Password?");
+                new Button("🔑  Forgot Password?");
 
         forgotPassword.setStyle(
                 "-fx-background-color: transparent;" +
@@ -529,6 +550,8 @@ public class Loginpage {
                         "-fx-font-size: 13px;" +
                         "-fx-cursor: hand;"
         );
+
+        addButtonMotion(forgotPassword, 1.04);
 
         forgotPassword.setOnAction(e ->
                 logininfo.setText(
@@ -541,7 +564,7 @@ public class Loginpage {
         // =========================================================
 
         CheckBox remember =
-                new CheckBox("Remember me");
+                new CheckBox("☑  Remember me");
 
         remember.setStyle(
                 "-fx-text-fill: #666680;" +
@@ -580,6 +603,7 @@ public class Loginpage {
         mother.setOnAction(e -> {
 
             role = "mother";
+            animateRoleSelection(mother);
 
             selectedRole.setText(
                     "Role : Mother"
@@ -604,6 +628,7 @@ public class Loginpage {
         doctor.setOnAction(e -> {
 
             role = "doctor";
+            animateRoleSelection(doctor);
 
             selectedRole.setText(
                     "Role : Doctor"
@@ -628,6 +653,7 @@ public class Loginpage {
         hospital.setOnAction(e -> {
 
             role = "hospital";
+            animateRoleSelection(hospital);
 
             selectedRole.setText(
                     "Role : Hospital"
@@ -652,6 +678,7 @@ public class Loginpage {
         asha.setOnAction(e -> {
 
             role = "asha";
+            animateRoleSelection(asha);
 
             selectedRole.setText(
                     "Role : ASHA Worker"
@@ -676,6 +703,7 @@ public class Loginpage {
         admin.setOnAction(e -> {
 
             role = "admin";
+            animateRoleSelection(admin);
 
             selectedRole.setText(
                     "Role : Admin"
@@ -684,7 +712,7 @@ public class Loginpage {
             securityCode.setVisible(true);
             securityCode.setManaged(true);
 
-            // Admin is login-only. Hide all Sign Up controls.
+            // Admin accounts are login-only.
             showSignUpControls(false);
         });
 
@@ -705,12 +733,23 @@ public class Loginpage {
         // LOGIN STATUS
         // =========================================================
 
+        Text loginStatus =
+                new Text("");
+
+        loginStatus.setStyle(
+                "-fx-fill: #D82F82;" +
+                        "-fx-font-size: 13px;" +
+                        "-fx-font-weight: bold;"
+        );
+
+        loginStatus.setWrappingWidth(650);
+
         // =========================================================
         // LOGIN BUTTON
         // =========================================================
 
         Button login =
-                new Button("Login");
+                new Button("🔐  Login");
 
         login.setMaxWidth(
                 Double.MAX_VALUE
@@ -727,6 +766,8 @@ public class Loginpage {
                         "-fx-cursor: hand;"
         );
 
+        addButtonMotion(login, 1.025);
+
         // =========================================================
         // LOGIN ACTION
         // =========================================================
@@ -734,6 +775,7 @@ public class Loginpage {
         login.setOnAction(e -> {
 
             loginStatus.setText("");
+            animateStatusMessage(loginStatus);
 
             String enteredEmail =
                     email.getText().trim();
@@ -750,7 +792,7 @@ public class Loginpage {
             if (role == null || role.isBlank()) {
 
                 loginStatus.setText(
-                        "Please select your role."
+                        "⚠  Please select your role."
                 );
 
                 return;
@@ -763,7 +805,7 @@ public class Loginpage {
             if (enteredEmail.isBlank()) {
 
                 loginStatus.setText(
-                        "Please enter your email."
+                        "📧  Please enter your email."
                 );
 
                 email.requestFocus();
@@ -778,7 +820,7 @@ public class Loginpage {
             if (enteredPassword.isBlank()) {
 
                 loginStatus.setText(
-                        "Please enter your password."
+                        "🔒  Please enter your password."
                 );
 
                 password.requestFocus();
@@ -810,7 +852,7 @@ public class Loginpage {
                         ADMIN_SECURITY_CODE)) {
 
                     loginStatus.setText(
-                            "Invalid Admin Security Code."
+                            "❌  Invalid Admin Security Code."
                     );
 
                     securityCode.clear();
@@ -863,7 +905,7 @@ public class Loginpage {
                     );
 
                     loginStatus.setText(
-                            "Invalid email or password."
+                            "❌  Invalid email or password."
                     );
 
                     password.clear();
@@ -892,152 +934,13 @@ public class Loginpage {
                 try {
 
                     // =================================================
-                    // ADMIN
+                    // ROLE-BASED LOGIN NAVIGATION
+                    // =================================================
+                    // Existing Mother -> Mother Dashboard
+                    // All other roles -> their assigned dashboard/page.
                     // =================================================
 
-                    if (role.equals("admin")) {
-
-                        System.out.println(
-                                "[LOGIN] Opening Admin Dashboard..."
-                        );
-
-                        AdminDashboard adminDashboard =
-                                new AdminDashboard();
-
-                        Scene adminScene =
-                                adminDashboard.gotoAdminDashboard();
-
-                        Welcomepage.stage.setScene(
-                                adminScene
-                        );
-
-                        Welcomepage.stage.setMaximized(
-                                true
-                        );
-
-                        System.out.println(
-                                "[LOGIN] Admin Dashboard opened"
-                        );
-                    }
-
-                  // =================================================
-// DOCTOR
-// =================================================
-else if (role.equals("doctor")) {
-
-    System.out.println(
-            "[LOGIN] Doctor Dashboard is not connected yet."
-    );
-
-    loginStatus.setText(
-            "Doctor Dashboard is not connected yet."
-    );
-
-    setLoginLoading(
-            false,
-            loginStatus
-    );
-
-    return;
-}
-
-                    // =================================================
-                    // HOSPITAL
-                    // =================================================
-
-                    else if (role.equals("hospital")) {
-
-                        System.out.println(
-                                "[LOGIN] Opening Hospital Dashboard..."
-                        );
-
-                        Dashboard dashboard =
-                                new Dashboard();
-
-                        dashboard.show(
-                                Welcomepage.stage
-                        );
-
-                        Welcomepage.stage.setMaximized(
-                                true
-                        );
-
-                        System.out.println(
-                                "[LOGIN] Hospital Dashboard opened"
-                        );
-                    }
-
-                    // =================================================
-                    // ASHA
-                    // =================================================
-
-                    else if (role.equals("asha")) {
-
-                        System.out.println(
-                                "[LOGIN] Opening ASHA Dashboard..."
-                        );
-
-                        Asha_workerdashboard ashaDashboard =
-                                new Asha_workerdashboard();
-
-                        Scene ashaScene =
-                                ashaDashboard.run();
-
-                        Welcomepage.stage.setScene(
-                                ashaScene
-                        );
-
-                        Welcomepage.stage.setMaximized(
-                                true
-                        );
-
-                        System.out.println(
-                                "[LOGIN] ASHA Dashboard opened"
-                        );
-                    }
-
-                    // =================================================
-// MOTHER
-// =================================================
-
-else if (role.equals("mother")) {
-
-        System.out.println(
-                "[LOGIN] Opening Mother Welcome..."
-        );
-    
-        MotherWelcome motherWelcome =
-                new MotherWelcome();
-    
-        Scene motherScene =
-                motherWelcome.getMotherWelcomeScene();
-    
-        Welcomepage.stage.setScene(
-                motherScene
-        );
-    
-        Welcomepage.stage.setMaximized(
-                true
-        );
-    
-        System.out.println(
-                "[LOGIN] Mother Welcome opened"
-        );
-    }
-
-                    else {
-
-                        loginStatus.setText(
-                                "Invalid role selected."
-                        );
-
-                        setLoginLoading(
-                                false,
-                                loginStatus
-                        );
-
-                        return;
-                    }
+                    openDashboardForLogin(role);
 
                     // Clear login fields after dashboard opens.
                     email.clear();
@@ -1122,7 +1025,7 @@ else if (role.equals("mother")) {
         // =========================================================
 
         Button signUp =
-                new Button("Sign Up");
+                new Button("📝  Sign Up");
 
         signUpButton = signUp;
 
@@ -1144,6 +1047,8 @@ else if (role.equals("mother")) {
                         "-fx-cursor: hand;"
         );
 
+        addButtonMotion(signUp, 1.025);
+
         signUp.setOnAction(e -> {
 
             if (role == null ||
@@ -1151,6 +1056,16 @@ else if (role.equals("mother")) {
 
                 loginStatus.setText(
                         "Please select your role first."
+                );
+
+                return;
+            }
+
+            // Admin does not have a public sign-up option.
+            if (role.equals("admin")) {
+
+                loginStatus.setText(
+                        "Admin accounts cannot be created here."
                 );
 
                 return;
@@ -1164,18 +1079,10 @@ else if (role.equals("mother")) {
                             ? visiblePassword.getText()
                             : password.getText();
 
-            // Admin accounts cannot be created from this page.
-            if (role.equals("admin")) {
-                loginStatus.setText(
-                        "Admin accounts cannot be created here."
-                );
-                return;
-            }
-
             if (enteredEmail.isBlank()) {
 
                 loginStatus.setText(
-                        "Please enter your email."
+                        "📧  Please enter your email."
                 );
 
                 email.requestFocus();
@@ -1186,7 +1093,7 @@ else if (role.equals("mother")) {
             if (enteredPassword.isBlank()) {
 
                 loginStatus.setText(
-                        "Please enter your password."
+                        "🔒  Please enter your password."
                 );
 
                 password.requestFocus();
@@ -1203,21 +1110,29 @@ else if (role.equals("mother")) {
 
                 if (controller.status_code == 200) {
 
-                    if (role.equals("admin")) {
-                        loginStatus.setText(
-                                "Admin account created successfully. Login to continue."
-                        );
-                    } else {
-                        loginStatus.setText(
-                                "Sign up successful. Login to continue."
-                        );
-                    }
+                    System.out.println(
+                            "[SIGNUP] Registration successful for role: " + role
+                    );
 
-                    password.clear();
-                    visiblePassword.clear();
+                    try {
 
-                    if (role.equals("admin")) {
-                        securityCode.clear();
+                        setLoginLoading(true, loginStatus);
+
+                        // New Mother -> Mother Welcome / onboarding.
+                        // New users of every other role -> their assigned page.
+                        openDashboardAfterSignup(role);
+
+                        return;
+
+                    } catch (Exception navigationException) {
+
+                        navigationException.printStackTrace();
+
+                        loginStatus.setText(
+                                "Sign up successful, but unable to open the next page."
+                        );
+
+                        setLoginLoading(false, loginStatus);
                     }
 
                 } else {
@@ -1242,37 +1157,6 @@ else if (role.equals("mother")) {
                 );
             }
         });
-
-        // =========================================================
-        // GOOGLE LOGIN
-        // =========================================================
-
-        Button google =
-                new Button("Continue with Google");
-
-        google.setMaxWidth(
-                Double.MAX_VALUE
-        );
-
-        google.setPrefHeight(52);
-
-        google.setStyle(
-                "-fx-background-color: white;" +
-                        "-fx-text-fill: #49308C;" +
-                        "-fx-font-size: 16px;" +
-                        "-fx-font-weight: bold;" +
-                        "-fx-border-color: #9B4DCC;" +
-                        "-fx-border-width: 1px;" +
-                        "-fx-border-radius: 12px;" +
-                        "-fx-background-radius: 12px;" +
-                        "-fx-cursor: hand;"
-        );
-
-        google.setOnAction(e ->
-                loginStatus.setText(
-                        "Google sign-in is not configured yet."
-                )
-        );
 
         // =========================================================
         // CREATE ACCOUNT
@@ -1318,8 +1202,7 @@ else if (role.equals("mother")) {
         // INITIAL SIGN-UP VISIBILITY
         // =========================================================
 
-        // No role is selected initially, so keep Sign Up hidden.
-        showSignUpControls(false);
+        showSignUpControls(true);
 
         // =========================================================
         // RESTORE REMEMBERED LOGIN
@@ -1338,12 +1221,19 @@ else if (role.equals("mother")) {
         );
 
         // =========================================================
+        // LIVE HEALTHCARE STATUS PANEL
+        // =========================================================
+
+        VBox livePanel = createLiveStatusPanel();
+
+        // =========================================================
         // LOGIN CARD CONTENT
         // =========================================================
 
         loginCard.getChildren().addAll(
                 welcome,
                 loginInfo,
+                livePanel,
                 roleTitle,
                 roles,
                 selectedRole,
@@ -1354,7 +1244,7 @@ else if (role.equals("mother")) {
                 options,
                 login,
                 loginStatus,
-
+                or,
                 signUp,
                 createAccount
         );
@@ -1376,6 +1266,15 @@ else if (role.equals("mother")) {
         );
 
         // =========================================================
+        // LIVE AMBIENT ANIMATION LAYER
+        // =========================================================
+
+        Pane ambientLayer = createAmbientAnimationLayer();
+
+        // Keep the animation layer visual-only so it never blocks clicks.
+        ambientLayer.setMouseTransparent(true);
+
+        // =========================================================
         // LOADING OVERLAY
         // =========================================================
 
@@ -1388,6 +1287,7 @@ else if (role.equals("mother")) {
         StackPane sceneRoot =
                 new StackPane(
                         root,
+                        ambientLayer,
                         loadingOverlay
                 );
 
@@ -1407,8 +1307,234 @@ else if (role.equals("mother")) {
         this.loginRootForLoading =
                 root;
 
+        // =========================================================
+        // START PAGE ANIMATIONS
+        // =========================================================
+
+        playPageEntranceAnimation(
+                leftSide,
+                loginCard,
+                logoView,
+                welcome,
+                loginInfo,
+                roleTitle,
+                roles,
+                email,
+                passwordBox,
+                login,
+                features
+        );
+
         return loginpagScene;
     }
+
+    // =========================================================
+    // ROLE-BASED NAVIGATION
+    // =========================================================
+
+    private void openDashboardForLogin(String selectedRole)
+            throws Exception {
+
+        if ("admin".equals(selectedRole)) {
+
+            System.out.println("[LOGIN] Opening Admin Dashboard...");
+
+            AdminDashboard adminDashboard =
+                    new AdminDashboard();
+
+            Scene adminScene =
+                    adminDashboard.gotoAdminDashboard();
+
+            Welcomepage.stage.setScene(adminScene);
+            Welcomepage.stage.setMaximized(true);
+            return;
+        }
+
+        if ("doctor".equals(selectedRole)) {
+
+            System.out.println(
+                    "[SIGNUP] Doctor selected."
+            );
+
+            /*
+             * =========================================================
+             * DOCTOR SIGNUP - WRITE / KEEP YOUR DOCTOR NAVIGATION HERE
+             * =========================================================
+             *
+             * Put the existing Doctor signup-success destination here.
+             *
+             * Example:
+             *
+             * DoctorDashboard doctorDashboard =
+             *         new DoctorDashboard();
+             *
+             * Scene doctorScene =
+             *         doctorDashboard.YOUR_EXISTING_METHOD();
+             *
+             * Welcomepage.stage.setScene(doctorScene);
+             * Welcomepage.stage.setMaximized(true);
+             *
+             * This space is intentionally left for your existing
+             * Doctor page/dashboard code.
+             * =========================================================
+             */
+
+            return;
+        }
+
+        if ("hospital".equals(selectedRole)) {
+
+            System.out.println("[LOGIN] Opening Hospital Dashboard...");
+
+            Dashboard dashboard =
+                    new Dashboard();
+
+            dashboard.show(Welcomepage.stage);
+            Welcomepage.stage.setMaximized(true);
+            return;
+        }
+
+        if ("asha".equals(selectedRole)) {
+
+            System.out.println("[LOGIN] Opening ASHA Dashboard...");
+
+            Asha_workerdashboard ashaDashboard =
+                    new Asha_workerdashboard();
+
+            Scene ashaScene =
+                    ashaDashboard.run();
+
+            Welcomepage.stage.setScene(ashaScene);
+            Welcomepage.stage.setMaximized(true);
+            return;
+        }
+
+        if ("mother".equals(selectedRole)) {
+
+            System.out.println(
+                    "[LOGIN] Existing Mother -> Opening Mother Dashboard..."
+            );
+
+            MotherWlcModel motherModel =
+                    new MotherWlcModel();
+
+            MotherDashBoard motherDashboard =
+                    new MotherDashBoard(motherModel);
+
+            Scene dashboardScene =
+                    motherDashboard.getmotherDashboardScene();
+
+            Welcomepage.stage.setScene(dashboardScene);
+            Welcomepage.stage.setMaximized(true);
+            return;
+        }
+
+        throw new IllegalArgumentException(
+                "Invalid role selected: " + selectedRole
+        );
+    }
+
+
+    private void openDashboardAfterSignup(String selectedRole)
+            throws Exception {
+
+        // =========================================================
+        // NEW MOTHER
+        // =========================================================
+        // Signup is different from login:
+        // a newly registered Mother goes to MotherWelcome first.
+        // =========================================================
+
+        if ("mother".equals(selectedRole)) {
+
+            System.out.println(
+                    "[SIGNUP] New Mother -> Opening Mother Welcome..."
+            );
+
+            MotherWelcome motherWelcome =
+                    new MotherWelcome();
+
+            Scene motherWelcomeScene =
+                    motherWelcome.getMotherWelcomeScene();
+
+            Welcomepage.stage.setScene(motherWelcomeScene);
+            Welcomepage.stage.setMaximized(true);
+
+            System.out.println(
+                    "[SIGNUP] Mother Welcome opened"
+            );
+
+            return;
+        }
+
+        // =========================================================
+        // ALL OTHER SIGNUP ROLES
+        // =========================================================
+        // Use the exact same destination as login.
+        // =========================================================
+
+        if ("doctor".equals(selectedRole)) {
+
+            System.out.println(
+                    "[SIGNUP] Doctor -> Opening Doctor Dashboard..."
+            );
+
+            // =========================================================
+            // DOCTOR LOGIN DESTINATION
+            // =========================================================
+            // WRITE YOUR EXISTING DOCTOR DASHBOARD NAVIGATION HERE.
+            //
+            // Example:
+            // Scene doctorScene = doctorDashboard.<your_existing_method>();
+            // Welcomepage.stage.setScene(doctorScene);
+            // Welcomepage.stage.setMaximized(true);
+            // =========================================================
+            return;
+        }
+
+        if ("hospital".equals(selectedRole)) {
+
+            System.out.println(
+                    "[SIGNUP] Hospital -> Opening Hospital Dashboard..."
+            );
+
+            Dashboard dashboard =
+                    new Dashboard();
+
+            dashboard.show(Welcomepage.stage);
+            Welcomepage.stage.setMaximized(true);
+            return;
+        }
+
+        if ("asha".equals(selectedRole)) {
+
+            System.out.println(
+                    "[SIGNUP] ASHA -> Opening ASHA Dashboard..."
+            );
+
+            Asha_workerdashboard ashaDashboard =
+                    new Asha_workerdashboard();
+
+            Scene ashaScene =
+                    ashaDashboard.run();
+
+            Welcomepage.stage.setScene(ashaScene);
+            Welcomepage.stage.setMaximized(true);
+            return;
+        }
+
+        if ("admin".equals(selectedRole)) {
+
+            throw new IllegalArgumentException(
+                    "Admin accounts cannot be created here."
+            );
+        }
+
+        throw new IllegalArgumentException(
+                "Invalid role selected: " + selectedRole
+        );
+    }
+
 
     // =========================================================
     // SIGN-UP VISIBILITY
@@ -1624,7 +1750,7 @@ else if (role.equals("mother")) {
 
         Text loadingTitle =
                 new Text(
-                        "Signing you in..."
+                        "Opening your MaaCare AI account..."
                 );
 
         loadingTitle.setStyle(
@@ -1635,7 +1761,7 @@ else if (role.equals("mother")) {
 
         Text loadingText =
                 new Text(
-                        "Connecting to MaaCare AI. Please wait..."
+                        "Preparing your dashboard. Please wait..."
                 );
 
         loadingText.setStyle(
@@ -1666,21 +1792,428 @@ else if (role.equals("mother")) {
             return;
         }
 
-        loadingOverlay.setVisible(
-                loading
-        );
-
-        loadingOverlay.setManaged(
-                loading
-        );
-
-        loginRootForLoading.setDisable(
-                loading
-        );
-
         if (loading) {
+            loadingOverlay.setManaged(true);
+            loadingOverlay.setVisible(true);
+            loginRootForLoading.setDisable(true);
+            loadingStatusPulse(loadingOverlay);
             loginStatus.setText("");
+        } else {
+            loginRootForLoading.setDisable(false);
+
+            FadeTransition fadeOut =
+                    new FadeTransition(Duration.millis(220), loadingOverlay);
+
+            fadeOut.setFromValue(loadingOverlay.getOpacity());
+            fadeOut.setToValue(0);
+
+            fadeOut.setOnFinished(e -> {
+                loadingOverlay.setVisible(false);
+                loadingOverlay.setManaged(false);
+                loadingOverlay.setOpacity(1);
+            });
+
+            fadeOut.play();
         }
+    }
+
+    // =============================================================
+    // ANIMATION HELPERS
+    // =============================================================
+
+    private Pane createAmbientAnimationLayer() {
+
+        Pane layer = new Pane();
+        layer.setMouseTransparent(true);
+
+        Circle glow1 = createGlowCircle(150, 0.10);
+        Circle glow2 = createGlowCircle(105, 0.08);
+        Circle glow3 = createGlowCircle(75, 0.07);
+        Circle glow4 = createGlowCircle(120, 0.06);
+
+        // Starting positions create a soft "living" background.
+        glow1.setTranslateX(-300);
+        glow1.setTranslateY(-230);
+
+        glow2.setTranslateX(370);
+        glow2.setTranslateY(-180);
+
+        glow3.setTranslateX(430);
+        glow3.setTranslateY(260);
+
+        glow4.setTranslateX(-390);
+        glow4.setTranslateY(300);
+
+        layer.getChildren().addAll(glow1, glow2, glow3, glow4);
+
+        animateAmbientCircle(glow1, 1500, 55, 35);
+        animateAmbientCircle(glow2, 1900, -45, 45);
+        animateAmbientCircle(glow3, 1700, -35, -50);
+        animateAmbientCircle(glow4, 2200, 50, -35);
+
+        return layer;
+    }
+
+    private Circle createGlowCircle(double radius, double opacity) {
+
+        Circle circle = new Circle(radius);
+        circle.setOpacity(opacity);
+        circle.setStyle("-fx-fill: #E84A87;");
+        circle.setEffect(new GaussianBlur(28));
+
+        return circle;
+    }
+
+    private void animateAmbientCircle(
+            Circle circle,
+            double millis,
+            double x,
+            double y) {
+
+        TranslateTransition move =
+                new TranslateTransition(
+                        Duration.millis(millis),
+                        circle
+                );
+
+        move.setByX(x);
+        move.setByY(y);
+        move.setInterpolator(Interpolator.EASE_BOTH);
+        move.setAutoReverse(true);
+        move.setCycleCount(TranslateTransition.INDEFINITE);
+        move.play();
+
+        RotateTransition rotate =
+                new RotateTransition(
+                        Duration.millis(millis * 1.7),
+                        circle
+                );
+
+        rotate.setByAngle(360);
+        rotate.setInterpolator(Interpolator.LINEAR);
+        rotate.setCycleCount(RotateTransition.INDEFINITE);
+        rotate.play();
+    }
+
+    private void playPageEntranceAnimation(
+            VBox leftSide,
+            VBox loginCard,
+            ImageView logoView,
+            Text welcome,
+            Text loginInfo,
+            Text roleTitle,
+            HBox roles,
+            TextField email,
+            HBox passwordBox,
+            Button login,
+            HBox features) {
+
+        leftSide.setOpacity(0);
+        leftSide.setTranslateX(-45);
+
+        loginCard.setOpacity(0);
+        loginCard.setTranslateX(55);
+
+        // Left panel slides in.
+        FadeTransition leftFade =
+                new FadeTransition(Duration.millis(700), leftSide);
+        leftFade.setFromValue(0);
+        leftFade.setToValue(1);
+
+        TranslateTransition leftSlide =
+                new TranslateTransition(Duration.millis(700), leftSide);
+        leftSlide.setFromX(-45);
+        leftSlide.setToX(0);
+        leftSlide.setInterpolator(Interpolator.EASE_OUT);
+
+        new ParallelTransition(leftFade, leftSlide).play();
+
+        // Login card arrives slightly after the branding panel.
+        FadeTransition cardFade =
+                new FadeTransition(Duration.millis(750), loginCard);
+        cardFade.setFromValue(0);
+        cardFade.setToValue(1);
+
+        TranslateTransition cardSlide =
+                new TranslateTransition(Duration.millis(750), loginCard);
+        cardSlide.setFromX(55);
+        cardSlide.setToX(0);
+        cardSlide.setInterpolator(Interpolator.EASE_OUT);
+
+        ParallelTransition cardEntrance =
+                new ParallelTransition(cardFade, cardSlide);
+
+        cardEntrance.setDelay(Duration.millis(120));
+        cardEntrance.play();
+
+        // Small staggered reveal makes the form feel active rather than static.
+        animateReveal(welcome, 220, 0, -12);
+        animateReveal(loginInfo, 300, 0, -10);
+        animateReveal(roleTitle, 380, 0, -10);
+        animateReveal(roles, 460, 0, -12);
+        animateReveal(email, 540, 0, -10);
+        animateReveal(passwordBox, 600, 0, -10);
+        animateReveal(login, 700, 0, -8);
+        animateReveal(features, 650, 0, 10);
+
+        // Logo continuously floats very slightly.
+        TranslateTransition logoFloat =
+                new TranslateTransition(
+                        Duration.seconds(2.4),
+                        logoView
+                );
+        logoFloat.setByY(-8);
+        logoFloat.setAutoReverse(true);
+        logoFloat.setCycleCount(TranslateTransition.INDEFINITE);
+        logoFloat.setInterpolator(Interpolator.EASE_BOTH);
+        logoFloat.play();
+
+        // Feature icons gently pulse.
+        for (javafx.scene.Node node : features.getChildren()) {
+            ScaleTransition pulse =
+                    new ScaleTransition(
+                            Duration.seconds(2.2),
+                            node
+                    );
+            pulse.setFromX(1.0);
+            pulse.setFromY(1.0);
+            pulse.setToX(1.035);
+            pulse.setToY(1.035);
+            pulse.setAutoReverse(true);
+            pulse.setCycleCount(ScaleTransition.INDEFINITE);
+            pulse.setInterpolator(Interpolator.EASE_BOTH);
+            pulse.play();
+        }
+    }
+
+    private void animateReveal(
+            javafx.scene.Node node,
+            double delayMillis,
+            double fromX,
+            double fromY) {
+
+        node.setOpacity(0);
+        node.setTranslateX(fromX);
+        node.setTranslateY(fromY);
+
+        FadeTransition fade =
+                new FadeTransition(
+                        Duration.millis(420),
+                        node
+                );
+        fade.setFromValue(0);
+        fade.setToValue(1);
+
+        TranslateTransition slide =
+                new TranslateTransition(
+                        Duration.millis(420),
+                        node
+                );
+        slide.setFromX(fromX);
+        slide.setFromY(fromY);
+        slide.setToX(0);
+        slide.setToY(0);
+        slide.setInterpolator(Interpolator.EASE_OUT);
+
+        ParallelTransition transition =
+                new ParallelTransition(fade, slide);
+
+        transition.setDelay(Duration.millis(delayMillis));
+        transition.play();
+    }
+
+    private void animateRoleSelection(Button selectedButton) {
+
+        ScaleTransition pop =
+                new ScaleTransition(
+                        Duration.millis(150),
+                        selectedButton
+                );
+
+        pop.setFromX(1.0);
+        pop.setFromY(1.0);
+        pop.setToX(1.10);
+        pop.setToY(1.10);
+        pop.setAutoReverse(true);
+        pop.setCycleCount(2);
+        pop.setInterpolator(Interpolator.EASE_OUT);
+        pop.play();
+    }
+
+    private void animateScale(
+            javafx.scene.Node node,
+            double scale,
+            double millis) {
+
+        ScaleTransition transition =
+                new ScaleTransition(
+                        Duration.millis(millis),
+                        node
+                );
+
+        transition.setToX(scale);
+        transition.setToY(scale);
+        transition.setInterpolator(Interpolator.EASE_OUT);
+        transition.play();
+    }
+
+    private void addButtonMotion(
+            Button button,
+            double hoverScale) {
+
+        button.setOnMouseEntered(e ->
+                animateScale(button, hoverScale, 120)
+        );
+
+        button.setOnMouseExited(e ->
+                animateScale(button, 1.0, 120)
+        );
+
+        button.setOnMousePressed(e ->
+                animateScale(button, 0.97, 70)
+        );
+
+        button.setOnMouseReleased(e ->
+                animateScale(button, hoverScale, 90)
+        );
+    }
+
+    private void loadingStatusPulse(
+            StackPane overlay) {
+
+        overlay.setOpacity(0);
+
+        FadeTransition fadeIn =
+                new FadeTransition(
+                        Duration.millis(250),
+                        overlay
+                );
+
+        fadeIn.setFromValue(0);
+        fadeIn.setToValue(1);
+        fadeIn.play();
+    }
+
+    // =============================================================
+    // ADDITIONAL LIVE UI / MOTION
+    // =============================================================
+
+    private VBox createLiveStatusPanel() {
+
+        VBox panel = new VBox(8);
+        panel.setAlignment(Pos.CENTER_LEFT);
+        panel.setPadding(new Insets(12, 16, 12, 16));
+        panel.setMaxWidth(Double.MAX_VALUE);
+        panel.setStyle(
+                "-fx-background-color: rgba(248,244,255,0.90);" +
+                "-fx-background-radius: 16px;" +
+                "-fx-border-color: rgba(155,77,204,0.18);" +
+                "-fx-border-radius: 16px;" +
+                "-fx-border-width: 1px;"
+        );
+
+        HBox header = new HBox(8);
+        header.setAlignment(Pos.CENTER_LEFT);
+
+        Circle dot = new Circle(5);
+        dot.setStyle("-fx-fill: #35C98B;");
+
+        Text live = new Text("🟢  LIVE CARE NETWORK");
+        live.setStyle(
+                "-fx-fill: #49308C;" +
+                "-fx-font-size: 11px;" +
+                "-fx-font-weight: bold;"
+        );
+
+        Text status = new Text("All systems operational");
+        status.setStyle(
+                "-fx-fill: #35A979;" +
+                "-fx-font-size: 11px;"
+        );
+
+        HBox.setHgrow(status, Priority.ALWAYS);
+        header.getChildren().addAll(dot, live, status);
+
+        ProgressBar activity = new ProgressBar(0.72);
+        activity.setMaxWidth(Double.MAX_VALUE);
+        activity.setPrefHeight(5);
+        activity.setStyle(
+                "-fx-accent: #E84A87;" +
+                "-fx-control-inner-background: #EEEAF5;"
+        );
+
+        Text activityText = new Text(
+                "AI monitoring • Secure connection • Real-time assistance"
+        );
+        activityText.setStyle(
+                "-fx-fill: #77778D;" +
+                "-fx-font-size: 10px;"
+        );
+
+        panel.getChildren().addAll(header, activity, activityText);
+
+        // Breathing live indicator.
+        ScaleTransition dotPulse =
+                new ScaleTransition(Duration.seconds(0.9), dot);
+        dotPulse.setFromX(0.75);
+        dotPulse.setFromY(0.75);
+        dotPulse.setToX(1.35);
+        dotPulse.setToY(1.35);
+        dotPulse.setAutoReverse(true);
+        dotPulse.setCycleCount(ScaleTransition.INDEFINITE);
+        dotPulse.setInterpolator(Interpolator.EASE_BOTH);
+        dotPulse.play();
+
+        // Continuously moving activity bar.
+        Timeline activityMotion = new Timeline(
+                new KeyFrame(Duration.ZERO,
+                        new KeyValue(activity.progressProperty(), 0.55)),
+                new KeyFrame(Duration.seconds(2.0),
+                        new KeyValue(activity.progressProperty(), 0.88))
+        );
+        activityMotion.setAutoReverse(true);
+        activityMotion.setCycleCount(Timeline.INDEFINITE);
+        activityMotion.play();
+
+        return panel;
+    }
+
+    private void animateStatusMessage(Text node) {
+
+        node.setOpacity(0);
+        node.setTranslateY(8);
+
+        FadeTransition fade =
+                new FadeTransition(Duration.millis(280), node);
+        fade.setFromValue(0);
+        fade.setToValue(1);
+
+        TranslateTransition slide =
+                new TranslateTransition(Duration.millis(280), node);
+        slide.setFromY(8);
+        slide.setToY(0);
+        slide.setInterpolator(Interpolator.EASE_OUT);
+
+        new ParallelTransition(fade, slide).play();
+    }
+
+    private void addFieldMotion(javafx.scene.control.Control field) {
+
+        field.setOnMouseEntered(e -> {
+            ScaleTransition s =
+                    new ScaleTransition(Duration.millis(120), field);
+            s.setToX(1.012);
+            s.setToY(1.012);
+            s.play();
+        });
+
+        field.setOnMouseExited(e -> {
+            ScaleTransition s =
+                    new ScaleTransition(Duration.millis(120), field);
+            s.setToX(1);
+            s.setToY(1);
+            s.play();
+        });
     }
 
     // =============================================================
@@ -1754,40 +2287,45 @@ else if (role.equals("mother")) {
                         "-fx-text-fill: #24234F;" +
                         "-fx-font-size: 13px;" +
                         "-fx-font-weight: bold;" +
-                        "-fx-background-radius: 12px;" +
+                        "-fx-background-radius: 16px;" +
                         "-fx-border-color: #E2DFEA;" +
-                        "-fx-border-radius: 12px;" +
+                        "-fx-border-radius: 16px;" +
                         "-fx-border-width: 1px;" +
                         "-fx-cursor: hand;"
         );
 
-        button.setOnMouseEntered(e ->
-                button.setStyle(
-                        "-fx-background-color: #FFF0F6;" +
-                                "-fx-text-fill: #C92F78;" +
-                                "-fx-font-size: 13px;" +
-                                "-fx-font-weight: bold;" +
-                                "-fx-background-radius: 12px;" +
-                                "-fx-border-color: #F54B87;" +
-                                "-fx-border-radius: 12px;" +
-                                "-fx-border-width: 2px;" +
-                                "-fx-cursor: hand;"
-                )
-        );
+        button.setOnMouseEntered(e -> {
+            button.setStyle(
+                    "-fx-background-color: #FFF0F6;" +
+                            "-fx-text-fill: #C92F78;" +
+                            "-fx-font-size: 13px;" +
+                            "-fx-font-weight: bold;" +
+                            "-fx-background-radius: 12px;" +
+                            "-fx-border-color: #F54B87;" +
+                            "-fx-border-radius: 12px;" +
+                            "-fx-border-width: 2px;" +
+                            "-fx-cursor: hand;"
+            );
+            animateScale(button, 1.06, 120);
+        });
 
-        button.setOnMouseExited(e ->
-                button.setStyle(
-                        "-fx-background-color: white;" +
-                                "-fx-text-fill: #24234F;" +
-                                "-fx-font-size: 13px;" +
-                                "-fx-font-weight: bold;" +
-                                "-fx-background-radius: 12px;" +
-                                "-fx-border-color: #E2DFEA;" +
-                                "-fx-border-radius: 12px;" +
-                                "-fx-border-width: 1px;" +
-                                "-fx-cursor: hand;"
-                )
-        );
+        button.setOnMouseExited(e -> {
+            button.setStyle(
+                    "-fx-background-color: white;" +
+                            "-fx-text-fill: #24234F;" +
+                            "-fx-font-size: 13px;" +
+                            "-fx-font-weight: bold;" +
+                            "-fx-background-radius: 12px;" +
+                            "-fx-border-color: #E2DFEA;" +
+                            "-fx-border-radius: 12px;" +
+                            "-fx-border-width: 1px;" +
+                            "-fx-cursor: hand;"
+            );
+            animateScale(button, 1.0, 120);
+        });
+
+        button.setOnMousePressed(e -> animateScale(button, 0.96, 70));
+        button.setOnMouseReleased(e -> animateScale(button, 1.06, 90));
 
         return button;
     }
