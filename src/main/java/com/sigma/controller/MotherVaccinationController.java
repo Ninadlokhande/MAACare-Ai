@@ -15,77 +15,64 @@ public class MotherVaccinationController {
 
     public MotherVaccinationController() {
 
-        vaccinationDAO =
-                new MotherVaccinationDAO();
+        vaccinationDAO = new MotherVaccinationDAO();
     }
 
     // =========================================================
     // GET ALL
     // =========================================================
 
-    public List<MotherVaccinationmodel>
-    getAllVaccinations() {
+    public List<MotherVaccinationmodel> getAllVaccinations() {
 
-        return vaccinationDAO
-                .getAllVaccinations();
+        return vaccinationDAO.getAllVaccinations();
     }
 
     // =========================================================
     // GET BY MOTHER ID
     // =========================================================
 
-    public List<MotherVaccinationmodel>
-    getVaccinationsByMotherId(
+    public List<MotherVaccinationmodel> getVaccinationsByMotherId(
             String motherId) {
 
-        return vaccinationDAO
-                .getVaccinationsByMotherId(
-                        motherId
-                );
+        return vaccinationDAO.getVaccinationsByMotherId(motherId);
     }
 
     // =========================================================
     // GET BY ID
     // =========================================================
 
-    public MotherVaccinationmodel
-    getVaccinationById(
+    public MotherVaccinationmodel getVaccinationById(
             String id) {
 
-        return vaccinationDAO
-                .getVaccinationById(id);
+        return vaccinationDAO.getVaccinationById(id);
     }
 
     // =========================================================
     // GET BY PERSON
     // =========================================================
 
-    public List<MotherVaccinationmodel>
-    getVaccinationsByPerson(
+    public List<MotherVaccinationmodel> getVaccinationsByPerson(
             String motherId,
             String person) {
 
-        return vaccinationDAO
-                .getVaccinationsByPerson(
-                        motherId,
-                        person
-                );
+        return vaccinationDAO.getVaccinationsByPerson(
+                motherId,
+                person
+        );
     }
 
     // =========================================================
     // GET BY STATUS
     // =========================================================
 
-    public List<MotherVaccinationmodel>
-    getVaccinationsByStatus(
+    public List<MotherVaccinationmodel> getVaccinationsByStatus(
             String motherId,
             String status) {
 
-        return vaccinationDAO
-                .getVaccinationsByStatus(
-                        motherId,
-                        status
-                );
+        return vaccinationDAO.getVaccinationsByStatus(
+                motherId,
+                status
+        );
     }
 
     // =========================================================
@@ -99,10 +86,7 @@ public class MotherVaccinationController {
             return false;
         }
 
-        return vaccinationDAO
-                .saveVaccination(
-                        vaccination
-                );
+        return vaccinationDAO.saveVaccination(vaccination);
     }
 
     // =========================================================
@@ -116,21 +100,16 @@ public class MotherVaccinationController {
             return false;
         }
 
-        return vaccinationDAO
-                .updateVaccination(
-                        vaccination
-                );
+        return vaccinationDAO.updateVaccination(vaccination);
     }
 
     // =========================================================
     // DELETE
     // =========================================================
 
-    public boolean deleteVaccination(
-            String id) {
+    public boolean deleteVaccination(String id) {
 
-        return vaccinationDAO
-                .deleteVaccination(id);
+        return vaccinationDAO.deleteVaccination(id);
     }
 
     // =========================================================
@@ -141,10 +120,9 @@ public class MotherVaccinationController {
             String id,
             String completedDate) {
 
-        return vaccinationDAO
-                .markAsCompleted(
-                        id,
-                        completedDate
-                );
+        return vaccinationDAO.markAsCompleted(
+                id,
+                completedDate
+        );
     }
 }

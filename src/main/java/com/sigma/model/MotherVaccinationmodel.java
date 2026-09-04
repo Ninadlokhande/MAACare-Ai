@@ -1,17 +1,31 @@
 package com.sigma.model;
 
-public class Vaccination {
+public class MotherVaccinationmodel {
+
+    // =========================================================
+    // BASIC INFORMATION
+    // =========================================================
 
     private String id;
 
-    private String person;          // Mother / Baby
+    private String motherId;
+
+    private String person;
+
+    // =========================================================
+    // VACCINATION INFORMATION
+    // =========================================================
+
     private String vaccineName;
+
     private String dose;
 
-    private String dueDate;         // Dynamic - Firebase
-    private String completedDate;   // Dynamic - Firebase
+    private String dueDate;
 
-    private String status;          // Upcoming / Due Soon / Completed
+    private String completedDate;
+
+    private String status;
+
     private String description;
 
     // =========================================================
@@ -19,15 +33,16 @@ public class Vaccination {
     // Required for Firebase
     // =========================================================
 
-    public Vaccination() {
+    public MotherVaccinationmodel() {
     }
 
     // =========================================================
     // CONSTRUCTOR
     // =========================================================
 
-    public Vaccination(
+    public MotherVaccinationmodel(
             String id,
+            String motherId,
             String person,
             String vaccineName,
             String dose,
@@ -37,6 +52,7 @@ public class Vaccination {
             String description) {
 
         this.id = id;
+        this.motherId = motherId;
         this.person = person;
         this.vaccineName = vaccineName;
         this.dose = dose;
@@ -52,6 +68,10 @@ public class Vaccination {
 
     public String getId() {
         return id;
+    }
+
+    public String getMotherId() {
+        return motherId;
     }
 
     public String getPerson() {
@@ -88,6 +108,10 @@ public class Vaccination {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public void setMotherId(String motherId) {
+        this.motherId = motherId;
     }
 
     public void setPerson(String person) {

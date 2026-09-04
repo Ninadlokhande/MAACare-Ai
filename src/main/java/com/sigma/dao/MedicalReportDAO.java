@@ -315,10 +315,10 @@ public class MedicalReportDAO {
                 report.getReportId()
         );
 
-        data.put(
-                "motherId",
-                report.getMotherId()
-        );
+        // data.put(
+        //         "motherId",
+        //         report.getMotherId()
+        // );
 
         data.put(
                 "reportName",
@@ -364,9 +364,9 @@ public class MedicalReportDAO {
                     document.getString("reportId")
             );
 
-            report.setMotherId(
-                    document.getString("motherId")
-            );
+        //     report.setMotherId(
+        //             document.getString("motherId")
+        //     );
 
             report.setReportName(
                     document.getString("reportName")
