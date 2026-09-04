@@ -29,6 +29,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.SVGPath;
+import com.sigma.SessionManager;
 import javafx.stage.FileChooser;
 //import com.google.firebase.auth.FirebaseAuth;
 //import com.google.firebase.auth.FirebaseUser;
@@ -106,13 +107,19 @@ public class Asha_profilepage {
     // =========================================================
     // CONSTRUCTOR
     // =========================================================
-
+ //private String sessionAshaId;
     public Asha_profilepage() {
+         
 
         controller = new Ashaprofilecontroller();
 
         cloudinaryService =
                 new CloudinaryService();
+                sessionAshaId = SessionManager.getAshaId();
+
+if (sessionAshaId != null && !sessionAshaId.isBlank()) {
+    ashaIdFixed = true;
+}
 
         /*
          * IMPORTANT:
@@ -397,6 +404,7 @@ public class Asha_profilepage {
 
             ashaIdFixed =
                     true;
+                    SessionManager.setAshaId(enteredId);
 
 
             /*
@@ -642,6 +650,7 @@ public class Asha_profilepage {
         uploadedImageView.setPreserveRatio(
                 false
         );
+       
 
         Circle imageClip =
                 new Circle(
@@ -1550,10 +1559,15 @@ public class Asha_profilepage {
         fileChooser.getExtensionFilters()
                 .add(
                         new FileChooser.ExtensionFilter(
-                                "Image Files",
+                                "All Files",
                                 "*.png",
                                 "*.jpg",
-                                "*.jpeg"
+                                "*.jpeg",
+                                "*.JPEG",
+                                "*.webp",
+                                "*.JPG",
+                                "*.WEBP",
+                                "*.PNG"
                         )
                 );
 
@@ -1621,6 +1635,11 @@ public class Asha_profilepage {
                             true
                     )
             );
+            refreshProfilePage();
+            
+
+            
+            
 
 
             avatarPane.getChildren()
@@ -1678,6 +1697,7 @@ public class Asha_profilepage {
 
         profile =
                 null;
+                SessionManager.logout();
 
 
         try {

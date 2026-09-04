@@ -91,6 +91,57 @@ public class AshaProfileDAO {
 
         return null;
     }
+    // =========================================================
+// GET ASHA PROFILE BY EMAIL
+// =========================================================
+
+public AshaProfileModel getAshaProfileByEmail(String email) {
+
+    try {
+
+        ApiFuture<QuerySnapshot> future =
+                db.collection("AshaProfiles")
+                  .whereEqualTo("email", email)
+                  .limit(1)
+                  .get();
+
+        QuerySnapshot snapshot =
+                future.get();
+
+        if (!snapshot.isEmpty()) {
+
+            DocumentSnapshot document =
+                    snapshot.getDocuments().get(0);
+
+            AshaProfileModel profile =
+                    document.toObject(
+                            AshaProfileModel.class
+                    );
+
+            System.out.println(
+                    "Asha Profile Found By Email: "
+                    + email
+            );
+
+            return profile;
+        }
+
+        System.out.println(
+                "Asha Profile Not Found For Email: "
+                + email
+        );
+
+    } catch (Exception e) {
+
+        System.out.println(
+                "ERROR: Fetch Asha Profile By Email Failed"
+        );
+
+        e.printStackTrace();
+    }
+
+    return null;
+}
 
 
     // =========================================================

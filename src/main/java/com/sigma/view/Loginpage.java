@@ -99,8 +99,7 @@ public class Loginpage {
         // =========================================================
 
       String IMAGE_PATH =
-             "file:Maacare-Ai\\src\\main\\resources\\assets\\images\\logo\\logo.png";
-         //  String IMAGE_PATH="asssets\\images\\logo\\logo.png";
+"assets\\images\\logo\\logo.png";
 
         Image logoImage =
                 new Image(IMAGE_PATH);
@@ -113,7 +112,7 @@ public class Loginpage {
         logoView.setSmooth(true);
 
         logoView.fitWidthProperty().bind(
-                leftSide.widthProperty().multiply(0.75)
+                leftSide.widthProperty().multiply(0.55)
         );
 
 
@@ -126,7 +125,7 @@ public class Loginpage {
 
         logininfo.setStyle(
                 "-fx-fill: #13cee3;" +
-                        "-fx-font-size: 16px;" +
+                        "-fx-font-size: 13px;" +
                         "-fx-font-weight: bold;"
         );
 
@@ -140,7 +139,7 @@ public class Loginpage {
 
         brandName.setStyle(
                 "-fx-fill: linear-gradient(to right, #E84A87, #9B4DCC);" +
-                        "-fx-font-size: 48px;" +
+                        "-fx-font-size: 26px;" +
                         "-fx-font-weight: bold;"
         );
 
@@ -156,7 +155,7 @@ public class Loginpage {
 
         tagline1.setStyle(
                 "-fx-fill: #24234F;" +
-                        "-fx-font-size: 16px;" +
+                        "-fx-font-size: 13px;" +
                         "-fx-font-weight: bold;"
         );
 
@@ -172,7 +171,7 @@ public class Loginpage {
 
         description1.setStyle(
                 "-fx-fill: #24234F;" +
-                        "-fx-font-size: 20px;" +
+                        "-fx-font-size: 16px;" +
                         "-fx-font-weight: bold;"
         );
 
@@ -184,7 +183,7 @@ public class Loginpage {
 
         descriptionPink.setStyle(
                 "-fx-fill: #E84A87;" +
-                        "-fx-font-size: 20px;" +
+                        "-fx-font-size: 16px;" +
                         "-fx-font-weight: bold;"
         );
 
@@ -196,7 +195,7 @@ public class Loginpage {
 
         description2.setStyle(
                 "-fx-fill: #24234F;" +
-                        "-fx-font-size: 20px;" +
+                        "-fx-font-size: 16px;" +
                         "-fx-font-weight: bold;"
         );
 
@@ -224,7 +223,7 @@ public class Loginpage {
 
         info.setStyle(
                 "-fx-fill: #666680;" +
-                        "-fx-font-size: 16px;"
+                        "-fx-font-size: 13px;"
         );
 
 
@@ -235,7 +234,7 @@ public class Loginpage {
 
         smallInfo.setStyle(
                 "-fx-fill: #77778D;" +
-                        "-fx-font-size: 14px;"
+                        "-fx-font-size: 12px;"
         );
 
 
@@ -244,14 +243,14 @@ public class Loginpage {
         // =========================================================
 
         HBox features =
-                new HBox(25);
+                new HBox(18);
 
         features.setAlignment(
                 Pos.CENTER
         );
 
         features.setPadding(
-                new Insets(20, 0, 0, 0)
+                new Insets(12, 0, 0, 0)
         );
 
         features.getChildren().addAll(
@@ -321,7 +320,7 @@ public class Loginpage {
         // =========================================================
 
         VBox loginCard =
-                new VBox(18);
+                new VBox(15);
 
         loginCard.setAlignment(
                 Pos.TOP_CENTER
@@ -336,9 +335,9 @@ public class Loginpage {
                 )
         );
 
-        loginCard.setMaxWidth(800);
+        loginCard.setMaxWidth(600);
 
-        loginCard.setMaxHeight(850);
+        loginCard.setMaxHeight(650);
 
         loginCard.setStyle(
                 "-fx-background-color: rgba(255,255,255,0.94);" +
@@ -360,7 +359,7 @@ public class Loginpage {
 
         welcome.setStyle(
                 "-fx-fill: #24234F;" +
-                        "-fx-font-size: 32px;" +
+                        "-fx-font-size: 23px;" +
                         "-fx-font-weight: bold;"
         );
 
@@ -569,7 +568,7 @@ public class Loginpage {
                 "Password"
         );
 
-        password.setPrefHeight(55);
+        password.setPrefHeight(45);
 
         password.setStyle(
                 "-fx-background-color: white;" +
@@ -945,7 +944,8 @@ if (role.equals("hospital")) {
                 // =================================================
                 // ASHA WORKER
                 // =================================================
-               // =================================================
+
+                // =================================================
 // ASHA WORKER
 // =================================================
 
@@ -959,49 +959,22 @@ if (role.equals("asha")) {
             "[LOGIN] Opening ASHA Worker Dashboard..."
     );
 
-    try {
+    Asha_workerdashboard dashboard =
+            new Asha_workerdashboard();
 
-        Asha_workerdashboard ashaDashboard =
-                new Asha_workerdashboard();
+    dashboard.show(
+            Welcomepage.stage
+    );
 
-        Scene ashaScene =
-                ashaDashboard.run();
+    System.out.println(
+            "[LOGIN] ASHA Worker Dashboard opened"
+    );
 
-        Welcomepage.stage.setScene(
-                ashaScene
-        );
-
-        Welcomepage.stage.setMaximized(
-                true
-        );
-
-        System.out.println(
-                "[LOGIN] ASHA Worker Dashboard opened"
-        );
-
-        email.clear();
-        password.clear();
-
-    } catch (Exception ex) {
-
-        ex.printStackTrace();
-
-        logininfo.setText(
-                "Unable to open ASHA Worker Dashboard"
-        );
-
-        System.out.println(
-                "[LOGIN] Error opening ASHA Dashboard"
-        );
-    }
+    email.clear();
+    password.clear();
 
     return;
 }
-
-              // ==========================================
-                     
-                            
-
 
                 // =================================================
                 // AMBULANCE

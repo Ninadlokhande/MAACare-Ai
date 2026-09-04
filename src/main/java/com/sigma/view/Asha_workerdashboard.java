@@ -72,6 +72,19 @@ public class Asha_workerdashboard {
     private ScrollPane centerScrollPane;
 
     private VBox centerContent;
+    private String ashaId;
+    // =========================================================
+// CONSTRUCTOR
+// =========================================================
+
+public Asha_workerdashboard() {
+
+    //this.ashaId = ashaId;
+
+    System.out.println(
+            "[DASHBOARD] ASHA ID received: " + ashaId
+    );
+}
 
     // =========================================================
     // FIREBASE DAO
@@ -102,7 +115,8 @@ private int womenTestRisky = 0;
 private int womenCheckupBaaki = 0;
 
     private String ashaName = "ASHA Worker";
-    private String villageName = "Village Rampur";
+   // ashaName.setTranslateY(2);
+    private String villageName = " ";
 
     private List<AshaWorkerVisitModel> firebaseVisits =
             new ArrayList<>();
@@ -1219,7 +1233,7 @@ private LocalDate parseDate(String dateText) {
         Button dashboardButton =
                 createNavItem(
                         "Dashboard",
-                        true
+                        false
                 );
 
         dashboardButton.setOnAction(
@@ -1418,9 +1432,7 @@ private LocalDate parseDate(String dateText) {
 
         try {
 
-            Asha_profilepage profile =
-                    new Asha_profilepage();
-
+           Asha_profilepage profile = new Asha_profilepage();
             Node content =
                     profile.getProfileContent();
 
