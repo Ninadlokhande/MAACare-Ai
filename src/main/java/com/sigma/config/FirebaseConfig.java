@@ -1,5 +1,6 @@
 package com.sigma.config;
 
+import java.io.FileInputStream;
 import java.io.InputStream;
 
 import com.google.auth.oauth2.GoogleCredentials;
@@ -18,37 +19,50 @@ public class FirebaseConfig {
 
         try {
 
-            InputStream serviceAccount =
-                    FirebaseConfig.class
-                            .getClassLoader()
-                            .getResourceAsStream("java2026.json");
+            // InputStream serviceAccount =
+            //         FirebaseConfig.class
+            //                 .getClassLoader()
+            //                 .getResourceAsStream("serviceAccountKey.json");
 
-            if (serviceAccount == null) {
-                throw new RuntimeException(
-                    "java2026.json file resources folder madhe sapadli nahi!"
-                );
-            }
+            // if (serviceAccount == null) {
+            //     throw new RuntimeException(
+            //         "file resources folder madhe sapadli nahi!"
+            //     );
+            // }
 
-            FirebaseOptions options =
-                    FirebaseOptions.builder()
-                            .setCredentials(
-                                GoogleCredentials.fromStream(
-                                    serviceAccount
-                                )
-                            )
-                            .build();
+        //     FirebaseOptions options =
+        //             FirebaseOptions.builder()
+        //                     .setCredentials(
+        //                         GoogleCredentials.fromStream(
+        //                             "src/main/resources/serviceAccountKey.json"
+        //                         )
+        //                     )
+        //                     .build();
 
-            if (FirebaseApp.getApps().isEmpty()) {
-                FirebaseApp.initializeApp(options);
-            }
+        //     if (FirebaseApp.getApps().isEmpty()) {
+        //         FirebaseApp.initializeApp(options);
+        //     }
 
-            System.out.println(
-                    "Firebase initialized successfully!"
-            );
+        //     System.out.println(
+        //             "Firebase initialized successfully!"
+        //     );
 
+        // } catch (Exception e) {
+        //     e.printStackTrace();
+        // }
+
+        FileInputStream serviceAccount =
+            new FileInputStream("src/main/resources/serviceAccountKey.json");
+
+            FirebaseOptions options = new FirebaseOptions.Builder()
+            .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+            .build();
+
+            FirebaseApp.initializeApp(options);
         } catch (Exception e) {
             e.printStackTrace();
         }
+
     }
 
     public static Firestore getFirestore() {

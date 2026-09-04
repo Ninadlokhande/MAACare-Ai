@@ -2,15 +2,23 @@ package com.sigma.view.motherPages;
 
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
-import javafx.scene.control.ButtonType;
+
+import javafx.application.Platform;
+import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Dialog;
+import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Separator;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -29,12 +37,17 @@ public class MotherNutritionDiet {
     private final String PURPLE = "#9B4DCC";
     private final String TEXT_GRAY = "#77778D";
 
-    // Used for tab scrolling
-    private ScrollPane mainScrollPane;
+    // =========================================================
+    // TAB NAVIGATION REFERENCES
+    // =========================================================
 
-    private VBox monthlySection;
-    private VBox childSection;
-    private VBox avoidSection;
+    private ScrollPane dietScrollPane;
+
+    private VBox monthlyDietSection;
+    private VBox childDietSection;
+    private VBox whatToAvoidSection;
+
+    private VBox dietContent;
 
     // =========================================================
     // MAIN PAGE
@@ -43,6 +56,7 @@ public class MotherNutritionDiet {
     public VBox createDietNutritionPage() {
 
         VBox page = new VBox();
+
         page.setFillWidth(true);
 
         page.setStyle(
@@ -54,16 +68,22 @@ public class MotherNutritionDiet {
         );
 
         VBox content = new VBox();
+
         content.setSpacing(18);
+
         content.setPadding(
             new Insets(18, 25, 35, 25)
         );
+
+        // Store content reference
+        dietContent = content;
 
         // =====================================================
         // PAGE TITLE
         // =====================================================
 
         VBox titleBox = new VBox();
+
         titleBox.setSpacing(3);
 
         Label title =
@@ -90,7 +110,9 @@ public class MotherNutritionDiet {
             subtitle
         );
 
-        content.getChildren().add(titleBox);
+        content.getChildren().add(
+            titleBox
+        );
 
         // =====================================================
         // TABS
@@ -105,9 +127,11 @@ public class MotherNutritionDiet {
         // =====================================================
 
         HBox contentLayout = new HBox();
+
         contentLayout.setSpacing(18);
 
         VBox leftContent = new VBox();
+
         leftContent.setSpacing(18);
 
         HBox.setHgrow(
@@ -116,22 +140,35 @@ public class MotherNutritionDiet {
         );
 
         VBox rightContent = new VBox();
+
         rightContent.setSpacing(18);
+
         rightContent.setPrefWidth(340);
+
         rightContent.setMinWidth(320);
 
         // =====================================================
         // LEFT CONTENT
         // =====================================================
 
-        monthlySection = createMonthlyDietCard();
-        childSection = createChildDietCard();
-        avoidSection = createWhatToAvoidCard();
+        // Keep references for tab navigation
+
+        monthlyDietSection =
+            createMonthlyDietCard();
+
+        childDietSection =
+            createChildDietCard();
+
+        whatToAvoidSection =
+            createWhatToAvoidCard();
 
         leftContent.getChildren().addAll(
-            monthlySection,
-            childSection,
-            avoidSection
+
+            monthlyDietSection,
+
+            childDietSection,
+
+            whatToAvoidSection
         );
 
         // =====================================================
@@ -162,32 +199,36 @@ public class MotherNutritionDiet {
         // SCROLL
         // =====================================================
 
-        mainScrollPane =
+        ScrollPane scrollPane =
             new ScrollPane(content);
 
-        mainScrollPane.setFitToWidth(true);
-        mainScrollPane.setPannable(true);
+        this.dietScrollPane =
+            scrollPane;
 
-        mainScrollPane.setHbarPolicy(
+        scrollPane.setFitToWidth(true);
+
+        scrollPane.setPannable(true);
+
+        scrollPane.setHbarPolicy(
             ScrollPane.ScrollBarPolicy.NEVER
         );
 
-        mainScrollPane.setVbarPolicy(
+        scrollPane.setVbarPolicy(
             ScrollPane.ScrollBarPolicy.AS_NEEDED
         );
 
-        mainScrollPane.setStyle(
+        scrollPane.setStyle(
             "-fx-background-color: transparent;" +
             "-fx-background: transparent;" +
             "-fx-border-color: transparent;"
         );
 
         page.getChildren().add(
-            mainScrollPane
+            scrollPane
         );
 
         VBox.setVgrow(
-            mainScrollPane,
+            scrollPane,
             Priority.ALWAYS
         );
 
@@ -233,54 +274,72 @@ public class MotherNutritionDiet {
             );
 
         // =====================================================
-        // TAB ACTIONS
+        // OVERVIEW TAB
         // =====================================================
 
         overview.setOnAction(e -> {
 
-            scrollToTop();
-
             setActiveTab(
                 overview,
                 monthly,
                 child,
                 avoid
             );
+
+            scrollToTop();
         });
+
+        // =====================================================
+        // MONTHLY DIET TAB
+        // =====================================================
 
         monthly.setOnAction(e -> {
 
-            scrollToSection(monthlySection);
-
             setActiveTab(
                 monthly,
                 overview,
                 child,
                 avoid
             );
+
+            scrollToSection(
+                monthlyDietSection
+            );
         });
+
+        // =====================================================
+        // CHILD DIET TAB
+        // =====================================================
 
         child.setOnAction(e -> {
 
-            scrollToSection(childSection);
-
             setActiveTab(
                 child,
                 overview,
                 monthly,
                 avoid
             );
+
+            scrollToSection(
+                childDietSection
+            );
         });
 
-        avoid.setOnAction(e -> {
+        // =====================================================
+        // WHAT TO AVOID TAB
+        // =====================================================
 
-            scrollToSection(avoidSection);
+        avoid.setOnAction(e -> {
 
             setActiveTab(
                 avoid,
                 overview,
                 monthly,
                 child
+            );
+
+            scrollToSection(
+                whatToAvoidSection
             );
         });
 
@@ -310,8 +369,16 @@ public class MotherNutritionDiet {
             active
         );
 
+        button.setCursor(
+            Cursor.HAND
+        );
+
         return button;
     }
+
+    // =========================================================
+    // APPLY TAB STYLE
+    // =========================================================
 
     private void applyTabStyle(
             Button button,
@@ -338,16 +405,26 @@ public class MotherNutritionDiet {
         );
     }
 
+    // =========================================================
+    // ACTIVE TAB
+    // =========================================================
+
     private void setActiveTab(
             Button active,
-            Button other1,
-            Button other2,
-            Button other3) {
+            Button... otherTabs) {
 
-        applyTabStyle(active, true);
-        applyTabStyle(other1, false);
-        applyTabStyle(other2, false);
-        applyTabStyle(other3, false);
+        applyTabStyle(
+            active,
+            true
+        );
+
+        for (Button button : otherTabs) {
+
+            applyTabStyle(
+                button,
+                false
+            );
+        }
     }
 
     // =========================================================
@@ -356,9 +433,14 @@ public class MotherNutritionDiet {
 
     private void scrollToTop() {
 
-        if (mainScrollPane != null) {
-            mainScrollPane.setVvalue(0);
+        if (dietScrollPane == null) {
+            return;
         }
+
+        Platform.runLater(() -> {
+
+            dietScrollPane.setVvalue(0);
+        });
     }
 
     // =========================================================
@@ -366,41 +448,80 @@ public class MotherNutritionDiet {
     // =========================================================
 
     private void scrollToSection(
-            VBox section) {
+            Node target) {
 
-        if (mainScrollPane == null ||
-            section == null) {
+        if (dietScrollPane == null ||
+            target == null) {
+
             return;
         }
 
-        javafx.application.Platform.runLater(() -> {
+        Platform.runLater(() -> {
 
-            double contentHeight =
-                mainScrollPane.getContent()
-                    .getBoundsInLocal()
-                    .getHeight();
+            try {
 
-            double viewportHeight =
-                mainScrollPane.getViewportBounds()
-                    .getHeight();
+                Node content =
+                    dietScrollPane.getContent();
 
-            double sectionY =
-                section.getBoundsInParent()
-                    .getMinY();
+                if (content == null) {
+                    return;
+                }
 
-            double maxScroll =
-                contentHeight - viewportHeight;
+                Bounds targetInScene =
+                    target.localToScene(
+                        target.getBoundsInLocal()
+                    );
 
-            if (maxScroll > 0) {
+                Bounds targetInContent =
+                    content.sceneToLocal(
+                        targetInScene
+                    );
 
-                mainScrollPane.setVvalue(
-                    Math.min(
-                        1,
-                        Math.max(
-                            0,
-                            sectionY / maxScroll
+                double targetY =
+                    targetInContent.getMinY();
+
+                double contentHeight =
+                    content.getBoundsInLocal()
+                        .getHeight();
+
+                double viewportHeight =
+                    dietScrollPane
+                        .getViewportBounds()
+                        .getHeight();
+
+                double scrollableHeight =
+                    contentHeight -
+                    viewportHeight;
+
+                if (scrollableHeight <= 0) {
+
+                    dietScrollPane.setVvalue(0);
+
+                    return;
+                }
+
+                double newValue =
+                    targetY /
+                    scrollableHeight;
+
+                newValue =
+                    Math.max(
+                        0,
+                        Math.min(
+                            1,
+                            newValue - 0.02
                         )
-                    )
+                    );
+
+                dietScrollPane.setVvalue(
+                    newValue
+                );
+
+            } catch (Exception ex) {
+
+                System.out.println(
+                    "TAB SCROLL ERROR: " +
+                    ex.getMessage()
                 );
             }
         });
@@ -486,7 +607,10 @@ public class MotherNutritionDiet {
             new HBox();
 
         meals.setSpacing(12);
-        meals.setAlignment(Pos.CENTER);
+
+        meals.setAlignment(
+            Pos.CENTER
+        );
 
         setSecondTrimesterMeals(
             meals
@@ -500,10 +624,6 @@ public class MotherNutritionDiet {
 
             String selected =
                 trimester.getValue();
-
-            if (selected == null) {
-                return;
-            }
 
             if (selected.startsWith("1st")) {
 
@@ -527,17 +647,13 @@ public class MotherNutritionDiet {
             }
         });
 
-        // =====================================================
-        // FULL PLAN BUTTON
-        // =====================================================
-
         Button fullPlan =
             createGradientButton(
                 "View Full Monthly Diet Plan  →"
             );
 
         fullPlan.setOnAction(e ->
-            showMonthlyDietDialog()
+            showMonthlyDietPlan()
         );
 
         card.getChildren().addAll(
@@ -561,7 +677,7 @@ public class MotherNutritionDiet {
             createMealCard(
                 "Breakfast",
                 "Start your day healthy",
-                "motherBreakfast.png",
+                "logo/motherBreakfast.png",
                 "☀️",
                 "Poha / Upma",
                 "1 Banana",
@@ -571,7 +687,7 @@ public class MotherNutritionDiet {
             createMealCard(
                 "Lunch",
                 "Balanced & nutritious",
-                "motherLunch.png",
+                "logo/motherLunch.png",
                 "🍱",
                 "2 Phulka",
                 "1 Cup Dal",
@@ -580,22 +696,22 @@ public class MotherNutritionDiet {
 
             createMealCard(
                 "Evening Snack",
-                "Healthy snacking",
-                "logo/snack.png",
+                "Light & healthy",
+                "/assets/images/logo/snack.png",
                 "☕",
-                "Sprouts / Fruit Bowl",
+                "Fruit Bowl",
                 "Coconut Water",
-                "Buttermilk"
+                "Roasted Chana"
             ),
 
             createMealCard(
                 "Dinner",
-                "Light & easy to digest",
-                "logo/dinner.png",
+                "Light dinner",
+                "/assets/images/logo/dinner.png",
                 "🍱",
-                "Veg Khichdi / Soup",
+                "Veg Khichdi",
                 "1 Bowl Curd",
-                "Steamed Vegetables"
+                "Green Vegetables"
             )
         );
     }
@@ -612,7 +728,7 @@ public class MotherNutritionDiet {
             createMealCard(
                 "Breakfast",
                 "Kickstart your day",
-                "motherBreakfast.png",
+                "logo/motherBreakfast.png",
                 "☀️",
                 "Oats / Poha / Upma",
                 "1 Banana",
@@ -622,7 +738,7 @@ public class MotherNutritionDiet {
             createMealCard(
                 "Lunch",
                 "Stay energetic",
-                "motherLunch.png",
+                "logo/motherLunch.png",
                 "🍱",
                 "2 Phulka",
                 "1 Cup Dal",
@@ -632,7 +748,7 @@ public class MotherNutritionDiet {
             createMealCard(
                 "Evening Snack",
                 "Healthy snacking",
-                "logo/snack.png",
+                "/assets/images/logo/snack.png",
                 "☕",
                 "Sprouts / Fruit Bowl",
                 "Coconut Water",
@@ -642,7 +758,7 @@ public class MotherNutritionDiet {
             createMealCard(
                 "Dinner",
                 "Light & easy to digest",
-                "logo/dinner.png",
+                "/assets/images/logo/dinner.png",
                 "🍱",
                 "Veg Khichdi / Soup",
                 "1 Bowl Curd",
@@ -663,7 +779,7 @@ public class MotherNutritionDiet {
             createMealCard(
                 "Breakfast",
                 "Energy rich breakfast",
-                "motherBreakfast.png",
+                "logo/motherBreakfast.png",
                 "☀️",
                 "Paratha / Poha",
                 "1 Fruit",
@@ -673,7 +789,7 @@ public class MotherNutritionDiet {
             createMealCard(
                 "Lunch",
                 "Protein rich meal",
-                "motherLunch.png",
+                "logo/motherLunch.png",
                 "🍛",
                 "2 Phulka",
                 "Dal",
@@ -682,22 +798,22 @@ public class MotherNutritionDiet {
 
             createMealCard(
                 "Evening Snack",
-                "Healthy snacking",
-                "logo/snack.png",
+                "Healthy snack",
+                "/assets/images/logo/snack.png",
                 "☕",
-                "Sprouts / Fruit Bowl",
+                "Fruit Bowl",
                 "Coconut Water",
-                "Buttermilk"
+                "Roasted Chana"
             ),
 
             createMealCard(
                 "Dinner",
-                "Light & easy to digest",
-                "logo/dinner.png",
+                "Easy to digest",
+                "/assets/images/logo/dinner.png",
                 "🍱",
-                "Veg Khichdi / Soup",
-                "1 Bowl Curd",
-                "Steamed Vegetables"
+                "Khichdi / Dal Rice",
+                "Curd",
+                "Vegetable Soup"
             )
         );
     }
@@ -719,7 +835,9 @@ public class MotherNutritionDiet {
             new VBox();
 
         card.setPrefWidth(205);
+
         card.setMinWidth(190);
+
         card.setSpacing(7);
 
         card.setPadding(
@@ -895,7 +1013,10 @@ public class MotherNutritionDiet {
             new HBox();
 
         meals.setSpacing(12);
-        meals.setAlignment(Pos.CENTER);
+
+        meals.setAlignment(
+            Pos.CENTER
+        );
 
         setSixToNineMonthsMeals(
             meals
@@ -909,10 +1030,6 @@ public class MotherNutritionDiet {
 
             String selectedAge =
                 age.getValue();
-
-            if (selectedAge == null) {
-                return;
-            }
 
             if (
                 selectedAge.equals(
@@ -1003,7 +1120,7 @@ public class MotherNutritionDiet {
             );
 
         fullChildPlan.setOnAction(e ->
-            showChildDietDialog()
+            showChildDietPlan()
         );
 
         HBox bottom =
@@ -1041,28 +1158,28 @@ public class MotherNutritionDiet {
 
             createChildMeal(
                 "Breakfast",
-                "childBreakfast.png",
+                "logo/childBreakfast.png",
                 "🥣",
                 "Rice Cereal / Dal Water"
             ),
 
             createChildMeal(
                 "Lunch",
-                "babylunch.png",
+                "logo/babylunch.png",
                 "🍚",
                 "Mashed Dal + Rice / Khichdi"
             ),
 
             createChildMeal(
                 "Evening Snack",
-                "childSnack.png",
+                "logo/childSnack.png",
                 "🍌",
                 "Banana / Fruit Puree"
             ),
 
             createChildMeal(
                 "Dinner",
-                "logo/childdinner.png",
+                "/assets/images/logo/childdinner.png",
                 "🍱",
                 "Veg Puree / Suji Porridge"
             )
@@ -1080,30 +1197,30 @@ public class MotherNutritionDiet {
 
             createChildMeal(
                 "Breakfast",
-                "childBreakfast.png",
+                "logo/childBreakfast.png",
                 "🥣",
                 "Soft Idli / Upma / Porridge"
             ),
 
             createChildMeal(
                 "Lunch",
-                "babylunch.png",
+                "logo/babylunch.png",
                 "🍛",
                 "Soft Rice + Dal + Vegetables"
             ),
 
             createChildMeal(
                 "Evening Snack",
-                "childSnack.png",
+                "logo/childSnack.png",
                 "🍎",
                 "Banana / Seasonal Fruit"
             ),
 
             createChildMeal(
                 "Dinner",
-                "logo/childdinner.png",
+                "/assets/images/logo/childdinner.png",
                 "🍱",
-                "Veg Puree / Suji Porridge"
+                "Khichdi / Soft Chapati + Dal"
             )
         );
     }
@@ -1119,30 +1236,30 @@ public class MotherNutritionDiet {
 
             createChildMeal(
                 "Breakfast",
-                "childBreakfast.png",
+                "logo/childBreakfast.png",
                 "🥞",
                 "Poha / Upma / Dosa"
             ),
 
             createChildMeal(
                 "Lunch",
-                "babylunch.png",
+                "logo/babylunch.png",
                 "🍱",
                 "Rice + Dal + Vegetables + Curd"
             ),
 
             createChildMeal(
                 "Evening Snack",
-                "childSnack.png",
+                "logo/childSnack.png",
                 "🍎",
                 "Fruit Bowl / Homemade Snack"
             ),
 
             createChildMeal(
                 "Dinner",
-                "logo/childdinner.png",
+                "/assets/images/logo/childdinner.png",
                 "🍱",
-                "Veg Puree / Suji Porridge"
+                "Chapati + Dal + Vegetables"
             )
         );
     }
@@ -1165,9 +1282,13 @@ public class MotherNutritionDiet {
         );
 
         box.setSpacing(7);
-        box.setPadding(new Insets(8));
+
+        box.setPadding(
+            new Insets(8)
+        );
 
         box.setPrefWidth(205);
+
         box.setMinWidth(190);
 
         box.setStyle(
@@ -1247,47 +1368,50 @@ public class MotherNutritionDiet {
             new HBox();
 
         items.setSpacing(10);
-        items.setAlignment(Pos.CENTER);
+
+        items.setAlignment(
+            Pos.CENTER
+        );
 
         items.getChildren().addAll(
 
             createAvoidCard(
-                "junkfood.png",
+                "logo/junkfood.png",
                 "🍔",
                 "Junk Food",
                 "High in calories,\nlow in nutrients"
             ),
 
             createAvoidCard(
-                "dairy.png",
+                "logo/dairyProduct.png",
                 "🥛",
                 "Unpasteurized Dairy",
                 "May contain harmful\nbacteria"
             ),
 
             createAvoidCard(
-                "rawMeetEgg.png",
+                "logo/rawMeetEgg.png",
                 "🥩",
                 "Raw or Undercooked",
                 "Risk of food\ninfection"
             ),
 
             createAvoidCard(
-                "cafenine.png",
+                "logo/cafenine.png",
                 "☕",
                 "High Caffeine",
                 "Limit caffeine\nintake"
             ),
 
             createAvoidCard(
-                "alcoholSmocking.png",
+                "logo/alcoholSmocking.png",
                 "🚫",
                 "Alcohol & Smoking",
                 "Highly harmful for\nbaby's development"
             ),
 
             createAvoidCard(
-                "exccesSugar.png",
+                "logo/exccesSugar.png",
                 "🍩",
                 "Excess Sugar",
                 "May lead to excess\nsugar intake"
@@ -1300,7 +1424,7 @@ public class MotherNutritionDiet {
             );
 
         detailed.setOnAction(e ->
-            showAvoidDialog()
+            showWhatToAvoid()
         );
 
         card.getChildren().addAll(
@@ -1333,6 +1457,7 @@ public class MotherNutritionDiet {
         box.setSpacing(7);
 
         box.setPrefWidth(130);
+
         box.setMinWidth(120);
 
         box.setPadding(
@@ -1358,7 +1483,10 @@ public class MotherNutritionDiet {
             new Label(title);
 
         name.setWrapText(true);
-        name.setAlignment(Pos.CENTER);
+
+        name.setAlignment(
+            Pos.CENTER
+        );
 
         name.setStyle(
             "-fx-font-size: 13px;" +
@@ -1370,7 +1498,10 @@ public class MotherNutritionDiet {
             new Label(description);
 
         desc.setWrapText(true);
-        desc.setAlignment(Pos.CENTER);
+
+        desc.setAlignment(
+            Pos.CENTER
+        );
 
         desc.setStyle(
             "-fx-font-size: 11px;" +
@@ -1410,6 +1541,7 @@ public class MotherNutritionDiet {
             new GridPane();
 
         grid.setHgap(15);
+
         grid.setVgap(12);
 
         grid.add(
@@ -1469,7 +1601,10 @@ public class MotherNutritionDiet {
             new HBox();
 
         box.setSpacing(9);
-        box.setAlignment(Pos.CENTER_LEFT);
+
+        box.setAlignment(
+            Pos.CENTER_LEFT
+        );
 
         Label icon =
             new Label(emoji);
@@ -1576,7 +1711,7 @@ public class MotherNutritionDiet {
             );
 
         viewTips.setOnAction(e ->
-            showTipsDialog()
+            showAllNutritionTips()
         );
 
         card.getChildren().addAll(
@@ -1599,7 +1734,10 @@ public class MotherNutritionDiet {
             new HBox();
 
         box.setSpacing(8);
-        box.setAlignment(Pos.CENTER_LEFT);
+
+        box.setAlignment(
+            Pos.CENTER_LEFT
+        );
 
         Label icon =
             new Label("✓");
@@ -1768,7 +1906,7 @@ public class MotherNutritionDiet {
             );
 
         consult.setOnAction(e ->
-            showNutritionistDialog()
+            showNutritionistInfo()
         );
 
         text.getChildren().addAll(
@@ -1826,46 +1964,102 @@ public class MotherNutritionDiet {
             "-fx-background-radius: 12;"
         );
 
-        if (imageName != null) {
+        if (imageName != null &&
+            !imageName.trim().isEmpty()) {
 
-            var resource =
-                getClass().getResource(
-                    "/assets/images/" + imageName
-                );
+            String resourcePath;
 
-            if (resource != null) {
+            if (imageName.startsWith("/")) {
 
-                javafx.scene.image.Image image =
-                    new javafx.scene.image.Image(
-                        resource.toExternalForm()
+                resourcePath = imageName;
+
+            } else if (
+                imageName.startsWith("assets/")
+            ) {
+
+                resourcePath =
+                    "/" + imageName;
+
+            } else if (
+                imageName.startsWith("logo/")
+            ) {
+
+                resourcePath =
+                    "/assets/images/" + imageName;
+
+            } else {
+
+                resourcePath =
+                    "/assets/images/logo/" +
+                    imageName;
+            }
+
+            try {
+
+                var resource =
+                    getClass().getResource(
+                        resourcePath
                     );
 
-                javafx.scene.image.ImageView imageView =
-                    new javafx.scene.image.ImageView(
-                        image
+                if (resource != null) {
+
+                    Image image =
+                        new Image(
+                            resource.toExternalForm(),
+                            false
+                        );
+
+                    if (!image.isError()) {
+
+                        ImageView imageView =
+                            new ImageView(image);
+
+                        imageView.setFitWidth(
+                            width - 6
+                        );
+
+                        imageView.setFitHeight(
+                            height - 6
+                        );
+
+                        imageView.setPreserveRatio(
+                            true
+                        );
+
+                        imageView.setSmooth(
+                            true
+                        );
+
+                        holder.getChildren().add(
+                            imageView
+                        );
+
+                        return holder;
+                    }
+
+                    System.out.println(
+                        "IMAGE LOAD ERROR: " +
+                        resourcePath
                     );
 
-                imageView.setFitWidth(
-                    width - 6
+                } else {
+
+                    System.out.println(
+                        "IMAGE NOT FOUND: " +
+                        resourcePath
+                    );
+                }
+
+            } catch (Exception ex) {
+
+                System.out.println(
+                    "IMAGE ERROR: " +
+                    resourcePath
                 );
 
-                imageView.setFitHeight(
-                    height - 6
+                System.out.println(
+                    ex.getMessage()
                 );
-
-                imageView.setPreserveRatio(
-                    true
-                );
-
-                imageView.setSmooth(
-                    true
-                );
-
-                holder.getChildren().add(
-                    imageView
-                );
-
-                return holder;
             }
         }
 
@@ -1974,8 +2168,11 @@ public class MotherNutritionDiet {
             "-fx-font-size: 13px;" +
             "-fx-font-weight: bold;" +
             "-fx-background-radius: 20;" +
-            "-fx-padding: 9px 20px;" +
-            "-fx-cursor: hand;"
+            "-fx-padding: 9px 20px;"
+        );
+
+        button.setCursor(
+            Cursor.HAND
         );
 
         return button;
@@ -1997,8 +2194,11 @@ public class MotherNutritionDiet {
             "-fx-font-size: 12px;" +
             "-fx-font-weight: bold;" +
             "-fx-background-radius: 8;" +
-            "-fx-padding: 8px 14px;" +
-            "-fx-cursor: hand;"
+            "-fx-padding: 8px 14px;"
+        );
+
+        button.setCursor(
+            Cursor.HAND
         );
 
         return button;
@@ -2046,742 +2246,484 @@ public class MotherNutritionDiet {
         return button;
     }
 
-    // =============================================================
-    // =============================================================
-    // DIALOG SECTION
-    // =============================================================
-    // =============================================================
-
     // =========================================================
-    // COMMON DIALOG
+    // POPUP HELPER
     // =========================================================
 
-    private Dialog<Void> createInfoDialog(
-        String titleText,
-        String subtitleText) {
-
-    Dialog<Void> dialog =
-        new Dialog<>();
-
-    dialog.setTitle(titleText);
-    dialog.setHeaderText(null);
-
-    VBox root =
-        new VBox();
-
-    root.setSpacing(15);
-    root.setPadding(
-        new Insets(22)
-    );
-
-    root.setPrefWidth(620);
-
-    root.setStyle(
-        "-fx-background-color: white;"
-    );
-
-    // =====================================================
-    // TITLE
-    // =====================================================
-
-    HBox heading =
-        new HBox();
-
-    heading.setAlignment(
-        Pos.CENTER_LEFT
-    );
-
-    heading.setSpacing(10);
-
-    Label title =
-        new Label(titleText);
-
-    title.setStyle(
-        "-fx-font-size: 23px;" +
-        "-fx-font-weight: bold;" +
-        "-fx-text-fill: #24234F;"
-    );
-
-    heading.getChildren().add(
-        title
-    );
-
-    // =====================================================
-    // SUBTITLE
-    // =====================================================
-
-    Label subtitle =
-        new Label(subtitleText);
-
-    subtitle.setWrapText(true);
-
-    subtitle.setStyle(
-        "-fx-font-size: 14px;" +
-        "-fx-text-fill: #77778D;"
-    );
-
-    root.getChildren().addAll(
-        heading,
-        subtitle
-    );
-
-    // =====================================================
-    // DIALOG CONTENT
-    // =====================================================
-
-    dialog.getDialogPane()
-        .setContent(root);
-
-    // =====================================================
-    // NATIVE CLOSE BUTTON
-    // =====================================================
-
-    dialog.getDialogPane()
-        .getButtonTypes()
-        .add(ButtonType.CLOSE);
-
-    // =====================================================
-    // CLOSE BUTTON STYLE
-    // =====================================================
-
-    Button closeButton =
-        (Button) dialog.getDialogPane()
-            .lookupButton(ButtonType.CLOSE);
-
-    closeButton.setText("Close");
-
-    closeButton.setStyle(
-        "-fx-background-color: #E84A87;" +
-        "-fx-text-fill: white;" +
-        "-fx-font-weight: bold;" +
-        "-fx-background-radius: 10;" +
-        "-fx-padding: 8px 24px;" +
-        "-fx-cursor: hand;"
-    );
-
-    return dialog;
-}
-
-    // =========================================================
-    // MONTHLY DIET DIALOG
-    // =========================================================
-
-    private void showMonthlyDietDialog() {
-
-        Dialog<Void> dialog =
-            createInfoDialog(
-                "🍃 Full Monthly Diet Plan",
-                "A simple trimester-wise nutrition guide for pregnancy."
-            );
-
-        VBox root =
-            (VBox) dialog.getDialogPane()
-                .getContent();
-
-        VBox details =
-            new VBox();
-
-        details.setSpacing(14);
-
-        ScrollPane scroll =
-            new ScrollPane(details);
-
-        scroll.setFitToWidth(true);
-        scroll.setPrefHeight(470);
-
-        scroll.setStyle(
-            "-fx-background-color: transparent;" +
-            "-fx-border-color: transparent;"
-        );
-
-        // =====================================================
-        // FIRST TRIMESTER
-        // =====================================================
-
-        details.getChildren().add(
-            createDialogSection(
-                "🌸 1st Trimester — Months 1 to 3",
-                "Focus on balanced meals, folate-rich foods, hydration and foods that are easy to tolerate."
-            )
-        );
-
-        details.getChildren().add(
-            createDetailMealBox(
-                "☀️ Breakfast",
-                "Poha / Upma / Oats + Banana + Almonds"
-            )
-        );
-
-        details.getChildren().add(
-            createDetailMealBox(
-                "🍱 Lunch",
-                "2 Phulka + Dal + Seasonal Vegetables + Curd"
-            )
-        );
-
-        details.getChildren().add(
-            createDetailMealBox(
-                "☕ Evening Snack",
-                "Fruit Bowl / Sprouts + Coconut Water"
-            )
-        );
-
-        details.getChildren().add(
-            createDetailMealBox(
-                "🌙 Dinner",
-                "Vegetable Khichdi / Dal Rice + Vegetables"
-            )
-        );
-
-        // =====================================================
-        // SECOND TRIMESTER
-        // =====================================================
-
-        details.getChildren().add(
-            createDialogSection(
-                "🌷 2nd Trimester — Months 4 to 6",
-                "Include a variety of vegetables, fruits, whole grains, protein sources and calcium-rich foods."
-            )
-        );
-
-        details.getChildren().add(
-            createDetailMealBox(
-                "☀️ Breakfast",
-                "Oats / Poha / Upma + Banana + Nuts"
-            )
-        );
-
-        details.getChildren().add(
-            createDetailMealBox(
-                "🍱 Lunch",
-                "2 Phulka + Dal + Rice + Vegetables + Curd"
-            )
-        );
-
-        details.getChildren().add(
-            createDetailMealBox(
-                "☕ Evening Snack",
-                "Sprouts / Fruit Bowl + Buttermilk"
-            )
-        );
-
-        details.getChildren().add(
-            createDetailMealBox(
-                "🌙 Dinner",
-                "Veg Khichdi / Soup + Curd + Steamed Vegetables"
-            )
-        );
-
-        // =====================================================
-        // THIRD TRIMESTER
-        // =====================================================
-
-        details.getChildren().add(
-            createDialogSection(
-                "🌺 3rd Trimester — Months 7 to 9",
-                "Keep meals balanced and comfortable. Include protein, iron, calcium, fibre and adequate fluids."
-            )
-        );
-
-        details.getChildren().add(
-            createDetailMealBox(
-                "☀️ Breakfast",
-                "Poha / Paratha + Fruit + Almonds & Walnuts"
-            )
-        );
-
-        details.getChildren().add(
-            createDetailMealBox(
-                "🍱 Lunch",
-                "2 Phulka + Dal + Rice + Seasonal Vegetables"
-            )
-        );
-
-        details.getChildren().add(
-            createDetailMealBox(
-                "☕ Evening Snack",
-                "Fruit Bowl / Sprouts + Buttermilk"
-            )
-        );
-
-        details.getChildren().add(
-            createDetailMealBox(
-                "🌙 Dinner",
-                "Light Khichdi / Soup + Curd + Vegetables"
-            )
-        );
-
-        details.getChildren().add(
-            createDialogSection(
-                "💧 Everyday Essentials",
-                "Stay hydrated, eat a variety of nutritious foods, follow your healthcare professional's supplement advice, and choose safe, properly prepared foods."
-            )
-        );
-
-        root.getChildren().add(
-            2,
-            scroll
-        );
-
-        dialog.showAndWait();
-    }
-
-    // =========================================================
-    // CHILD DIET DIALOG
-    // =========================================================
-
-    private void showChildDietDialog() {
-
-        Dialog<Void> dialog =
-            createInfoDialog(
-                "👶 Full Child Diet Plan",
-                "Age-wise complementary feeding information for children from 6 months to 2 years."
-            );
-
-        VBox root =
-            (VBox) dialog.getDialogPane()
-                .getContent();
-
-        VBox details =
-            new VBox();
-
-        details.setSpacing(14);
-
-        ScrollPane scroll =
-            new ScrollPane(details);
-
-        scroll.setFitToWidth(true);
-        scroll.setPrefHeight(470);
-
-        scroll.setStyle(
-            "-fx-background-color: transparent;" +
-            "-fx-border-color: transparent;"
-        );
-
-        // =====================================================
-        // 6-9 MONTHS
-        // =====================================================
-
-        details.getChildren().add(
-            createDialogSection(
-                "🥣 6–9 Months",
-                "Start complementary foods in suitable texture while continuing breastfeeding as recommended by a healthcare professional."
-            )
-        );
-
-        details.getChildren().add(
-            createDetailMealBox(
-                "☀️ Breakfast",
-                "Rice Cereal / Soft Porridge / Dal Water"
-            )
-        );
-
-        details.getChildren().add(
-            createDetailMealBox(
-                "🍚 Lunch",
-                "Mashed Dal + Rice / Soft Khichdi"
-            )
-        );
-
-        details.getChildren().add(
-            createDetailMealBox(
-                "🍌 Snack",
-                "Mashed Banana / Suitable Fruit Puree"
-            )
-        );
-
-        details.getChildren().add(
-            createDetailMealBox(
-                "🌙 Dinner",
-                "Vegetable Puree / Suji Porridge"
-            )
-        );
-
-        // =====================================================
-        // 9-12 MONTHS
-        // =====================================================
-
-        details.getChildren().add(
-            createDialogSection(
-                "🍎 9–12 Months",
-                "Gradually introduce a wider variety of soft foods and textures appropriate for the child's developmental stage."
-            )
-        );
-
-        details.getChildren().add(
-            createDetailMealBox(
-                "☀️ Breakfast",
-                "Soft Idli / Upma / Porridge"
-            )
-        );
-
-        details.getChildren().add(
-            createDetailMealBox(
-                "🍛 Lunch",
-                "Soft Rice + Dal + Vegetables"
-            )
-        );
-
-        details.getChildren().add(
-            createDetailMealBox(
-                "🍎 Snack",
-                "Banana / Soft Seasonal Fruit"
-            )
-        );
-
-        details.getChildren().add(
-            createDetailMealBox(
-                "🌙 Dinner",
-                "Vegetable Puree / Soft Porridge"
-            )
-        );
-
-        // =====================================================
-        // 1-2 YEARS
-        // =====================================================
-
-        details.getChildren().add(
-            createDialogSection(
-                "🥗 1–2 Years",
-                "Offer a varied family diet with age-appropriate portions and textures."
-            )
-        );
-
-        details.getChildren().add(
-            createDetailMealBox(
-                "☀️ Breakfast",
-                "Poha / Upma / Dosa"
-            )
-        );
-
-        details.getChildren().add(
-            createDetailMealBox(
-                "🍱 Lunch",
-                "Rice + Dal + Vegetables + Curd"
-            )
-        );
-
-        details.getChildren().add(
-            createDetailMealBox(
-                "🍎 Snack",
-                "Fruit Bowl / Homemade Nutritious Snack"
-            )
-        );
-
-        details.getChildren().add(
-            createDetailMealBox(
-                "🌙 Dinner",
-                "Soft Vegetable Meal / Khichdi"
-            )
-        );
-
-        details.getChildren().add(
-            createDialogSection(
-                "🧼 Important",
-                "Maintain hand hygiene, food hygiene and age-appropriate food texture. Avoid foods that may create a choking risk and consult a pediatric healthcare professional when introducing new foods or if the child has feeding concerns."
-            )
-        );
-
-        root.getChildren().add(
-            2,
-            scroll
-        );
-
-        dialog.showAndWait();
-    }
-
-    // =========================================================
-    // WHAT TO AVOID DIALOG
-    // =========================================================
-
-    private void showAvoidDialog() {
-
-        Dialog<Void> dialog =
-            createInfoDialog(
-                "🚫 Detailed Foods & Habits to Avoid",
-                "Important pregnancy food-safety and healthy-lifestyle reminders."
-            );
-
-        VBox root =
-            (VBox) dialog.getDialogPane()
-                .getContent();
-
-        VBox details =
-            new VBox();
-
-        details.setSpacing(12);
-
-        ScrollPane scroll =
-            new ScrollPane(details);
-
-        scroll.setFitToWidth(true);
-        scroll.setPrefHeight(470);
-
-        scroll.setStyle(
-            "-fx-background-color: transparent;" +
-            "-fx-border-color: transparent;"
-        );
-
-        details.getChildren().add(
-            createAvoidDetail(
-                "🍔",
-                "Junk & Highly Processed Food",
-                "Limit foods that are high in added sugar, salt or unhealthy fats and low in useful nutrients."
-            )
-        );
-
-        details.getChildren().add(
-            createAvoidDetail(
-                "🥛",
-                "Unpasteurized Dairy",
-                "Choose pasteurized milk and dairy products to reduce food-safety risks."
-            )
-        );
-
-        details.getChildren().add(
-            createAvoidDetail(
-                "🥩",
-                "Raw or Undercooked Food",
-                "Avoid raw or undercooked meat, eggs and other foods that may carry harmful microorganisms."
-            )
-        );
-
-        details.getChildren().add(
-            createAvoidDetail(
-                "🐟",
-                "High-Mercury Fish",
-                "Choose fish varieties that are considered lower in mercury and follow local healthcare guidance."
-            )
-        );
-
-        details.getChildren().add(
-            createAvoidDetail(
-                "☕",
-                "Excess Caffeine",
-                "Keep caffeine intake within the limit recommended by your healthcare professional."
-            )
-        );
-
-        details.getChildren().add(
-            createAvoidDetail(
-                "🚫",
-                "Alcohol & Smoking",
-                "Avoid alcohol and tobacco exposure during pregnancy."
-            )
-        );
-
-        details.getChildren().add(
-            createAvoidDetail(
-                "🍩",
-                "Excess Added Sugar",
-                "Limit sugary drinks, sweets and highly sugary snacks and prefer nutrient-rich foods."
-            )
-        );
-
-        details.getChildren().add(
-            createAvoidDetail(
-                "🧴",
-                "Unverified Supplements",
-                "Do not start supplements, herbal products or medicines without guidance from a qualified healthcare professional."
-            )
-        );
-
-        root.getChildren().add(
-            2,
-            scroll
-        );
-
-        dialog.showAndWait();
-    }
-
-    // =========================================================
-    // DAILY TIPS DIALOG
-    // =========================================================
-
-    private void showTipsDialog() {
-
-        Dialog<Void> dialog =
-            createInfoDialog(
-                "💡 All Nutrition Tips",
-                "Simple everyday reminders for maintaining a balanced pregnancy diet."
-            );
-
-        VBox root =
-            (VBox) dialog.getDialogPane()
-                .getContent();
-
-        VBox tips =
-            new VBox();
-
-        tips.setSpacing(11);
-
-        tips.getChildren().addAll(
-
-            createLargeTip(
-                "🍽️",
-                "Eat balanced meals",
-                "Include a variety of grains, vegetables, fruits and protein-rich foods."
-            ),
-
-            createLargeTip(
-                "💧",
-                "Stay hydrated",
-                "Drink water regularly throughout the day and follow your healthcare professional's advice."
-            ),
-
-            createLargeTip(
-                "🥦",
-                "Choose fresh foods",
-                "Include seasonal fruits, vegetables and other nutrient-rich foods."
-            ),
-
-            createLargeTip(
-                "🩸",
-                "Focus on important nutrients",
-                "Include sources of iron, folate, calcium and protein in your meals."
-            ),
-
-            createLargeTip(
-                "💊",
-                "Follow supplement advice",
-                "Take pregnancy supplements only as prescribed or recommended by your healthcare professional."
-            ),
-
-            createLargeTip(
-                "🧘‍♀️",
-                "Stay safely active",
-                "Follow activity and exercise guidance that is appropriate for your pregnancy."
-            ),
-
-            createLargeTip(
-                "🧼",
-                "Maintain food hygiene",
-                "Wash hands, use clean utensils and prepare food safely."
-            ),
-
-            createLargeTip(
-                "👩‍⚕️",
-                "Attend regular check-ups",
-                "Discuss your diet, symptoms and nutritional needs with your healthcare professional."
-            )
-        );
-
-        ScrollPane scroll =
-            new ScrollPane(tips);
-
-        scroll.setFitToWidth(true);
-        scroll.setPrefHeight(450);
-
-        scroll.setStyle(
-            "-fx-background-color: transparent;" +
-            "-fx-border-color: transparent;"
-        );
-
-        root.getChildren().add(
-            2,
-            scroll
-        );
-
-        dialog.showAndWait();
-    }
-
-    // =========================================================
-    // NUTRITIONIST DIALOG
-    // =========================================================
-
-    private void showNutritionistDialog() {
-
-        Dialog<Void> dialog =
-            createInfoDialog(
-                "👩‍⚕️ Consult Nutritionist",
-                "Get guidance for a personalized nutrition plan based on your pregnancy and health profile."
-            );
-
-        VBox root =
-            (VBox) dialog.getDialogPane()
-                .getContent();
-
-        VBox details =
-            new VBox();
-
-        details.setSpacing(14);
-
-        details.getChildren().add(
-            createNutritionistInfo(
-                "👩‍⚕️",
-                "Personalized Nutrition Guidance",
-                "A nutrition professional can help you plan balanced meals according to your nutritional needs, food preferences and healthcare advice."
-            )
-        );
-
-        details.getChildren().add(
-            createNutritionistInfo(
-                "📋",
-                "What to Discuss",
-                "Pregnancy stage, current diet, food preferences, allergies, supplements and any nutrition-related concerns."
-            )
-        );
-
-        details.getChildren().add(
-            createNutritionistInfo(
-                "🥗",
-                "Personal Diet Plan",
-                "Your plan can include meal timing, food variety, healthy snack options and nutrient-focused choices."
-            )
-        );
-
-        details.getChildren().add(
-            createNutritionistInfo(
-                "💗",
-                "Important",
-                "For pregnancy-specific medical or nutritional concerns, always follow advice from your doctor or qualified healthcare professional."
-            )
-        );
-
-        Button request =
-            createGradientButton(
-                "Request Nutrition Consultation"
-            );
-
-        request.setOnAction(e -> {
-
-            request.setText(
-                "✓ Consultation Request Sent"
-            );
-
-            request.setDisable(true);
-        });
-
-        details.getChildren().add(
-            request
-        );
-
-        ScrollPane scroll =
-            new ScrollPane(details);
-
-        scroll.setFitToWidth(true);
-        scroll.setPrefHeight(430);
-
-        scroll.setStyle(
-            "-fx-background-color: transparent;" +
-            "-fx-border-color: transparent;"
-        );
-
-        root.getChildren().add(
-            2,
-            scroll
-        );
-
-        dialog.showAndWait();
-    }
-
-    // =========================================================
-    // DIALOG SECTION
-    // =========================================================
-
-    private VBox createDialogSection(
+    private void showPopup(
             String title,
-            String description) {
+            String subtitle,
+            VBox popupContent) {
+
+        Dialog<Void> dialog =
+            new Dialog<>();
+
+        dialog.setTitle(title);
+
+        DialogPane dialogPane =
+            dialog.getDialogPane();
+
+        dialogPane.setHeaderText(null);
+
+        dialogPane.setStyle(
+            "-fx-background-color: #FFFDFE;"
+        );
+
+        // =====================================================
+        // POPUP HEADER
+        // =====================================================
+
+        VBox main =
+            new VBox();
+
+        main.setSpacing(12);
+
+        main.setPadding(
+            new Insets(18)
+        );
+
+        Label heading =
+            new Label(title);
+
+        heading.setStyle(
+            "-fx-font-size: 22px;" +
+            "-fx-font-weight: bold;" +
+            "-fx-text-fill: #24234F;"
+        );
+
+        Label sub =
+            new Label(subtitle);
+
+        sub.setWrapText(true);
+
+        sub.setStyle(
+            "-fx-font-size: 13px;" +
+            "-fx-text-fill: #77778D;"
+        );
+
+        Separator separator =
+            new Separator();
+
+        main.getChildren().addAll(
+            heading,
+            sub,
+            separator,
+            popupContent
+        );
+
+        // =====================================================
+        // POPUP SCROLL
+        // =====================================================
+
+        ScrollPane popupScroll =
+            new ScrollPane(main);
+
+        popupScroll.setFitToWidth(
+            true
+        );
+
+        popupScroll.setPannable(
+            true
+        );
+
+        popupScroll.setHbarPolicy(
+            ScrollPane.ScrollBarPolicy.NEVER
+        );
+
+        popupScroll.setVbarPolicy(
+            ScrollPane.ScrollBarPolicy.AS_NEEDED
+        );
+
+        popupScroll.setPrefViewportWidth(
+            620
+        );
+
+        popupScroll.setPrefViewportHeight(
+            500
+        );
+
+        popupScroll.setStyle(
+            "-fx-background-color: transparent;" +
+            "-fx-border-color: transparent;"
+        );
+
+        dialogPane.setContent(
+            popupScroll
+        );
+
+        dialogPane.getButtonTypes().add(
+            ButtonType.CLOSE
+        );
+
+        dialog.showAndWait();
+    }
+
+    // =========================================================
+    // MONTHLY DIET FULL PLAN
+    // =========================================================
+
+    private void showMonthlyDietPlan() {
+
+        VBox content =
+            new VBox();
+
+        content.setSpacing(14);
+
+        content.getChildren().addAll(
+
+            createPopupSection(
+                "🌅 Breakfast",
+                "Start your day with a nutritious meal.",
+                "• Poha / Upma / Oats\n" +
+                "• One seasonal fruit\n" +
+                "• 5-6 almonds or other nuts\n" +
+                "• Milk or another suitable calcium-rich food"
+            ),
+
+            createPopupSection(
+                "🍱 Lunch",
+                "Keep lunch balanced with carbohydrates, protein and vegetables.",
+                "• 2 Phulka / Chapati\n" +
+                "• Dal or another protein source\n" +
+                "• Seasonal vegetables\n" +
+                "• Rice as required\n" +
+                "• Curd / suitable dairy option"
+            ),
+
+            createPopupSection(
+                "☕ Evening Snack",
+                "Choose a light and nutritious snack.",
+                "• Fruit bowl\n" +
+                "• Sprouts\n" +
+                "• Roasted chana\n" +
+                "• Coconut water\n" +
+                "• Buttermilk"
+            ),
+
+            createPopupSection(
+                "🌙 Dinner",
+                "Prefer a balanced and easy-to-digest dinner.",
+                "• Veg Khichdi\n" +
+                "• Dal + Rice\n" +
+                "• Chapati + vegetables\n" +
+                "• Vegetable soup\n" +
+                "• Curd"
+            ),
+
+            createPopupSection(
+                "💧 Hydration",
+                "Drink fluids regularly throughout the day.",
+                "• Prefer water as the main drink\n" +
+                "• Keep yourself hydrated throughout the day\n" +
+                "• Coconut water or buttermilk can be included when suitable"
+            ),
+
+            createPopupSection(
+                "💊 Supplements",
+                "Take pregnancy supplements only as prescribed.",
+                "• Follow the prescribed dose and timing\n" +
+                "• Do not start or stop supplements on your own\n" +
+                "• Ask your doctor if you have questions"
+            )
+        );
+
+        showPopup(
+            "🍃 Full Monthly Diet Plan",
+            "A general pregnancy nutrition guide. Your healthcare professional can personalize it for you.",
+            content
+        );
+    }
+
+    // =========================================================
+    // CHILD FULL DIET PLAN
+    // =========================================================
+
+    private void showChildDietPlan() {
+
+        VBox content =
+            new VBox();
+
+        content.setSpacing(14);
+
+        content.getChildren().addAll(
+
+            createPopupSection(
+                "🥣 6-9 Months",
+                "Introduce age-appropriate complementary foods gradually.",
+                "• Rice cereal / dal water\n" +
+                "• Soft khichdi\n" +
+                "• Mashed vegetables\n" +
+                "• Banana or suitable fruit puree\n" +
+                "• Soft porridge\n" +
+                "• Continue breast milk or formula as appropriate"
+            ),
+
+            createPopupSection(
+                "🍚 9-12 Months",
+                "Gradually introduce more textures and variety.",
+                "• Soft idli / upma / porridge\n" +
+                "• Soft rice + dal + vegetables\n" +
+                "• Mashed or soft seasonal fruits\n" +
+                "• Khichdi\n" +
+                "• Soft chapati with dal"
+            ),
+
+            createPopupSection(
+                "🍱 1-2 Years",
+                "Offer a varied family-style diet with suitable textures.",
+                "• Poha / Upma / Dosa\n" +
+                "• Rice + Dal + Vegetables\n" +
+                "• Chapati + Dal + Vegetables\n" +
+                "• Seasonal fruits\n" +
+                "• Curd / suitable dairy foods\n" +
+                "• Homemade nutritious snacks"
+            ),
+
+            createPopupSection(
+                "💧 Hydration",
+                "Offer appropriate fluids regularly.",
+                "• Water\n" +
+                "• Breast milk / formula as appropriate for age\n" +
+                "• Avoid making sugary drinks a regular part of the diet"
+            ),
+
+            createPopupSection(
+                "🧼 Food Safety",
+                "Safe preparation is especially important for young children.",
+                "• Wash hands before preparing food\n" +
+                "• Use clean utensils\n" +
+                "• Use safe ingredients\n" +
+                "• Introduce new foods gradually\n" +
+                "• Use age-appropriate textures"
+            )
+        );
+
+        showPopup(
+            "👶 Full Child Diet Plan",
+            "General complementary-feeding information. Follow your pediatrician's advice for your child's individual needs.",
+            content
+        );
+    }
+
+    // =========================================================
+    // WHAT TO AVOID - FULL LIST
+    // =========================================================
+
+    private void showWhatToAvoid() {
+
+        VBox content =
+            new VBox();
+
+        content.setSpacing(14);
+
+        content.getChildren().addAll(
+
+            createPopupSection(
+                "🍔 Junk Food",
+                "Limit foods that provide lots of calories but relatively few nutrients.",
+                "Examples include highly processed snacks, fried foods and sugary packaged foods."
+            ),
+
+            createPopupSection(
+                "🥛 Unpasteurized Dairy",
+                "Choose pasteurized dairy products.",
+                "Unpasteurized milk and dairy products can carry harmful bacteria."
+            ),
+
+            createPopupSection(
+                "🥩 Raw or Undercooked Foods",
+                "Food should be prepared safely and cooked appropriately.",
+                "Avoid raw or undercooked meat, eggs and other foods when they may pose an infection risk."
+            ),
+
+            createPopupSection(
+                "☕ High Caffeine",
+                "Keep caffeine intake within the limit recommended by your healthcare professional.",
+                "Caffeine can be present in coffee, tea, cola, energy drinks and chocolate."
+            ),
+
+            createPopupSection(
+                "🚫 Alcohol & Smoking",
+                "Avoid alcohol and tobacco exposure during pregnancy.",
+                "If you need help stopping tobacco use, speak with a healthcare professional."
+            ),
+
+            createPopupSection(
+                "🍩 Excess Sugar",
+                "Limit foods and drinks high in added sugar.",
+                "Prefer whole fruits and balanced meals instead of frequently consuming sugary snacks and drinks."
+            ),
+
+            createPopupSection(
+                "🥤 Sugary Drinks",
+                "Limit drinks with high amounts of added sugar.",
+                "Choose water as the main drink and include other suitable fluids when needed."
+            ),
+
+            createPopupSection(
+                "🍟 Excess Fried Food",
+                "Avoid making deep-fried foods a regular part of your diet.",
+                "Prefer balanced meals with vegetables, whole grains and suitable protein sources."
+            ),
+
+            createPopupSection(
+                "⚠️ Unwashed Foods",
+                "Food hygiene is important during pregnancy.",
+                "Wash fruits and vegetables properly and maintain clean food preparation practices."
+            )
+        );
+
+        showPopup(
+            "🚫 What to Avoid",
+            "Food-safety and healthy-eating reminders during pregnancy.",
+            content
+        );
+    }
+
+    // =========================================================
+    // ALL DAILY NUTRITION TIPS
+    // =========================================================
+
+    private void showAllNutritionTips() {
+
+        VBox content =
+            new VBox();
+
+        content.setSpacing(14);
+
+        content.getChildren().addAll(
+
+            createPopupSection(
+                "🍽️ Eat Small & Frequent Meals",
+                "Smaller meals may be easier to manage for some people.",
+                "Choose balanced meals and snacks throughout the day according to your appetite and healthcare advice."
+            ),
+
+            createPopupSection(
+                "💧 Stay Hydrated",
+                "Drink water regularly throughout the day.",
+                "Keep water available and drink regularly according to your needs."
+            ),
+
+            createPopupSection(
+                "🥦 Eat Fruits & Vegetables",
+                "Include a variety of seasonal produce.",
+                "Try to include different types of fruits and vegetables across your meals."
+            ),
+
+            createPopupSection(
+                "🌾 Choose Nutritious Foods",
+                "Build meals around nutritious food choices.",
+                "Include whole grains, pulses, vegetables, fruits, nuts and suitable protein sources."
+            ),
+
+            createPopupSection(
+                "🥚 Include Protein",
+                "Protein supports normal growth and tissue maintenance.",
+                "Include suitable sources such as dal, beans, dairy, eggs or other protein foods according to your dietary preferences."
+            ),
+
+            createPopupSection(
+                "💊 Take Prescribed Supplements",
+                "Follow your healthcare professional's instructions.",
+                "Do not change the dose or add supplements without discussing them with your doctor."
+            ),
+
+            createPopupSection(
+                "🧘‍♀️ Stay Active Safely",
+                "Movement can be part of a healthy pregnancy when medically appropriate.",
+                "Choose activities approved for you by your healthcare professional."
+            ),
+
+            createPopupSection(
+                "😴 Prioritize Rest",
+                "Good nutrition works together with adequate rest.",
+                "Maintain a regular sleep and rest routine as much as possible."
+            ),
+
+            createPopupSection(
+                "👩‍⚕️ Regular Checkups",
+                "Keep your scheduled prenatal appointments.",
+                "Discuss nutrition, supplements and any pregnancy-related concerns with your healthcare professional."
+            ),
+
+            createPopupSection(
+                "🧼 Food Safety",
+                "Safe food handling is important.",
+                "Wash hands, use clean utensils, store food safely and avoid foods that may carry infection risks."
+            )
+        );
+
+        showPopup(
+            "💡 All Daily Nutrition Tips",
+            "Simple nutrition and healthy-lifestyle reminders for pregnancy.",
+            content
+        );
+    }
+
+    // =========================================================
+    // CONSULT NUTRITIONIST
+    // =========================================================
+
+    private void showNutritionistInfo() {
+
+        VBox content =
+            new VBox();
+
+        content.setSpacing(14);
+
+        content.getChildren().addAll(
+
+            createPopupSection(
+                "👩‍⚕️ Personalized Diet Consultation",
+                "Get nutrition guidance based on your individual health profile.",
+                "A nutritionist or registered dietitian can help plan meals according to your pregnancy stage, food preferences, nutritional requirements and medical advice."
+            ),
+
+            createPopupSection(
+                "📋 What to Discuss",
+                "Keep your relevant information ready for the consultation.",
+                "• Current pregnancy week\n" +
+                "• Usual eating pattern\n" +
+                "• Food preferences and restrictions\n" +
+                "• Doctor-advised dietary restrictions\n" +
+                "• Current supplements or medicines"
+            ),
+
+            createPopupSection(
+                "🥗 Personalized Plan",
+                "Your diet plan can be adjusted to your individual requirements.",
+                "The nutrition professional can suggest suitable meal timing, food choices, portions and alternatives based on your needs."
+            ),
+
+            createPopupSection(
+                "🩺 Health Conditions",
+                "Some conditions require specific dietary guidance.",
+                "For conditions such as gestational diabetes, anemia, food allergies or other health concerns, follow your doctor's or qualified nutrition professional's specific advice."
+            ),
+
+            createPopupSection(
+                "💗 Before Your Consultation",
+                "Prepare your questions in advance.",
+                "Write down any food-related concerns, symptoms, allergies, dietary preferences or questions about supplements that you want to discuss."
+            )
+        );
+
+        showPopup(
+            "👩‍⚕️ Consult Nutritionist",
+            "Personalized nutrition support for a healthier pregnancy.",
+            content
+        );
+    }
+
+    // =========================================================
+    // POPUP SECTION
+    // =========================================================
+
+    private VBox createPopupSection(
+            String title,
+            String subtitle,
+            String details) {
 
         VBox box =
             new VBox();
@@ -2793,14 +2735,16 @@ public class MotherNutritionDiet {
         );
 
         box.setStyle(
-            "-fx-background-color: #FFF5FA;" +
+            "-fx-background-color: #FFFFFF;" +
             "-fx-background-radius: 12;" +
-            "-fx-border-color: #F3D8E3;" +
+            "-fx-border-color: #E8E0EA;" +
             "-fx-border-radius: 12;"
         );
 
         Label titleLabel =
             new Label(title);
+
+        titleLabel.setWrapText(true);
 
         titleLabel.setStyle(
             "-fx-font-size: 16px;" +
@@ -2808,311 +2752,31 @@ public class MotherNutritionDiet {
             "-fx-text-fill: #E84A87;"
         );
 
-        Label descriptionLabel =
-            new Label(description);
+        Label subtitleLabel =
+            new Label(subtitle);
 
-        descriptionLabel.setWrapText(true);
+        subtitleLabel.setWrapText(true);
 
-        descriptionLabel.setStyle(
-            "-fx-font-size: 13px;" +
-            "-fx-text-fill: #666680;"
-        );
-
-        box.getChildren().addAll(
-            titleLabel,
-            descriptionLabel
-        );
-
-        return box;
-    }
-
-    // =========================================================
-    // DETAIL MEAL BOX
-    // =========================================================
-
-    private HBox createDetailMealBox(
-            String title,
-            String food) {
-
-        HBox box =
-            new HBox();
-
-        box.setSpacing(10);
-        box.setAlignment(
-            Pos.CENTER_LEFT
-        );
-
-        box.setPadding(
-            new Insets(11)
-        );
-
-        box.setStyle(
-            "-fx-background-color: #FAF8FF;" +
-            "-fx-background-radius: 10;" +
-            "-fx-border-color: #E7DDF2;" +
-            "-fx-border-radius: 10;"
-        );
-
-        Label titleLabel =
-            new Label(title);
-
-        titleLabel.setPrefWidth(120);
-
-        titleLabel.setStyle(
-            "-fx-font-size: 13px;" +
-            "-fx-font-weight: bold;" +
-            "-fx-text-fill: #7041A5;"
-        );
-
-        Label foodLabel =
-            new Label(food);
-
-        foodLabel.setWrapText(true);
-
-        foodLabel.setStyle(
-            "-fx-font-size: 13px;" +
-            "-fx-text-fill: #24234F;"
-        );
-
-        HBox.setHgrow(
-            foodLabel,
-            Priority.ALWAYS
-        );
-
-        box.getChildren().addAll(
-            titleLabel,
-            foodLabel
-        );
-
-        return box;
-    }
-
-    // =========================================================
-    // AVOID DETAIL
-    // =========================================================
-
-    private HBox createAvoidDetail(
-            String emoji,
-            String title,
-            String description) {
-
-        HBox box =
-            new HBox();
-
-        box.setSpacing(12);
-        box.setAlignment(
-            Pos.TOP_LEFT
-        );
-
-        box.setPadding(
-            new Insets(12)
-        );
-
-        box.setStyle(
-            "-fx-background-color: #FFF8FA;" +
-            "-fx-background-radius: 12;" +
-            "-fx-border-color: #F3D8E3;" +
-            "-fx-border-radius: 12;"
-        );
-
-        Label icon =
-            new Label(emoji);
-
-        icon.setStyle(
-            "-fx-font-size: 25px;"
-        );
-
-        VBox text =
-            new VBox();
-
-        text.setSpacing(3);
-
-        Label titleLabel =
-            new Label(title);
-
-        titleLabel.setStyle(
-            "-fx-font-size: 14px;" +
-            "-fx-font-weight: bold;" +
-            "-fx-text-fill: #D14A78;"
-        );
-
-        Label descLabel =
-            new Label(description);
-
-        descLabel.setWrapText(true);
-
-        descLabel.setStyle(
+        subtitleLabel.setStyle(
             "-fx-font-size: 12px;" +
-            "-fx-text-fill: #666680;"
+            "-fx-text-fill: #77778D;"
         );
 
-        text.getChildren().addAll(
-            titleLabel,
-            descLabel
-        );
+        Label detailsLabel =
+            new Label(details);
 
-        HBox.setHgrow(
-            text,
-            Priority.ALWAYS
-        );
+        detailsLabel.setWrapText(true);
 
-        box.getChildren().addAll(
-            icon,
-            text
-        );
-
-        return box;
-    }
-
-    // =========================================================
-    // LARGE TIP
-    // =========================================================
-
-    private HBox createLargeTip(
-            String emoji,
-            String title,
-            String description) {
-
-        HBox box =
-            new HBox();
-
-        box.setSpacing(12);
-        box.setAlignment(
-            Pos.TOP_LEFT
-        );
-
-        box.setPadding(
-            new Insets(11)
-        );
-
-        box.setStyle(
-            "-fx-background-color: #FFFDF4;" +
-            "-fx-background-radius: 12;" +
-            "-fx-border-color: #F1E7BE;" +
-            "-fx-border-radius: 12;"
-        );
-
-        Label icon =
-            new Label(emoji);
-
-        icon.setStyle(
-            "-fx-font-size: 24px;"
-        );
-
-        VBox text =
-            new VBox();
-
-        text.setSpacing(3);
-
-        Label titleLabel =
-            new Label(title);
-
-        titleLabel.setStyle(
-            "-fx-font-size: 14px;" +
-            "-fx-font-weight: bold;" +
-            "-fx-text-fill: #C7821B;"
-        );
-
-        Label desc =
-            new Label(description);
-
-        desc.setWrapText(true);
-
-        desc.setStyle(
-            "-fx-font-size: 12px;" +
-            "-fx-text-fill: #666680;"
-        );
-
-        text.getChildren().addAll(
-            titleLabel,
-            desc
-        );
-
-        HBox.setHgrow(
-            text,
-            Priority.ALWAYS
+        detailsLabel.setStyle(
+            "-fx-font-size: 13px;" +
+            "-fx-text-fill: #24234F;" +
+            "-fx-line-spacing: 4px;"
         );
 
         box.getChildren().addAll(
-            icon,
-            text
-        );
-
-        return box;
-    }
-
-    // =========================================================
-    // NUTRITIONIST INFO
-    // =========================================================
-
-    private HBox createNutritionistInfo(
-            String emoji,
-            String title,
-            String description) {
-
-        HBox box =
-            new HBox();
-
-        box.setSpacing(12);
-        box.setAlignment(
-            Pos.TOP_LEFT
-        );
-
-        box.setPadding(
-            new Insets(12)
-        );
-
-        box.setStyle(
-            "-fx-background-color: #FAF5FF;" +
-            "-fx-background-radius: 12;" +
-            "-fx-border-color: #E5D8F1;" +
-            "-fx-border-radius: 12;"
-        );
-
-        Label icon =
-            new Label(emoji);
-
-        icon.setStyle(
-            "-fx-font-size: 27px;"
-        );
-
-        VBox text =
-            new VBox();
-
-        text.setSpacing(4);
-
-        Label titleLabel =
-            new Label(title);
-
-        titleLabel.setStyle(
-            "-fx-font-size: 14px;" +
-            "-fx-font-weight: bold;" +
-            "-fx-text-fill: #7041A5;"
-        );
-
-        Label desc =
-            new Label(description);
-
-        desc.setWrapText(true);
-
-        desc.setStyle(
-            "-fx-font-size: 12px;" +
-            "-fx-text-fill: #666680;"
-        );
-
-        text.getChildren().addAll(
             titleLabel,
-            desc
-        );
-
-        HBox.setHgrow(
-            text,
-            Priority.ALWAYS
-        );
-
-        box.getChildren().addAll(
-            icon,
-            text
+            subtitleLabel,
+            detailsLabel
         );
 
         return box;

@@ -20,7 +20,7 @@ public class MotherAiAssistant {
     // =========================================================
     // MAIN PAGE
     // =========================================================
-
+    
     public VBox createAIAssistantPage() {
 
         VBox page = new VBox();

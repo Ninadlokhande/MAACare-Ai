@@ -16,7 +16,7 @@ public class Controller {
         // FIREBASE WEB API KEY
         // =============================================================
 
-        private static final String API_KEY = "AIzaSyAhkH0AhllTx10IFjFA3VzbKvZSxIMA5bQ";
+        private static final String API_KEY = "AIzaSyDGseSX-w2j5L7HYmHH-sw9qXT558RaTeU";
 
         // =============================================================
         // STATUS CODE

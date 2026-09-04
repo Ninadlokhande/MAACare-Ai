@@ -12,7 +12,6 @@ import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -198,6 +197,7 @@ public class MotherDashBoard {
                     FontAwesomeIcon.COG
                 );
 
+
         // =====================================================
         // SETTINGS BUTTON
         // =====================================================
@@ -269,13 +269,13 @@ public class MotherDashBoard {
 
         medicineButton.setOnAction(e -> {
 
-                MotherMedicineReminder medicinePage =
-                new MotherMedicineReminder(motherModel);
-            
+            MotherMedicineReminder medicinePage =
+                    new MotherMedicineReminder(motherModel);
+
             mainContent.getChildren().clear();
-            
+
             mainContent.getChildren().add(
-                medicinePage.createMedicineReminderPage()
+                    medicinePage.createMedicineReminderPage()
             );
         });
 
@@ -324,14 +324,14 @@ public class MotherDashBoard {
 
         reportsButton.setOnAction(e -> {
 
-                MotherReports reports =
-                new MotherReports(motherModel);
-        
-        mainContent.getChildren().clear();
-        
-        mainContent.getChildren().add(
-            reports.createReportsPage()
-        );
+            MotherReports reports =
+                    new MotherReports(motherModel);
+
+            mainContent.getChildren().clear();
+
+            mainContent.getChildren().add(
+                    reports.createReportsPage()
+            );
 
         });
 
@@ -446,10 +446,6 @@ public class MotherDashBoard {
 
         welcomeBox.setSpacing(5);
 
-
-        /*
-         * Firebase मधून आलेले actual mother name
-         */
         String motherName = getMotherName();
 
 
@@ -644,10 +640,6 @@ public class MotherDashBoard {
 
         profileBox.setSpacing(9);
 
-
-        /*
-         * Actual mother name चा first letter
-         */
         String firstLetter =
                 motherName.substring(0, 1).toUpperCase();
 
@@ -893,25 +885,36 @@ public class MotherDashBoard {
     }
 
 
+    // =========================================================
+    // WEEK TEXT
+    // =========================================================
+
     private String getWeekText(int week) {
 
-        if (week == 0) {
-            return "Pregnancy Not Started";
+        if (week <= 0) {
+            return "Current Pregnancy Week";
         }
 
-        if (week == 1) {
-            return "1st Week of Pregnancy";
+        if (week % 100 >= 11 &&
+                week % 100 <= 13) {
+
+            return week + "th Week of Pregnancy";
         }
 
-        if (week == 2) {
-            return "2nd Week of Pregnancy";
-        }
+        switch (week % 10) {
 
-        if (week == 3) {
-            return "3rd Week of Pregnancy";
-        }
+            case 1:
+                return week + "st Week of Pregnancy";
 
-        return week + "th Week of Pregnancy";
+            case 2:
+                return week + "nd Week of Pregnancy";
+
+            case 3:
+                return week + "rd Week of Pregnancy";
+
+            default:
+                return week + "th Week of Pregnancy";
+        }
     }
 
 
@@ -1024,26 +1027,27 @@ public class MotherDashBoard {
 
         reportButton.setOnAction(e -> {
 
-                MotherReports reports =
-                new MotherReports(motherModel);
-        
-        mainContent.getChildren().clear();
-        
-        mainContent.getChildren().add(
-            reports.createReportsPage()
-        );
+            MotherReports reports =
+                    new MotherReports(motherModel);
+
+            mainContent.getChildren().clear();
+
+            mainContent.getChildren().add(
+                    reports.createReportsPage()
+            );
 
         });
 
 
         medicineAction.setOnAction(e -> {
-                MotherMedicineReminder medicinePage =
-                new MotherMedicineReminder(motherModel);
-            
+
+            MotherMedicineReminder medicinePage =
+                    new MotherMedicineReminder(motherModel);
+
             mainContent.getChildren().clear();
-            
+
             mainContent.getChildren().add(
-                medicinePage.createMedicineReminderPage()
+                    medicinePage.createMedicineReminderPage()
             );
 
         });
@@ -1168,11 +1172,16 @@ public class MotherDashBoard {
         );
 
 
+        // =====================================================
+        // YOU ARE IN
+        // =====================================================
+
         Label smallText =
                 new Label("You are in");
 
         smallText.setStyle(
             "-fx-font-size: 17px;" +
+            "-fx-font-weight: bold;" +
             "-fx-text-fill: #24234F;"
         );
 
@@ -1312,59 +1321,51 @@ public class MotherDashBoard {
         // MOTHER IMAGE
         // =====================================================
 
-        ImageView motherImage =
-                new ImageView();
+        ImageView motherImage = new ImageView();
 
-        var motherResource =
-                getClass().getResource(
-                    "/assets/images/logo/ChatGPT Image Aug 15, 2026, 01_33_52 PM.png"
-                );
-
-
+        String imagePath = "/assets/images/logo/PregnantMother.png";
+        
+        var motherResource = getClass().getResource(imagePath);
+        
+        System.out.println("Mother image resource = " + motherResource);
+        
         if (motherResource != null) {
-
-            Image image =
-                    new Image(
-                        motherResource.toExternalForm()
-                    );
-
-            motherImage.setImage(image);
-
-            motherImage.setViewport(
-                new Rectangle2D(
-                    700,
-                    60,
-                    836,
-                    900
-                )
+        
+            Image image = new Image(
+                    motherResource.toExternalForm()
             );
-
-            motherImage.setFitWidth(210);
-
-            motherImage.setFitHeight(245);
-
+        
+            System.out.println("Mother image loaded = " + !image.isError());
+        
+            motherImage.setImage(image);
+        
+            motherImage.setFitWidth(350);
+            motherImage.setFitHeight(350);
+        
             motherImage.setPreserveRatio(true);
+            motherImage.setSmooth(true);
+        
+        } else {
+        
+            System.out.println(
+                    "❌ Mother image NOT FOUND: " + imagePath
+            );
         }
-
-
-        VBox imageBox =
-                new VBox();
-
+        
+        VBox imageBox = new VBox();
+        
         imageBox.setAlignment(
-                Pos.CENTER
+                Pos.CENTER_RIGHT
         );
-
-        imageBox.setPrefWidth(230);
-
-        imageBox.setMinWidth(210);
-
+        
+        imageBox.setPrefWidth(270);
+        imageBox.setMinWidth(230);
         imageBox.setPrefHeight(250);
-
+        
         imageBox.getChildren().add(
                 motherImage
         );
-
-
+        
         card.getChildren().addAll(
                 details,
                 imageBox
@@ -1484,9 +1485,6 @@ public class MotherDashBoard {
         );
 
 
-        /*
-         * Existing dashboard stats unchanged
-         */
         stats.getChildren().addAll(
 
                 createStat(
