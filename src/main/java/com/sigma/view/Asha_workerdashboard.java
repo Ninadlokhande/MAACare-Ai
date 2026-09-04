@@ -46,15 +46,47 @@ public class Asha_workerdashboard {
     // COLORS
     // =========================================================
 
-    private static final String COLOR_BG = "#FEF9FC";
+    /*private static final String COLOR_BG = "#FEF9FC";
     private static final String COLOR_PRIMARY_PINK = "#E91E63";
     private static final String COLOR_LIGHT_PINK = "#FCE4EC";
     private static final String COLOR_TEXT_DARK = "#111827";
     private static final String COLOR_TEXT_MUTED = "#374151";
     private static final String COLOR_WHITE = "#FFFFFF";
     private static final String COLOR_BORDER = "#D1D5DB";
-    private static final String COLOR_GREEN = "#059669";
+    private static final String COLOR_GREEN = "#059669";*/
+// =========================================================
+// COLORS - MotherBabyCare Theme
+// =========================================================
 
+private static final String COLOR_BG = "#FFF7FB";
+
+private static final String COLOR_PRIMARY_PINK = "#E84A87";
+
+private static final String COLOR_LIGHT_PINK = "#FFF5F9";
+
+private static final String COLOR_TEXT_DARK = "#24234F";
+
+private static final String COLOR_TEXT_MUTED = "#77778D";
+
+private static final String COLOR_WHITE = "#FFFFFF";
+
+private static final String COLOR_BORDER = "#E7DCE8";
+
+private static final String COLOR_GREEN = "#3C9A68";
+
+private static final String COLOR_PURPLE = "#9B4DCC";
+
+private static final String COLOR_LIGHT_PURPLE = "#F4EDFF";
+
+private static final String COLOR_GOLD = "#C7821B";
+
+private static final String COLOR_LIGHT_GOLD = "#FFFDF4";
+
+private static final String COLOR_BLUE = "#6B7FD7";
+
+private static final String COLOR_LIGHT_BLUE = "#F0F4FF";
+
+private static final String COLOR_BABY_PINK = "#FFEAF3";
     // =========================================================
     // STAGE / SCENE
     // =========================================================
@@ -155,7 +187,11 @@ private int womenCheckupBaaki = 0;
         mainRoot = new BorderPane();
 
         mainRoot.setStyle(
-                "-fx-background-color: " + COLOR_BG + ";"
+                "-fx-background-color: linear-gradient(" +
+        "to bottom right, " +
+        "#FFFFFF 0%, " +
+        "#FFF7FB 55%, " +
+        "#F4EDFF 100%);"
         );
 
         mainRoot.setPrefSize(
@@ -220,7 +256,7 @@ private int womenCheckupBaaki = 0;
                 new BorderPane();
 
         centerPane.setStyle(
-                "-fx-background-color: " + COLOR_BG + ";"
+                "-fx-background-color: #FFF7FB;"
         );
 
         centerPane.setTop(header);
@@ -2057,7 +2093,7 @@ private LocalDate parseDate(String dateText) {
                 ),
 
                 createLegendRow(
-                        "#6366F1",
+                        "#9B4DCC",
                         "Women Test Normal",
                         String.valueOf(
                                 womenTestNormal
@@ -2065,13 +2101,13 @@ private LocalDate parseDate(String dateText) {
                 ),
 
                 createLegendRow(
-                        "#F59E0B",
+                        "#C7821B",
                         "Women Test Risky",
                         String.valueOf(womenTestRisky)
                 ),
 
                 createLegendRow(
-                        "#0EA5E9",
+                        "#6B7FD7",
                         "Women Checkup Baaki",
                         String.valueOf(
                                 womenCheckupBaaki
@@ -2145,7 +2181,7 @@ private LocalDate parseDate(String dateText) {
 VBox btn2 =
         createActionButton(
                 "Send Message",
-                "#E0E7FF"
+                "#FFF9FC"
         );
 
 // =====================================================
@@ -2217,7 +2253,7 @@ btn2.setOnMouseClicked(e -> {
                 canvas.getGraphicsContext2D();
 
         gc.setLineWidth(16);
-        gc.setStroke(Color.web("#E5E7EB"));
+        gc.setStroke(Color.web("#E7DCE8"));
         gc.strokeArc(12, 12,size - 24, size -24, 0, 360, javafx.scene.shape.ArcType.OPEN);
 
         gc.setLineCap(
@@ -2269,7 +2305,7 @@ btn2.setOnMouseClicked(e -> {
                 gc,
                 startAngle,
                 normalAngle,
-                "#6366F1",
+                COLOR_PURPLE,
                 size
         );
 
@@ -2283,7 +2319,7 @@ btn2.setOnMouseClicked(e -> {
                 gc,
                 startAngle,
                 riskyAngle,
-                "#F59E0B",
+                 COLOR_GOLD,
                 size
         );
 
@@ -2298,7 +2334,7 @@ btn2.setOnMouseClicked(e -> {
 
 
 
-                "#0EA5E9",
+                 COLOR_BLUE,
                 size
         );
     }
