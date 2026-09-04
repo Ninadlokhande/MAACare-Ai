@@ -2,6 +2,7 @@ package com.sigma.view.doctorpages;
 
 import com.sigma.controller.doctorController.DoctorAppointmentController;
 import com.sigma.model.DoctorModel.DoctorAppointment;
+import com.sigma.view.scenesettings;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -23,13 +24,23 @@ public class DoctorAppointmentsPage {
         // =========================================================
 
         private static final String PINK = "#E84A87";
-        private static final String LIGHT_PINK = "#FFEAF3";
-        private static final String PURPLE = "#754CE0";
-        private static final String LIGHT_PURPLE = "#F3ECFF";
-        private static final String DARK_TEXT = "#172554";
-        private static final String SECONDARY = "#64748B";
-        private static final String BORDER = "#E8E8F0";
-        private static final String PAGE_BACKGROUND = "#FAF9FC";
+        private static final String LIGHT_PINK = "#FFF0F6";
+        private static final String PURPLE = "#C5306D";
+        private static final String LIGHT_PURPLE = "#FFE3EE";
+        private static final String DARK_TEXT = "#3B2140";
+        private static final String SECONDARY = "#806A78";
+        private static final String BORDER = "#F0D8E3";
+        private static final String PAGE_BACKGROUND = "#FFF9FB";
+
+        // =========================================================
+        // COMMON SCREEN SIZE
+        // =========================================================
+        // Uses your existing scenesettings.java
+        // =========================================================
+
+        private static final double SCREEN_WIDTH = scenesettings.rectanguler2d.getWidth();
+
+        private static final double SCREEN_HEIGHT = scenesettings.rectanguler2d.getHeight();
 
         // =========================================================
         // TABLE
@@ -42,7 +53,9 @@ public class DoctorAppointmentsPage {
         // =========================================================
 
         private static TextField searchField;
+
         private static ComboBox<String> statusCombo;
+
         private static ComboBox<String> typeCombo;
 
         // =========================================================
@@ -64,15 +77,24 @@ public class DoctorAppointmentsPage {
         public static void show() {
 
                 try {
+
                         controller.refreshAppointments();
+
                 } catch (Exception e) {
+
                         e.printStackTrace();
                 }
+
+                // =====================================================
+                // ROOT
+                // =====================================================
 
                 BorderPane root = new BorderPane();
 
                 root.setStyle(
-                                "-fx-background-color: " + PAGE_BACKGROUND + ";");
+                                "-fx-background-color: "
+                                                + PAGE_BACKGROUND
+                                                + ";");
 
                 // =====================================================
                 // HEADER
@@ -81,34 +103,47 @@ public class DoctorAppointmentsPage {
                 HBox header = new HBox(18);
 
                 header.setPadding(
-                                new Insets(20, 25, 20, 25));
+                                new Insets(
+                                                20,
+                                                25,
+                                                20,
+                                                25));
 
-                header.setAlignment(Pos.CENTER_LEFT);
+                header.setAlignment(
+                                Pos.CENTER_LEFT);
 
                 header.setStyle(
                                 "-fx-background-color: white;"
-                                                + "-fx-border-color: " + BORDER + ";"
+                                                + "-fx-border-color: "
+                                                + BORDER
+                                                + ";"
                                                 + "-fx-border-width: 0 0 1 0;");
 
                 VBox titleBox = new VBox(4);
 
-                Label title = new Label("Appointments");
+                Label title = new Label(
+                                "Appointments");
 
                 title.setStyle(
                                 "-fx-font-size: 26px;"
                                                 + "-fx-font-weight: bold;"
-                                                + "-fx-text-fill: " + DARK_TEXT + ";");
+                                                + "-fx-text-fill: "
+                                                + DARK_TEXT
+                                                + ";");
 
                 Label subtitle = new Label(
                                 "Manage and view all patient appointments");
 
                 subtitle.setStyle(
                                 "-fx-font-size: 13px;"
-                                                + "-fx-text-fill: " + SECONDARY + ";");
+                                                + "-fx-text-fill: "
+                                                + SECONDARY
+                                                + ";");
 
-                titleBox.getChildren().addAll(
-                                title,
-                                subtitle);
+                titleBox.getChildren()
+                                .addAll(
+                                                title,
+                                                subtitle);
 
                 Region spacer = new Region();
 
@@ -117,10 +152,11 @@ public class DoctorAppointmentsPage {
                                 Priority.ALWAYS);
 
                 // =====================================================
-                // REFRESH
+                // REFRESH BUTTON
                 // =====================================================
 
-                refreshButton = new Button("↻ Refresh");
+                refreshButton = new Button(
+                                "↻ Refresh");
 
                 styleRefreshButton();
 
@@ -128,13 +164,16 @@ public class DoctorAppointmentsPage {
                                 e -> refreshAppointmentsFromFirebase());
 
                 // =====================================================
-                // ADD
+                // ADD APPOINTMENT BUTTON
                 // =====================================================
 
-                Button add = new Button("+ Add Appointment");
+                Button add = new Button(
+                                "+ Add Appointment");
 
                 add.setStyle(
-                                "-fx-background-color: " + PINK + ";"
+                                "-fx-background-color: "
+                                                + PINK
+                                                + ";"
                                                 + "-fx-text-fill: white;"
                                                 + "-fx-font-weight: bold;"
                                                 + "-fx-background-radius: 8;"
@@ -145,30 +184,25 @@ public class DoctorAppointmentsPage {
                                 e -> showAddAppointmentDialog());
 
                 // =====================================================
-                // BACK
+                // HEADER CHILDREN
                 // =====================================================
 
-                Button back = new Button("← Back to Dashboard");
-
-                back.setStyle(
-                                "-fx-background-color: " + LIGHT_PINK + ";"
-                                                + "-fx-text-fill: " + PINK + ";"
-                                                + "-fx-font-weight: bold;"
-                                                + "-fx-background-radius: 8;"
-                                                + "-fx-padding: 10 16 10 16;"
-                                                + "-fx-cursor: hand;");
-
-                back.setOnAction(
-                                e -> DoctorDashboard.showDashboard());
-
-                header.getChildren().addAll(
-                                titleBox,
-                                spacer,
-                                refreshButton,
-                                add,
-                                back);
+                header.getChildren()
+                                .addAll(
+                                                titleBox,
+                                                spacer,
+                                                refreshButton,
+                                                add);
 
                 root.setTop(header);
+
+                // =====================================================
+                // COMMON SIDEBAR
+                // =====================================================
+
+                root.setLeft(
+                                DoctorDashboard.createSidebar(
+                                                "Appointments"));
 
                 // =====================================================
                 // FILTER BOX
@@ -177,12 +211,17 @@ public class DoctorAppointmentsPage {
                 HBox filterBox = new HBox(14);
 
                 filterBox.setPadding(
-                                new Insets(20, 25, 10, 25));
+                                new Insets(
+                                                20,
+                                                25,
+                                                10,
+                                                25));
 
-                filterBox.setAlignment(Pos.CENTER_LEFT);
+                filterBox.setAlignment(
+                                Pos.CENTER_LEFT);
 
                 // =====================================================
-                // SEARCH
+                // SEARCH FIELD
                 // =====================================================
 
                 searchField = new TextField();
@@ -190,17 +229,20 @@ public class DoctorAppointmentsPage {
                 searchField.setPromptText(
                                 "Search patient, type, date...");
 
-                searchField.setPrefWidth(300);
+                searchField.setPrefWidth(
+                                300);
 
                 searchField.setStyle(
                                 "-fx-background-color: white;"
-                                                + "-fx-border-color: " + BORDER + ";"
+                                                + "-fx-border-color: "
+                                                + BORDER
+                                                + ";"
                                                 + "-fx-border-radius: 8;"
                                                 + "-fx-background-radius: 8;"
                                                 + "-fx-padding: 10;");
 
                 // =====================================================
-                // STATUS
+                // STATUS FILTER
                 // =====================================================
 
                 statusCombo = new ComboBox<>(
@@ -211,11 +253,14 @@ public class DoctorAppointmentsPage {
                                                 "Completed",
                                                 "Cancelled"));
 
-                statusCombo.setValue("All");
-                statusCombo.setPrefWidth(150);
+                statusCombo.setValue(
+                                "All");
+
+                statusCombo.setPrefWidth(
+                                150);
 
                 // =====================================================
-                // TYPE
+                // TYPE FILTER
                 // =====================================================
 
                 typeCombo = new ComboBox<>(
@@ -226,13 +271,17 @@ public class DoctorAppointmentsPage {
                                                 "Emergency",
                                                 "Check-up"));
 
-                typeCombo.setValue("All");
-                typeCombo.setPrefWidth(150);
+                typeCombo.setValue(
+                                "All");
 
-                filterBox.getChildren().addAll(
-                                searchField,
-                                statusCombo,
-                                typeCombo);
+                typeCombo.setPrefWidth(
+                                150);
+
+                filterBox.getChildren()
+                                .addAll(
+                                                searchField,
+                                                statusCombo,
+                                                typeCombo);
 
                 // =====================================================
                 // TABLE
@@ -240,107 +289,150 @@ public class DoctorAppointmentsPage {
 
                 table = new TableView<>();
 
-                table.setMaxWidth(Double.MAX_VALUE);
-                table.setMaxHeight(Double.MAX_VALUE);
+                table.setMaxWidth(
+                                Double.MAX_VALUE);
+
+                table.setMaxHeight(
+                                Double.MAX_VALUE);
+
+                table.setColumnResizePolicy(
+                                TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
+
+                table.setStyle(
+                                "-fx-background-color: white;"
+                                                + "-fx-border-color: "
+                                                + BORDER
+                                                + ";"
+                                                + "-fx-border-radius: 10;"
+                                                + "-fx-background-radius: 10;");
 
                 VBox.setVgrow(
                                 table,
                                 Priority.ALWAYS);
 
-                table.setColumnResizePolicy(
-                                TableView.CONSTRAINED_RESIZE_POLICY);
-
-                table.setStyle(
-                                "-fx-background-color: white;"
-                                                + "-fx-border-color: " + BORDER + ";"
-                                                + "-fx-border-radius: 10;"
-                                                + "-fx-background-radius: 10;");
-
                 // =====================================================
-                // TIME
+                // TIME COLUMN
                 // =====================================================
 
-                TableColumn<DoctorAppointment, String> timeCol = new TableColumn<>("Time");
+                TableColumn<DoctorAppointment, String> timeCol = new TableColumn<>(
+                                "Time");
 
                 timeCol.setCellValueFactory(
-                                new PropertyValueFactory<>("time"));
+                                new PropertyValueFactory<>(
+                                                "time"));
 
                 // =====================================================
-                // PATIENT
+                // PATIENT COLUMN
                 // =====================================================
 
-                TableColumn<DoctorAppointment, String> patientCol = new TableColumn<>("Patient");
+                TableColumn<DoctorAppointment, String> patientCol = new TableColumn<>(
+                                "Patient");
 
                 patientCol.setCellValueFactory(
-                                new PropertyValueFactory<>("patient"));
+                                new PropertyValueFactory<>(
+                                                "patient"));
 
                 // =====================================================
-                // TYPE
+                // TYPE COLUMN
                 // =====================================================
 
-                TableColumn<DoctorAppointment, String> typeCol = new TableColumn<>("Type");
+                TableColumn<DoctorAppointment, String> typeCol = new TableColumn<>(
+                                "Type");
 
                 typeCol.setCellValueFactory(
-                                new PropertyValueFactory<>("type"));
+                                new PropertyValueFactory<>(
+                                                "type"));
 
                 // =====================================================
-                // STATUS
+                // STATUS COLUMN
                 // =====================================================
 
-                TableColumn<DoctorAppointment, String> statusCol = new TableColumn<>("Status");
+                TableColumn<DoctorAppointment, String> statusCol = new TableColumn<>(
+                                "Status");
 
                 statusCol.setCellValueFactory(
-                                new PropertyValueFactory<>("status"));
+                                new PropertyValueFactory<>(
+                                                "status"));
 
                 // =====================================================
-                // PAYMENT
+                // PAYMENT COLUMN
                 // =====================================================
 
-                TableColumn<DoctorAppointment, String> paymentCol = new TableColumn<>("Payment");
+                TableColumn<DoctorAppointment, String> paymentCol = new TableColumn<>(
+                                "Payment");
 
                 paymentCol.setCellValueFactory(
-                                new PropertyValueFactory<>("payment"));
+                                new PropertyValueFactory<>(
+                                                "payment"));
 
                 // =====================================================
-                // ACTION
+                // ACTION COLUMN
                 // =====================================================
 
-                TableColumn<DoctorAppointment, Void> actionCol = new TableColumn<>("Action");
+                TableColumn<DoctorAppointment, Void> actionCol = new TableColumn<>(
+                                "Action");
 
-                actionCol.setPrefWidth(200);
+                actionCol.setPrefWidth(
+                                200);
 
                 actionCol.setCellFactory(
                                 column -> new TableCell<>() {
 
-                                        private final Button view = new Button("View");
+                                        private final Button view = new Button(
+                                                        "View");
 
-                                        private final Button edit = new Button("Edit");
+                                        private final Button edit = new Button(
+                                                        "Edit");
 
-                                        private final Button delete = new Button("Delete");
+                                        private final Button delete = new Button(
+                                                        "Delete");
 
                                         private final HBox buttons = new HBox(7);
 
                                         {
-                                                buttons.setAlignment(Pos.CENTER);
 
-                                                buttons.getChildren().addAll(
-                                                                view,
-                                                                edit,
-                                                                delete);
+                                                buttons.setAlignment(
+                                                                Pos.CENTER);
+
+                                                buttons.getChildren()
+                                                                .addAll(
+                                                                                view,
+                                                                                edit,
+                                                                                delete);
+
+                                                // =================================
+                                                // VIEW STYLE
+                                                // =================================
 
                                                 view.setStyle(
-                                                                "-fx-background-color: " + LIGHT_PINK + ";"
-                                                                                + "-fx-text-fill: " + PURPLE + ";"
+                                                                "-fx-background-color: "
+                                                                                + LIGHT_PINK
+                                                                                + ";"
+                                                                                + "-fx-text-fill: "
+                                                                                + PURPLE
+                                                                                + ";"
                                                                                 + "-fx-font-weight: bold;"
                                                                                 + "-fx-background-radius: 6;"
                                                                                 + "-fx-cursor: hand;");
 
+                                                // =================================
+                                                // EDIT STYLE
+                                                // =================================
+
                                                 edit.setStyle(
-                                                                "-fx-background-color: " + LIGHT_PURPLE + ";"
-                                                                                + "-fx-text-fill: " + PURPLE + ";"
+                                                                "-fx-background-color: "
+                                                                                + LIGHT_PURPLE
+                                                                                + ";"
+                                                                                + "-fx-text-fill: "
+                                                                                + PURPLE
+                                                                                + ";"
                                                                                 + "-fx-font-weight: bold;"
                                                                                 + "-fx-background-radius: 6;"
                                                                                 + "-fx-cursor: hand;");
+
+                                                // =================================
+                                                // DELETE STYLE
+                                                // =================================
 
                                                 delete.setStyle(
                                                                 "-fx-background-color: #FFF0F0;"
@@ -349,111 +441,125 @@ public class DoctorAppointmentsPage {
                                                                                 + "-fx-background-radius: 6;"
                                                                                 + "-fx-cursor: hand;");
 
-                                                // =========================================
-                                                // VIEW
-                                                // =========================================
+                                                // =================================
+                                                // VIEW ACTION
+                                                // =================================
 
-                                                view.setOnAction(e -> {
+                                                view.setOnAction(
+                                                                e -> {
 
-                                                        if (getIndex() < 0 ||
-                                                                        getIndex() >= getTableView()
-                                                                                        .getItems().size()) {
-                                                                return;
-                                                        }
+                                                                        if (getIndex() < 0
+                                                                                        || getIndex() >= getTableView()
+                                                                                                        .getItems()
+                                                                                                        .size()) {
 
-                                                        DoctorAppointment appointment = getTableView()
-                                                                        .getItems()
-                                                                        .get(getIndex());
+                                                                                return;
+                                                                        }
 
-                                                        showAppointmentDetails(
-                                                                        appointment);
-                                                });
+                                                                        DoctorAppointment appointment = getTableView()
+                                                                                        .getItems()
+                                                                                        .get(
+                                                                                                        getIndex());
 
-                                                // =========================================
-                                                // EDIT
-                                                // =========================================
+                                                                        showAppointmentDetails(
+                                                                                        appointment);
+                                                                });
 
-                                                edit.setOnAction(e -> {
+                                                // =================================
+                                                // EDIT ACTION
+                                                // =================================
 
-                                                        if (getIndex() < 0 ||
-                                                                        getIndex() >= getTableView()
-                                                                                        .getItems().size()) {
-                                                                return;
-                                                        }
+                                                edit.setOnAction(
+                                                                e -> {
 
-                                                        DoctorAppointment appointment = getTableView()
-                                                                        .getItems()
-                                                                        .get(getIndex());
+                                                                        if (getIndex() < 0
+                                                                                        || getIndex() >= getTableView()
+                                                                                                        .getItems()
+                                                                                                        .size()) {
 
-                                                        showEditAppointmentDialog(
-                                                                        appointment);
-                                                });
+                                                                                return;
+                                                                        }
 
-                                                // =========================================
-                                                // DELETE
-                                                // =========================================
+                                                                        DoctorAppointment appointment = getTableView()
+                                                                                        .getItems()
+                                                                                        .get(
+                                                                                                        getIndex());
 
-                                                delete.setOnAction(e -> {
+                                                                        showEditAppointmentDialog(
+                                                                                        appointment);
+                                                                });
 
-                                                        if (getIndex() < 0 ||
-                                                                        getIndex() >= getTableView()
-                                                                                        .getItems().size()) {
-                                                                return;
-                                                        }
+                                                // =================================
+                                                // DELETE ACTION
+                                                // =================================
 
-                                                        DoctorAppointment appointment = getTableView()
-                                                                        .getItems()
-                                                                        .get(getIndex());
+                                                delete.setOnAction(
+                                                                e -> {
 
-                                                        Alert confirm = new Alert(
-                                                                        Alert.AlertType.CONFIRMATION);
+                                                                        if (getIndex() < 0
+                                                                                        || getIndex() >= getTableView()
+                                                                                                        .getItems()
+                                                                                                        .size()) {
 
-                                                        confirm.setTitle(
-                                                                        "Delete Appointment");
+                                                                                return;
+                                                                        }
 
-                                                        confirm.setHeaderText(
-                                                                        "Delete this appointment?");
+                                                                        DoctorAppointment appointment = getTableView()
+                                                                                        .getItems()
+                                                                                        .get(
+                                                                                                        getIndex());
 
-                                                        confirm.setContentText(
-                                                                        "Patient: "
-                                                                                        + appointment.getPatient());
+                                                                        Alert confirm = new Alert(
+                                                                                        Alert.AlertType.CONFIRMATION);
 
-                                                        confirm.showAndWait()
-                                                                        .ifPresent(result -> {
+                                                                        confirm.setTitle(
+                                                                                        "Delete Appointment");
 
-                                                                                if (result == ButtonType.OK) {
+                                                                        confirm.setHeaderText(
+                                                                                        "Delete this appointment?");
 
-                                                                                        try {
+                                                                        confirm.setContentText(
+                                                                                        "Patient: "
+                                                                                                        + appointment
+                                                                                                                        .getPatient());
 
-                                                                                                boolean deleted = controller
-                                                                                                                .deleteAppointment(
-                                                                                                                                appointment);
+                                                                        confirm.showAndWait()
+                                                                                        .ifPresent(
+                                                                                                        result -> {
 
-                                                                                                if (deleted) {
+                                                                                                                if (result == ButtonType.OK) {
 
-                                                                                                        refreshAppointmentTable();
+                                                                                                                        try {
 
-                                                                                                        showSuccess(
-                                                                                                                        "Appointment Deleted",
-                                                                                                                        "Appointment deleted successfully.");
+                                                                                                                                boolean deleted = controller
+                                                                                                                                                .deleteAppointment(
+                                                                                                                                                                appointment);
 
-                                                                                                } else {
+                                                                                                                                if (deleted) {
 
-                                                                                                        showError(
-                                                                                                                        "Unable to delete appointment.");
-                                                                                                }
+                                                                                                                                        refreshAppointmentTable();
 
-                                                                                        } catch (Exception ex) {
+                                                                                                                                        showSuccess(
+                                                                                                                                                        "Appointment Deleted",
+                                                                                                                                                        "Appointment deleted successfully.");
 
-                                                                                                ex.printStackTrace();
+                                                                                                                                } else {
 
-                                                                                                showError(
-                                                                                                                "Delete failed.\n\n"
-                                                                                                                                + ex.getMessage());
-                                                                                        }
-                                                                                }
-                                                                        });
-                                                });
+                                                                                                                                        showError(
+                                                                                                                                                        "Unable to delete appointment.");
+                                                                                                                                }
+
+                                                                                                                        } catch (Exception ex) {
+
+                                                                                                                                ex.printStackTrace();
+
+                                                                                                                                showError(
+                                                                                                                                                "Delete failed.\n\n"
+                                                                                                                                                                + ex.getMessage());
+                                                                                                                        }
+                                                                                                                }
+                                                                                                        });
+                                                                });
                                         }
 
                                         @Override
@@ -466,20 +572,30 @@ public class DoctorAppointmentsPage {
                                                                 empty);
 
                                                 if (empty) {
-                                                        setGraphic(null);
+
+                                                        setGraphic(
+                                                                        null);
+
                                                 } else {
-                                                        setGraphic(buttons);
+
+                                                        setGraphic(
+                                                                        buttons);
                                                 }
                                         }
                                 });
 
-                table.getColumns().addAll(
-                                timeCol,
-                                patientCol,
-                                typeCol,
-                                statusCol,
-                                paymentCol,
-                                actionCol);
+                // =====================================================
+                // ADD TABLE COLUMNS
+                // =====================================================
+
+                table.getColumns()
+                                .addAll(
+                                                timeCol,
+                                                patientCol,
+                                                typeCol,
+                                                statusCol,
+                                                paymentCol,
+                                                actionCol);
 
                 // =====================================================
                 // FILTER LISTENERS
@@ -487,15 +603,21 @@ public class DoctorAppointmentsPage {
 
                 searchField.textProperty()
                                 .addListener(
-                                                (obs, oldValue, newValue) -> applyFilter());
+                                                (obs,
+                                                                oldValue,
+                                                                newValue) -> applyFilter());
 
                 statusCombo.valueProperty()
                                 .addListener(
-                                                (obs, oldValue, newValue) -> applyFilter());
+                                                (obs,
+                                                                oldValue,
+                                                                newValue) -> applyFilter());
 
                 typeCombo.valueProperty()
                                 .addListener(
-                                                (obs, oldValue, newValue) -> applyFilter());
+                                                (obs,
+                                                                oldValue,
+                                                                newValue) -> applyFilter());
 
                 // =====================================================
                 // INITIAL DATA
@@ -510,26 +632,44 @@ public class DoctorAppointmentsPage {
                 VBox content = new VBox(10);
 
                 content.setPadding(
-                                new Insets(0, 25, 25, 25));
+                                new Insets(
+                                                0,
+                                                25,
+                                                25,
+                                                25));
+
+                content.setFillWidth(
+                                true);
 
                 VBox.setVgrow(
                                 table,
                                 Priority.ALWAYS);
 
-                content.getChildren().addAll(
-                                filterBox,
-                                table);
+                content.getChildren()
+                                .addAll(
+                                                filterBox,
+                                                table);
 
-                root.setCenter(content);
+                root.setCenter(
+                                content);
 
                 // =====================================================
                 // SCENE
                 // =====================================================
+                // Uses scenesettings.java
+                // No fixed 1100 x 700 size
+                // =====================================================
 
                 Scene appointmentsScene = new Scene(
                                 root,
-                                1100,
-                                700);
+                                SCREEN_WIDTH,
+                                SCREEN_HEIGHT);
+
+                // =====================================================
+                // COMMON DASHBOARD STAGE
+                // =====================================================
+                // No new Stage()
+                // =====================================================
 
                 DoctorDashboard.changeScene(
                                 appointmentsScene);
@@ -548,16 +688,19 @@ public class DoctorAppointmentsPage {
                         applyFilter();
 
                         if (table != null) {
+
                                 table.refresh();
                         }
 
                         System.out.println(
-                                        "[APPOINTMENT PAGE] Latest Firestore data loaded.");
+                                        "[APPOINTMENT PAGE] "
+                                                        + "Latest Firestore data loaded.");
 
                 } catch (Exception e) {
 
                         System.out.println(
-                                        "[APPOINTMENT PAGE ERROR] Refresh failed.");
+                                        "[APPOINTMENT PAGE ERROR] "
+                                                        + "Refresh failed.");
 
                         e.printStackTrace();
                 }
@@ -570,12 +713,17 @@ public class DoctorAppointmentsPage {
         private static void styleRefreshButton() {
 
                 if (refreshButton == null) {
+
                         return;
                 }
 
                 refreshButton.setStyle(
-                                "-fx-background-color: " + LIGHT_PINK + ";"
-                                                + "-fx-text-fill: " + PINK + ";"
+                                "-fx-background-color: "
+                                                + LIGHT_PINK
+                                                + ";"
+                                                + "-fx-text-fill: "
+                                                + PINK
+                                                + ";"
                                                 + "-fx-font-weight: bold;"
                                                 + "-fx-background-radius: 8;"
                                                 + "-fx-padding: 10 16 10 16;"
@@ -589,11 +737,15 @@ public class DoctorAppointmentsPage {
         private static void refreshAppointmentsFromFirebase() {
 
                 if (refreshButton == null) {
+
                         return;
                 }
 
-                refreshButton.setDisable(true);
-                refreshButton.setText("↻ Refreshing...");
+                refreshButton.setDisable(
+                                true);
+
+                refreshButton.setText(
+                                "↻ Refreshing...");
 
                 Task<Void> refreshTask = new Task<>() {
 
@@ -606,45 +758,60 @@ public class DoctorAppointmentsPage {
                         }
                 };
 
-                refreshTask.setOnSucceeded(e -> {
+                refreshTask.setOnSucceeded(
+                                e -> {
 
-                        applyFilter();
+                                        applyFilter();
 
-                        if (table != null) {
-                                table.refresh();
-                        }
+                                        if (table != null) {
 
-                        refreshButton.setText("↻ Refresh");
-                        refreshButton.setDisable(false);
+                                                table.refresh();
+                                        }
 
-                        styleRefreshButton();
-                });
+                                        refreshButton.setText(
+                                                        "↻ Refresh");
 
-                refreshTask.setOnFailed(e -> {
+                                        refreshButton.setDisable(
+                                                        false);
 
-                        Throwable exception = refreshTask.getException();
+                                        styleRefreshButton();
+                                });
 
-                        if (exception != null) {
-                                exception.printStackTrace();
-                        }
+                refreshTask.setOnFailed(
+                                e -> {
 
-                        Platform.runLater(() -> {
+                                        Throwable exception = refreshTask.getException();
 
-                                refreshButton.setText("↻ Refresh");
-                                refreshButton.setDisable(false);
+                                        if (exception != null) {
 
-                                styleRefreshButton();
+                                                exception.printStackTrace();
+                                        }
 
-                                showError(
-                                                "Unable to refresh appointments.\n\n"
-                                                                + "Please check your Firebase connection.");
-                        });
-                });
+                                        Platform.runLater(
+                                                        () -> {
 
-                Thread thread = new Thread(refreshTask);
+                                                                refreshButton.setText(
+                                                                                "↻ Refresh");
+
+                                                                refreshButton.setDisable(
+                                                                                false);
+
+                                                                styleRefreshButton();
+
+                                                                showError(
+                                                                                "Unable to refresh appointments.\n\n"
+                                                                                                + "Please check your Firebase connection.");
+                                                        });
+                                });
+
+                Thread thread = new Thread(
+                                refreshTask);
 
                 thread.setDaemon(true);
-                thread.setName("Appointment-Refresh-Thread");
+
+                thread.setName(
+                                "Appointment-Refresh-Thread");
+
                 thread.start();
         }
 
@@ -655,13 +822,15 @@ public class DoctorAppointmentsPage {
         private static void applyFilter() {
 
                 if (table == null) {
+
                         return;
                 }
 
-                String search = searchField == null ||
-                                searchField.getText() == null
+                String search = searchField == null
+                                || searchField.getText() == null
                                                 ? ""
-                                                : searchField.getText()
+                                                : searchField
+                                                                .getText()
                                                                 .trim()
                                                                 .toLowerCase();
 
@@ -673,25 +842,33 @@ public class DoctorAppointmentsPage {
                                 ? "All"
                                 : typeCombo.getValue();
 
-                ObservableList<DoctorAppointment> filtered = FXCollections.observableArrayList();
+                ObservableList<DoctorAppointment> filtered = FXCollections
+                                .observableArrayList();
 
                 for (DoctorAppointment appointment : controller.getAppointments()) {
 
                         if (appointment == null) {
+
                                 continue;
                         }
 
-                        String patient = safeLower(appointment.getPatient());
+                        String patient = safeLower(
+                                        appointment.getPatient());
 
-                        String patientId = safeLower(appointment.getPatientId());
+                        String patientId = safeLower(
+                                        appointment.getPatientId());
 
-                        String type = safeLower(appointment.getType());
+                        String type = safeLower(
+                                        appointment.getType());
 
-                        String status = safeLower(appointment.getStatus());
+                        String status = safeLower(
+                                        appointment.getStatus());
 
-                        String date = safeLower(appointment.getDate());
+                        String date = safeLower(
+                                        appointment.getDate());
 
-                        String time = safeLower(appointment.getTime());
+                        String time = safeLower(
+                                        appointment.getTime());
 
                         boolean searchMatch = search.isEmpty()
                                         || patient.contains(search)
@@ -711,15 +888,18 @@ public class DoctorAppointmentsPage {
                                         || selectedType.equalsIgnoreCase(
                                                         appointment.getType());
 
-                        if (searchMatch &&
-                                        statusMatch &&
-                                        typeMatch) {
+                        if (searchMatch
+                                        && statusMatch
+                                        && typeMatch) {
 
-                                filtered.add(appointment);
+                                filtered.add(
+                                                appointment);
                         }
                 }
 
-                table.setItems(filtered);
+                table.setItems(
+                                filtered);
+
                 table.refresh();
         }
 
@@ -727,20 +907,24 @@ public class DoctorAppointmentsPage {
         // SAFE LOWER
         // =========================================================
 
-        private static String safeLower(String value) {
+        private static String safeLower(
+                        String value) {
 
                 if (value == null) {
+
                         return "";
                 }
 
-                return value.trim().toLowerCase();
+                return value.trim()
+                                .toLowerCase();
         }
 
         // =========================================================
         // ERROR
         // =========================================================
 
-        private static void showError(String message) {
+        private static void showError(
+                        String message) {
 
                 Alert alert = new Alert(
                                 Alert.AlertType.ERROR);
@@ -748,9 +932,11 @@ public class DoctorAppointmentsPage {
                 alert.setTitle(
                                 "Appointment Error");
 
-                alert.setHeaderText(null);
+                alert.setHeaderText(
+                                null);
 
-                alert.setContentText(message);
+                alert.setContentText(
+                                message);
 
                 alert.showAndWait();
         }
@@ -766,15 +952,20 @@ public class DoctorAppointmentsPage {
                 Alert alert = new Alert(
                                 Alert.AlertType.INFORMATION);
 
-                alert.setTitle(title);
-                alert.setHeaderText(title);
-                alert.setContentText(message);
+                alert.setTitle(
+                                title);
+
+                alert.setHeaderText(
+                                title);
+
+                alert.setContentText(
+                                message);
 
                 alert.showAndWait();
         }
 
         // =========================================================
-        // VIEW DETAILS
+        // VIEW APPOINTMENT DETAILS
         // =========================================================
 
         private static void showAppointmentDetails(
@@ -792,25 +983,32 @@ public class DoctorAppointmentsPage {
                 alert.setContentText(
 
                                 "Appointment ID: "
-                                                + appointment.getAppointmentId()
+                                                + appointment
+                                                                .getAppointmentId()
 
                                                 + "\n\nPatient ID: "
-                                                + appointment.getPatientId()
+                                                + appointment
+                                                                .getPatientId()
 
                                                 + "\n\nDate: "
-                                                + appointment.getDate()
+                                                + appointment
+                                                                .getDate()
 
                                                 + "\n\nTime: "
-                                                + appointment.getTime()
+                                                + appointment
+                                                                .getTime()
 
                                                 + "\n\nType: "
-                                                + appointment.getType()
+                                                + appointment
+                                                                .getType()
 
                                                 + "\n\nStatus: "
-                                                + appointment.getStatus()
+                                                + appointment
+                                                                .getStatus()
 
                                                 + "\n\nPayment: "
-                                                + appointment.getPayment());
+                                                + appointment
+                                                                .getPayment());
 
                 alert.showAndWait();
         }
@@ -832,9 +1030,14 @@ public class DoctorAppointmentsPage {
 
                 GridPane grid = new GridPane();
 
-                grid.setHgap(12);
-                grid.setVgap(12);
-                grid.setPadding(new Insets(20));
+                grid.setHgap(
+                                12);
+
+                grid.setVgap(
+                                12);
+
+                grid.setPadding(
+                                new Insets(20));
 
                 // =====================================================
                 // PATIENT ID
@@ -843,7 +1046,8 @@ public class DoctorAppointmentsPage {
                 TextField patientId = new TextField(
                                 appointment.getPatientId());
 
-                patientId.setPrefWidth(260);
+                patientId.setPrefWidth(
+                                260);
 
                 // =====================================================
                 // PATIENT NAME
@@ -852,7 +1056,8 @@ public class DoctorAppointmentsPage {
                 TextField patient = new TextField(
                                 appointment.getPatient());
 
-                patient.setPrefWidth(260);
+                patient.setPrefWidth(
+                                260);
 
                 // =====================================================
                 // DATE
@@ -862,8 +1067,8 @@ public class DoctorAppointmentsPage {
 
                 try {
 
-                        if (appointment.getDate() != null &&
-                                        !appointment.getDate()
+                        if (appointment.getDate() != null
+                                        && !appointment.getDate()
                                                         .trim()
                                                         .isEmpty()) {
 
@@ -887,7 +1092,8 @@ public class DoctorAppointmentsPage {
                 TextField time = new TextField(
                                 appointment.getTime());
 
-                time.setPrefWidth(260);
+                time.setPrefWidth(
+                                260);
 
                 // =====================================================
                 // TYPE
@@ -900,8 +1106,8 @@ public class DoctorAppointmentsPage {
                                                 "Emergency",
                                                 "Check-up"));
 
-                if (appointment.getType() != null &&
-                                !appointment.getType()
+                if (appointment.getType() != null
+                                && !appointment.getType()
                                                 .trim()
                                                 .isEmpty()) {
 
@@ -914,7 +1120,8 @@ public class DoctorAppointmentsPage {
                                         "Consultation");
                 }
 
-                type.setPrefWidth(260);
+                type.setPrefWidth(
+                                260);
 
                 // =====================================================
                 // STATUS
@@ -927,8 +1134,8 @@ public class DoctorAppointmentsPage {
                                                 "Completed",
                                                 "Cancelled"));
 
-                if (appointment.getStatus() != null &&
-                                !appointment.getStatus()
+                if (appointment.getStatus() != null
+                                && !appointment.getStatus()
                                                 .trim()
                                                 .isEmpty()) {
 
@@ -941,7 +1148,8 @@ public class DoctorAppointmentsPage {
                                         "Pending");
                 }
 
-                status.setPrefWidth(260);
+                status.setPrefWidth(
+                                260);
 
                 // =====================================================
                 // PAYMENT
@@ -953,8 +1161,8 @@ public class DoctorAppointmentsPage {
                                                 "Unpaid",
                                                 "Pending"));
 
-                if (appointment.getPayment() != null &&
-                                !appointment.getPayment()
+                if (appointment.getPayment() != null
+                                && !appointment.getPayment()
                                                 .trim()
                                                 .isEmpty()) {
 
@@ -967,14 +1175,16 @@ public class DoctorAppointmentsPage {
                                         "Unpaid");
                 }
 
-                payment.setPrefWidth(260);
+                payment.setPrefWidth(
+                                260);
 
                 // =====================================================
                 // GRID
                 // =====================================================
 
                 grid.add(
-                                new Label("Patient ID:"),
+                                new Label(
+                                                "Patient ID:"),
                                 0,
                                 0);
 
@@ -984,7 +1194,8 @@ public class DoctorAppointmentsPage {
                                 0);
 
                 grid.add(
-                                new Label("Patient Name:"),
+                                new Label(
+                                                "Patient Name:"),
                                 0,
                                 1);
 
@@ -994,7 +1205,8 @@ public class DoctorAppointmentsPage {
                                 1);
 
                 grid.add(
-                                new Label("Date:"),
+                                new Label(
+                                                "Date:"),
                                 0,
                                 2);
 
@@ -1004,7 +1216,8 @@ public class DoctorAppointmentsPage {
                                 2);
 
                 grid.add(
-                                new Label("Time:"),
+                                new Label(
+                                                "Time:"),
                                 0,
                                 3);
 
@@ -1014,7 +1227,8 @@ public class DoctorAppointmentsPage {
                                 3);
 
                 grid.add(
-                                new Label("Type:"),
+                                new Label(
+                                                "Type:"),
                                 0,
                                 4);
 
@@ -1024,7 +1238,8 @@ public class DoctorAppointmentsPage {
                                 4);
 
                 grid.add(
-                                new Label("Status:"),
+                                new Label(
+                                                "Status:"),
                                 0,
                                 5);
 
@@ -1034,7 +1249,8 @@ public class DoctorAppointmentsPage {
                                 5);
 
                 grid.add(
-                                new Label("Payment:"),
+                                new Label(
+                                                "Payment:"),
                                 0,
                                 6);
 
@@ -1044,7 +1260,12 @@ public class DoctorAppointmentsPage {
                                 6);
 
                 dialog.getDialogPane()
-                                .setContent(grid);
+                                .setContent(
+                                                grid);
+
+                // =====================================================
+                // BUTTONS
+                // =====================================================
 
                 ButtonType saveButton = new ButtonType(
                                 "Save Changes",
@@ -1064,135 +1285,138 @@ public class DoctorAppointmentsPage {
                 // SAVE
                 // =====================================================
 
-                dialog.setResultConverter(button -> {
+                dialog.setResultConverter(
+                                button -> {
 
-                        if (button != saveButton) {
-                                return button;
-                        }
+                                        if (button != saveButton) {
 
-                        String newPatientId = patientId.getText().trim();
+                                                return button;
+                                        }
 
-                        String newPatientName = patient.getText().trim();
+                                        String newPatientId = patientId.getText()
+                                                        .trim();
 
-                        String newTime = time.getText().trim();
+                                        String newPatientName = patient.getText()
+                                                        .trim();
 
-                        if (newPatientName.isEmpty()) {
+                                        String newTime = time.getText()
+                                                        .trim();
 
-                                showError(
-                                                "Patient name cannot be empty.");
+                                        if (newPatientName.isEmpty()) {
 
-                                return null;
-                        }
+                                                showError(
+                                                                "Patient name cannot be empty.");
 
-                        if (newPatientId.isEmpty()) {
+                                                return null;
+                                        }
 
-                                showError(
-                                                "Patient ID cannot be empty.");
+                                        if (newPatientId.isEmpty()) {
 
-                                return null;
-                        }
+                                                showError(
+                                                                "Patient ID cannot be empty.");
 
-                        if (date.getValue() == null) {
+                                                return null;
+                                        }
 
-                                showError(
-                                                "Please select appointment date.");
+                                        if (date.getValue() == null) {
 
-                                return null;
-                        }
+                                                showError(
+                                                                "Please select appointment date.");
 
-                        if (newTime.isEmpty()) {
+                                                return null;
+                                        }
 
-                                showError(
-                                                "Appointment time cannot be empty.");
+                                        if (newTime.isEmpty()) {
 
-                                return null;
-                        }
+                                                showError(
+                                                                "Appointment time cannot be empty.");
 
-                        if (type.getValue() == null) {
+                                                return null;
+                                        }
 
-                                showError(
-                                                "Please select appointment type.");
+                                        if (type.getValue() == null) {
 
-                                return null;
-                        }
+                                                showError(
+                                                                "Please select appointment type.");
 
-                        if (status.getValue() == null) {
+                                                return null;
+                                        }
 
-                                showError(
-                                                "Please select appointment status.");
+                                        if (status.getValue() == null) {
 
-                                return null;
-                        }
+                                                showError(
+                                                                "Please select appointment status.");
 
-                        if (payment.getValue() == null) {
+                                                return null;
+                                        }
 
-                                showError(
-                                                "Please select payment status.");
+                                        if (payment.getValue() == null) {
 
-                                return null;
-                        }
+                                                showError(
+                                                                "Please select payment status.");
 
-                        String newDate = date.getValue().toString();
+                                                return null;
+                                        }
 
-                        String newType = type.getValue();
+                                        String newDate = date.getValue()
+                                                        .toString();
 
-                        String newStatus = status.getValue();
+                                        String newType = type.getValue();
 
-                        String newPayment = payment.getValue();
+                                        String newStatus = status.getValue();
 
-                        try {
+                                        String newPayment = payment.getValue();
 
-                                System.out.println(
-                                                "[EDIT APPOINTMENT] Updating Firestore...");
+                                        try {
 
-                                boolean updated = controller.updateAppointment(
+                                                System.out.println(
+                                                                "[EDIT APPOINTMENT] "
+                                                                                + "Updating Firestore...");
 
-                                                appointment.getAppointmentId(),
+                                                boolean updated = controller.updateAppointment(
 
-                                                newPatientId,
+                                                                appointment
+                                                                                .getAppointmentId(),
 
-                                                newDate,
+                                                                newPatientId,
 
-                                                newTime,
+                                                                newDate,
 
-                                                newPatientName,
+                                                                newTime,
 
-                                                newType,
+                                                                newPatientName,
 
-                                                newStatus,
+                                                                newType,
 
-                                                newPayment);
+                                                                newStatus,
 
-                                if (updated) {
+                                                                newPayment);
 
-                                        // =========================================
-                                        // VERY IMPORTANT
-                                        // RELOAD LATEST DATA
-                                        // =========================================
+                                                if (updated) {
 
-                                        refreshAppointmentTable();
+                                                        refreshAppointmentTable();
 
-                                        showSuccess(
-                                                        "Appointment Updated",
-                                                        "Updated appointment details are now visible.");
+                                                        showSuccess(
+                                                                        "Appointment Updated",
+                                                                        "Updated appointment details are now visible.");
 
-                                } else {
+                                                } else {
 
-                                        showError(
-                                                        "Appointment could not be updated in Firebase.");
-                                }
+                                                        showError(
+                                                                        "Appointment could not be updated in Firebase.");
+                                                }
 
-                        } catch (Exception ex) {
+                                        } catch (Exception ex) {
 
-                                ex.printStackTrace();
+                                                ex.printStackTrace();
 
-                                showError(
-                                                "Unable to update appointment.\n\n"
-                                                                + ex.getMessage());
-                        }
+                                                showError(
+                                                                "Unable to update appointment.\n\n"
+                                                                                + ex.getMessage());
+                                        }
 
-                        return button;
-                });
+                                        return button;
+                                });
 
                 dialog.showAndWait();
         }
@@ -1213,34 +1437,65 @@ public class DoctorAppointmentsPage {
 
                 GridPane grid = new GridPane();
 
-                grid.setHgap(12);
-                grid.setVgap(12);
-                grid.setPadding(new Insets(20));
+                grid.setHgap(
+                                12);
+
+                grid.setVgap(
+                                12);
+
+                grid.setPadding(
+                                new Insets(20));
+
+                // =====================================================
+                // DOCTOR ID
+                // =====================================================
 
                 TextField doctorId = new TextField(
-                                controller.getDefaultDoctorId());
+                                controller
+                                                .getDefaultDoctorId());
 
-                doctorId.setDisable(true);
+                doctorId.setDisable(
+                                true);
+
+                // =====================================================
+                // PATIENT ID
+                // =====================================================
 
                 TextField patientId = new TextField();
 
                 patientId.setPromptText(
                                 "Enter patient ID");
 
+                // =====================================================
+                // PATIENT NAME
+                // =====================================================
+
                 TextField patientName = new TextField();
 
                 patientName.setPromptText(
                                 "Enter patient name");
+
+                // =====================================================
+                // DATE
+                // =====================================================
 
                 DatePicker appointmentDate = new DatePicker();
 
                 appointmentDate.setValue(
                                 LocalDate.now());
 
+                // =====================================================
+                // TIME
+                // =====================================================
+
                 TextField time = new TextField();
 
                 time.setPromptText(
                                 "e.g. 10:30 AM");
+
+                // =====================================================
+                // TYPE
+                // =====================================================
 
                 ComboBox<String> type = new ComboBox<>(
                                 FXCollections.observableArrayList(
@@ -1252,6 +1507,10 @@ public class DoctorAppointmentsPage {
                 type.setValue(
                                 "Consultation");
 
+                // =====================================================
+                // STATUS
+                // =====================================================
+
                 ComboBox<String> status = new ComboBox<>(
                                 FXCollections.observableArrayList(
                                                 "Pending",
@@ -1262,6 +1521,10 @@ public class DoctorAppointmentsPage {
                 status.setValue(
                                 "Pending");
 
+                // =====================================================
+                // PAYMENT
+                // =====================================================
+
                 ComboBox<String> payment = new ComboBox<>(
                                 FXCollections.observableArrayList(
                                                 "Paid",
@@ -1271,32 +1534,105 @@ public class DoctorAppointmentsPage {
                 payment.setValue(
                                 "Unpaid");
 
-                grid.add(new Label("Doctor ID:"), 0, 0);
-                grid.add(doctorId, 1, 0);
+                // =====================================================
+                // GRID
+                // =====================================================
 
-                grid.add(new Label("Patient ID:"), 0, 1);
-                grid.add(patientId, 1, 1);
+                grid.add(
+                                new Label(
+                                                "Doctor ID:"),
+                                0,
+                                0);
 
-                grid.add(new Label("Patient Name:"), 0, 2);
-                grid.add(patientName, 1, 2);
+                grid.add(
+                                doctorId,
+                                1,
+                                0);
 
-                grid.add(new Label("Date:"), 0, 3);
-                grid.add(appointmentDate, 1, 3);
+                grid.add(
+                                new Label(
+                                                "Patient ID:"),
+                                0,
+                                1);
 
-                grid.add(new Label("Time:"), 0, 4);
-                grid.add(time, 1, 4);
+                grid.add(
+                                patientId,
+                                1,
+                                1);
 
-                grid.add(new Label("Type:"), 0, 5);
-                grid.add(type, 1, 5);
+                grid.add(
+                                new Label(
+                                                "Patient Name:"),
+                                0,
+                                2);
 
-                grid.add(new Label("Status:"), 0, 6);
-                grid.add(status, 1, 6);
+                grid.add(
+                                patientName,
+                                1,
+                                2);
 
-                grid.add(new Label("Payment:"), 0, 7);
-                grid.add(payment, 1, 7);
+                grid.add(
+                                new Label(
+                                                "Date:"),
+                                0,
+                                3);
+
+                grid.add(
+                                appointmentDate,
+                                1,
+                                3);
+
+                grid.add(
+                                new Label(
+                                                "Time:"),
+                                0,
+                                4);
+
+                grid.add(
+                                time,
+                                1,
+                                4);
+
+                grid.add(
+                                new Label(
+                                                "Type:"),
+                                0,
+                                5);
+
+                grid.add(
+                                type,
+                                1,
+                                5);
+
+                grid.add(
+                                new Label(
+                                                "Status:"),
+                                0,
+                                6);
+
+                grid.add(
+                                status,
+                                1,
+                                6);
+
+                grid.add(
+                                new Label(
+                                                "Payment:"),
+                                0,
+                                7);
+
+                grid.add(
+                                payment,
+                                1,
+                                7);
 
                 dialog.getDialogPane()
-                                .setContent(grid);
+                                .setContent(
+                                                grid);
+
+                // =====================================================
+                // BUTTONS
+                // =====================================================
 
                 ButtonType saveButton = new ButtonType(
                                 "Save",
@@ -1312,90 +1648,123 @@ public class DoctorAppointmentsPage {
                                                 saveButton,
                                                 cancelButton);
 
-                dialog.setResultConverter(button -> {
+                // =====================================================
+                // SAVE
+                // =====================================================
 
-                        if (button != saveButton) {
-                                return button;
-                        }
+                dialog.setResultConverter(
+                                button -> {
 
-                        String selectedDate = appointmentDate.getValue() == null
-                                        ? ""
-                                        : appointmentDate
-                                                        .getValue()
-                                                        .toString();
+                                        if (button != saveButton) {
 
-                        String selectedPatientId = patientId.getText().trim();
+                                                return button;
+                                        }
 
-                        String selectedPatientName = patientName.getText().trim();
+                                        String selectedDate = appointmentDate.getValue() == null
+                                                        ? ""
+                                                        : appointmentDate
+                                                                        .getValue()
+                                                                        .toString();
 
-                        String selectedTime = time.getText().trim();
+                                        String selectedPatientId = patientId.getText()
+                                                        .trim();
 
-                        if (selectedPatientId.isEmpty()) {
+                                        String selectedPatientName = patientName.getText()
+                                                        .trim();
 
-                                showError(
-                                                "Patient ID cannot be empty.");
+                                        String selectedTime = time.getText()
+                                                        .trim();
 
-                                return null;
-                        }
+                                        if (selectedPatientId.isEmpty()) {
 
-                        if (selectedPatientName.isEmpty()) {
+                                                showError(
+                                                                "Patient ID cannot be empty.");
 
-                                showError(
-                                                "Patient name cannot be empty.");
+                                                return null;
+                                        }
 
-                                return null;
-                        }
+                                        if (selectedPatientName.isEmpty()) {
 
-                        if (selectedDate.isEmpty()) {
+                                                showError(
+                                                                "Patient name cannot be empty.");
 
-                                showError(
-                                                "Please select appointment date.");
+                                                return null;
+                                        }
 
-                                return null;
-                        }
+                                        if (selectedDate.isEmpty()) {
 
-                        if (selectedTime.isEmpty()) {
+                                                showError(
+                                                                "Please select appointment date.");
 
-                                showError(
-                                                "Appointment time cannot be empty.");
+                                                return null;
+                                        }
 
-                                return null;
-                        }
+                                        if (selectedTime.isEmpty()) {
 
-                        DoctorAppointment appointment = controller.addAppointment(
+                                                showError(
+                                                                "Appointment time cannot be empty.");
 
-                                        doctorId.getText(),
+                                                return null;
+                                        }
 
-                                        selectedPatientId,
+                                        if (type.getValue() == null) {
 
-                                        selectedDate,
+                                                showError(
+                                                                "Please select appointment type.");
 
-                                        selectedTime,
+                                                return null;
+                                        }
 
-                                        selectedPatientName,
+                                        if (status.getValue() == null) {
 
-                                        type.getValue(),
+                                                showError(
+                                                                "Please select appointment status.");
 
-                                        status.getValue(),
+                                                return null;
+                                        }
 
-                                        payment.getValue());
+                                        if (payment.getValue() == null) {
 
-                        if (appointment != null) {
+                                                showError(
+                                                                "Please select payment status.");
 
-                                refreshAppointmentTable();
+                                                return null;
+                                        }
 
-                                showSuccess(
-                                                "Appointment Added",
-                                                "Appointment has been saved to Firebase.");
+                                        DoctorAppointment appointment = controller.addAppointment(
 
-                        } else {
+                                                        doctorId.getText(),
 
-                                showError(
-                                                "Unable to add appointment.");
-                        }
+                                                        selectedPatientId,
 
-                        return button;
-                });
+                                                        selectedDate,
+
+                                                        selectedTime,
+
+                                                        selectedPatientName,
+
+                                                        type.getValue(),
+
+                                                        status.getValue(),
+
+                                                        payment.getValue());
+
+                                        if (appointment != null) {
+
+                                                refreshAppointmentTable();
+
+                                                showSuccess(
+                                                                "Appointment Added",
+                                                                "Appointment has been saved to Firebase.");
+
+                                        } else {
+
+                                                showError(
+                                                                "Unable to add appointment.");
+                                        }
+
+                                        return button;
+                                });
 
                 dialog.showAndWait();
         }

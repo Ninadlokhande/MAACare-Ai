@@ -7,7 +7,6 @@ import com.google.cloud.firestore.Query;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
 import com.google.cloud.firestore.SetOptions;
-import com.google.cloud.firestore.WriteResult;
 
 import com.sigma.config.DoctorModule.FirebaseConfig;
 import com.sigma.model.DoctorModel.PatientReport;

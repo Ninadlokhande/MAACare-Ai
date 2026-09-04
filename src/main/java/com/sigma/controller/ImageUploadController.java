@@ -9,98 +9,116 @@ import com.sigma.config.CloudinaryConfig;
 
 public class ImageUploadController {
 
-    public String imageUpload(File file) {
+        // =========================================================
+        // UPLOAD FILE TO CLOUDINARY
+        // =========================================================
 
-        // =====================================================
-        // VALIDATE FILE
-        // =====================================================
+        public String imageUpload(File file) {
 
-        if (file == null) {
-            System.out.println(
-                    "[CLOUDINARY] File is null.");
-            return null;
+                // -----------------------------------------------------
+                // CHECK FILE
+                // -----------------------------------------------------
+
+                if (file == null) {
+
+                        System.out.println(
+                                        "[CLOUDINARY] File is null.");
+
+                        return null;
+                }
+
+                if (!file.exists() || !file.isFile()) {
+
+                        System.out.println(
+                                        "[CLOUDINARY] File does not exist: "
+                                                        + file.getAbsolutePath());
+
+                        return null;
+                }
+
+                try {
+
+                        // -------------------------------------------------
+                        // GET CLOUDINARY INSTANCE
+                        // -------------------------------------------------
+
+                        Cloudinary cloudinary = CloudinaryConfig.getCloudinary();
+
+                        if (cloudinary == null) {
+
+                                System.out.println(
+                                                "[CLOUDINARY ERROR] Cloudinary configuration is null.");
+
+                                return null;
+                        }
+
+                        // -------------------------------------------------
+                        // UPLOAD FILE
+                        // -------------------------------------------------
+
+                        Map<String, Object> result = cloudinary.uploader().upload(
+                                        file,
+                                        ObjectUtils.asMap(
+                                                        "resource_type",
+                                                        "auto"));
+
+                        System.out.println(
+                                        "[CLOUDINARY] Upload result:");
+
+                        System.out.println(result);
+
+                        // -------------------------------------------------
+                        // GET SECURE URL
+                        // -------------------------------------------------
+
+                        Object secureUrlObject = result.get("secure_url");
+
+                        if (secureUrlObject == null) {
+
+                                System.out.println(
+                                                "[CLOUDINARY ERROR] secure_url is null.");
+
+                                return null;
+                        }
+
+                        String url = String.valueOf(
+                                        secureUrlObject).trim();
+
+                        // -------------------------------------------------
+                        // VALIDATE URL
+                        // -------------------------------------------------
+
+                        if (url.isEmpty()
+                                        || url.equalsIgnoreCase("null")) {
+
+                                System.out.println(
+                                                "[CLOUDINARY ERROR] Uploaded URL is empty.");
+
+                                return null;
+                        }
+
+                        // -------------------------------------------------
+                        // SUCCESS
+                        // -------------------------------------------------
+
+                        System.out.println(
+                                        "[CLOUDINARY] File uploaded successfully.");
+
+                        System.out.println(
+                                        "[CLOUDINARY] Uploaded File URL:");
+
+                        System.out.println(url);
+
+                        return url;
+
+                } catch (Exception e) {
+
+                        System.out.println(
+                                        "[CLOUDINARY ERROR] Upload failed.");
+
+                        e.printStackTrace();
+
+                        return null;
+                }
         }
-
-        if (!file.exists() || !file.isFile()) {
-            System.out.println(
-                    "[CLOUDINARY] File does not exist: "
-                            + file.getAbsolutePath());
-            return null;
-        }
-
-        try {
-
-            // =================================================
-            // GET CLOUDINARY INSTANCE
-            // =================================================
-
-            Cloudinary cloudinary = CloudinaryConfig.getCloudinary();
-
-            // =================================================
-            // UPLOAD FILE
-            // =================================================
-            //
-            // "auto" supports:
-            // PDF
-            // JPG
-            // JPEG
-            // PNG
-            // etc.
-            //
-            // =================================================
-
-            Map<String, Object> result = cloudinary.uploader().upload(
-                    file,
-                    ObjectUtils.asMap(
-                            "resource_type",
-                            "auto"));
-
-            System.out.println(
-                    "[CLOUDINARY] Upload result:");
-
-            System.out.println(result);
-
-            // =================================================
-            // GET SECURE URL
-            // =================================================
-
-            Object secureUrlObject = result.get("secure_url");
-
-            if (secureUrlObject == null) {
-
-                System.out.println(
-                        "[CLOUDINARY ERROR] secure_url is null.");
-
-                return null;
-            }
-
-            String url = String.valueOf(
-                    secureUrlObject);
-
-            if (url.trim().isEmpty()
-                    || url.equalsIgnoreCase("null")) {
-
-                System.out.println(
-                        "[CLOUDINARY ERROR] Uploaded URL is empty.");
-
-                return null;
-            }
-
-            System.out.println(
-                    "[CLOUDINARY] Uploaded File URL:");
-
-            System.out.println(url);
-
-            return url.trim();
-
-        } catch (Exception e) {
-
-            System.out.println(
-                    "[CLOUDINARY ERROR] Upload failed.");
-
-            e.printStackTrace();
-
-            return null;
-        }
-    }
 }

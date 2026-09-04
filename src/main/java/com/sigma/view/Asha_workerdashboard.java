@@ -37,3040 +37,2751 @@ import com.sigma.dao.AshaProfileDAO;
 import com.sigma.model.AshaBeneficiary;
 import com.sigma.model.AshaWorkerVisitModel;
 import com.sigma.model.AshaProfileModel;
-import com.sigma.dao.AshaMessageDAO;
 
 public class Asha_workerdashboard {
+
         private final AshaMessageDAO messageDAO = new AshaMessageDAO();
 
-    // =========================================================
-    // COLORS
-    // =========================================================
+        // =========================================================
+        // COLORS
+        // =========================================================
 
-    private static final String COLOR_BG = "#FEF9FC";
-    private static final String COLOR_PRIMARY_PINK = "#E91E63";
-    private static final String COLOR_LIGHT_PINK = "#FCE4EC";
-    private static final String COLOR_TEXT_DARK = "#111827";
-    private static final String COLOR_TEXT_MUTED = "#374151";
-    private static final String COLOR_WHITE = "#FFFFFF";
-    private static final String COLOR_BORDER = "#D1D5DB";
-    private static final String COLOR_GREEN = "#059669";
+        private static final String COLOR_BG = "#FEF9FC";
+        private static final String COLOR_PRIMARY_PINK = "#E91E63";
+        private static final String COLOR_LIGHT_PINK = "#FCE4EC";
+        private static final String COLOR_TEXT_DARK = "#111827";
+        private static final String COLOR_TEXT_MUTED = "#374151";
+        private static final String COLOR_WHITE = "#FFFFFF";
+        private static final String COLOR_BORDER = "#D1D5DB";
+        private static final String COLOR_GREEN = "#059669";
 
-    // =========================================================
-    // STAGE / SCENE
-    // =========================================================
+        // =========================================================
+        // STAGE / SCENE
+        // =========================================================
 
-    public static Stage homepageStage;
+        public static Stage homepageStage;
 
-    private Scene homepageScene;
+        private Scene homepageScene;
 
-    // =========================================================
-    // COMMON MAIN AREA
-    // =========================================================
+        // =========================================================
+        // COMMON MAIN AREA
+        // =========================================================
 
-    private BorderPane mainRoot;
+        private BorderPane mainRoot;
 
-    private ScrollPane centerScrollPane;
+        private ScrollPane centerScrollPane;
 
-    private VBox centerContent;
+        private VBox centerContent;
 
-    // =========================================================
-    // FIREBASE DAO
-    // =========================================================
+        // =========================================================
+        // SELECTED SIDEBAR BUTTON
+        // =========================================================
 
-    private final Ashabeneficiariesdao beneficiaryDAO =
-            new Ashabeneficiariesdao();
+        private Button selectedNavButton;
 
-    private final Ashavisit visitDAO =
-            new Ashavisit();
+        // =========================================================
+        // FIREBASE DAO
+        // =========================================================
 
-    private final AshaProfileDAO profileDAO =
-            new AshaProfileDAO();
+        private final Ashabeneficiariesdao beneficiaryDAO = new Ashabeneficiariesdao();
 
-    // =========================================================
-    // DASHBOARD FIREBASE DATA
-    // =========================================================
+        private final Ashavisit visitDAO = new Ashavisit();
 
-    private int totalBeneficiaries = 0;
-    private int totalVisits = 0;
+        private final AshaProfileDAO profileDAO = new AshaProfileDAO();
 
-    private int pregnantWomen = 0;
-    private int children = 0;
-    private int immunizations = 0;
-    private int womenTestedThisMonth = 0;
-private int womenTestNormal = 0;
-private int womenTestRisky = 0;
-private int womenCheckupBaaki = 0;
+        // =========================================================
+        // DASHBOARD FIREBASE DATA
+        // =========================================================
 
-    private String ashaName = "ASHA Worker";
-    private String villageName = "Village Rampur";
+        private int totalBeneficiaries = 0;
+        private int totalVisits = 0;
 
-    private List<AshaWorkerVisitModel> firebaseVisits =
-            new ArrayList<>();
-            private List<AshaBeneficiary> firebaseBeneficiaries =
-        new ArrayList<>();
+        private int pregnantWomen = 0;
+        private int children = 0;
+        private int immunizations = 0;
 
-    // =========================================================
-    // SET STAGE
-    // =========================================================
+        private int womenTestedThisMonth = 0;
+        private int womenTestNormal = 0;
+        private int womenTestRisky = 0;
+        private int womenCheckupBaaki = 0;
 
-    public void setStage(Stage stage) {
-        homepageStage = stage;
-    }
+        private String ashaName = "ASHA Worker";
+        private String villageName = "Village Rampur";
 
-    // =========================================================
-    // RUN
-    // =========================================================
+        private List<AshaWorkerVisitModel> firebaseVisits = new ArrayList<>();
 
-    public Scene run() {
+        private List<AshaBeneficiary> firebaseBeneficiaries = new ArrayList<>();
 
-        homepageScene = createDashboardScene();
+        // =========================================================
+        // SET STAGE
+        // =========================================================
 
-        return homepageScene;
-    }
-
-    // =========================================================
-    // DASHBOARD SCENE
-    // =========================================================
-
-    private Scene createDashboardScene() {
-
-        // -----------------------------------------------------
-        // COMMON ROOT
-        // -----------------------------------------------------
-
-        mainRoot = new BorderPane();
-
-        mainRoot.setStyle(
-                "-fx-background-color: " + COLOR_BG + ";"
-        );
-
-        mainRoot.setPrefSize(
-                1300,
-                700
-        );
-
-        // -----------------------------------------------------
-        // SIDEBAR
-        // -----------------------------------------------------
-
-        VBox sidebar = createSidebar();
-
-        // -----------------------------------------------------
-        // COMMON HEADER
-        // -----------------------------------------------------
-
-        HBox header = createHeader();
-
-        // -----------------------------------------------------
-        // CENTER CONTENT
-        // -----------------------------------------------------
-
-        centerContent = new VBox(22);
-
-        centerContent.setPadding(
-                new Insets(22, 28, 22, 28)
-        );
-
-        centerContent.setFillWidth(true);
-
-        // -----------------------------------------------------
-        // SCROLL PANE
-        // -----------------------------------------------------
-
-        centerScrollPane =
-                new ScrollPane(centerContent);
-
-        centerScrollPane.setFitToWidth(true);
-
-        centerScrollPane.setFitToHeight(false);
-
-        centerScrollPane.setHbarPolicy(
-                ScrollPane.ScrollBarPolicy.NEVER
-        );
-
-        centerScrollPane.setVbarPolicy(
-                ScrollPane.ScrollBarPolicy.AS_NEEDED
-        );
-
-        centerScrollPane.setStyle(
-                "-fx-background-color: " + COLOR_BG + ";" +
-                "-fx-background: " + COLOR_BG + ";" +
-                "-fx-border-color: transparent;"
-        );
-
-        // -----------------------------------------------------
-        // CENTER WRAPPER
-        // -----------------------------------------------------
-
-        BorderPane centerPane =
-                new BorderPane();
-
-        centerPane.setStyle(
-                "-fx-background-color: " + COLOR_BG + ";"
-        );
-
-        centerPane.setTop(header);
-
-        centerPane.setCenter(centerScrollPane);
-
-        // -----------------------------------------------------
-        // ROOT
-        // -----------------------------------------------------
-
-        mainRoot.setLeft(sidebar);
-
-        mainRoot.setCenter(centerPane);
-
-        // -----------------------------------------------------
-        // FIRST PAGE
-        // -----------------------------------------------------
-
-        showDashboardContent();
-
-        // -----------------------------------------------------
-        // LOAD FIREBASE
-        // -----------------------------------------------------
-
-        loadDashboardData();
-
-        return new Scene(
-                mainRoot,
-                1300,
-                700
-        );
-    }
-    // =========================================================
-// SEND MESSAGE
-// =========================================================
-// =========================================================
-// SEND MESSAGE
-// =========================================================
-
-/*private void showSendMessageDialog() {
-
-    javafx.scene.control.Dialog<Void> dialog =
-            new javafx.scene.control.Dialog<>();
-
-    dialog.setTitle("Send Message");
-    dialog.setHeaderText(
-            "Send Message to Beneficiary"
-    );
-
-
-    javafx.scene.control.ButtonType sendButton =
-            new javafx.scene.control.ButtonType(
-                    "Send",
-                    javafx.scene.control.ButtonBar.ButtonData.OK_DONE
-            );
-
-    javafx.scene.control.ButtonType cancelButton =
-            javafx.scene.control.ButtonType.CANCEL;
-
-
-    dialog.getDialogPane()
-            .getButtonTypes()
-            .addAll(
-                    sendButton,
-                    cancelButton
-            );
-
-
-    // =====================================================
-    // CONTENT
-    // =====================================================
-
-    VBox content =
-            new VBox(12);
-
-    content.setPadding(
-            new Insets(15)
-    );
-
-
-    Label nameLabel =
-            new Label(
-                    "Beneficiary Name"
-            );
-
-    nameLabel.setFont(
-            Font.font(
-                    "System",
-                    FontWeight.BOLD,
-                    13
-            )
-    );
-
-
-    javafx.scene.control.TextField receiver =
-            new javafx.scene.control.TextField();
-
-    receiver.setPromptText(
-            "Enter beneficiary name"
-    );
-
-    receiver.setPrefWidth(350);
-
-
-    Label messageLabel =
-            new Label(
-                    "Message"
-            );
-
-    messageLabel.setFont(
-            Font.font(
-                    "System",
-                    FontWeight.BOLD,
-                    13
-            )
-    );
-
-
-    javafx.scene.control.TextArea message =
-            new javafx.scene.control.TextArea();
-
-    message.setPromptText(
-            "Enter your message"
-    );
-
-    message.setPrefRowCount(5);
-
-    message.setWrapText(true);
-
-
-    content.getChildren().addAll(
-            nameLabel,
-            receiver,
-            messageLabel,
-            message
-    );
-
-
-    dialog.getDialogPane()
-            .setContent(content);
-
-
-    // =====================================================
-    // SEND BUTTON ACTION
-    // =====================================================
-
-    javafx.scene.Node sendButtonNode =
-            dialog.getDialogPane()
-                    .lookupButton(sendButton);
-
-
-    sendButtonNode.setOnMouseClicked(e -> {
-
-        String beneficiaryName =
-                receiver.getText().trim();
-
-        String msg =
-                message.getText().trim();
-
-
-        // -------------------------------------------------
-        // VALIDATION
-        // -------------------------------------------------
-
-        if (beneficiaryName.isEmpty()) {
-
-            showAlert(
-                    javafx.scene.control.Alert.AlertType.WARNING,
-                    "Please enter beneficiary name."
-            );
-
-            e.consume();
-
-            return;
+        public void setStage(Stage stage) {
+                homepageStage = stage;
         }
 
+        // =========================================================
+        // RUN
+        // =========================================================
 
-        if (msg.isEmpty()) {
+        public Scene run() {
 
-            showAlert(
-                    javafx.scene.control.Alert.AlertType.WARNING,
-                    "Please enter a message."
-            );
+                homepageScene = createDashboardScene();
 
-            e.consume();
-
-            return;
+                return homepageScene;
         }
 
+        // =========================================================
+        // DASHBOARD SCENE
+        // =========================================================
 
-        // -------------------------------------------------
-        // SAVE TO FIREBASE
-        // -------------------------------------------------
+        private Scene createDashboardScene() {
 
-        boolean saved =
-                messageDAO.saveMessage(
-                        beneficiaryName,
-                        msg
-                );
+                // -----------------------------------------------------
+                // COMMON ROOT
+                // -----------------------------------------------------
 
+                mainRoot = new BorderPane();
 
-        if (saved) {
+                mainRoot.setStyle(
+                                "-fx-background-color: " +
+                                                COLOR_BG +
+                                                ";");
 
-            showAlert(
-                    javafx.scene.control.Alert.AlertType.INFORMATION,
-                    "Message sent and saved successfully!"
-            );
+                mainRoot.setPrefSize(
+                                1300,
+                                700);
 
-        } else {
+                // -----------------------------------------------------
+                // SIDEBAR
+                // -----------------------------------------------------
 
-            showAlert(
-                    javafx.scene.control.Alert.AlertType.ERROR,
-                    "Message could not be saved."
-            );
+                VBox sidebar = createSidebar();
 
-            e.consume();
+                // -----------------------------------------------------
+                // COMMON HEADER
+                // -----------------------------------------------------
+
+                HBox header = createHeader();
+
+                // -----------------------------------------------------
+                // CENTER CONTENT
+                // -----------------------------------------------------
+
+                centerContent = new VBox(22);
+
+                centerContent.setPadding(
+                                new Insets(
+                                                22,
+                                                28,
+                                                22,
+                                                28));
+
+                centerContent.setFillWidth(true);
+
+                // -----------------------------------------------------
+                // SCROLL PANE
+                // -----------------------------------------------------
+
+                centerScrollPane = new ScrollPane(centerContent);
+
+                centerScrollPane.setFitToWidth(true);
+
+                centerScrollPane.setFitToHeight(false);
+
+                centerScrollPane.setHbarPolicy(
+                                ScrollPane.ScrollBarPolicy.NEVER);
+
+                centerScrollPane.setVbarPolicy(
+                                ScrollPane.ScrollBarPolicy.AS_NEEDED);
+
+                centerScrollPane.setStyle(
+                                "-fx-background-color: " +
+                                                COLOR_BG +
+                                                ";" +
+                                                "-fx-background: " +
+                                                COLOR_BG +
+                                                ";" +
+                                                "-fx-border-color: transparent;");
+
+                // -----------------------------------------------------
+                // CENTER WRAPPER
+                // -----------------------------------------------------
+
+                BorderPane centerPane = new BorderPane();
+
+                centerPane.setStyle(
+                                "-fx-background-color: " +
+                                                COLOR_BG +
+                                                ";");
+
+                centerPane.setTop(header);
+
+                centerPane.setCenter(
+                                centerScrollPane);
+
+                // -----------------------------------------------------
+                // ROOT
+                // -----------------------------------------------------
+
+                mainRoot.setLeft(sidebar);
+
+                mainRoot.setCenter(centerPane);
+
+                // -----------------------------------------------------
+                // FIRST PAGE
+                // -----------------------------------------------------
+
+                showDashboardContent();
+
+                // -----------------------------------------------------
+                // LOAD FIREBASE
+                // -----------------------------------------------------
+
+                loadDashboardData();
+
+                return new Scene(
+                                mainRoot,
+                                scenesettings.rectanguler2d.getWidth(),
+                                scenesettings.rectanguler2d.getHeight());
         }
 
-    });
+        // =========================================================
+        // SEND MESSAGE DIALOG
+        // =========================================================
 
+        private void showSendMessageDialog() {
 
-    dialog.showAndWait();
-}*/
-// =========================================================
-// SEND MESSAGE DIALOG
-// =========================================================
+                javafx.scene.control.Dialog<Boolean> dialog = new javafx.scene.control.Dialog<>();
 
-private void showSendMessageDialog() {
+                dialog.setTitle("Send Message");
 
-    javafx.scene.control.Dialog<Boolean> dialog =
-            new javafx.scene.control.Dialog<>();
+                dialog.setHeaderText(
+                                "Send Message to Beneficiary");
 
-    dialog.setTitle("Send Message");
+                // =====================================================
+                // BUTTONS
+                // =====================================================
 
-    dialog.setHeaderText(
-            "Send Message to Beneficiary"
-    );
+                javafx.scene.control.ButtonType sendButton = new javafx.scene.control.ButtonType(
+                                "Send",
+                                javafx.scene.control.ButtonBar.ButtonData.OK_DONE);
 
+                javafx.scene.control.ButtonType cancelButton = javafx.scene.control.ButtonType.CANCEL;
 
-    // =====================================================
-    // BUTTONS
-    // =====================================================
+                dialog.getDialogPane()
+                                .getButtonTypes()
+                                .addAll(
+                                                sendButton,
+                                                cancelButton);
 
-    javafx.scene.control.ButtonType sendButton =
-            new javafx.scene.control.ButtonType(
-                    "Send",
-                    javafx.scene.control.ButtonBar.ButtonData.OK_DONE
-            );
+                // =====================================================
+                // HISTORY
+                // =====================================================
 
-    javafx.scene.control.ButtonType cancelButton =
-            javafx.scene.control.ButtonType.CANCEL;
+                VBox historyBox = new VBox(8);
 
+                Label historyTitle = new Label(
+                                "Previous Messages");
 
-    dialog.getDialogPane()
-            .getButtonTypes()
-            .addAll(
-                    sendButton,
-                    cancelButton
-            );
-            VBox historyBox = new VBox(8);
+                historyTitle.setFont(
+                                Font.font(
+                                                "System",
+                                                FontWeight.BOLD,
+                                                14));
 
-Label historyTitle =
-        new Label("Previous Messages");
+                historyBox.getChildren()
+                                .add(historyTitle);
 
-historyTitle.setFont(
-        Font.font(
-                "System",
-                FontWeight.BOLD,
-                14
-        )
-);
+                List<Map<String, Object>> messages = messageDAO.getMessages();
 
-historyBox.getChildren().add(historyTitle);
+                for (Map<String, Object> data : messages) {
 
-List<Map<String, Object>> messages =
-        messageDAO.getMessages();
+                        String beneficiary = String.valueOf(
+                                        data.get(
+                                                        "beneficiaryName"));
 
-for (Map<String, Object> data : messages) {
+                        String msg = String.valueOf(
+                                        data.get(
+                                                        "message"));
 
-    String beneficiary =
-            String.valueOf(
-                    data.get("beneficiaryName")
-            );
+                        Label messageLabel = new Label(
+                                        beneficiary +
+                                                        " : " +
+                                                        msg);
 
-    String msg =
-            String.valueOf(
-                    data.get("message")
-            );
+                        messageLabel.setWrapText(
+                                        true);
 
-    Label messageLabel =
-            new Label(
-                    beneficiary + " : " + msg
-            );
-
-    messageLabel.setWrapText(true);
-
-    historyBox.getChildren().add(
-            messageLabel
-    );
-}
-
-
-    // =====================================================
-    // CONTENT
-    // =====================================================
-
-    VBox content =
-            new VBox(12);
-
-    content.setPadding(
-            new Insets(20)
-    );
-
-
-    Label nameLabel =
-            new Label(
-                    "Beneficiary Name"
-            );
-
-    nameLabel.setFont(
-            Font.font(
-                    "System",
-                    FontWeight.BOLD,
-                    13
-            )
-    );
-
-
-    javafx.scene.control.TextField nameField =
-            new javafx.scene.control.TextField();
-
-    nameField.setPromptText(
-            "Enter beneficiary name"
-    );
-
-    nameField.setPrefWidth(350);
-
-
-    Label messageLabel =
-            new Label(
-                    "Message"
-            );
-
-    messageLabel.setFont(
-            Font.font(
-                    "System",
-                    FontWeight.BOLD,
-                    13
-            )
-    );
-
-
-    javafx.scene.control.TextArea messageField =
-            new javafx.scene.control.TextArea();
-
-    messageField.setPromptText(
-            "Enter message"
-    );
-
-    messageField.setPrefRowCount(5);
-
-    messageField.setWrapText(true);
-
-
-    content.getChildren().addAll(
-            nameLabel,
-            nameField,
-            messageLabel,
-            messageField,
-            historyBox
-    );
-
-
-    dialog.getDialogPane()
-            .setContent(content);
-
-
-    // =====================================================
-    // RESULT CONVERTER
-    // =====================================================
-
-    dialog.setResultConverter(
-            button -> {
-
-                if (button == sendButton) {
-
-                    String beneficiaryName =
-                            nameField.getText().trim();
-
-                    String message =
-                            messageField.getText().trim();
-
-
-                    // -----------------------------------------
-                    // VALIDATION
-                    // -----------------------------------------
-
-                    if (beneficiaryName.isEmpty()) {
-
-                        showAlert(
-                                javafx.scene.control.Alert.AlertType.WARNING,
-                                "Please enter beneficiary name."
-                        );
-
-                        return false;
-                    }
-
-
-                    if (message.isEmpty()) {
-
-                        showAlert(
-                                javafx.scene.control.Alert.AlertType.WARNING,
-                                "Please enter message."
-                        );
-
-                        return false;
-                    }
-
-
-                    // -----------------------------------------
-                    // FIREBASE SAVE
-                    // -----------------------------------------
-
-                    System.out.println(
-                            "Trying to save message..."
-                    );
-
-
-                    boolean saved =
-                            messageDAO.saveMessage(
-                                    beneficiaryName,
-                                    message
-                            );
-
-
-                    if (saved) {
-
-                        showAlert(
-                                javafx.scene.control.Alert.AlertType.INFORMATION,
-                                "Message saved successfully in Firebase!"
-                        );
-
-                        return true;
-
-                    } else {
-
-                        showAlert(
-                                javafx.scene.control.Alert.AlertType.ERROR,
-                                "Message could not be saved in Firebase."
-                        );
-
-                        return false;
-                    }
+                        historyBox.getChildren()
+                                        .add(
+                                                        messageLabel);
                 }
 
-                return null;
-            }
-    );
+                // =====================================================
+                // CONTENT
+                // =====================================================
 
+                VBox content = new VBox(12);
 
-    dialog.showAndWait();
-}
+                content.setPadding(
+                                new Insets(20));
 
-// =========================================================
-// ALERT
-// =========================================================
+                Label nameLabel = new Label(
+                                "Beneficiary Name");
 
-private void showAlert(
-        javafx.scene.control.Alert.AlertType type,
-        String message) {
+                nameLabel.setFont(
+                                Font.font(
+                                                "System",
+                                                FontWeight.BOLD,
+                                                13));
 
-    javafx.scene.control.Alert alert =
-            new javafx.scene.control.Alert(type);
+                javafx.scene.control.TextField nameField = new javafx.scene.control.TextField();
 
-    alert.setTitle("MaaCare AI");
+                nameField.setPromptText(
+                                "Enter beneficiary name");
 
-    alert.setHeaderText(null);
+                nameField.setPrefWidth(
+                                350);
 
-    alert.setContentText(message);
+                Label messageLabel = new Label(
+                                "Message");
 
-    alert.showAndWait();
-}
+                messageLabel.setFont(
+                                Font.font(
+                                                "System",
+                                                FontWeight.BOLD,
+                                                13));
 
-    // =========================================================
-    // LOAD DASHBOARD DATA FROM FIREBASE
-    // =========================================================
+                javafx.scene.control.TextArea messageField = new javafx.scene.control.TextArea();
 
-    private void loadDashboardData() {
+                messageField.setPromptText(
+                                "Enter message");
 
-        Task<Void> firebaseTask =
-                new Task<>() {
+                messageField.setPrefRowCount(
+                                5);
 
-                    @Override
-                    protected Void call() {
+                messageField.setWrapText(
+                                true);
+
+                content.getChildren().addAll(
+                                nameLabel,
+                                nameField,
+                                messageLabel,
+                                messageField,
+                                historyBox);
+
+                dialog.getDialogPane()
+                                .setContent(
+                                                content);
+
+                // =====================================================
+                // RESULT CONVERTER
+                // =====================================================
+
+                dialog.setResultConverter(
+                                button -> {
+
+                                        if (button == sendButton) {
+
+                                                String beneficiaryName = nameField
+                                                                .getText()
+                                                                .trim();
+
+                                                String message = messageField
+                                                                .getText()
+                                                                .trim();
+
+                                                // -----------------------------------------
+                                                // VALIDATION
+                                                // -----------------------------------------
+
+                                                if (beneficiaryName
+                                                                .isEmpty()) {
+
+                                                        showAlert(
+                                                                        javafx.scene.control.Alert.AlertType.WARNING,
+                                                                        "Please enter beneficiary name.");
+
+                                                        return false;
+                                                }
+
+                                                if (message.isEmpty()) {
+
+                                                        showAlert(
+                                                                        javafx.scene.control.Alert.AlertType.WARNING,
+                                                                        "Please enter message.");
+
+                                                        return false;
+                                                }
+
+                                                // -----------------------------------------
+                                                // FIREBASE SAVE
+                                                // -----------------------------------------
+
+                                                System.out.println(
+                                                                "Trying to save message...");
+
+                                                boolean saved = messageDAO
+                                                                .saveMessage(
+                                                                                beneficiaryName,
+                                                                                message);
+
+                                                if (saved) {
+
+                                                        showAlert(
+                                                                        javafx.scene.control.Alert.AlertType.INFORMATION,
+                                                                        "Message saved successfully in Firebase!");
+
+                                                        return true;
+
+                                                } else {
+
+                                                        showAlert(
+                                                                        javafx.scene.control.Alert.AlertType.ERROR,
+                                                                        "Message could not be saved in Firebase.");
+
+                                                        return false;
+                                                }
+                                        }
+
+                                        return null;
+                                });
+
+                dialog.showAndWait();
+        }
+
+        // =========================================================
+        // ALERT
+        // =========================================================
+
+        private void showAlert(
+                        javafx.scene.control.Alert.AlertType type,
+                        String message) {
+
+                javafx.scene.control.Alert alert = new javafx.scene.control.Alert(type);
+
+                alert.setTitle(
+                                "MaaCare AI");
+
+                alert.setHeaderText(
+                                null);
+
+                alert.setContentText(
+                                message);
+
+                alert.showAndWait();
+        }
+
+        // =========================================================
+        // LOAD DASHBOARD DATA FROM FIREBASE
+        // =========================================================
+
+        private void loadDashboardData() {
+
+                Task<Void> firebaseTask = new Task<>() {
+
+                        @Override
+                        protected Void call() {
+
+                                try {
+
+                                        System.out.println(
+                                                        "=================================");
+
+                                        System.out.println(
+                                                        "Loading ASHA Dashboard Data...");
+
+                                        // ---------------------------------
+                                        // BENEFICIARIES
+                                        // ---------------------------------
+
+                                        List<AshaBeneficiary> beneficiaries = beneficiaryDAO
+                                                        .getAshaBeneficiaries();
+
+                                        if (beneficiaries != null) {
+
+                                                firebaseBeneficiaries = beneficiaries;
+
+                                                totalBeneficiaries = beneficiaries
+                                                                .size();
+
+                                                calculateBeneficiaryStats(
+                                                                beneficiaries);
+                                        }
+
+                                        // ---------------------------------
+                                        // VISITS
+                                        // ---------------------------------
+
+                                        firebaseVisits = visitDAO
+                                                        .getVisits();
+
+                                        if (firebaseVisits != null) {
+
+                                                totalVisits = firebaseVisits
+                                                                .size();
+                                        }
+
+                                        // ---------------------------------
+                                        // PROFILE
+                                        // ---------------------------------
+
+                                        List<AshaProfileModel> profiles = profileDAO
+                                                        .getAshaProfiles();
+
+                                        if (profiles != null &&
+                                                        !profiles
+                                                                        .isEmpty()) {
+
+                                                AshaProfileModel profile = profiles.get(
+                                                                0);
+
+                                                loadProfileData(
+                                                                profile);
+                                        }
+
+                                        System.out.println(
+                                                        "Total Beneficiaries = "
+                                                                        + totalBeneficiaries);
+
+                                        System.out.println(
+                                                        "Total Visits = "
+                                                                        + totalVisits);
+
+                                        System.out.println(
+                                                        "Pregnant Women = "
+                                                                        + pregnantWomen);
+
+                                        System.out.println(
+                                                        "Children = "
+                                                                        + children);
+
+                                        System.out.println(
+                                                        "Immunizations = "
+                                                                        + immunizations);
+
+                                        System.out.println(
+                                                        "=================================");
+
+                                } catch (Exception e) {
+
+                                        System.out.println(
+                                                        "ERROR LOADING DASHBOARD DATA");
+
+                                        e.printStackTrace();
+                                }
+
+                                return null;
+                        }
+                };
+
+                firebaseTask.setOnSucceeded(
+                                e -> {
+
+                                        Platform.runLater(
+                                                        () -> {
+
+                                                                updateHeaderProfile();
+
+                                                                showDashboardContent();
+
+                                                        });
+                                });
+
+                firebaseTask.setOnFailed(
+                                e -> {
+
+                                        System.out.println(
+                                                        "Firebase Dashboard Task Failed");
+
+                                        if (firebaseTask
+                                                        .getException() != null) {
+
+                                                firebaseTask
+                                                                .getException()
+                                                                .printStackTrace();
+                                        }
+                                });
+
+                Thread thread = new Thread(
+                                firebaseTask);
+
+                thread.setDaemon(true);
+
+                thread.start();
+        }
+
+        // =========================================================
+        // BENEFICIARY STATISTICS
+        // =========================================================
+
+        private void calculateBeneficiaryStats(
+                        List<AshaBeneficiary> beneficiaries) {
+
+                pregnantWomen = 0;
+                children = 0;
+                immunizations = 0;
+
+                womenTestedThisMonth = 0;
+                womenTestNormal = 0;
+                womenTestRisky = 0;
+                womenCheckupBaaki = 0;
+
+                if (beneficiaries == null) {
+                        return;
+                }
+
+                LocalDate today = LocalDate.now();
+
+                for (AshaBeneficiary beneficiary : beneficiaries) {
+
+                        if (beneficiary == null) {
+                                continue;
+                        }
+
+                        String category = beneficiary.getCategory() == null
+                                        ? ""
+                                        : beneficiary
+                                                        .getCategory()
+                                                        .trim()
+                                                        .toLowerCase();
+
+                        String status = beneficiary.getStatus() == null
+                                        ? ""
+                                        : beneficiary
+                                                        .getStatus()
+                                                        .trim()
+                                                        .toLowerCase();
+
+                        // =====================================================
+                        // PREGNANT WOMEN
+                        // =====================================================
+
+                        if (category.contains(
+                                        "pregnant")) {
+
+                                pregnantWomen++;
+
+                                // -----------------------------------------------
+                                // WOMEN TESTED THIS MONTH
+                                // -----------------------------------------------
+
+                                String lastVisit = beneficiary
+                                                .getLastVisit();
+
+                                if (lastVisit != null &&
+                                                !lastVisit
+                                                                .trim()
+                                                                .isEmpty()) {
+
+                                        LocalDate visitDate = parseDate(
+                                                        lastVisit);
+
+                                        if (visitDate != null &&
+                                                        visitDate.getMonth() == today
+                                                                        .getMonth()
+                                                        &&
+                                                        visitDate.getYear() == today
+                                                                        .getYear()) {
+
+                                                womenTestedThisMonth++;
+                                        }
+                                }
+
+                                // -----------------------------------------------
+                                // NORMAL
+                                // -----------------------------------------------
+
+                                if (status.equals(
+                                                "normal")) {
+
+                                        womenTestNormal++;
+                                }
+
+                                // -----------------------------------------------
+                                // RISKY
+                                // -----------------------------------------------
+
+                                if (status.equals(
+                                                "high risk")) {
+
+                                        womenTestRisky++;
+                                }
+
+                                // -----------------------------------------------
+                                // CHECKUP BAAKI
+                                // -----------------------------------------------
+
+                                if (status.equals(
+                                                "follow-up due") ||
+                                                status.equals(
+                                                                "follow up due")
+                                                ||
+                                                status.equals(
+                                                                "pending")) {
+
+                                        womenCheckupBaaki++;
+                                }
+                        }
+
+                        // =====================================================
+                        // CHILDREN
+                        // =====================================================
+
+                        if (category.contains(
+                                        "child")) {
+
+                                children++;
+                        }
+
+                        // =====================================================
+                        // IMMUNIZED
+                        // =====================================================
+
+                        if (status.equals(
+                                        "immunized")) {
+
+                                immunizations++;
+                        }
+                }
+
+                System.out.println();
+
+                System.out.println(
+                                "Women Tested This Month = " +
+                                                womenTestedThisMonth);
+
+                System.out.println(
+                                "Women Test Normal = " +
+                                                womenTestNormal);
+
+                System.out.println(
+                                "Women Test Risky = " +
+                                                womenTestRisky);
+
+                System.out.println(
+                                "Women Checkup Baaki = " +
+                                                womenCheckupBaaki);
+
+                System.out.println();
+        }
+
+        // =========================================================
+        // PARSE DATE
+        // =========================================================
+
+        private LocalDate parseDate(
+                        String dateText) {
+
+                if (dateText == null ||
+                                dateText
+                                                .trim()
+                                                .isEmpty()) {
+
+                        return null;
+                }
+
+                String text = dateText.trim();
+
+                String[] formats = {
+                                "dd-MM-yyyy",
+                                "dd/MM/yyyy",
+                                "yyyy-MM-dd",
+                                "MM/dd/yyyy",
+                                "dd MMM yyyy",
+                                "d MMM yyyy",
+                                "dd MMMM yyyy",
+                                "d MMMM yyyy"
+                };
+
+                for (String format : formats) {
 
                         try {
 
-                            System.out.println(
-                                    "================================="
-                            );
+                                return LocalDate.parse(
+                                                text,
+                                                DateTimeFormatter.ofPattern(
+                                                                format));
 
-                            System.out.println(
-                                    "Loading ASHA Dashboard Data..."
-                            );
+                        } catch (Exception ignored) {
+                        }
+                }
 
-                            // ---------------------------------
-                            // BENEFICIARIES
-                            // ---------------------------------
+                System.out.println(
+                                "Unable to parse visit date: " +
+                                                text);
 
-                            List<AshaBeneficiary> beneficiaries =
-                                    beneficiaryDAO
-                                            .getAshaBeneficiaries();
+                return null;
+        }
 
-                            if (beneficiaries != null) {
-                                firebaseBeneficiaries = beneficiaries;
+        // =========================================================
+        // PROFILE DATA
+        // =========================================================
 
-                                totalBeneficiaries =
-                                        beneficiaries.size();
+        private void loadProfileData(
+                        AshaProfileModel profile) {
 
-                                calculateBeneficiaryStats(
-                                        beneficiaries
-                                );
-                            }
+                if (profile == null) {
+                        return;
+                }
 
-                            // ---------------------------------
-                            // VISITS
-                            // ---------------------------------
+                try {
 
-                            firebaseVisits =
-                                    visitDAO.getVisits();
+                        String name = profile.getName();
 
-                            if (firebaseVisits != null) {
+                        if (name != null &&
+                                        !name
+                                                        .trim()
+                                                        .isEmpty()) {
 
-                                totalVisits =
-                                        firebaseVisits.size();
-                            }
-
-                            // ---------------------------------
-                            // PROFILE
-                            // ---------------------------------
-
-                            List<AshaProfileModel> profiles =
-                                    profileDAO.getAshaProfiles();
-
-                            if (profiles != null &&
-                                    !profiles.isEmpty()) {
-
-                                AshaProfileModel profile =
-                                        profiles.get(0);
-
-                                loadProfileData(profile);
-                            }
-
-                            System.out.println(
-                                    "Total Beneficiaries = "
-                                            + totalBeneficiaries
-                            );
-
-                            System.out.println(
-                                    "Total Visits = "
-                                            + totalVisits
-                            );
-
-                            System.out.println(
-                                    "Pregnant Women = "
-                                            + pregnantWomen
-                            );
-
-                            System.out.println(
-                                    "Children = "
-                                            + children
-                            );
-
-                            System.out.println(
-                                    "Immunizations = "
-                                            + immunizations
-                            );
-
-                            System.out.println(
-                                    "================================="
-                            );
-
-                        } catch (Exception e) {
-
-                            System.out.println(
-                                    "ERROR LOADING DASHBOARD DATA"
-                            );
-
-                            e.printStackTrace();
+                                ashaName = name;
                         }
 
-                        return null;
-                    }
-                };
+                } catch (Exception e) {
 
-        firebaseTask.setOnSucceeded(
-                e -> {
-
-                    Platform.runLater(() -> {
-
-                        updateHeaderProfile();
-
-                        showDashboardContent();
-
-                    });
+                        System.out.println(
+                                        "Unable to read ASHA profile name.");
                 }
-        );
 
-        firebaseTask.setOnFailed(
-                e -> {
+                try {
 
-                    System.out.println(
-                            "Firebase Dashboard Task Failed"
-                    );
+                        String village = profile.getAddress();
 
-                    if (firebaseTask.getException() != null) {
+                        if (village != null &&
+                                        !village
+                                                        .trim()
+                                                        .isEmpty()) {
 
-                        firebaseTask
-                                .getException()
-                                .printStackTrace();
-                    }
+                                villageName = village;
+                        }
+
+                } catch (Exception e) {
+
+                        System.out.println(
+                                        "Unable to read village.");
                 }
-        );
-
-        Thread thread =
-                new Thread(firebaseTask);
-
-        thread.setDaemon(true);
-
-        thread.start();
-    }
-
-    // =========================================================
-    // BENEFICIARY STATISTICS
-    // =========================================================
-
-    private void calculateBeneficiaryStats(
-        List<AshaBeneficiary> beneficiaries) {
-
-    pregnantWomen = 0;
-    children = 0;
-    immunizations = 0;
-
-    womenTestedThisMonth = 0;
-    womenTestNormal = 0;
-    womenTestRisky = 0;
-    womenCheckupBaaki = 0;
-
-    if (beneficiaries == null) {
-        return;
-    }
-
-    LocalDate today = LocalDate.now();
-
-    for (AshaBeneficiary beneficiary : beneficiaries) {
-
-        if (beneficiary == null) {
-            continue;
         }
 
-        String category =
-                beneficiary.getCategory() == null
-                        ? ""
-                        : beneficiary.getCategory().trim().toLowerCase();
+        // =========================================================
+        // UPDATE HEADER PROFILE
+        // =========================================================
 
-        String status =
-                beneficiary.getStatus() == null
-                        ? ""
-                        : beneficiary.getStatus().trim().toLowerCase();
+        private void updateHeaderProfile() {
 
-        // =====================================================
-        // PREGNANT WOMEN
-        // =====================================================
-
-        if (category.contains("pregnant")) {
-
-            pregnantWomen++;
-
-            // -----------------------------------------------
-            // WOMEN TESTED THIS MONTH
-            // -----------------------------------------------
-
-            String lastVisit = beneficiary.getLastVisit();
-
-            if (lastVisit != null &&
-                    !lastVisit.trim().isEmpty()) {
-
-                LocalDate visitDate =
-                        parseDate(lastVisit);
-
-                if (visitDate != null &&
-                        visitDate.getMonth() == today.getMonth() &&
-                        visitDate.getYear() == today.getYear()) {
-
-                    womenTestedThisMonth++;
+                if (mainRoot == null) {
+                        return;
                 }
-            }
 
-            // -----------------------------------------------
-            // NORMAL
-            // -----------------------------------------------
+                Node center = mainRoot.getCenter();
 
-            if (status.equals("normal")) {
-
-                womenTestNormal++;
-            }
-
-            // -----------------------------------------------
-            // RISKY
-            // -----------------------------------------------
-
-            if (status.equals("high risk")) {
-
-                womenTestRisky++;
-            }
-
-            // -----------------------------------------------
-            // CHECKUP BAAKI
-            // -----------------------------------------------
-
-            if (status.equals("follow-up due") ||
-                    status.equals("follow up due") ||
-                    status.equals("pending")) {
-
-                womenCheckupBaaki++;
-            }
-        }
-
-        // =====================================================
-        // CHILDREN
-        // =====================================================
-
-        if (category.contains("child")) {
-
-            children++;
-        }
-
-        // =====================================================
-        // IMMUNIZED
-        // =====================================================
-
-        if (status.equals("immunized")) {
-
-            immunizations++;
-        }
-    }
-    System.out.println();
-
-    System.out.println(
-            "Women Tested This Month = " +
-                    womenTestedThisMonth
-    );
-
-    System.out.println(
-            "Women Test Normal = " +
-                    womenTestNormal
-    );
-
-    System.out.println(
-            "Women Test Risky = " +
-                    womenTestRisky
-    );
-
-    System.out.println(
-            "Women Checkup Baaki = " +
-                    womenCheckupBaaki
-    );
-    System.out.println();
-}
-private LocalDate parseDate(String dateText) {
-
-    if (dateText == null || dateText.trim().isEmpty()) {
-        return null;
-    }
-
-    String text = dateText.trim();
-
-    String[] formats = {
-            "dd-MM-yyyy",
-            "dd/MM/yyyy",
-            "yyyy-MM-dd",
-            "MM/dd/yyyy",
-            "dd MMM yyyy",
-            "d MMM yyyy",
-            "dd MMMM yyyy",
-            "d MMMM yyyy"
-    };
-
-    for (String format : formats) {
-
-        try {
-
-            return LocalDate.parse(
-                    text,
-                    DateTimeFormatter.ofPattern(format)
-            );
-
-        } catch (Exception ignored) {
-        }
-    }
-
-    System.out.println(
-            "Unable to parse visit date: " + text
-    );
-
-    return null;
-}
-
-    // =========================================================
-    // PROFILE DATA
-    // =========================================================
-
-    private void loadProfileData(
-            AshaProfileModel profile) {
-
-        if (profile == null) {
-            return;
-        }
-
-        try {
-
-            /*
-             * Common getter names ke according profile data.
-             *
-             * Agar tumhare model me exact getter available hai
-             * to usko use kar sakte ho.
-             */
-
-            String name =
-                    profile.getName();
-
-            if (name != null &&
-                    !name.trim().isEmpty()) {
-
-                ashaName = name;
-            }
-
-        } catch (Exception e) {
-
-            System.out.println(
-                    "Unable to read ASHA profile name."
-            );
-        }
-
-        try {
-
-            String village =
-                    profile.getAddress();
-
-            if (village != null &&
-                    !village.trim().isEmpty()) {
-
-                villageName = village;
-            }
-
-        } catch (Exception e) {
-
-            System.out.println(
-                    "Unable to read village."
-            );
-        }
-    }
-
-    // =========================================================
-    // UPDATE HEADER PROFILE
-    // =========================================================
-
-    private void updateHeaderProfile() {
-
-        /*
-         * Header ko recreate karne se navigation/UI structure
-         * disturb nahi hota.
-         *
-         * Current header Firebase profile values use karega.
-         */
-
-        if (mainRoot == null) {
-            return;
-        }
-
-        Node center =
-                mainRoot.getCenter();
-
-        if (!(center instanceof BorderPane)) {
-            return;
-        }
-
-        BorderPane centerPane =
-                (BorderPane) center;
-
-        centerPane.setTop(
-                createHeader()
-        );
-    }
-
-    // =========================================================
-    // SHOW DASHBOARD
-    // =========================================================
-
-    private void showDashboardContent() {
-
-        if (centerContent == null) {
-            return;
-        }
-
-        centerContent.getChildren().clear();
-
-        HBox statsRow =
-                createStatsRow();
-
-        HBox middleRow =
-                createMiddleRow();
-
-        HBox bottomRow =
-                createBottomRow();
-
-        centerContent.getChildren().addAll(
-                statsRow,
-                middleRow,
-                bottomRow
-        );
-
-        centerScrollPane.setVvalue(0);
-    }
-
-    // =========================================================
-    // COMMON PAGE CONTENT
-    // =========================================================
-
-    private void setCenterContent(Node content) {
-
-        if (centerContent == null ||
-                content == null) {
-
-            return;
-        }
-
-        centerContent.getChildren().clear();
-
-        if (content instanceof Region) {
-
-            Region region =
-                    (Region) content;
-
-            region.setMaxWidth(
-                    Double.MAX_VALUE
-            );
-
-            region.setPrefWidth(
-                    centerScrollPane
-                            .getViewportBounds()
-                            .getWidth()
-            );
-        }
-
-        centerContent.getChildren().add(
-                content
-        );
-
-        centerScrollPane.setVvalue(0);
-    }
-
-    // =========================================================
-    // SIDEBAR
-    // =========================================================
-
-    private VBox createSidebar() {
-
-        VBox sidebar =
-                new VBox(14);
-
-        sidebar.setPadding(
-                new Insets(18, 16, 12, 16)
-        );
-
-        sidebar.setPrefWidth(260);
-
-        sidebar.setMinWidth(260);
-
-        sidebar.setStyle(
-                "-fx-background-color: " +
-                COLOR_BG + ";" +
-                "-fx-border-color: " +
-                COLOR_BORDER + ";" +
-                "-fx-border-width: 0 1 0 0;"
-        );
-
-        // =====================================================
-        // LOGO
-        // =====================================================
-
-        ImageView logoView =
-                createImageViewHolder(
-                        "assets\\images\\logo1.jpeg",
-                        290,
-                        190
-                );
-
-        // =====================================================
-        // NAVIGATION
-        // =====================================================
-
-        VBox navList =
-                new VBox(8);
-
-        // -----------------------------------------------------
-        // DASHBOARD
-        // -----------------------------------------------------
-
-        Button dashboardButton =
-                createNavItem(
-                        "Dashboard",
-                        true
-                );
-
-        dashboardButton.setOnAction(
-                e -> {
-
-                    showDashboardContent();
-
-                    // Refresh Firebase data
-                    loadDashboardData();
+                if (!(center instanceof BorderPane)) {
+                        return;
                 }
-        );
 
-        // -----------------------------------------------------
+                BorderPane centerPane = (BorderPane) center;
+
+                centerPane.setTop(
+                                createHeader());
+        }
+
+        // =========================================================
+        // SHOW DASHBOARD
+        // =========================================================
+
+        private void showDashboardContent() {
+
+                if (centerContent == null) {
+                        return;
+                }
+
+                centerContent
+                                .getChildren()
+                                .clear();
+
+                HBox statsRow = createStatsRow();
+
+                HBox middleRow = createMiddleRow();
+
+                HBox bottomRow = createBottomRow();
+
+                centerContent
+                                .getChildren()
+                                .addAll(
+                                                statsRow,
+                                                middleRow,
+                                                bottomRow);
+
+                centerScrollPane.setVvalue(
+                                0);
+        }
+
+        // =========================================================
+        // COMMON PAGE CONTENT
+        // =========================================================
+
+        private void setCenterContent(
+                        Node content) {
+
+                if (centerContent == null ||
+                                content == null) {
+
+                        return;
+                }
+
+                centerContent
+                                .getChildren()
+                                .clear();
+
+                if (content instanceof Region) {
+
+                        Region region = (Region) content;
+
+                        region.setMaxWidth(
+                                        Double.MAX_VALUE);
+
+                        region.setPrefWidth(
+                                        centerScrollPane
+                                                        .getViewportBounds()
+                                                        .getWidth());
+                }
+
+                centerContent
+                                .getChildren()
+                                .add(content);
+
+                centerScrollPane.setVvalue(
+                                0);
+        }
+
+        // =========================================================
+        // SIDEBAR
+        // =========================================================
+
+        private VBox createSidebar() {
+
+                VBox sidebar = new VBox(14);
+
+                sidebar.setPadding(
+                                new Insets(
+                                                18,
+                                                16,
+                                                12,
+                                                16));
+
+                sidebar.setPrefWidth(
+                                260);
+
+                sidebar.setMinWidth(
+                                260);
+
+                sidebar.setStyle(
+                                "-fx-background-color: " +
+                                                COLOR_BG +
+                                                ";" +
+                                                "-fx-border-color: " +
+                                                COLOR_BORDER +
+                                                ";" +
+                                                "-fx-border-width: 0 1 0 0;");
+
+                // =====================================================
+                // LOGO
+                // =====================================================
+
+                ImageView logoView = createImageViewHolder(
+                                "assets\\images\\logo1.jpeg",
+                                290,
+                                190);
+
+                // =====================================================
+                // NAVIGATION
+                // =====================================================
+
+                VBox navList = new VBox(8);
+
+                // =====================================================
+                // DASHBOARD
+                // =====================================================
+
+                Button dashboardButton = createNavItem(
+                                "Dashboard",
+                                true);
+
+                // =====================================================
+                // BENEFICIARIES
+                // =====================================================
+
+                Button beneficiariesButton = createNavItem(
+                                "Beneficiaries",
+                                false);
+
+                // =====================================================
+                // HEALTH VISIT
+                // =====================================================
+
+                Button healthVisitButton = createNavItem(
+                                "Health Visit",
+                                false);
+
+                // =====================================================
+                // PROFILE
+                // =====================================================
+
+                Button profileButton = createNavItem(
+                                "Profile",
+                                false);
+
+                // =====================================================
+                // DASHBOARD CLICK
+                // =====================================================
+
+                dashboardButton.setOnAction(
+                                e -> {
+
+                                        setSelectedNavButton(
+                                                        dashboardButton,
+                                                        dashboardButton,
+                                                        beneficiariesButton,
+                                                        healthVisitButton,
+                                                        profileButton);
+
+                                        showDashboardContent();
+
+                                        loadDashboardData();
+                                });
+
+                // =====================================================
+                // BENEFICIARIES CLICK
+                // =====================================================
+
+                beneficiariesButton.setOnAction(
+                                e -> {
+
+                                        setSelectedNavButton(
+                                                        beneficiariesButton,
+                                                        dashboardButton,
+                                                        beneficiariesButton,
+                                                        healthVisitButton,
+                                                        profileButton);
+
+                                        openBeneficiaries();
+                                });
+
+                // =====================================================
+                // HEALTH VISIT CLICK
+                // =====================================================
+
+                healthVisitButton.setOnAction(
+                                e -> {
+
+                                        setSelectedNavButton(
+                                                        healthVisitButton,
+                                                        dashboardButton,
+                                                        beneficiariesButton,
+                                                        healthVisitButton,
+                                                        profileButton);
+
+                                        openHealthVisit();
+                                });
+
+                // =====================================================
+                // PROFILE CLICK
+                // =====================================================
+
+                profileButton.setOnAction(
+                                e -> {
+
+                                        setSelectedNavButton(
+                                                        profileButton,
+                                                        dashboardButton,
+                                                        beneficiariesButton,
+                                                        healthVisitButton,
+                                                        profileButton);
+
+                                        openProfile();
+                                });
+
+                // =====================================================
+                // ADD BUTTONS
+                // =====================================================
+
+                navList.getChildren().addAll(
+                                dashboardButton,
+                                beneficiariesButton,
+                                healthVisitButton,
+                                profileButton);
+
+                // =====================================================
+                // BOTTOM IMAGE
+                // =====================================================
+
+                ImageView bottomImgView = createImageViewHolder(
+                                "assets\\images\\worker2.jpeg",
+                                290,
+                                190);
+
+                bottomImgView.setTranslateY(
+                                -7);
+
+                Label txtSlogan = new Label(
+                                "Swasth Maa, Swasth Parivaar,\n" +
+                                                "Swasth Samaaj.");
+
+                txtSlogan.setTranslateY(
+                                -14);
+
+                txtSlogan.setFont(
+                                Font.font(
+                                                "System",
+                                                FontWeight.BOLD,
+                                                16));
+
+                txtSlogan.setStyle(
+                                "-fx-text-fill: " +
+                                                COLOR_TEXT_DARK +
+                                                ";");
+
+                txtSlogan.setAlignment(
+                                Pos.CENTER);
+
+                VBox bottomBox = new VBox(
+                                6,
+                                bottomImgView,
+                                txtSlogan);
+
+                bottomBox.setAlignment(
+                                Pos.CENTER);
+
+                VBox.setMargin(
+                                bottomBox,
+                                new Insets(
+                                                -50,
+                                                0,
+                                                0,
+                                                0));
+
+                bottomBox.setCursor(
+                                Cursor.HAND);
+
+                bottomBox.setOnMouseClicked(
+                                e -> openProfile());
+
+                sidebar.getChildren().addAll(
+                                logoView,
+                                navList,
+                                new Spacer(),
+                                bottomBox);
+
+                return sidebar;
+        }
+
+        // =========================================================
+        // SET SELECTED SIDEBAR BUTTON
+        // =========================================================
+
+        private void setSelectedNavButton(
+                        Button selectedButton,
+                        Button... allButtons) {
+
+                for (Button button : allButtons) {
+
+                        boolean isSelected = button == selectedButton;
+
+                        // -------------------------------------------------
+                        // SAVE SELECTED STATE
+                        // -------------------------------------------------
+
+                        button.getProperties().put(
+                                        "selected",
+                                        isSelected);
+
+                        // -------------------------------------------------
+                        // BUTTON STYLE
+                        // -------------------------------------------------
+
+                        if (isSelected) {
+
+                                button.setStyle(
+                                                "-fx-background-color: " +
+                                                                COLOR_LIGHT_PINK +
+                                                                ";" +
+                                                                "-fx-background-radius: 12;" +
+                                                                "-fx-border-color: " +
+                                                                COLOR_PRIMARY_PINK +
+                                                                ";" +
+                                                                "-fx-border-width: 0 0 0 4;" +
+                                                                "-fx-border-radius: 12;" +
+                                                                "-fx-padding: 0 14 0 10;" +
+                                                                "-fx-cursor: hand;");
+
+                        } else {
+
+                                button.setStyle(
+                                                "-fx-background-color: transparent;" +
+                                                                "-fx-background-radius: 12;" +
+                                                                "-fx-border-color: transparent;" +
+                                                                "-fx-border-radius: 12;" +
+                                                                "-fx-border-width: 0;" +
+                                                                "-fx-padding: 0 14 0 14;" +
+                                                                "-fx-cursor: hand;");
+                        }
+
+                        // -------------------------------------------------
+                        // ICON + TEXT COLOR
+                        // -------------------------------------------------
+
+                        if (button.getGraphic() instanceof HBox) {
+
+                                HBox box = (HBox) button
+                                                .getGraphic();
+
+                                for (Node node : box.getChildren()) {
+
+                                        if (node instanceof Circle) {
+
+                                                Circle circle = (Circle) node;
+
+                                                circle.setFill(
+                                                                Color.web(
+                                                                                isSelected
+                                                                                                ? COLOR_PRIMARY_PINK
+                                                                                                : COLOR_TEXT_MUTED));
+                                        }
+
+                                        if (node instanceof Label) {
+
+                                                Label label = (Label) node;
+
+                                                label.setStyle(
+                                                                "-fx-text-fill: " +
+                                                                                (isSelected
+                                                                                                ? COLOR_PRIMARY_PINK
+                                                                                                : COLOR_TEXT_MUTED)
+                                                                                + ";");
+                                        }
+                                }
+                        }
+                }
+
+                selectedNavButton = selectedButton;
+        }
+
+        // =========================================================
         // BENEFICIARIES
-        // -----------------------------------------------------
+        // =========================================================
 
-        Button beneficiariesButton =
-                createNavItem(
-                        "Beneficiaries",
-                        false
-                );
+        private void openBeneficiaries() {
 
-        beneficiariesButton.setOnAction(
-                e -> openBeneficiaries()
-        );
+                try {
 
-        // -----------------------------------------------------
+                        Asha_beneficiaries beneficiaries = new Asha_beneficiaries();
+
+                        Node content = beneficiaries
+                                        .getBeneficiariesContent();
+
+                        setCenterContent(
+                                        content);
+
+                } catch (Exception ex) {
+
+                        ex.printStackTrace();
+
+                        System.out.println(
+                                        "Error opening Beneficiaries page.");
+                }
+        }
+
+        // =========================================================
         // HEALTH VISIT
-        // -----------------------------------------------------
+        // =========================================================
 
-        Button healthVisitButton =
-                createNavItem(
-                        "Health Visit",
-                        false
-                );
+        private void openHealthVisit() {
 
-        healthVisitButton.setOnAction(
-                e -> openHealthVisit()
-        );
+                try {
 
-        // -----------------------------------------------------
+                        Asha_workervisit visit = new Asha_workervisit();
+
+                        Node content = visit.getHealthVisitContent();
+
+                        setCenterContent(
+                                        content);
+
+                } catch (Exception ex) {
+
+                        ex.printStackTrace();
+
+                        System.out.println(
+                                        "Error opening Health Visit page.");
+                }
+        }
+
+        // =========================================================
         // PROFILE
-        // -----------------------------------------------------
+        // =========================================================
 
-        Button profileButton =
-                createNavItem(
-                        "Profile",
-                        false
-                );
+        private void openProfile() {
 
-        profileButton.setOnAction(
-                e -> openProfile()
-        );
+                try {
 
-        navList.getChildren().addAll(
-                dashboardButton,
-                beneficiariesButton,
-                healthVisitButton,
-                profileButton
-        );
+                        Asha_profilepage profile = new Asha_profilepage();
 
-        // =====================================================
-        // BOTTOM WORKER IMAGE
-        // =====================================================
+                        Node content = profile.getProfileContent();
 
-        ImageView bottomImgView =
-                createImageViewHolder(
-                        "assets\\images\\worker2.jpeg",
-                        290,
-                        190
-                );
+                        setCenterContent(
+                                        content);
 
-        bottomImgView.setTranslateY(-7);
+                } catch (Exception ex) {
 
-        Label txtSlogan =
-                new Label(
-                        "Swasth Maa, Swasth Parivaar,\n" +
-                        "Swasth Samaaj."
-                );
+                        ex.printStackTrace();
 
-        txtSlogan.setTranslateY(-14);
-
-        txtSlogan.setFont(
-                Font.font(
-                        "System",
-                        FontWeight.BOLD,
-                        16
-                )
-        );
-
-        txtSlogan.setStyle(
-                "-fx-text-fill: " +
-                COLOR_TEXT_DARK + ";"
-        );
-
-        txtSlogan.setAlignment(
-                Pos.CENTER
-        );
-
-        VBox bottomBox =
-                new VBox(
-                        6,
-                        bottomImgView,
-                        txtSlogan
-                );
-
-        bottomBox.setAlignment(
-                Pos.CENTER
-        );
-
-        VBox.setMargin(
-                bottomBox,
-                new Insets(-50, 0, 0, 0)
-        );
-
-        bottomBox.setCursor(
-                Cursor.HAND
-        );
-
-        bottomBox.setOnMouseClicked(
-                e -> openProfile()
-        );
-
-        // =====================================================
-        // ADD SIDEBAR
-        // =====================================================
-
-        sidebar.getChildren().addAll(
-                logoView,
-                navList,
-                new Spacer(),
-                bottomBox
-        );
-
-        return sidebar;
-    }
-
-    // =========================================================
-    // BENEFICIARIES
-    // =========================================================
-
-    private void openBeneficiaries() {
-
-        try {
-
-            Asha_beneficiaries beneficiaries =
-                    new Asha_beneficiaries();
-
-            Node content =
-                    beneficiaries
-                            .getBeneficiariesContent();
-
-            setCenterContent(content);
-
-        } catch (Exception ex) {
-
-            ex.printStackTrace();
-
-            System.out.println(
-                    "Error opening Beneficiaries page."
-            );
+                        System.out.println(
+                                        "Error opening Profile page.");
+                }
         }
-    }
 
-    // =========================================================
-    // HEALTH VISIT
-    // =========================================================
+        // =========================================================
+        // BACK TO DASHBOARD
+        // =========================================================
 
-    private void openHealthVisit() {
+        public void backToDashboard() {
 
-        try {
-
-            Asha_workervisit visit =
-                    new Asha_workervisit();
-
-            Node content =
-                    visit.getHealthVisitContent();
-
-            setCenterContent(content);
-
-        } catch (Exception ex) {
-
-            ex.printStackTrace();
-
-            System.out.println(
-                    "Error opening Health Visit page."
-            );
+                showDashboardContent();
         }
-    }
 
-    // =========================================================
-    // PROFILE
-    // =========================================================
+        // =========================================================
+        // NAVIGATION BUTTON
+        // =========================================================
 
-    private void openProfile() {
+        private Button createNavItem(
+                        String title,
+                        boolean active) {
 
-        try {
+                Button button = new Button();
 
-            Asha_profilepage profile =
-                    new Asha_profilepage();
+                HBox content = new HBox(14);
 
-            Node content =
-                    profile.getProfileContent();
+                content.setAlignment(
+                                Pos.CENTER_LEFT);
 
-            setCenterContent(content);
+                // =====================================================
+                // ICON DOT
+                // =====================================================
 
-        } catch (Exception ex) {
+                Circle iconDot = new Circle(
+                                6,
+                                active
+                                                ? Color.web(
+                                                                COLOR_PRIMARY_PINK)
+                                                : Color.web(
+                                                                COLOR_TEXT_MUTED));
 
-            ex.printStackTrace();
+                // =====================================================
+                // LABEL
+                // =====================================================
 
-            System.out.println(
-                    "Error opening Profile page."
-            );
-        }
-    }
+                Label lbl = new Label(title);
 
-    // =========================================================
-    // BACK TO DASHBOARD
-    // =========================================================
+                lbl.setFont(
+                                Font.font(
+                                                "System",
+                                                FontWeight.BOLD,
+                                                15));
 
-    public void backToDashboard() {
+                lbl.setStyle(
+                                "-fx-text-fill: " +
+                                                (active
+                                                                ? COLOR_PRIMARY_PINK
+                                                                : COLOR_TEXT_MUTED)
+                                                + ";");
 
-        showDashboardContent();
-    }
+                content.getChildren().addAll(
+                                iconDot,
+                                lbl);
 
-    // =========================================================
-    // NAVIGATION BUTTON
-    // =========================================================
+                button.setGraphic(
+                                content);
 
-    private Button createNavItem(
-            String title,
-            boolean active
-    ) {
+                button.setMaxWidth(
+                                Double.MAX_VALUE);
 
-        Button button =
-                new Button();
+                button.setPrefHeight(
+                                48);
 
-        HBox content =
-                new HBox(14);
+                button.setAlignment(
+                                Pos.CENTER_LEFT);
 
-        content.setAlignment(
-                Pos.CENTER_LEFT
-        );
+                // =====================================================
+                // SAVE INITIAL STATE
+                // =====================================================
 
-        Circle iconDot =
-                new Circle(
-                        6,
-                        active
-                                ? Color.web(
-                                        COLOR_PRIMARY_PINK
-                                )
-                                : Color.web(
-                                        COLOR_TEXT_MUTED
-                                )
-                );
+                button.getProperties().put(
+                                "selected",
+                                active);
 
-        Label lbl =
-                new Label(title);
+                if (active) {
 
-        lbl.setFont(
-                Font.font(
-                        "System",
-                        FontWeight.BOLD,
-                        15
-                )
-        );
+                        selectedNavButton = button;
+                }
 
-        lbl.setStyle(
-                "-fx-text-fill: " +
-                (
-                        active
-                                ? COLOR_PRIMARY_PINK
-                                : COLOR_TEXT_MUTED
-                ) +
-                ";"
-        );
+                // =====================================================
+                // NORMAL STYLE
+                // =====================================================
 
-        content.getChildren().addAll(
-                iconDot,
-                lbl
-        );
-
-        button.setGraphic(
-                content
-        );
-
-        button.setMaxWidth(
-                Double.MAX_VALUE
-        );
-
-        button.setPrefHeight(48);
-
-        button.setAlignment(
-                Pos.CENTER_LEFT
-        );
-
-        String baseStyle =
-                active
-                        ?
-                        "-fx-background-color: " +
-                        COLOR_LIGHT_PINK +
-                        ";" +
-                        "-fx-background-radius: 12;" +
-                        "-fx-border-color: transparent;" +
-                        "-fx-cursor: hand;"
-                        :
-                        "-fx-background-color: transparent;" +
-                        "-fx-background-radius: 12;" +
-                        "-fx-border-color: transparent;" +
-                        "-fx-cursor: hand;";
-
-        button.setStyle(
-                baseStyle
-        );
-
-        button.setOnMouseEntered(
-                e -> {
-
-                    if (!active) {
-
-                        button.setStyle(
-                                "-fx-background-color: #F3F4F6;" +
+                String normalStyle = "-fx-background-color: transparent;" +
                                 "-fx-background-radius: 12;" +
                                 "-fx-border-color: transparent;" +
-                                "-fx-cursor: hand;"
-                        );
-                    }
+                                "-fx-border-radius: 12;" +
+                                "-fx-border-width: 0;" +
+                                "-fx-padding: 0 14 0 14;" +
+                                "-fx-cursor: hand;";
+
+                // =====================================================
+                // HOVER STYLE
+                // =====================================================
+
+                String hoverStyle = "-fx-background-color: " +
+                                COLOR_LIGHT_PINK +
+                                ";" +
+                                "-fx-background-radius: 12;" +
+                                "-fx-border-color: transparent;" +
+                                "-fx-border-radius: 12;" +
+                                "-fx-border-width: 0;" +
+                                "-fx-padding: 0 14 0 14;" +
+                                "-fx-cursor: hand;";
+
+                // =====================================================
+                // SELECTED STYLE
+                // =====================================================
+
+                String selectedStyle = "-fx-background-color: " +
+                                COLOR_LIGHT_PINK +
+                                ";" +
+                                "-fx-background-radius: 12;" +
+                                "-fx-border-color: " +
+                                COLOR_PRIMARY_PINK +
+                                ";" +
+                                "-fx-border-width: 0 0 0 4;" +
+                                "-fx-border-radius: 12;" +
+                                "-fx-padding: 0 14 0 10;" +
+                                "-fx-cursor: hand;";
+
+                // =====================================================
+                // INITIAL STYLE
+                // =====================================================
+
+                if (active) {
+
+                        button.setStyle(
+                                        selectedStyle);
+
+                } else {
+
+                        button.setStyle(
+                                        normalStyle);
                 }
-        );
 
-        button.setOnMouseExited(
-                e -> button.setStyle(
-                        baseStyle
-                )
-        );
+                // =====================================================
+                // HOVER ENTER
+                // =====================================================
 
-        return button;
-    }
+                button.setOnMouseEntered(
+                                e -> {
 
-    // =========================================================
-    // HEADER
-    // =========================================================
+                                        boolean selected = Boolean.TRUE.equals(
+                                                        button.getProperties()
+                                                                        .get("selected"));
 
-    private HBox createHeader() {
+                                        if (!selected) {
 
-        HBox header =
-                new HBox();
+                                                button.setStyle(
+                                                                hoverStyle);
 
-        header.setAlignment(
-                Pos.CENTER_LEFT
-        );
+                                                iconDot.setFill(
+                                                                Color.web(
+                                                                                COLOR_PRIMARY_PINK));
 
-        header.setPadding(
-                new Insets(22, 28, 0, 28)
-        );
+                                                lbl.setStyle(
+                                                                "-fx-text-fill: " +
+                                                                                COLOR_PRIMARY_PINK +
+                                                                                ";");
+                                        }
+                                });
 
-        VBox titleBox =
-                new VBox(4);
+                // =====================================================
+                // HOVER EXIT
+                // =====================================================
 
-        Label welcome =
-                new Label(
-                        "Namaste, ASHA Worker! 👋"
-                );
+                button.setOnMouseExited(
+                                e -> {
 
-        welcome.setFont(
-                Font.font(
-                        "System",
-                        FontWeight.BOLD,
-                        24
-                )
-        );
+                                        boolean selected = Boolean.TRUE.equals(
+                                                        button.getProperties()
+                                                                        .get("selected"));
 
-        welcome.setStyle(
-                "-fx-text-fill: " +
-                COLOR_TEXT_DARK + ";"
-        );
+                                        if (selected) {
 
-        Label sub =
-                new Label(
-                        "Thank you for your dedication towards a healthier community."
-                );
+                                                button.setStyle(
+                                                                selectedStyle);
 
-        sub.setFont(
-                Font.font(
-                        "System",
-                        FontWeight.BOLD,
-                        13.5
-                )
-        );
+                                                iconDot.setFill(
+                                                                Color.web(
+                                                                                COLOR_PRIMARY_PINK));
 
-        sub.setStyle(
-                "-fx-text-fill: " +
-                COLOR_TEXT_MUTED + ";"
-        );
+                                                lbl.setStyle(
+                                                                "-fx-text-fill: " +
+                                                                                COLOR_PRIMARY_PINK +
+                                                                                ";");
 
-        titleBox.getChildren().addAll(
-                welcome,
-                sub
-        );
+                                        } else {
 
-        HBox rightControls =
-                new HBox(14);
+                                                button.setStyle(
+                                                                normalStyle);
 
-        rightControls.setAlignment(
-                Pos.CENTER_RIGHT
-        );
+                                                iconDot.setFill(
+                                                                Color.web(
+                                                                                COLOR_TEXT_MUTED));
 
-        // =====================================================
-        // DATE PICKER
-        // =====================================================
+                                                lbl.setStyle(
+                                                                "-fx-text-fill: " +
+                                                                                COLOR_TEXT_MUTED +
+                                                                                ";");
+                                        }
+                                });
 
-        DatePicker calendarPicker =
-                new DatePicker(
-                        LocalDate.now()
-                );
-
-        calendarPicker.setPrefWidth(
-                150
-        );
-
-        calendarPicker.setStyle(
-                "-fx-background-color: " +
-                COLOR_WHITE + ";" +
-                "-fx-border-color: " +
-                COLOR_BORDER + ";" +
-                "-fx-border-radius: 8;" +
-                "-fx-background-radius: 8;" +
-                "-fx-font-size: 13px;" +
-                "-fx-font-weight: bold;" +
-                "-fx-cursor: hand;"
-        );
-
-        calendarPicker.setOnAction(
-                e -> System.out.println(
-                        "Selected Date: " +
-                        calendarPicker.getValue()
-                )
-        );
-
-        // =====================================================
-        // PROFILE IMAGE
-        // =====================================================
-
-        ImageView avatar =
-                createImageViewHolder(
-                        "assets\\images\\profilelogo.jpeg",
-                        42,
-                        42
-                );
-
-        Circle clip =
-                new Circle(
-                        21,
-                        21,
-                        21
-                );
-
-        avatar.setClip(clip);
-
-        VBox userDetails =
-                new VBox(2);
-
-        Label name =
-                new Label(
-                        ashaName
-                );
-
-        name.setTranslateY(6);
-
-        name.setFont(
-                Font.font(
-                        "System",
-                        FontWeight.BOLD,
-                        14
-                )
-        );
-
-        name.setStyle(
-                "-fx-text-fill: " +
-                COLOR_TEXT_DARK + ";"
-        );
-
-        Label location =
-                new Label(
-                        villageName
-                );
-
-        location.setTranslateY(6);
-
-        location.setFont(
-                Font.font(
-                        "System",
-                        FontWeight.BOLD,
-                        11.5
-                )
-        );
-
-        location.setStyle(
-                "-fx-text-fill: " +
-                COLOR_TEXT_MUTED + ";"
-        );
-
-        userDetails.getChildren().addAll(
-                name,
-                location
-        );
-
-        // =====================================================
-        // PROFILE HEADER CLICK
-        // =====================================================
-
-        HBox profileContent =
-                new HBox(10);
-
-        profileContent.setAlignment(
-                Pos.CENTER_LEFT
-        );
-
-        profileContent.getChildren().addAll(
-                avatar,
-                userDetails
-        );
-
-        Button profileHeaderButton =
-                new Button();
-
-        profileHeaderButton.setGraphic(
-                profileContent
-        );
-
-        profileHeaderButton.setStyle(
-                "-fx-background-color: transparent;" +
-                "-fx-border-color: transparent;" +
-                "-fx-padding: 0;" +
-                "-fx-cursor: hand;"
-        );
-
-        profileHeaderButton.setOnAction(
-                e -> openProfile()
-        );
-
-        rightControls.getChildren().addAll(
-                calendarPicker,
-                profileHeaderButton
-        );
-
-        header.getChildren().addAll(
-                titleBox,
-                new Spacer(),
-                rightControls
-        );
-
-        return header;
-    }
-
-    // =========================================================
-    // STATS ROW
-    // =========================================================
-
-    private HBox createStatsRow() {
-
-        HBox row =
-                new HBox(16);
-
-        /*
-         * Firebase:
-         *
-         * Pregnant Women -> available model data
-         * Children       -> available model data
-         * Home Visits    -> Ashavisit.getVisits()
-         * Immunizations  -> available model data
-         */
-
-        VBox c1 =
-                createStatCard(
-                        "Pregnant Women",
-                        String.valueOf(
-                                pregnantWomen
-                        ),
-                        "Firebase Data",
-                        COLOR_LIGHT_PINK
-                );
-
-        VBox c2 =
-                createStatCard(
-                        "Children (0–5 yrs)",
-                        String.valueOf(
-                                children
-                        ),
-                        "Firebase Data",
-                        "#E0E7FF"
-                );
-
-        VBox c3 =
-                createStatCard(
-                        "Home Visits",
-                        String.valueOf(
-                                totalVisits
-                        ),
-                        "Firebase Data",
-                        "#E0F2FE"
-                );
-
-        VBox c4 =
-                createStatCard(
-                        "Immunizations",
-                        String.valueOf(
-                                immunizations
-                        ),
-                        "Firebase Data",
-                        "#FFEDD5"
-                );
-
-        HBox.setHgrow(
-                c1,
-                Priority.ALWAYS
-        );
-
-        HBox.setHgrow(
-                c2,
-                Priority.ALWAYS
-        );
-
-        HBox.setHgrow(
-                c3,
-                Priority.ALWAYS
-        );
-
-        HBox.setHgrow(
-                c4,
-                Priority.ALWAYS
-        );
-
-        row.getChildren().addAll(
-                c1,
-                c2,
-                c3,
-                c4
-        );
-
-        return row;
-    }
-
-    // =========================================================
-    // STAT CARD
-    // =========================================================
-
-    private VBox createStatCard(
-            String title,
-            String val,
-            String trend,
-            String iconBg
-    ) {
-
-        VBox card =
-                new VBox(10);
-
-        card.setPadding(
-                new Insets(18)
-        );
-
-        card.setStyle(
-                "-fx-background-color: " +
-                COLOR_WHITE + ";" +
-                "-fx-background-radius: 14;" +
-                "-fx-border-color: " +
-                COLOR_BORDER + ";" +
-                "-fx-border-radius: 14;"
-        );
-
-        HBox top =
-                new HBox(14);
-
-        top.setAlignment(
-                Pos.CENTER_LEFT
-        );
-
-        Circle iconCircle =
-                new Circle(
-                        22,
-                        Color.web(iconBg)
-                );
-
-        VBox txt =
-                new VBox(2);
-
-        Label t =
-                new Label(title);
-
-        t.setFont(
-                Font.font(
-                        "System",
-                        FontWeight.BOLD,
-                        13.5
-                )
-        );
-
-        t.setStyle(
-                "-fx-text-fill: " +
-                COLOR_TEXT_MUTED + ";"
-        );
-
-        Label v =
-                new Label(val);
-
-        v.setFont(
-                Font.font(
-                        "System",
-                        FontWeight.BOLD,
-                        28
-                )
-        );
-
-        v.setStyle(
-                "-fx-text-fill: " +
-                COLOR_TEXT_DARK + ";"
-        );
-
-        txt.getChildren().addAll(
-                t,
-                v
-        );
-
-        top.getChildren().addAll(
-                iconCircle,
-                txt
-        );
-
-        Label tr =
-                new Label(trend);
-
-        tr.setFont(
-                Font.font(
-                        "System",
-                        FontWeight.BOLD,
-                        12.5
-                )
-        );
-
-        tr.setStyle(
-                "-fx-text-fill: " +
-                COLOR_GREEN + ";"
-        );
-
-        card.getChildren().addAll(
-                top,
-                tr
-        );
-
-        return card;
-    }
-
-    // =========================================================
-    // MIDDLE ROW
-    // =========================================================
-
-    private HBox createMiddleRow() {
-
-        HBox row =
-                new HBox(16);
-
-        VBox chartBox =
-                new VBox(14);
-
-        chartBox.setPadding(
-                new Insets(18)
-        );
-
-        chartBox.setStyle(
-                "-fx-background-color: " +
-                COLOR_WHITE + ";" +
-                "-fx-background-radius: 14;" +
-                "-fx-border-color: " +
-                COLOR_BORDER + ";" +
-                "-fx-border-radius: 14;"
-        );
-
-        HBox.setHgrow(
-                chartBox,
-                Priority.ALWAYS
-        );
-
-        Label chartTitle =
-                new Label(
-                        "♥ Health Activities Overview for only pregant women"
-                );
-
-        chartTitle.setFont(
-                Font.font(
-                        "System",
-                        FontWeight.BOLD,
-                        16
-                )
-        );
-
-        chartTitle.setStyle(
-                "-fx-text-fill: " +
-                COLOR_TEXT_DARK + ";"
-        );
-
-        StackPane donutContainer =
-                createSegmentedDonutChart();
-
-        VBox legend =
-                new VBox(10);
-
-        legend.setAlignment(
-                Pos.CENTER_LEFT
-        );
-
-        int totalActivities =
-                totalBeneficiaries +
-                totalVisits;
-
-        legend.getChildren().addAll(
-
-                createLegendRow(
-                        COLOR_PRIMARY_PINK,
-                        "Women Tested This Month",
-                        String.valueOf(
-                                womenTestedThisMonth
-                        )
-                ),
-
-                createLegendRow(
-                        "#6366F1",
-                        "Women Test Normal",
-                        String.valueOf(
-                                womenTestNormal
-                        )
-                ),
-
-                createLegendRow(
-                        "#F59E0B",
-                        "Women Test Risky",
-                        String.valueOf(womenTestRisky)
-                ),
-
-                createLegendRow(
-                        "#0EA5E9",
-                        "Women Checkup Baaki",
-                        String.valueOf(
-                                womenCheckupBaaki
-                        )
-                )
-        );
-
-        HBox chartBody =
-                new HBox(
-                        30,
-                        donutContainer,
-                        legend
-                );
-
-        chartBody.setAlignment(
-                Pos.CENTER_LEFT
-        );
-
-        chartBox.getChildren().addAll(
-                chartTitle,
-                chartBody
-        );
-
-        // =====================================================
-        // QUICK ACTIONS
-        // =====================================================
-
-        VBox actionsBox =
-                new VBox(14);
-
-        actionsBox.setPrefWidth(
-                310
-        );
-
-        actionsBox.setPadding(
-                new Insets(18)
-        );
-
-        actionsBox.setStyle(
-                "-fx-background-color: " +
-                COLOR_WHITE + ";" +
-                "-fx-background-radius: 14;" +
-                "-fx-border-color: " +
-                COLOR_BORDER + ";" +
-                "-fx-border-radius: 14;"
-        );
-
-        Label actTitle =
-                new Label(
-                        "⚡ Quick Actions"
-                );
-
-        actTitle.setFont(
-                Font.font(
-                        "System",
-                        FontWeight.BOLD,
-                        16
-                )
-        );
-
-        actTitle.setStyle(
-                "-fx-text-fill: " +
-                COLOR_TEXT_DARK + ";"
-        );
-        VBox btn1 =
-        createActionButton(
-                "Add Beneficiary",
-                COLOR_LIGHT_PINK
-        );
-
-VBox btn2 =
-        createActionButton(
-                "Send Message",
-                "#E0E7FF"
-        );
-
-// =====================================================
-// ADD BENEFICIARY CLICK
-// =====================================================
-
-btn1.setOnMouseClicked(e -> {
-    openBeneficiaries();
-});
-
-// =====================================================
-// SEND MESSAGE CLICK
-// =====================================================
-
-btn2.setOnMouseClicked(e -> {
-    showSendMessageDialog();
-});
-
-       /*  VBox btn1 =
-                createActionButton(
-                        "Add Beneficiary",
-                        COLOR_LIGHT_PINK
-                );
-
-        VBox btn2 =
-                createActionButton(
-                        "Send Message",
-                        "#E0E7FF"
-                );*/
-
-        
-         // Existing UI remains same.
-        // *
-         // No navigation change is made here.
-         
-
-        actionsBox.getChildren().addAll(
-                actTitle,
-                btn1,
-                btn2
-        );
-
-        row.getChildren().addAll(
-                chartBox,
-                actionsBox
-        );
-
-        return row;
-    }
-
-    // =========================================================
-    // DONUT
-    // =========================================================
-
-    private StackPane createSegmentedDonutChart() {
-
-        StackPane donutView =
-                new StackPane();
-
-        double size = 140;
-
-        Canvas canvas =
-                new Canvas(
-                        size,
-                        size
-                );
-
-        GraphicsContext gc =
-                canvas.getGraphicsContext2D();
-
-        gc.setLineWidth(16);
-        gc.setStroke(Color.web("#E5E7EB"));
-        gc.strokeArc(12, 12,size - 24, size -24, 0, 360, javafx.scene.shape.ArcType.OPEN);
-
-        gc.setLineCap(
-                StrokeLineCap.ROUND
-        );
-        int total =
-            womenTestedThisMonth +
-            womenTestNormal +
-            womenTestRisky +
-            womenCheckupBaaki;
-
-    // =====================================================
-    // AVOID DIVIDE BY ZERO
-    // =====================================================
-
-    if (total > 0) {
-
-        double testedAngle =
-                (womenTestedThisMonth * 360.0) / total;
-
-        double normalAngle =
-                (womenTestNormal * 360.0) / total;
-
-        double riskyAngle =
-                (womenTestRisky * 360.0) / total;
-
-        double pendingAngle =
-                (womenCheckupBaaki * 360.0) / total;
-              double startAngle = 0;
-
-    // Women Tested
-    if (womenTestedThisMonth > 0) {
-
-        drawArc(
-                gc,
-                startAngle,
-                testedAngle,
-                COLOR_PRIMARY_PINK,
-                size
-        );
-
-        startAngle += testedAngle;
-    }
-
-    // Women Normal
-    if (womenTestNormal > 0) {
-
-        drawArc(
-                gc,
-                startAngle,
-                normalAngle,
-                "#6366F1",
-                size
-        );
-
-        startAngle += normalAngle;
-    }
-
-    // Women Risky
-    if (womenTestRisky > 0) {
-
-        drawArc(
-                gc,
-                startAngle,
-                riskyAngle,
-                "#F59E0B",
-                size
-        );
-
-        startAngle += riskyAngle;
-    }
-
-    // Women Checkup Pending
-    if (womenCheckupBaaki > 0) {
-        drawArc(gc,
-                startAngle,
-                pendingAngle,
-
-
-
-                "#0EA5E9",
-                size
-        );
-    }
-}  
-
-       
-        
-               
-        
-
-        VBox centerTxt =
-                new VBox(-2);
-
-        centerTxt.setAlignment(
-                Pos.CENTER
-        );
-
-       
-
-        Label num =
-                new Label(
-                        String.valueOf(
-                                total
-                        )
-                );
-
-        num.setFont(
-                Font.font(
-                        "System",
-                        FontWeight.BOLD,
-                        24
-                )
-        );
-
-        num.setStyle(
-                "-fx-text-fill: " +
-                COLOR_TEXT_DARK + ";"
-        );
-
-        Label lbl =
-                new Label(
-                        "Total Activities"
-                );
-
-        lbl.setFont(
-                Font.font(
-                        "System",
-                        FontWeight.BOLD,
-                        9.5
-                )
-        );
-
-        lbl.setStyle(
-                "-fx-text-fill: " +
-                COLOR_TEXT_MUTED + ";"
-        );
-
-        centerTxt.getChildren().addAll(
-                num,
-                lbl
-        );
-
-        donutView.getChildren().addAll(
-                canvas,
-                centerTxt
-        );
-
-        
-    
-    return donutView;
-}
-
-
-    // =========================================================
-    // DRAW ARC
-    // =========================================================
-
-    private void drawArc(
-            GraphicsContext gc,
-            double startAngle,
-            double arcExtent,
-            String colorHex,
-            double size
-    ) {
-
-        gc.setStroke(
-                Color.web(colorHex)
-        );
-
-        gc.strokeArc(
-                12,
-                12,
-                size - 24,
-                size - 24,
-                startAngle,
-                arcExtent,
-                javafx.scene.shape.ArcType.OPEN
-        );
-    }
-
-    // =========================================================
-    // LEGEND
-    // =========================================================
-
-    private HBox createLegendRow(
-            String colorHex,
-            String text,
-            String val
-    ) {
-
-        HBox h =
-                new HBox(12);
-
-        h.setAlignment(
-                Pos.CENTER_LEFT
-        );
-
-        Circle c =
-                new Circle(
-                        7,
-                        Color.web(colorHex)
-                );
-
-        Label t =
-                new Label(text);
-
-        t.setFont(
-                Font.font(
-                        "System",
-                        FontWeight.BOLD,
-                        13
-                )
-        );
-
-        t.setStyle(
-                "-fx-text-fill: " +
-                COLOR_TEXT_MUTED + ";"
-        );
-
-        Label v =
-                new Label(val);
-
-        v.setFont(
-                Font.font(
-                        "System",
-                        FontWeight.BOLD,
-                        14
-                )
-        );
-
-        v.setStyle(
-                "-fx-text-fill: " +
-                COLOR_TEXT_DARK + ";"
-        );
-
-        h.getChildren().addAll(
-                c,
-                t,
-                new Spacer(),
-                v
-        );
-
-        return h;
-    }
-
-    // =========================================================
-    // ACTION BUTTON
-    // =========================================================
-
-    private VBox createActionButton(
-            String label,
-            String bgColor
-    ) {
-
-        VBox box =
-                new VBox();
-
-        box.setPadding(
-                new Insets(14)
-        );
-
-        box.setStyle(
-                "-fx-background-color: #F3F4F6;" +
-                "-fx-background-radius: 12;" +
-                "-fx-border-color: " +
-                COLOR_BORDER + ";" +
-                "-fx-border-radius: 12;" +
-                "-fx-cursor: hand;"
-        );
-
-        HBox inner =
-                new HBox(14);
-
-        inner.setAlignment(
-                Pos.CENTER_LEFT
-        );
-
-        Circle c =
-                new Circle(
-                        16,
-                        Color.web(bgColor)
-                );
-
-        Label l =
-                new Label(label);
-
-        l.setFont(
-                Font.font(
-                        "System",
-                        FontWeight.BOLD,
-                        14
-                )
-        );
-
-        l.setStyle(
-                "-fx-text-fill: " +
-                COLOR_TEXT_DARK + ";"
-        );
-
-        Label arrow =
-                new Label(">");
-
-        arrow.setFont(
-                Font.font(
-                        "System",
-                        FontWeight.BOLD,
-                        14
-                )
-        );
-
-        arrow.setStyle(
-                "-fx-text-fill: " +
-                COLOR_PRIMARY_PINK + ";"
-        );
-
-        inner.getChildren().addAll(
-                c,
-                l,
-                new Spacer(),
-                arrow
-        );
-
-        box.getChildren().add(
-                inner
-        );
-
-        return box;
-    }
-
-    // =========================================================
-    // BOTTOM ROW
-    // =========================================================
-
-    private HBox createBottomRow() {
-
-        HBox row =
-                new HBox(16);
-
-        VBox actCard =
-                createListContainer(
-                        "Recent Activities"
-                );
-
-        VBox actList =
-                (VBox) actCard.getChildren().get(2);
-
-        // =====================================================
-        // FIREBASE VISITS
-        // =====================================================
-
-     /* if (firebaseVisits != null &&
-        !firebaseVisits.isEmpty()) {
-
-    int count = 0;
-
-    for (AshaWorkerVisitModel visit : firebaseVisits) {
-
-        if (visit == null) {
-            continue;
+                return button;
         }
 
-        if (count >= 3) {
-            break;
+        // =========================================================
+        // HEADER
+        // =========================================================
+
+        private HBox createHeader() {
+
+                HBox header = new HBox();
+
+                header.setAlignment(
+                                Pos.CENTER_LEFT);
+
+                header.setPadding(
+                                new Insets(
+                                                22,
+                                                28,
+                                                0,
+                                                28));
+
+                VBox titleBox = new VBox(4);
+
+                Label welcome = new Label(
+                                "Namaste, ASHA Worker! 👋");
+
+                welcome.setFont(
+                                Font.font(
+                                                "System",
+                                                FontWeight.BOLD,
+                                                24));
+
+                welcome.setStyle(
+                                "-fx-text-fill: " +
+                                                COLOR_TEXT_DARK +
+                                                ";");
+
+                Label sub = new Label(
+                                "Thank you for your dedication towards a healthier community.");
+
+                sub.setFont(
+                                Font.font(
+                                                "System",
+                                                FontWeight.BOLD,
+                                                13.5));
+
+                sub.setStyle(
+                                "-fx-text-fill: " +
+                                                COLOR_TEXT_MUTED +
+                                                ";");
+
+                titleBox.getChildren().addAll(
+                                welcome,
+                                sub);
+
+                HBox rightControls = new HBox(14);
+
+                rightControls.setAlignment(
+                                Pos.CENTER_RIGHT);
+
+                // =====================================================
+                // DATE PICKER
+                // =====================================================
+
+                DatePicker calendarPicker = new DatePicker(
+                                LocalDate.now());
+
+                calendarPicker.setPrefWidth(
+                                150);
+
+                calendarPicker.setStyle(
+                                "-fx-background-color: " +
+                                                COLOR_WHITE +
+                                                ";" +
+                                                "-fx-border-color: " +
+                                                COLOR_BORDER +
+                                                ";" +
+                                                "-fx-border-radius: 8;" +
+                                                "-fx-background-radius: 8;" +
+                                                "-fx-font-size: 13px;" +
+                                                "-fx-font-weight: bold;" +
+                                                "-fx-cursor: hand;");
+
+                calendarPicker.setOnAction(
+                                e -> System.out.println(
+                                                "Selected Date: " +
+                                                                calendarPicker
+                                                                                .getValue()));
+
+                // =====================================================
+                // PROFILE IMAGE
+                // =====================================================
+
+                ImageView avatar = createImageViewHolder(
+                                "assets\\images\\profilelogo.jpeg",
+                                42,
+                                42);
+
+                Circle clip = new Circle(
+                                21,
+                                21,
+                                21);
+
+                avatar.setClip(
+                                clip);
+
+                VBox userDetails = new VBox(2);
+
+                Label name = new Label(
+                                ashaName);
+
+                name.setTranslateY(
+                                6);
+
+                name.setFont(
+                                Font.font(
+                                                "System",
+                                                FontWeight.BOLD,
+                                                14));
+
+                name.setStyle(
+                                "-fx-text-fill: " +
+                                                COLOR_TEXT_DARK +
+                                                ";");
+
+                Label location = new Label(
+                                villageName);
+
+                location.setTranslateY(
+                                6);
+
+                location.setFont(
+                                Font.font(
+                                                "System",
+                                                FontWeight.BOLD,
+                                                11.5));
+
+                location.setStyle(
+                                "-fx-text-fill: " +
+                                                COLOR_TEXT_MUTED +
+                                                ";");
+
+                userDetails.getChildren().addAll(
+                                name,
+                                location);
+
+                // =====================================================
+                // PROFILE HEADER CLICK
+                // =====================================================
+
+                HBox profileContent = new HBox(10);
+
+                profileContent.setAlignment(
+                                Pos.CENTER_LEFT);
+
+                profileContent.getChildren().addAll(
+                                avatar,
+                                userDetails);
+
+                Button profileHeaderButton = new Button();
+
+                profileHeaderButton.setGraphic(
+                                profileContent);
+
+                profileHeaderButton.setStyle(
+                                "-fx-background-color: transparent;" +
+                                                "-fx-border-color: transparent;" +
+                                                "-fx-padding: 0;" +
+                                                "-fx-cursor: hand;");
+
+                profileHeaderButton.setOnAction(
+                                e -> openProfile());
+
+                rightControls.getChildren().addAll(
+                                calendarPicker,
+                                profileHeaderButton);
+
+                header.getChildren().addAll(
+                                titleBox,
+                                new Spacer(),
+                                rightControls);
+
+                return header;
         }
 
-        String visitName = "Health visit completed";
-        String visitDate = "Firebase";
+        // =========================================================
+        // STATS ROW
+        // =========================================================
 
-        try {
-            if (visit.getName() != null &&
-                    !visit.getName().trim().isEmpty()) {
+        private HBox createStatsRow() {
 
-                visitName = "Visit: " + visit.getName();
-            }
-        } catch (Exception ignored) {
+                HBox row = new HBox(16);
+
+                VBox c1 = createStatCard(
+                                "Pregnant Women",
+                                String.valueOf(
+                                                pregnantWomen),
+                                "Firebase Data",
+                                COLOR_LIGHT_PINK);
+
+                VBox c2 = createStatCard(
+                                "Children (0–5 yrs)",
+                                String.valueOf(
+                                                children),
+                                "Firebase Data",
+                                "#E0E7FF");
+
+                VBox c3 = createStatCard(
+                                "Home Visits",
+                                String.valueOf(
+                                                totalVisits),
+                                "Firebase Data",
+                                "#E0F2FE");
+
+                VBox c4 = createStatCard(
+                                "Immunizations",
+                                String.valueOf(
+                                                immunizations),
+                                "Firebase Data",
+                                "#FFEDD5");
+
+                HBox.setHgrow(
+                                c1,
+                                Priority.ALWAYS);
+
+                HBox.setHgrow(
+                                c2,
+                                Priority.ALWAYS);
+
+                HBox.setHgrow(
+                                c3,
+                                Priority.ALWAYS);
+
+                HBox.setHgrow(
+                                c4,
+                                Priority.ALWAYS);
+
+                row.getChildren().addAll(
+                                c1,
+                                c2,
+                                c3,
+                                c4);
+
+                return row;
         }
 
-        try {
-            if (visit.getDate() != null) {
-                visitDate = String.valueOf(visit.getDate());
-            }
-        } catch (Exception ignored) {
+        // =========================================================
+        // STAT CARD
+        // =========================================================
+
+        private VBox createStatCard(
+                        String title,
+                        String val,
+                        String trend,
+                        String iconBg) {
+
+                VBox card = new VBox(10);
+
+                card.setPadding(
+                                new Insets(18));
+
+                card.setStyle(
+                                "-fx-background-color: " +
+                                                COLOR_WHITE +
+                                                ";" +
+                                                "-fx-background-radius: 14;" +
+                                                "-fx-border-color: " +
+                                                COLOR_BORDER +
+                                                ";" +
+                                                "-fx-border-radius: 14;");
+
+                HBox top = new HBox(14);
+
+                top.setAlignment(
+                                Pos.CENTER_LEFT);
+
+                Circle iconCircle = new Circle(
+                                22,
+                                Color.web(
+                                                iconBg));
+
+                VBox txt = new VBox(2);
+
+                Label t = new Label(
+                                title);
+
+                t.setFont(
+                                Font.font(
+                                                "System",
+                                                FontWeight.BOLD,
+                                                13.5));
+
+                t.setStyle(
+                                "-fx-text-fill: " +
+                                                COLOR_TEXT_MUTED +
+                                                ";");
+
+                Label v = new Label(
+                                val);
+
+                v.setFont(
+                                Font.font(
+                                                "System",
+                                                FontWeight.BOLD,
+                                                28));
+
+                v.setStyle(
+                                "-fx-text-fill: " +
+                                                COLOR_TEXT_DARK +
+                                                ";");
+
+                txt.getChildren().addAll(
+                                t,
+                                v);
+
+                top.getChildren().addAll(
+                                iconCircle,
+                                txt);
+
+                Label tr = new Label(
+                                trend);
+
+                tr.setFont(
+                                Font.font(
+                                                "System",
+                                                FontWeight.BOLD,
+                                                12.5));
+
+                tr.setStyle(
+                                "-fx-text-fill: " +
+                                                COLOR_GREEN +
+                                                ";");
+
+                card.getChildren().addAll(
+                                top,
+                                tr);
+
+                return card;
         }
 
-        actList.getChildren().add(
-                createListItem(
-                        visitName,
-                        visitDate,
-                        COLOR_TEXT_MUTED
-                )
-        );
+        // =========================================================
+        // MIDDLE ROW
+        // =========================================================
 
-        count++;
-    }
-}*/
-if (firebaseVisits != null &&
-        !firebaseVisits.isEmpty()) {
+        private HBox createMiddleRow() {
 
-    int count = 0;
+                HBox row = new HBox(16);
 
-    LocalDate today = LocalDate.now();
+                VBox chartBox = new VBox(14);
 
-    for (AshaWorkerVisitModel visit : firebaseVisits) {
+                chartBox.setPadding(
+                                new Insets(18));
 
-        if (visit == null) {
-            continue;
+                chartBox.setStyle(
+                                "-fx-background-color: " +
+                                                COLOR_WHITE +
+                                                ";" +
+                                                "-fx-background-radius: 14;" +
+                                                "-fx-border-color: " +
+                                                COLOR_BORDER +
+                                                ";" +
+                                                "-fx-border-radius: 14;");
+
+                HBox.setHgrow(
+                                chartBox,
+                                Priority.ALWAYS);
+
+                Label chartTitle = new Label(
+                                "♥ Health Activities Overview for only pregant women");
+
+                chartTitle.setFont(
+                                Font.font(
+                                                "System",
+                                                FontWeight.BOLD,
+                                                16));
+
+                chartTitle.setStyle(
+                                "-fx-text-fill: " +
+                                                COLOR_TEXT_DARK +
+                                                ";");
+
+                StackPane donutContainer = createSegmentedDonutChart();
+
+                VBox legend = new VBox(10);
+
+                legend.setAlignment(
+                                Pos.CENTER_LEFT);
+
+                legend.getChildren().addAll(
+
+                                createLegendRow(
+                                                COLOR_PRIMARY_PINK,
+                                                "Women Tested This Month",
+                                                String.valueOf(
+                                                                womenTestedThisMonth)),
+
+                                createLegendRow(
+                                                "#9B4DCC",
+                                                "Women Test Normal",
+                                                String.valueOf(
+                                                                womenTestNormal)),
+
+                                createLegendRow(
+                                                "#C7821B",
+                                                "Women Test Risky",
+                                                String.valueOf(
+                                                                womenTestRisky)),
+
+                                createLegendRow(
+                                                "#6B7FD7",
+                                                "Women Checkup Baaki",
+                                                String.valueOf(
+                                                                womenCheckupBaaki)));
+
+                HBox chartBody = new HBox(
+                                30,
+                                donutContainer,
+                                legend);
+
+                chartBody.setAlignment(
+                                Pos.CENTER_LEFT);
+
+                chartBox.getChildren().addAll(
+                                chartTitle,
+                                chartBody);
+
+                // =====================================================
+                // QUICK ACTIONS
+                // =====================================================
+
+                VBox actionsBox = new VBox(14);
+
+                actionsBox.setPrefWidth(
+                                310);
+
+                actionsBox.setPadding(
+                                new Insets(18));
+
+                actionsBox.setStyle(
+                                "-fx-background-color: " +
+                                                COLOR_WHITE +
+                                                ";" +
+                                                "-fx-background-radius: 14;" +
+                                                "-fx-border-color: " +
+                                                COLOR_BORDER +
+                                                ";" +
+                                                "-fx-border-radius: 14;");
+
+                Label actTitle = new Label(
+                                "⚡ Quick Actions");
+
+                actTitle.setFont(
+                                Font.font(
+                                                "System",
+                                                FontWeight.BOLD,
+                                                16));
+
+                actTitle.setStyle(
+                                "-fx-text-fill: " +
+                                                COLOR_TEXT_DARK +
+                                                ";");
+
+                VBox btn1 = createActionButton(
+                                "Add Beneficiary",
+                                COLOR_LIGHT_PINK);
+
+                VBox btn2 = createActionButton(
+                                "Send Message",
+                                "#E0E7FF");
+
+                btn1.setOnMouseClicked(
+                                e -> {
+                                        openBeneficiaries();
+                                });
+
+                btn2.setOnMouseClicked(
+                                e -> {
+                                        showSendMessageDialog();
+                                });
+
+                actionsBox.getChildren().addAll(
+                                actTitle,
+                                btn1,
+                                btn2);
+
+                row.getChildren().addAll(
+                                chartBox,
+                                actionsBox);
+
+                return row;
         }
 
-        if (count >= 3) {
-            break;
+        // =========================================================
+        // DONUT CHART
+        // =========================================================
+
+        private StackPane createSegmentedDonutChart() {
+
+                StackPane donutView = new StackPane();
+
+                double size = 140;
+
+                Canvas canvas = new Canvas(
+                                size,
+                                size);
+
+                GraphicsContext gc = canvas.getGraphicsContext2D();
+
+                gc.setLineWidth(
+                                16);
+
+                gc.setStroke(
+                                Color.web(
+                                                "#E5E7EB"));
+
+                gc.strokeArc(
+                                12,
+                                12,
+                                size - 24,
+                                size - 24,
+                                0,
+                                360,
+                                javafx.scene.shape.ArcType.OPEN);
+
+                gc.setLineCap(
+                                StrokeLineCap.ROUND);
+
+                int total = womenTestedThisMonth +
+                                womenTestNormal +
+                                womenTestRisky +
+                                womenCheckupBaaki;
+
+                if (total > 0) {
+
+                        double testedAngle = (womenTestedThisMonth *
+                                        360.0) /
+                                        total;
+
+                        double normalAngle = (womenTestNormal *
+                                        360.0) /
+                                        total;
+
+                        double riskyAngle = (womenTestRisky *
+                                        360.0) /
+                                        total;
+
+                        double pendingAngle = (womenCheckupBaaki *
+                                        360.0) /
+                                        total;
+
+                        double startAngle = 0;
+
+                        if (womenTestedThisMonth > 0) {
+
+                                drawArc(
+                                                gc,
+                                                startAngle,
+                                                testedAngle,
+                                                COLOR_PRIMARY_PINK,
+                                                size);
+
+                                startAngle += testedAngle;
+                        }
+
+                        if (womenTestNormal > 0) {
+
+                                drawArc(
+                                                gc,
+                                                startAngle,
+                                                normalAngle,
+                                                "#6366F1",
+                                                size);
+
+                                startAngle += normalAngle;
+                        }
+
+                        if (womenTestRisky > 0) {
+
+                                drawArc(
+                                                gc,
+                                                startAngle,
+                                                riskyAngle,
+                                                "#F59E0B",
+                                                size);
+
+                                startAngle += riskyAngle;
+                        }
+
+                        if (womenCheckupBaaki > 0) {
+
+                                drawArc(
+                                                gc,
+                                                startAngle,
+                                                pendingAngle,
+                                                "#0EA5E9",
+                                                size);
+                        }
+                }
+
+                VBox centerTxt = new VBox(-2);
+
+                centerTxt.setAlignment(
+                                Pos.CENTER);
+
+                Label num = new Label(
+                                String.valueOf(
+                                                total));
+
+                num.setFont(
+                                Font.font(
+                                                "System",
+                                                FontWeight.BOLD,
+                                                24));
+
+                num.setStyle(
+                                "-fx-text-fill: " +
+                                                COLOR_TEXT_DARK +
+                                                ";");
+
+                Label lbl = new Label(
+                                "Total Activities");
+
+                lbl.setFont(
+                                Font.font(
+                                                "System",
+                                                FontWeight.BOLD,
+                                                9.5));
+
+                lbl.setStyle(
+                                "-fx-text-fill: " +
+                                                COLOR_TEXT_MUTED +
+                                                ";");
+
+                centerTxt.getChildren().addAll(
+                                num,
+                                lbl);
+
+                donutView.getChildren().addAll(
+                                canvas,
+                                centerTxt);
+
+                return donutView;
         }
 
-        String visitName = "Health visit completed";
-        String visitDateText = "";
+        // =========================================================
+        // DRAW ARC
+        // =========================================================
 
-        // -----------------------------------------
-        // NAME
-        // -----------------------------------------
+        private void drawArc(
+                        GraphicsContext gc,
+                        double startAngle,
+                        double arcExtent,
+                        String colorHex,
+                        double size) {
 
-        try {
+                gc.setStroke(
+                                Color.web(
+                                                colorHex));
 
-            if (visit.getName() != null &&
-                    !visit.getName().trim().isEmpty()) {
-
-                visitName =
-                        "Visit: " +
-                        visit.getName().trim();
-            }
-
-        } catch (Exception ignored) {
+                gc.strokeArc(
+                                12,
+                                12,
+                                size - 24,
+                                size - 24,
+                                startAngle,
+                                arcExtent,
+                                javafx.scene.shape.ArcType.OPEN);
         }
 
-        // -----------------------------------------
-        // DATE
-        // -----------------------------------------
+        // =========================================================
+        // LEGEND
+        // =========================================================
 
-        try {
+        private HBox createLegendRow(
+                        String colorHex,
+                        String text,
+                        String val) {
 
-            if (visit.getDate() != null) {
+                HBox h = new HBox(12);
 
-                visitDateText =
-                        visit.getDate().trim();
-            }
+                h.setAlignment(
+                                Pos.CENTER_LEFT);
 
-        } catch (Exception ignored) {
+                Circle c = new Circle(
+                                7,
+                                Color.web(
+                                                colorHex));
+
+                Label t = new Label(
+                                text);
+
+                t.setFont(
+                                Font.font(
+                                                "System",
+                                                FontWeight.BOLD,
+                                                13));
+
+                t.setStyle(
+                                "-fx-text-fill: " +
+                                                COLOR_TEXT_MUTED +
+                                                ";");
+
+                Label v = new Label(
+                                val);
+
+                v.setFont(
+                                Font.font(
+                                                "System",
+                                                FontWeight.BOLD,
+                                                14));
+
+                v.setStyle(
+                                "-fx-text-fill: " +
+                                                COLOR_TEXT_DARK +
+                                                ";");
+
+                h.getChildren().addAll(
+                                c,
+                                t,
+                                new Spacer(),
+                                v);
+
+                return h;
         }
 
-        // -----------------------------------------
-        // PARSE DATE
-        // -----------------------------------------
+        // =========================================================
+        // ACTION BUTTON
+        // =========================================================
 
-        LocalDate visitDate =
-                parseDate(visitDateText);
+        private VBox createActionButton(
+                        String label,
+                        String bgColor) {
 
-        System.out.println(
-                "Dashboard Visit: " +
-                visitName +
-                " | Date: " +
-                visitDateText +
-                " | Parsed: " +
-                visitDate
-        );
+                VBox box = new VBox();
 
-        // -----------------------------------------
-        // RECENT ACTIVITY
-        // -----------------------------------------
+                box.setPadding(
+                                new Insets(14));
 
-        if (visitDate != null &&
-                !visitDate.isAfter(today)) {
+                box.setStyle(
+                                "-fx-background-color: #F3F4F6;" +
+                                                "-fx-background-radius: 12;" +
+                                                "-fx-border-color: " +
+                                                COLOR_BORDER +
+                                                ";" +
+                                                "-fx-border-radius: 12;" +
+                                                "-fx-cursor: hand;");
 
-            actList.getChildren().add(
-                    createListItem(
-                            visitName,
-                            visitDateText,
-                            COLOR_TEXT_MUTED
-                    )
-            );
+                HBox inner = new HBox(14);
 
-            count++;
-        }
-    }
-}
-        // =====================================================
-        // UPCOMING REMINDERS
-        // =====================================================
+                inner.setAlignment(
+                                Pos.CENTER_LEFT);
 
-        VBox remCard =
-                createListContainer(
-                        "Upcoming Reminders"
-                );
+                Circle c = new Circle(
+                                16,
+                                Color.web(
+                                                bgColor));
 
-        VBox remList =
-                (VBox) remCard.getChildren().get(2);
+                Label l = new Label(
+                                label);
 
-        // =====================================================
-// DYNAMIC UPCOMING REMINDERS
-// =====================================================
+                l.setFont(
+                                Font.font(
+                                                "System",
+                                                FontWeight.BOLD,
+                                                14));
 
-if (firebaseBeneficiaries != null &&
-        !firebaseBeneficiaries.isEmpty()) {
+                l.setStyle(
+                                "-fx-text-fill: " +
+                                                COLOR_TEXT_DARK +
+                                                ";");
 
-    int reminderCount = 0;
+                Label arrow = new Label(
+                                ">");
 
-    for (AshaBeneficiary beneficiary :
-            firebaseBeneficiaries) {
+                arrow.setFont(
+                                Font.font(
+                                                "System",
+                                                FontWeight.BOLD,
+                                                14));
 
-        if (beneficiary == null) {
-            continue;
-        }
+                arrow.setStyle(
+                                "-fx-text-fill: " +
+                                                COLOR_PRIMARY_PINK +
+                                                ";");
 
-        if (reminderCount >= 3) {
-            break;
-        }
+                inner.getChildren().addAll(
+                                c,
+                                l,
+                                new Spacer(),
+                                arrow);
 
-        String status =
-                beneficiary.getStatus() == null
-                        ? ""
-                        : beneficiary.getStatus()
-                                .trim()
-                                .toLowerCase();
+                box.getChildren().add(
+                                inner);
 
-        String name =
-                beneficiary.getName() == null
-                        ? "Beneficiary"
-                        : beneficiary.getName().trim();
-
-        // =================================================
-        // HIGH RISK REMINDER
-        // =================================================
-
-        if (status.equals("high risk")) {
-
-            remList.getChildren().add(
-                    createListItem(
-                            "High Risk: " + name,
-                            "Checkup required",
-                            COLOR_PRIMARY_PINK
-                    )
-            );
-
-            reminderCount++;
+                return box;
         }
 
-        // =================================================
-        // FOLLOW-UP DUE
-        // =================================================
+        // =========================================================
+        // BOTTOM ROW
+        // =========================================================
 
-        else if (status.equals("follow-up due") ||
-                status.equals("follow up due")) {
+        private HBox createBottomRow() {
 
-            remList.getChildren().add(
-                    createListItem(
-                            "Follow-up due: " + name,
-                            "Visit required",
-                            COLOR_PRIMARY_PINK
-                    )
-            );
+                HBox row = new HBox(16);
 
-            reminderCount++;
+                VBox actCard = createListContainer(
+                                "Recent Activities");
+
+                VBox actList = (VBox) actCard
+                                .getChildren()
+                                .get(2);
+
+                // =====================================================
+                // FIREBASE VISITS
+                // =====================================================
+
+                if (firebaseVisits != null &&
+                                !firebaseVisits.isEmpty()) {
+
+                        int count = 0;
+
+                        LocalDate today = LocalDate.now();
+
+                        for (AshaWorkerVisitModel visit : firebaseVisits) {
+
+                                if (visit == null) {
+                                        continue;
+                                }
+
+                                if (count >= 3) {
+                                        break;
+                                }
+
+                                String visitName = "Health visit completed";
+
+                                String visitDateText = "";
+
+                                try {
+
+                                        if (visit.getName() != null &&
+                                                        !visit.getName()
+                                                                        .trim()
+                                                                        .isEmpty()) {
+
+                                                visitName = "Visit: " +
+                                                                visit.getName()
+                                                                                .trim();
+                                        }
+
+                                } catch (Exception ignored) {
+                                }
+
+                                try {
+
+                                        if (visit.getDate() != null) {
+
+                                                visitDateText = visit.getDate()
+                                                                .trim();
+                                        }
+
+                                } catch (Exception ignored) {
+                                }
+
+                                LocalDate visitDate = parseDate(
+                                                visitDateText);
+
+                                System.out.println(
+                                                "Dashboard Visit: " +
+                                                                visitName +
+                                                                " | Date: " +
+                                                                visitDateText +
+                                                                " | Parsed: " +
+                                                                visitDate);
+
+                                if (visitDate != null &&
+                                                !visitDate
+                                                                .isAfter(today)) {
+
+                                        actList.getChildren()
+                                                        .add(
+                                                                        createListItem(
+                                                                                        visitName,
+                                                                                        visitDateText,
+                                                                                        COLOR_TEXT_MUTED));
+
+                                        count++;
+                                }
+                        }
+                }
+
+                // =====================================================
+                // UPCOMING REMINDERS
+                // =====================================================
+
+                VBox remCard = createListContainer(
+                                "Upcoming Reminders");
+
+                VBox remList = (VBox) remCard
+                                .getChildren()
+                                .get(2);
+
+                if (firebaseBeneficiaries != null &&
+                                !firebaseBeneficiaries.isEmpty()) {
+
+                        int reminderCount = 0;
+
+                        for (AshaBeneficiary beneficiary : firebaseBeneficiaries) {
+
+                                if (beneficiary == null) {
+                                        continue;
+                                }
+
+                                if (reminderCount >= 3) {
+                                        break;
+                                }
+
+                                String status = beneficiary.getStatus() == null
+                                                ? ""
+                                                : beneficiary
+                                                                .getStatus()
+                                                                .trim()
+                                                                .toLowerCase();
+
+                                String name = beneficiary.getName() == null
+                                                ? "Beneficiary"
+                                                : beneficiary
+                                                                .getName()
+                                                                .trim();
+
+                                // =================================================
+                                // HIGH RISK
+                                // =================================================
+
+                                if (status.equals(
+                                                "high risk")) {
+
+                                        remList.getChildren()
+                                                        .add(
+                                                                        createListItem(
+                                                                                        "High Risk: " +
+                                                                                                        name,
+                                                                                        "Checkup required",
+                                                                                        COLOR_PRIMARY_PINK));
+
+                                        reminderCount++;
+                                }
+
+                                // =================================================
+                                // FOLLOW-UP DUE
+                                // =================================================
+
+                                else if (status.equals(
+                                                "follow-up due") ||
+                                                status.equals(
+                                                                "follow up due")) {
+
+                                        remList.getChildren()
+                                                        .add(
+                                                                        createListItem(
+                                                                                        "Follow-up due: " +
+                                                                                                        name,
+                                                                                        "Visit required",
+                                                                                        COLOR_PRIMARY_PINK));
+
+                                        reminderCount++;
+                                }
+
+                                // =================================================
+                                // PENDING
+                                // =================================================
+
+                                else if (status.equals(
+                                                "pending")) {
+
+                                        remList.getChildren()
+                                                        .add(
+                                                                        createListItem(
+                                                                                        "Checkup pending: " +
+                                                                                                        name,
+                                                                                        "Action required",
+                                                                                        COLOR_PRIMARY_PINK));
+
+                                        reminderCount++;
+                                }
+                        }
+                }
+
+                // =====================================================
+                // NO REMINDERS
+                // =====================================================
+
+                if (remList.getChildren()
+                                .isEmpty()) {
+
+                        remList.getChildren()
+                                        .add(
+                                                        createListItem(
+                                                                        "No upcoming reminders",
+                                                                        "All up to date",
+                                                                        COLOR_GREEN));
+                }
+
+                HBox.setHgrow(
+                                actCard,
+                                Priority.ALWAYS);
+
+                HBox.setHgrow(
+                                remCard,
+                                Priority.ALWAYS);
+
+                row.getChildren().addAll(
+                                actCard,
+                                remCard);
+
+                return row;
         }
 
-        // =================================================
-        // PENDING
-        // =================================================
+        // =========================================================
+        // LIST CONTAINER
+        // =========================================================
 
-        else if (status.equals("pending")) {
+        private VBox createListContainer(
+                        String title) {
 
-            remList.getChildren().add(
-                    createListItem(
-                            "Checkup pending: " + name,
-                            "Action required",
-                            COLOR_PRIMARY_PINK
-                    )
-            );
+                VBox box = new VBox(12);
 
-            reminderCount++;
-        }
-    }
-}
+                box.setPadding(
+                                new Insets(18));
 
-// =====================================================
-// NO REMINDERS
-// =====================================================
+                box.setStyle(
+                                "-fx-background-color: " +
+                                                COLOR_WHITE +
+                                                ";" +
+                                                "-fx-background-radius: 14;" +
+                                                "-fx-border-color: " +
+                                                COLOR_BORDER +
+                                                ";" +
+                                                "-fx-border-radius: 14;");
 
-if (remList.getChildren().isEmpty()) {
+                HBox header = new HBox();
 
-    remList.getChildren().add(
-            createListItem(
-                    "No upcoming reminders",
-                    "All up to date",
-                    COLOR_GREEN
-            )
-    );
-}
+                Label t = new Label(
+                                title);
 
-        HBox.setHgrow(
-                actCard,
-                Priority.ALWAYS
-        );
+                t.setFont(
+                                Font.font(
+                                                "System",
+                                                FontWeight.BOLD,
+                                                15));
 
-        HBox.setHgrow(
-                remCard,
-                Priority.ALWAYS
-        );
+                t.setStyle(
+                                "-fx-text-fill: " +
+                                                COLOR_TEXT_DARK +
+                                                ";");
 
-        row.getChildren().addAll(
-                actCard,
-                remCard
-        );
+                Label viewAll = new Label(
+                                "View All >");
 
-        return row;
-    }
+                viewAll.setFont(
+                                Font.font(
+                                                "System",
+                                                FontWeight.BOLD,
+                                                13));
 
-    // =========================================================
-    // LIST CONTAINER
-    // =========================================================
+                viewAll.setStyle(
+                                "-fx-text-fill: " +
+                                                COLOR_PRIMARY_PINK +
+                                                "; -fx-cursor: hand;");
 
-    private VBox createListContainer(
-            String title
-    ) {
+                viewAll.setOnMouseClicked(
+                                e -> {
 
-        VBox box =
-                new VBox(12);
+                                        if (title.equals(
+                                                        "Recent Activities") ||
+                                                        title.equals(
+                                                                        "Upcoming Reminders")) {
 
-        box.setPadding(
-                new Insets(18)
-        );
+                                                openHealthVisit();
+                                        }
+                                });
 
-        box.setStyle(
-                "-fx-background-color: " +
-                COLOR_WHITE + ";" +
-                "-fx-background-radius: 14;" +
-                "-fx-border-color: " +
-                COLOR_BORDER + ";" +
-                "-fx-border-radius: 14;"
-        );
+                header.getChildren().addAll(
+                                t,
+                                new Spacer(),
+                                viewAll);
 
-        HBox header =
-                new HBox();
+                Line line = new Line(
+                                0,
+                                0,
+                                420,
+                                0);
 
-        Label t =
-                new Label(title);
+                line.setStroke(
+                                Color.web(
+                                                COLOR_BORDER));
 
-        t.setFont(
-                Font.font(
-                        "System",
-                        FontWeight.BOLD,
-                        15
-                )
-        );
+                VBox list = new VBox(10);
 
-        t.setStyle(
-                "-fx-text-fill: " +
-                COLOR_TEXT_DARK + ";"
-        );
+                box.getChildren().addAll(
+                                header,
+                                line,
+                                list);
 
-        Label viewAll =
-                new Label(
-                        "View All >"
-                );
-
-        viewAll.setFont(
-                Font.font(
-                        "System",
-                        FontWeight.BOLD,
-                        13
-                )
-        );
-
-        viewAll.setStyle(
-                "-fx-text-fill: " +
-                COLOR_PRIMARY_PINK +
-                "; -fx-cursor: hand;"
-        );
-        viewAll.setOnMouseClicked(e -> {
-
-        if (title.equals("Recent Activities") ||
-                title.equals("Upcoming Reminders")) {
-
-            openHealthVisit();
-        }
-    });
-
-    header.getChildren().addAll(
-            t,
-            new Spacer(),
-            viewAll
-
-        
-        );
-
-        Line line =
-                new Line(
-                        0,
-                        0,
-                        420,
-                        0
-                );
-
-        line.setStroke(
-                Color.web(COLOR_BORDER)
-        );
-
-        VBox list =
-                new VBox(10);
-
-        box.getChildren().addAll(
-                header,
-                line,
-                list
-        );
-
-        return box;
-    }
-
-    // =========================================================
-    // LIST ITEM
-    // =========================================================
-
-    private HBox createListItem(
-            String desc,
-            String time,
-            String timeColor
-    ) {
-
-        HBox item =
-                new HBox(12);
-
-        item.setAlignment(
-                Pos.CENTER_LEFT
-        );
-
-        Circle dot =
-                new Circle(
-                        4.5,
-                        Color.web(
-                                COLOR_PRIMARY_PINK
-                        )
-                );
-
-        Label d =
-                new Label(desc);
-
-        d.setFont(
-                Font.font(
-                        "System",
-                        FontWeight.BOLD,
-                        12.5
-                )
-        );
-
-        d.setStyle(
-                "-fx-text-fill: " +
-                COLOR_TEXT_DARK + ";"
-        );
-
-        Label tm =
-                new Label(time);
-
-        tm.setFont(
-                Font.font(
-                        "System",
-                        FontWeight.BOLD,
-                        12
-                )
-        );
-
-        tm.setStyle(
-                "-fx-text-fill: " +
-                timeColor + ";"
-        );
-
-        item.getChildren().addAll(
-                dot,
-                d,
-                new Spacer(),
-                tm
-        );
-
-        return item;
-    }
-
-    // =========================================================
-    // IMAGE HOLDER
-    // =========================================================
-
-    private ImageView createImageViewHolder(
-            String imagePath,
-            double width,
-            double height
-    ) {
-
-        ImageView imgView =
-                new ImageView();
-
-        try {
-
-            Image img =
-                    new Image(
-                            imagePath,
-                            true
-                    );
-
-            imgView.setImage(img);
-
-        } catch (Exception e) {
-
-            System.out.println(
-                    "Image not found: " +
-                    imagePath
-            );
+                return box;
         }
 
-        imgView.setFitWidth(
-                width
-        );
+        // =========================================================
+        // LIST ITEM
+        // =========================================================
 
-        imgView.setFitHeight(
-                height
-        );
+        private HBox createListItem(
+                        String desc,
+                        String time,
+                        String timeColor) {
 
-        imgView.setPreserveRatio(
-                true
-        );
+                HBox item = new HBox(12);
 
-        return imgView;
-    }
+                item.setAlignment(
+                                Pos.CENTER_LEFT);
 
-    // =========================================================
-    // SPACER
-    // =========================================================
+                Circle dot = new Circle(
+                                4.5,
+                                Color.web(
+                                                COLOR_PRIMARY_PINK));
 
-    private static class Spacer
-            extends Pane {
+                Label d = new Label(
+                                desc);
 
-        public Spacer() {
+                d.setFont(
+                                Font.font(
+                                                "System",
+                                                FontWeight.BOLD,
+                                                12.5));
 
-            HBox.setHgrow(
-                    this,
-                    Priority.ALWAYS
-            );
+                d.setStyle(
+                                "-fx-text-fill: " +
+                                                COLOR_TEXT_DARK +
+                                                ";");
 
-            VBox.setVgrow(
-                    this,
-                    Priority.ALWAYS
-            );
+                Label tm = new Label(
+                                time);
+
+                tm.setFont(
+                                Font.font(
+                                                "System",
+                                                FontWeight.BOLD,
+                                                12));
+
+                tm.setStyle(
+                                "-fx-text-fill: " +
+                                                timeColor +
+                                                ";");
+
+                item.getChildren().addAll(
+                                dot,
+                                d,
+                                new Spacer(),
+                                tm);
+
+                return item;
         }
-    }
 
-    // =========================================================
-    // SHOW
-    // =========================================================
+        // =========================================================
+        // IMAGE HOLDER
+        // =========================================================
 
-    public void show(Stage stage) {
+        private ImageView createImageViewHolder(
+                        String imagePath,
+                        double width,
+                        double height) {
 
-        Scene dashboardScene =
-                createDashboardScene();
+                ImageView imgView = new ImageView();
 
-        stage.setScene(
-                dashboardScene
-        );
+                try {
 
-        stage.setMaximized(true);
+                        Image img = new Image(
+                                        imagePath,
+                                        true);
 
-        stage.show();
-    }
+                        imgView.setImage(
+                                        img);
+
+                } catch (Exception e) {
+
+                        System.out.println(
+                                        "Image not found: " +
+                                                        imagePath);
+                }
+
+                imgView.setFitWidth(
+                                width);
+
+                imgView.setFitHeight(
+                                height);
+
+                imgView.setPreserveRatio(
+                                true);
+
+                return imgView;
+        }
+
+        // =========================================================
+        // SPACER
+        // =========================================================
+
+        private static class Spacer
+                        extends Pane {
+
+                public Spacer() {
+
+                        HBox.setHgrow(
+                                        this,
+                                        Priority.ALWAYS);
+
+                        VBox.setVgrow(
+                                        this,
+                                        Priority.ALWAYS);
+                }
+        }
+
+        // =========================================================
+        // SHOW
+        // =========================================================
+
+        public void show(Stage stage) {
+
+                Scene dashboardScene = createDashboardScene();
+
+                stage.setScene(
+                                dashboardScene);
+
+                stage.setMaximized(
+                                true);
+
+                stage.show();
+        }
 }

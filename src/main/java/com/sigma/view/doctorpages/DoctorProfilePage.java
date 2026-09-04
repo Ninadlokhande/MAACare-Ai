@@ -9,8 +9,9 @@ import com.sigma.config.DoctorModule.FirebaseConfig;
 import com.sigma.controller.doctorController.DoctorProfileController;
 import com.sigma.controller.doctorController.ImageUploadController;
 import com.sigma.model.DoctorModel.DoctorProfileModel;
+import com.sigma.view.Loginpage;
+import com.sigma.view.scenesettings;
 
-import javafx.animation.FadeTransition;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -20,24 +21,24 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
-import javafx.stage.FileChooser;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -47,19 +48,17 @@ public class DoctorProfilePage {
         // THEME
         // =========================================================
 
-        private static final String BACKGROUND = "#F8F5FF";
-        private static final String WHITE = "#FFFFFF";
+        private static final String BACKGROUND = "#FFF9FB";
 
-        private static final String PURPLE = "#9B4DCC";
-        private static final String DARK_PURPLE = "#7540A8";
-        private static final String LIGHT_PURPLE = "#F3ECFF";
+        private static final String PURPLE = "#E84A87";
+        private static final String LIGHT_PURPLE = "#FFE3EE";
 
         private static final String PINK = "#E84A87";
         private static final String LIGHT_PINK = "#FFEAF3";
 
-        private static final String DARK_TEXT = "#24234F";
-        private static final String SECONDARY_TEXT = "#77778D";
-        private static final String BORDER = "#E7DCE8";
+        private static final String DARK_TEXT = "#3B2140";
+        private static final String SECONDARY_TEXT = "#806A78";
+        private static final String BORDER = "#F0D8E3";
 
         // =========================================================
         // STAGE / FIREBASE
@@ -90,7 +89,9 @@ public class DoctorProfilePage {
 
         private TextField firstNameField;
         private TextField lastNameField;
+
         private ComboBox<String> genderCombo;
+
         private DatePicker dobPicker;
 
         private TextField phoneField;
@@ -109,21 +110,34 @@ public class DoctorProfilePage {
         // CONSTRUCTOR
         // =========================================================
 
-        public DoctorProfilePage(Stage dashboardStage, String doctorUid) {
+        public DoctorProfilePage(
+                        Stage dashboardStage,
+                        String doctorUid) {
 
-                this.dashboardStage = dashboardStage;
-                this.doctorUid = doctorUid;
+                /*
+                 * Same common Dashboard stage वापरला जात आहे.
+                 * नवीन Stage create केलेला नाही.
+                 */
+
+                this.dashboardStage = dashboardStage != null
+                                ? dashboardStage
+                                : DoctorDashboard.dashboardStage;
+
+                this.doctorUid = doctorUid == null
+                                ? ""
+                                : doctorUid.trim();
 
                 this.db = FirebaseConfig.getFirestore();
 
                 this.controller = new DoctorProfileController(
                                 db,
-                                doctorUid);
+                                this.doctorUid);
 
                 this.imageUploadController = new ImageUploadController();
 
                 System.out.println(
-                                "[DOCTOR PROFILE PAGE] UID = " + doctorUid);
+                                "[DOCTOR PROFILE PAGE] UID = "
+                                                + this.doctorUid);
         }
 
         // =========================================================
@@ -132,7 +146,8 @@ public class DoctorProfilePage {
 
         public void show() {
 
-                if (doctorUid == null || doctorUid.trim().isEmpty()) {
+                if (doctorUid == null
+                                || doctorUid.trim().isEmpty()) {
 
                         showAlert(
                                         Alert.AlertType.ERROR,
@@ -144,7 +159,9 @@ public class DoctorProfilePage {
                 BorderPane root = new BorderPane();
 
                 root.setStyle(
-                                "-fx-background-color: " + BACKGROUND + ";");
+                                "-fx-background-color: "
+                                                + BACKGROUND
+                                                + ";");
 
                 // =====================================================
                 // HEADER
@@ -154,6 +171,15 @@ public class DoctorProfilePage {
 
                 root.setTop(header);
 
+                /*
+                 * Profile page Settings section मधून open होत असल्यामुळे
+                 * sidebar active item = Settings.
+                 */
+
+                root.setLeft(
+                                DoctorDashboard.createSidebar(
+                                                "Settings"));
+
                 // =====================================================
                 // CONTENT
                 // =====================================================
@@ -161,9 +187,14 @@ public class DoctorProfilePage {
                 VBox content = new VBox(25);
 
                 content.setPadding(
-                                new Insets(30, 45, 40, 45));
+                                new Insets(
+                                                30,
+                                                45,
+                                                40,
+                                                45));
 
-                content.setAlignment(Pos.TOP_CENTER);
+                content.setAlignment(
+                                Pos.TOP_CENTER);
 
                 // =====================================================
                 // PROFILE CARD
@@ -195,23 +226,27 @@ public class DoctorProfilePage {
 
                 HBox saveBox = new HBox();
 
-                saveBox.setAlignment(Pos.CENTER_RIGHT);
+                saveBox.setAlignment(
+                                Pos.CENTER_RIGHT);
 
                 Button saveButton = new Button(
                                 "Save Profile");
 
                 saveButton.setStyle(
-                                "-fx-background-color: " + PURPLE + ";" +
-                                                "-fx-text-fill: white;" +
-                                                "-fx-font-size: 15px;" +
-                                                "-fx-font-weight: bold;" +
-                                                "-fx-padding: 12px 28px;" +
-                                                "-fx-background-radius: 10px;" +
-                                                "-fx-cursor: hand;");
+                                "-fx-background-color: "
+                                                + PURPLE + ";"
+                                                + "-fx-text-fill: white;"
+                                                + "-fx-font-size: 15px;"
+                                                + "-fx-font-weight: bold;"
+                                                + "-fx-padding: 12px 28px;"
+                                                + "-fx-background-radius: 10px;"
+                                                + "-fx-cursor: hand;");
 
-                saveButton.setOnAction(e -> saveProfile());
+                saveButton.setOnAction(
+                                e -> saveProfile());
 
-                saveBox.getChildren().add(saveButton);
+                saveBox.getChildren().add(
+                                saveButton);
 
                 content.getChildren().addAll(
                                 profileCard,
@@ -220,13 +255,23 @@ public class DoctorProfilePage {
                                 clinicCard,
                                 saveBox);
 
+                // =====================================================
+                // SCROLL PANE
+                // =====================================================
+
                 ScrollPane scrollPane = new ScrollPane(content);
 
                 scrollPane.setFitToWidth(true);
 
+                scrollPane.setHbarPolicy(
+                                ScrollPane.ScrollBarPolicy.NEVER);
+
+                scrollPane.setVbarPolicy(
+                                ScrollPane.ScrollBarPolicy.AS_NEEDED);
+
                 scrollPane.setStyle(
-                                "-fx-background: transparent;" +
-                                                "-fx-background-color: transparent;");
+                                "-fx-background: transparent;"
+                                                + "-fx-background-color: transparent;");
 
                 root.setCenter(scrollPane);
 
@@ -234,13 +279,37 @@ public class DoctorProfilePage {
                 // SCENE
                 // =====================================================
 
-                Scene scene = new Scene(root);
+                Scene scene = new Scene(
+                                root,
+                                scenesettings.rectanguler2d.getWidth(),
+                                scenesettings.rectanguler2d.getHeight());
 
-                dashboardStage.setScene(scene);
+                // =====================================================
+                // SAME COMMON STAGE
+                // =====================================================
 
-                dashboardStage.setResizable(true);
+                DoctorDashboard.changeScene(scene);
 
-                dashboardStage.show();
+                Stage commonStage = dashboardStage != null
+                                ? dashboardStage
+                                : DoctorDashboard.dashboardStage;
+
+                if (commonStage != null) {
+
+                        commonStage.setTitle(
+                                        "MaaCare AI - Doctor Profile");
+
+                        commonStage.setResizable(true);
+
+                        commonStage.setMaximized(true);
+
+                        if (!commonStage.isShowing()) {
+                                commonStage.show();
+                        }
+
+                        commonStage.toFront();
+                        commonStage.requestFocus();
+                }
 
                 // =====================================================
                 // LOAD PROFILE + PHOTO
@@ -261,45 +330,36 @@ public class DoctorProfilePage {
 
                 HBox header = new HBox();
 
-                header.setAlignment(Pos.CENTER_LEFT);
+                header.setAlignment(
+                                Pos.CENTER_LEFT);
 
                 header.setPadding(
-                                new Insets(18, 30, 18, 30));
+                                new Insets(
+                                                18,
+                                                30,
+                                                18,
+                                                30));
 
                 header.setSpacing(20);
 
                 header.setStyle(
-                                "-fx-background-color: white;" +
-                                                "-fx-border-color: " + BORDER + ";" +
-                                                "-fx-border-width: 0 0 1 0;");
+                                "-fx-background-color: white;"
+                                                + "-fx-border-color: "
+                                                + BORDER + ";"
+                                                + "-fx-border-width: 0 0 1 0;");
 
-                Button backButton = new Button(
-                                "← Back to Dashboard");
-
-                backButton.setStyle(
-                                "-fx-background-color: " + LIGHT_PURPLE + ";" +
-                                                "-fx-text-fill: " + PURPLE + ";" +
-                                                "-fx-font-size: 14px;" +
-                                                "-fx-font-weight: bold;" +
-                                                "-fx-padding: 10px 18px;" +
-                                                "-fx-background-radius: 9px;" +
-                                                "-fx-cursor: hand;");
-
-                backButton.setOnAction(e -> {
-
-                        stopPhotoRefresh();
-
-                        DoctorDashboard.showDashboard();
-
-                });
+                // =====================================================
+                // TITLE
+                // =====================================================
 
                 Label title = new Label(
                                 "Doctor Profile");
 
                 title.setStyle(
-                                "-fx-text-fill: " + DARK_TEXT + ";" +
-                                                "-fx-font-size: 25px;" +
-                                                "-fx-font-weight: bold;");
+                                "-fx-text-fill: "
+                                                + DARK_TEXT + ";"
+                                                + "-fx-font-size: 25px;"
+                                                + "-fx-font-weight: bold;");
 
                 Region spacer = new Region();
 
@@ -307,20 +367,263 @@ public class DoctorProfilePage {
                                 spacer,
                                 Priority.ALWAYS);
 
+                // =====================================================
+                // DOCTOR ID
+                // =====================================================
+
                 Label uidLabel = new Label(
-                                "Doctor ID: " + doctorUid);
+                                "Doctor ID: "
+                                                + doctorUid);
 
                 uidLabel.setStyle(
-                                "-fx-text-fill: " + SECONDARY_TEXT + ";" +
-                                                "-fx-font-size: 12px;");
+                                "-fx-text-fill: "
+                                                + SECONDARY_TEXT + ";"
+                                                + "-fx-font-size: 12px;");
+
+                // =====================================================
+                // LOGOUT BUTTON
+                // =====================================================
+
+                Button logoutButton = new Button("↪  Logout");
+
+                logoutButton.setStyle(
+                                "-fx-background-color: "
+                                                + LIGHT_PINK + ";"
+                                                + "-fx-text-fill: "
+                                                + PINK + ";"
+                                                + "-fx-font-size: 12px;"
+                                                + "-fx-font-weight: bold;"
+                                                + "-fx-padding: 9px 16px;"
+                                                + "-fx-background-radius: 9px;"
+                                                + "-fx-border-color: "
+                                                + BORDER + ";"
+                                                + "-fx-border-radius: 9px;"
+                                                + "-fx-cursor: hand;");
+
+                logoutButton.setOnMouseEntered(
+                                e -> logoutButton.setStyle(
+                                                "-fx-background-color: "
+                                                                + PINK + ";"
+                                                                + "-fx-text-fill: white;"
+                                                                + "-fx-font-size: 12px;"
+                                                                + "-fx-font-weight: bold;"
+                                                                + "-fx-padding: 9px 16px;"
+                                                                + "-fx-background-radius: 9px;"
+                                                                + "-fx-border-color: "
+                                                                + PINK + ";"
+                                                                + "-fx-border-radius: 9px;"
+                                                                + "-fx-cursor: hand;"));
+
+                logoutButton.setOnMouseExited(
+                                e -> logoutButton.setStyle(
+                                                "-fx-background-color: "
+                                                                + LIGHT_PINK + ";"
+                                                                + "-fx-text-fill: "
+                                                                + PINK + ";"
+                                                                + "-fx-font-size: 12px;"
+                                                                + "-fx-font-weight: bold;"
+                                                                + "-fx-padding: 9px 16px;"
+                                                                + "-fx-background-radius: 9px;"
+                                                                + "-fx-border-color: "
+                                                                + BORDER + ";"
+                                                                + "-fx-border-radius: 9px;"
+                                                                + "-fx-cursor: hand;"));
+
+                logoutButton.setOnAction(
+                                e -> handleLogout());
 
                 header.getChildren().addAll(
-                                backButton,
                                 title,
                                 spacer,
-                                uidLabel);
+                                uidLabel,
+                                logoutButton);
 
                 return header;
+        }
+
+        // =========================================================
+        // LOGOUT
+        // =========================================================
+
+        private void handleLogout() {
+
+                Alert confirmation = new Alert(
+                                Alert.AlertType.CONFIRMATION);
+
+                confirmation.setTitle("Logout");
+
+                confirmation.setHeaderText(
+                                "Are you sure you want to logout?");
+
+                confirmation.setContentText(
+                                "You will be redirected to the Login page.");
+
+                confirmation.getButtonTypes().setAll(
+                                ButtonType.CANCEL,
+                                ButtonType.OK);
+
+                confirmation.showAndWait().ifPresent(
+                                result -> {
+
+                                        if (result != ButtonType.OK) {
+                                                return;
+                                        }
+
+                                        try {
+
+                                                System.out.println(
+                                                                "[LOGOUT] Doctor logout started.");
+
+                                                // =====================================
+                                                // STOP DASHBOARD REALTIME SERVICES
+                                                // =====================================
+
+                                                try {
+
+                                                        DoctorDashboard
+                                                                        .stopDashboardRealtimeServices();
+
+                                                } catch (Exception ex) {
+
+                                                        System.out.println(
+                                                                        "[LOGOUT] Could not stop "
+                                                                                        + "dashboard realtime services.");
+
+                                                        ex.printStackTrace();
+                                                }
+
+                                                // =====================================
+                                                // STOP PROFILE PHOTO REFRESH
+                                                // =====================================
+
+                                                stopPhotoRefresh();
+
+                                                // =====================================
+                                                // CLEAR PROFILE PHOTO DATA
+                                                // =====================================
+
+                                                lastPhotoUrl = "";
+
+                                                if (doctorPhotoView != null) {
+
+                                                        doctorPhotoView.setImage(null);
+
+                                                        doctorPhotoView.setVisible(false);
+                                                }
+
+                                                if (doctorIcon != null) {
+
+                                                        doctorIcon.setVisible(true);
+                                                }
+
+                                                // =====================================
+                                                // CLEAR CURRENT DOCTOR UID
+                                                // =====================================
+
+                                                try {
+
+                                                        DoctorDashboard
+                                                                        .setCurrentDoctorUid(null);
+
+                                                } catch (Exception ex) {
+
+                                                        System.out.println(
+                                                                        "[LOGOUT] Could not clear "
+                                                                                        + "dashboard doctor UID.");
+
+                                                        ex.printStackTrace();
+                                                }
+
+                                                // =====================================
+                                                // GET SAME COMMON STAGE
+                                                // =====================================
+
+                                                Stage stage = dashboardStage != null
+                                                                ? dashboardStage
+                                                                : DoctorDashboard.dashboardStage;
+
+                                                /*
+                                                 * जर DoctorDashboard stage null असेल,
+                                                 * तर Loginpage वापरत असलेला common stage
+                                                 * वापरला जाईल.
+                                                 */
+
+                                                if (stage == null) {
+
+                                                        stage = com.sigma.view.Welcomepage.stage;
+                                                }
+
+                                                // =====================================
+                                                // CHECK STAGE
+                                                // =====================================
+
+                                                if (stage == null) {
+
+                                                        showAlert(
+                                                                        Alert.AlertType.ERROR,
+                                                                        "Unable to logout because "
+                                                                                        + "application stage is unavailable.");
+
+                                                        return;
+                                                }
+
+                                                // =====================================
+                                                // CREATE LOGIN PAGE
+                                                // =====================================
+
+                                                Loginpage loginPage = new Loginpage();
+
+                                                /*
+                                                 * IMPORTANT:
+                                                 *
+                                                 * Loginpage मध्ये start() method नाही.
+                                                 *
+                                                 * तिथे:
+                                                 * public Scene gotologinpage()
+                                                 *
+                                                 * आहे.
+                                                 */
+
+                                                Scene loginScene = loginPage.gotologinpage();
+
+                                                // =====================================
+                                                // SET LOGIN SCENE ON SAME STAGE
+                                                // =====================================
+
+                                                stage.setScene(loginScene);
+
+                                                stage.setTitle(
+                                                                "MaaCare AI - Login");
+
+                                                stage.setResizable(true);
+
+                                                /*
+                                                 * Dashboard जसा maximized होता,
+                                                 * Login page सुद्धा same maximized stage वर.
+                                                 */
+
+                                                stage.setMaximized(true);
+
+                                                stage.show();
+
+                                                stage.toFront();
+
+                                                stage.requestFocus();
+
+                                                System.out.println(
+                                                                "[LOGOUT] Successfully redirected "
+                                                                                + "to Login page.");
+
+                                        } catch (Exception ex) {
+
+                                                ex.printStackTrace();
+
+                                                showAlert(
+                                                                Alert.AlertType.ERROR,
+                                                                "Unable to logout.\n\n"
+                                                                                + ex.getMessage());
+                                        }
+                                });
         }
 
         // =========================================================
@@ -334,13 +637,15 @@ public class DoctorProfilePage {
                 card.setPadding(
                                 new Insets(25));
 
-                card.setAlignment(Pos.CENTER);
+                card.setAlignment(
+                                Pos.CENTER);
 
                 card.setStyle(
-                                "-fx-background-color: white;" +
-                                                "-fx-background-radius: 18px;" +
-                                                "-fx-border-color: " + BORDER + ";" +
-                                                "-fx-border-radius: 18px;");
+                                "-fx-background-color: white;"
+                                                + "-fx-background-radius: 18px;"
+                                                + "-fx-border-color: "
+                                                + BORDER + ";"
+                                                + "-fx-border-radius: 18px;");
 
                 // =====================================================
                 // PHOTO
@@ -365,22 +670,25 @@ public class DoctorProfilePage {
 
                 doctorPhotoView.setClip(clip);
 
-                doctorIcon = new Label(
-                                "👨‍⚕️");
+                doctorIcon = new Label("👨‍⚕️");
 
                 doctorIcon.setStyle(
                                 "-fx-font-size: 48px;");
 
                 StackPane avatar = new StackPane();
 
-                avatar.setPrefSize(90, 90);
+                avatar.setPrefSize(
+                                90,
+                                90);
 
-                avatar.setMaxSize(90, 90);
+                avatar.setMaxSize(
+                                90,
+                                90);
 
                 avatar.setStyle(
-                                "-fx-background-color: " +
-                                                LIGHT_PURPLE + ";" +
-                                                "-fx-background-radius: 50%;");
+                                "-fx-background-color: "
+                                                + LIGHT_PURPLE + ";"
+                                                + "-fx-background-radius: 50%;");
 
                 avatar.getChildren().addAll(
                                 doctorIcon,
@@ -393,35 +701,38 @@ public class DoctorProfilePage {
                 // NAME
                 // =====================================================
 
-                Label nameLabel = new Label(
-                                "Doctor Profile");
+                Label nameLabel = new Label("Doctor Profile");
 
                 nameLabel.setStyle(
-                                "-fx-text-fill: " + DARK_TEXT + ";" +
-                                                "-fx-font-size: 22px;" +
-                                                "-fx-font-weight: bold;");
+                                "-fx-text-fill: "
+                                                + DARK_TEXT + ";"
+                                                + "-fx-font-size: 22px;"
+                                                + "-fx-font-weight: bold;");
 
                 Label photoHint = new Label(
                                 "Upload your professional profile photo");
 
                 photoHint.setStyle(
-                                "-fx-text-fill: " + SECONDARY_TEXT + ";" +
-                                                "-fx-font-size: 13px;");
+                                "-fx-text-fill: "
+                                                + SECONDARY_TEXT + ";"
+                                                + "-fx-font-size: 13px;");
 
                 // =====================================================
                 // CHANGE PHOTO
                 // =====================================================
 
-                Button changePhotoButton = new Button("📷  Change Photo");
+                Button changePhotoButton = new Button(
+                                "📷  Change Photo");
 
                 changePhotoButton.setStyle(
-                                "-fx-background-color: " + PURPLE + ";" +
-                                                "-fx-text-fill: white;" +
-                                                "-fx-font-size: 13px;" +
-                                                "-fx-font-weight: bold;" +
-                                                "-fx-padding: 10px 18px;" +
-                                                "-fx-background-radius: 9px;" +
-                                                "-fx-cursor: hand;");
+                                "-fx-background-color: "
+                                                + PURPLE + ";"
+                                                + "-fx-text-fill: white;"
+                                                + "-fx-font-size: 13px;"
+                                                + "-fx-font-weight: bold;"
+                                                + "-fx-padding: 10px 18px;"
+                                                + "-fx-background-radius: 9px;"
+                                                + "-fx-cursor: hand;");
 
                 changePhotoButton.setOnAction(
                                 e -> chooseAndUploadPhoto());
@@ -433,13 +744,15 @@ public class DoctorProfilePage {
                 Button removePhotoButton = new Button("Remove Photo");
 
                 removePhotoButton.setStyle(
-                                "-fx-background-color: " + LIGHT_PINK + ";" +
-                                                "-fx-text-fill: " + PINK + ";" +
-                                                "-fx-font-size: 13px;" +
-                                                "-fx-font-weight: bold;" +
-                                                "-fx-padding: 10px 18px;" +
-                                                "-fx-background-radius: 9px;" +
-                                                "-fx-cursor: hand;");
+                                "-fx-background-color: "
+                                                + LIGHT_PINK + ";"
+                                                + "-fx-text-fill: "
+                                                + PINK + ";"
+                                                + "-fx-font-size: 13px;"
+                                                + "-fx-font-weight: bold;"
+                                                + "-fx-padding: 10px 18px;"
+                                                + "-fx-background-radius: 9px;"
+                                                + "-fx-cursor: hand;");
 
                 removePhotoButton.setOnAction(
                                 e -> removeDoctorPhoto());
@@ -489,14 +802,16 @@ public class DoctorProfilePage {
                 genderCombo.setMaxWidth(
                                 Double.MAX_VALUE);
 
-                styleComboBox(genderCombo);
+                styleComboBox(
+                                genderCombo);
 
                 dobPicker = new DatePicker();
 
                 dobPicker.setMaxWidth(
                                 Double.MAX_VALUE);
 
-                styleDatePicker(dobPicker);
+                styleDatePicker(
+                                dobPicker);
 
                 phoneField = createTextField();
 
@@ -554,7 +869,8 @@ public class DoctorProfilePage {
                                 3);
 
                 GridPane.setColumnSpan(
-                                addressField,
+                                grid.getChildren().get(
+                                                grid.getChildren().size() - 1),
                                 2);
 
                 card.getChildren().addAll(
@@ -670,10 +986,11 @@ public class DoctorProfilePage {
                                 new Insets(25));
 
                 box.setStyle(
-                                "-fx-background-color: white;" +
-                                                "-fx-background-radius: 18px;" +
-                                                "-fx-border-color: " + BORDER + ";" +
-                                                "-fx-border-radius: 18px;");
+                                "-fx-background-color: white;"
+                                                + "-fx-background-radius: 18px;"
+                                                + "-fx-border-color: "
+                                                + BORDER + ";"
+                                                + "-fx-border-radius: 18px;");
 
                 return box;
         }
@@ -682,14 +999,16 @@ public class DoctorProfilePage {
         // SECTION TITLE
         // =========================================================
 
-        private Label sectionTitle(String text) {
+        private Label sectionTitle(
+                        String text) {
 
                 Label label = new Label(text);
 
                 label.setStyle(
-                                "-fx-text-fill: " + DARK_TEXT + ";" +
-                                                "-fx-font-size: 18px;" +
-                                                "-fx-font-weight: bold;");
+                                "-fx-text-fill: "
+                                                + DARK_TEXT + ";"
+                                                + "-fx-font-size: 18px;"
+                                                + "-fx-font-weight: bold;");
 
                 return label;
         }
@@ -706,7 +1025,16 @@ public class DoctorProfilePage {
 
                 grid.setVgap(16);
 
-                ColumnConstraintsHelper.setColumns(grid);
+                ColumnConstraints c1 = new ColumnConstraints();
+
+                ColumnConstraints c2 = new ColumnConstraints();
+
+                c1.setPercentWidth(50);
+
+                c2.setPercentWidth(50);
+
+                grid.getColumnConstraints()
+                                .addAll(c1, c2);
 
                 return grid;
         }
@@ -727,9 +1055,10 @@ public class DoctorProfilePage {
                 Label label = new Label(labelText);
 
                 label.setStyle(
-                                "-fx-text-fill: " + DARK_TEXT + ";" +
-                                                "-fx-font-size: 13px;" +
-                                                "-fx-font-weight: bold;");
+                                "-fx-text-fill: "
+                                                + DARK_TEXT + ";"
+                                                + "-fx-font-size: 13px;"
+                                                + "-fx-font-weight: bold;");
 
                 box.getChildren().addAll(
                                 label,
@@ -743,6 +1072,13 @@ public class DoctorProfilePage {
                 GridPane.setHgrow(
                                 box,
                                 Priority.ALWAYS);
+
+                if (field instanceof Region) {
+
+                        ((Region) field)
+                                        .setMaxWidth(
+                                                        Double.MAX_VALUE);
+                }
         }
 
         // =========================================================
@@ -756,13 +1092,15 @@ public class DoctorProfilePage {
                 field.setPrefHeight(42);
 
                 field.setStyle(
-                                "-fx-background-color: #FCFAFF;" +
-                                                "-fx-border-color: " + BORDER + ";" +
-                                                "-fx-border-radius: 9px;" +
-                                                "-fx-background-radius: 9px;" +
-                                                "-fx-padding: 0 12px;" +
-                                                "-fx-text-fill: " + DARK_TEXT + ";" +
-                                                "-fx-font-size: 13px;");
+                                "-fx-background-color: #FFF9FB;"
+                                                + "-fx-border-color: "
+                                                + BORDER + ";"
+                                                + "-fx-border-radius: 9px;"
+                                                + "-fx-background-radius: 9px;"
+                                                + "-fx-padding: 0 12px;"
+                                                + "-fx-text-fill: "
+                                                + DARK_TEXT + ";"
+                                                + "-fx-font-size: 13px;");
 
                 return field;
         }
@@ -777,11 +1115,12 @@ public class DoctorProfilePage {
                 comboBox.setPrefHeight(42);
 
                 comboBox.setStyle(
-                                "-fx-background-color: #FCFAFF;" +
-                                                "-fx-border-color: " + BORDER + ";" +
-                                                "-fx-border-radius: 9px;" +
-                                                "-fx-background-radius: 9px;" +
-                                                "-fx-font-size: 13px;");
+                                "-fx-background-color: #FFF9FB;"
+                                                + "-fx-border-color: "
+                                                + BORDER + ";"
+                                                + "-fx-border-radius: 9px;"
+                                                + "-fx-background-radius: 9px;"
+                                                + "-fx-font-size: 13px;");
         }
 
         // =========================================================
@@ -794,11 +1133,12 @@ public class DoctorProfilePage {
                 datePicker.setPrefHeight(42);
 
                 datePicker.setStyle(
-                                "-fx-background-color: #FCFAFF;" +
-                                                "-fx-border-color: " + BORDER + ";" +
-                                                "-fx-border-radius: 9px;" +
-                                                "-fx-background-radius: 9px;" +
-                                                "-fx-font-size: 13px;");
+                                "-fx-background-color: #FFF9FB;"
+                                                + "-fx-border-color: "
+                                                + BORDER + ";"
+                                                + "-fx-border-radius: 9px;"
+                                                + "-fx-background-radius: 9px;"
+                                                + "-fx-font-size: 13px;");
         }
 
         // =========================================================
@@ -818,71 +1158,90 @@ public class DoctorProfilePage {
                         }
                 };
 
-                task.setOnSucceeded(e -> {
+                task.setOnSucceeded(
+                                e -> {
 
-                        DoctorProfileModel doctor = task.getValue();
+                                        DoctorProfileModel doctor = task.getValue();
 
-                        if (doctor == null) {
-                                return;
-                        }
+                                        if (doctor == null) {
+                                                return;
+                                        }
 
-                        firstNameField.setText(
-                                        safe(doctor.getFirstName()));
+                                        firstNameField.setText(
+                                                        safe(
+                                                                        doctor.getFirstName()));
 
-                        lastNameField.setText(
-                                        safe(doctor.getLastName()));
+                                        lastNameField.setText(
+                                                        safe(
+                                                                        doctor.getLastName()));
 
-                        genderCombo.setValue(
-                                        safe(doctor.getGender()));
+                                        genderCombo.setValue(
+                                                        safe(
+                                                                        doctor.getGender()));
 
-                        if (doctor.getDob() != null
-                                        && !doctor.getDob().isEmpty()) {
+                                        if (doctor.getDob() != null
+                                                        && !doctor.getDob().isEmpty()) {
 
-                                try {
+                                                try {
 
-                                        dobPicker.setValue(
-                                                        java.time.LocalDate.parse(
-                                                                        doctor.getDob()));
+                                                        dobPicker.setValue(
+                                                                        java.time.LocalDate.parse(
+                                                                                        doctor.getDob()));
 
-                                } catch (Exception ignored) {
-                                }
-                        }
+                                                } catch (Exception ignored) {
+                                                }
+                                        }
 
-                        phoneField.setText(
-                                        safe(doctor.getPhone()));
+                                        phoneField.setText(
+                                                        safe(
+                                                                        doctor.getPhone()));
 
-                        emailField.setText(
-                                        safe(doctor.getEmail()));
+                                        emailField.setText(
+                                                        safe(
+                                                                        doctor.getEmail()));
 
-                        addressField.setText(
-                                        safe(doctor.getAddress()));
+                                        addressField.setText(
+                                                        safe(
+                                                                        doctor.getAddress()));
 
-                        specializationField.setText(
-                                        safe(doctor.getSpecialization()));
+                                        specializationField.setText(
+                                                        safe(
+                                                                        doctor.getSpecialization()));
 
-                        qualificationField.setText(
-                                        safe(doctor.getQualification()));
+                                        qualificationField.setText(
+                                                        safe(
+                                                                        doctor.getQualification()));
 
-                        experienceField.setText(
-                                        safe(doctor.getExperience()));
+                                        experienceField.setText(
+                                                        safe(
+                                                                        doctor.getExperience()));
 
-                        medicalLicenseField.setText(
-                                        safe(doctor.getMedicalLicense()));
+                                        medicalLicenseField.setText(
+                                                        safe(
+                                                                        doctor.getMedicalLicense()));
 
-                        clinicNameField.setText(
-                                        safe(doctor.getClinicName()));
+                                        clinicNameField.setText(
+                                                        safe(
+                                                                        doctor.getClinicName()));
 
-                        clinicAddressField.setText(
-                                        safe(doctor.getClinicAddress()));
-                });
+                                        clinicAddressField.setText(
+                                                        safe(
+                                                                        doctor.getClinicAddress()));
+                                });
 
-                task.setOnFailed(e -> {
+                task.setOnFailed(
+                                e -> {
 
-                        System.out.println(
-                                        "[DOCTOR PROFILE] Failed to load profile.");
+                                        System.out.println(
+                                                        "[DOCTOR PROFILE] "
+                                                                        + "Failed to load profile.");
 
-                        task.getException().printStackTrace();
-                });
+                                        if (task.getException() != null) {
+
+                                                task.getException()
+                                                                .printStackTrace();
+                                        }
+                                });
 
                 Thread thread = new Thread(task);
 
@@ -909,9 +1268,13 @@ public class DoctorProfilePage {
 
                                 return controller.updateProfile(
 
-                                                firstNameField.getText().trim(),
+                                                firstNameField
+                                                                .getText()
+                                                                .trim(),
 
-                                                lastNameField.getText().trim(),
+                                                lastNameField
+                                                                .getText()
+                                                                .trim(),
 
                                                 genderCombo.getValue() == null
                                                                 ? ""
@@ -919,52 +1282,76 @@ public class DoctorProfilePage {
 
                                                 dob,
 
-                                                phoneField.getText().trim(),
+                                                phoneField
+                                                                .getText()
+                                                                .trim(),
 
-                                                emailField.getText().trim(),
+                                                emailField
+                                                                .getText()
+                                                                .trim(),
 
-                                                addressField.getText().trim(),
+                                                addressField
+                                                                .getText()
+                                                                .trim(),
 
-                                                specializationField.getText().trim(),
+                                                specializationField
+                                                                .getText()
+                                                                .trim(),
 
-                                                qualificationField.getText().trim(),
+                                                qualificationField
+                                                                .getText()
+                                                                .trim(),
 
-                                                experienceField.getText().trim(),
+                                                experienceField
+                                                                .getText()
+                                                                .trim(),
 
-                                                medicalLicenseField.getText().trim(),
+                                                medicalLicenseField
+                                                                .getText()
+                                                                .trim(),
 
-                                                clinicNameField.getText().trim(),
+                                                clinicNameField
+                                                                .getText()
+                                                                .trim(),
 
-                                                clinicAddressField.getText().trim());
+                                                clinicAddressField
+                                                                .getText()
+                                                                .trim());
                         }
                 };
 
-                task.setOnSucceeded(e -> {
+                task.setOnSucceeded(
+                                e -> {
 
-                        if (task.getValue()) {
+                                        if (task.getValue()) {
 
-                                showAlert(
-                                                Alert.AlertType.INFORMATION,
-                                                "Profile updated successfully.");
+                                                showAlert(
+                                                                Alert.AlertType.INFORMATION,
+                                                                "Profile updated successfully.");
 
-                                loadDoctorPhoto();
+                                                loadDoctorPhoto();
 
-                        } else {
+                                        } else {
 
-                                showAlert(
-                                                Alert.AlertType.ERROR,
-                                                "Failed to update profile.");
-                        }
-                });
+                                                showAlert(
+                                                                Alert.AlertType.ERROR,
+                                                                "Failed to update profile.");
+                                        }
+                                });
 
-                task.setOnFailed(e -> {
+                task.setOnFailed(
+                                e -> {
 
-                        showAlert(
-                                        Alert.AlertType.ERROR,
-                                        "Error while updating profile.");
+                                        showAlert(
+                                                        Alert.AlertType.ERROR,
+                                                        "Error while updating profile.");
 
-                        task.getException().printStackTrace();
-                });
+                                        if (task.getException() != null) {
+
+                                                task.getException()
+                                                                .printStackTrace();
+                                        }
+                                });
 
                 Thread thread = new Thread(task);
 
@@ -984,16 +1371,21 @@ public class DoctorProfilePage {
                 fileChooser.setTitle(
                                 "Select Doctor Profile Photo");
 
-                fileChooser.getExtensionFilters().add(
-                                new FileChooser.ExtensionFilter(
-                                                "Image Files",
-                                                "*.png",
-                                                "*.jpg",
-                                                "*.jpeg",
-                                                "*.webp"));
+                fileChooser.getExtensionFilters()
+                                .add(
+                                                new FileChooser.ExtensionFilter(
+                                                                "Image Files",
+                                                                "*.png",
+                                                                "*.jpg",
+                                                                "*.jpeg",
+                                                                "*.webp"));
+
+                Stage ownerStage = dashboardStage != null
+                                ? dashboardStage
+                                : DoctorDashboard.dashboardStage;
 
                 File file = fileChooser.showOpenDialog(
-                                dashboardStage);
+                                ownerStage);
 
                 if (file == null) {
                         return;
@@ -1018,86 +1410,97 @@ public class DoctorProfilePage {
                         }
                 };
 
-                uploadTask.setOnSucceeded(e -> {
+                uploadTask.setOnSucceeded(
+                                e -> {
 
-                        String photoUrl = uploadTask.getValue();
+                                        String photoUrl = uploadTask.getValue();
 
-                        if (photoUrl == null
-                                        || photoUrl.trim().isEmpty()) {
+                                        if (photoUrl == null
+                                                        || photoUrl.trim().isEmpty()) {
 
-                                showAlert(
-                                                Alert.AlertType.ERROR,
-                                                "Photo upload failed.");
+                                                showAlert(
+                                                                Alert.AlertType.ERROR,
+                                                                "Photo upload failed.");
 
-                                return;
-                        }
+                                                return;
+                                        }
 
-                        System.out.println(
-                                        "[DOCTOR PHOTO] Cloudinary URL = "
-                                                        + photoUrl);
+                                        System.out.println(
+                                                        "[DOCTOR PHOTO] Cloudinary URL = "
+                                                                        + photoUrl);
 
-                        // =================================================
-                        // SAVE URL TO FIRESTORE
-                        // =================================================
+                                        // =========================================
+                                        // SAVE URL TO FIRESTORE
+                                        // =========================================
 
-                        Task<Boolean> saveTask = new Task<Boolean>() {
+                                        Task<Boolean> saveTask = new Task<Boolean>() {
 
-                                @Override
-                                protected Boolean call()
-                                                throws Exception {
+                                                @Override
+                                                protected Boolean call()
+                                                                throws Exception {
 
-                                        return controller
-                                                        .saveDoctorPhotoUrl(
-                                                                        photoUrl);
-                                }
-                        };
+                                                        return controller
+                                                                        .saveDoctorPhotoUrl(
+                                                                                        photoUrl);
+                                                }
+                                        };
 
-                        saveTask.setOnSucceeded(event -> {
+                                        saveTask.setOnSucceeded(
+                                                        event -> {
 
-                                if (saveTask.getValue()) {
+                                                                if (saveTask.getValue()) {
 
-                                        lastPhotoUrl = photoUrl;
+                                                                        lastPhotoUrl = photoUrl;
 
-                                        displayPhoto(photoUrl);
+                                                                        displayPhoto(
+                                                                                        photoUrl);
 
-                                        showAlert(
-                                                        Alert.AlertType.INFORMATION,
-                                                        "Profile photo updated successfully.");
+                                                                        showAlert(
+                                                                                        Alert.AlertType.INFORMATION,
+                                                                                        "Profile photo updated successfully.");
 
-                                } else {
+                                                                } else {
+
+                                                                        showAlert(
+                                                                                        Alert.AlertType.ERROR,
+                                                                                        "Photo uploaded but URL could not be saved.");
+                                                                }
+                                                        });
+
+                                        saveTask.setOnFailed(
+                                                        event -> {
+
+                                                                showAlert(
+                                                                                Alert.AlertType.ERROR,
+                                                                                "Could not save photo URL to Firestore.");
+
+                                                                if (saveTask.getException() != null) {
+
+                                                                        saveTask.getException()
+                                                                                        .printStackTrace();
+                                                                }
+                                                        });
+
+                                        Thread saveThread = new Thread(saveTask);
+
+                                        saveThread.setDaemon(true);
+
+                                        saveThread.start();
+                                });
+
+                uploadTask.setOnFailed(
+                                e -> {
 
                                         showAlert(
                                                         Alert.AlertType.ERROR,
-                                                        "Photo uploaded but URL could not be saved.");
-                                }
-                        });
+                                                        "Cloudinary upload failed.");
 
-                        saveTask.setOnFailed(event -> {
+                                        if (uploadTask.getException() != null) {
 
-                                showAlert(
-                                                Alert.AlertType.ERROR,
-                                                "Could not save photo URL to Firestore.");
-
-                                saveTask.getException()
-                                                .printStackTrace();
-                        });
-
-                        Thread saveThread = new Thread(saveTask);
-
-                        saveThread.setDaemon(true);
-
-                        saveThread.start();
-                });
-
-                uploadTask.setOnFailed(e -> {
-
-                        showAlert(
-                                        Alert.AlertType.ERROR,
-                                        "Cloudinary upload failed.");
-
-                        uploadTask.getException()
-                                        .printStackTrace();
-                });
+                                                uploadTask.getException()
+                                                                .printStackTrace();
+                                        }
+                                });
 
                 Thread uploadThread = new Thread(uploadTask);
 
@@ -1118,18 +1521,28 @@ public class DoctorProfilePage {
                         protected String call()
                                         throws Exception {
 
+                                String profileUid = doctorUid;
+
+                                if (profileUid == null
+                                                || profileUid.isEmpty()) {
+
+                                        return "";
+                                }
+
                                 DocumentSnapshot document = db.collection("doctors")
-                                                .document(doctorUid)
+                                                .document(profileUid)
                                                 .get()
                                                 .get(
                                                                 10,
                                                                 TimeUnit.SECONDS);
 
                                 if (!document.exists()) {
+
                                         return "";
                                 }
 
-                                String url = document.getString("photoUrl");
+                                String url = document.getString(
+                                                "photoUrl");
 
                                 if (url == null
                                                 || url.trim().isEmpty()) {
@@ -1158,35 +1571,42 @@ public class DoctorProfilePage {
                         }
                 };
 
-                task.setOnSucceeded(e -> {
+                task.setOnSucceeded(
+                                e -> {
 
-                        String photoUrl = task.getValue();
+                                        String photoUrl = task.getValue();
 
-                        if (photoUrl == null
-                                        || photoUrl.isEmpty()) {
+                                        if (photoUrl == null
+                                                        || photoUrl.isEmpty()) {
 
-                                clearPhoto();
+                                                clearPhoto();
 
-                                return;
-                        }
+                                                return;
+                                        }
 
-                        if (!photoUrl.equals(lastPhotoUrl)) {
+                                        if (!photoUrl.equals(
+                                                        lastPhotoUrl)) {
 
-                                lastPhotoUrl = photoUrl;
+                                                lastPhotoUrl = photoUrl;
 
-                                displayPhoto(photoUrl);
-                        }
-                });
+                                                displayPhoto(
+                                                                photoUrl);
+                                        }
+                                });
 
-                task.setOnFailed(e -> {
+                task.setOnFailed(
+                                e -> {
 
-                        System.out.println(
-                                        "[DOCTOR PHOTO] Failed to load photo.");
+                                        System.out.println(
+                                                        "[DOCTOR PHOTO] "
+                                                                        + "Failed to load photo.");
 
-                        if (task.getException() != null) {
-                                task.getException().printStackTrace();
-                        }
-                });
+                                        if (task.getException() != null) {
+
+                                                task.getException()
+                                                                .printStackTrace();
+                                        }
+                                });
 
                 Thread thread = new Thread(task);
 
@@ -1199,7 +1619,8 @@ public class DoctorProfilePage {
         // DISPLAY PHOTO
         // =========================================================
 
-        private void displayPhoto(String photoUrl) {
+        private void displayPhoto(
+                        String photoUrl) {
 
                 if (photoUrl == null
                                 || photoUrl.trim().isEmpty()) {
@@ -1224,6 +1645,7 @@ public class DoctorProfilePage {
                                                 false);
 
                                 if (image.isError()) {
+
                                         throw new Exception(
                                                         "Unable to load image.");
                                 }
@@ -1232,27 +1654,40 @@ public class DoctorProfilePage {
                         }
                 };
 
-                imageTask.setOnSucceeded(e -> {
+                imageTask.setOnSucceeded(
+                                e -> {
 
-                        Image image = imageTask.getValue();
+                                        Image image = imageTask.getValue();
 
-                        doctorPhotoView.setImage(image);
+                                        if (doctorPhotoView == null
+                                                        || doctorIcon == null) {
 
-                        doctorPhotoView.setVisible(true);
+                                                return;
+                                        }
 
-                        doctorIcon.setVisible(false);
+                                        doctorPhotoView.setImage(
+                                                        image);
 
-                        System.out.println(
-                                        "[DOCTOR PHOTO] Photo displayed.");
-                });
+                                        doctorPhotoView.setVisible(
+                                                        true);
 
-                imageTask.setOnFailed(e -> {
+                                        doctorIcon.setVisible(
+                                                        false);
 
-                        System.out.println(
-                                        "[DOCTOR PHOTO] Image loading failed.");
+                                        System.out.println(
+                                                        "[DOCTOR PHOTO] "
+                                                                        + "Photo displayed.");
+                                });
 
-                        clearPhoto();
-                });
+                imageTask.setOnFailed(
+                                e -> {
+
+                                        System.out.println(
+                                                        "[DOCTOR PHOTO] "
+                                                                        + "Image loading failed.");
+
+                                        clearPhoto();
+                                });
 
                 Thread thread = new Thread(imageTask);
 
@@ -1267,16 +1702,26 @@ public class DoctorProfilePage {
 
         private void clearPhoto() {
 
-                Platform.runLater(() -> {
+                Platform.runLater(
+                                () -> {
 
-                        doctorPhotoView.setImage(null);
+                                        if (doctorPhotoView != null) {
 
-                        doctorPhotoView.setVisible(false);
+                                                doctorPhotoView.setImage(
+                                                                null);
 
-                        doctorIcon.setVisible(true);
+                                                doctorPhotoView.setVisible(
+                                                                false);
+                                        }
 
-                        lastPhotoUrl = "";
-                });
+                                        if (doctorIcon != null) {
+
+                                                doctorIcon.setVisible(
+                                                                true);
+                                        }
+
+                                        lastPhotoUrl = "";
+                                });
         }
 
         // =========================================================
@@ -1296,33 +1741,38 @@ public class DoctorProfilePage {
                         }
                 };
 
-                task.setOnSucceeded(e -> {
+                task.setOnSucceeded(
+                                e -> {
 
-                        if (task.getValue()) {
+                                        if (task.getValue()) {
 
-                                clearPhoto();
+                                                clearPhoto();
 
-                                showAlert(
-                                                Alert.AlertType.INFORMATION,
-                                                "Profile photo removed successfully.");
+                                                showAlert(
+                                                                Alert.AlertType.INFORMATION,
+                                                                "Profile photo removed successfully.");
 
-                        } else {
+                                        } else {
 
-                                showAlert(
-                                                Alert.AlertType.ERROR,
-                                                "Could not remove profile photo.");
-                        }
-                });
+                                                showAlert(
+                                                                Alert.AlertType.ERROR,
+                                                                "Could not remove profile photo.");
+                                        }
+                                });
 
-                task.setOnFailed(e -> {
+                task.setOnFailed(
+                                e -> {
 
-                        showAlert(
-                                        Alert.AlertType.ERROR,
-                                        "Error while removing photo.");
+                                        showAlert(
+                                                        Alert.AlertType.ERROR,
+                                                        "Error while removing photo.");
 
-                        task.getException()
-                                        .printStackTrace();
-                });
+                                        if (task.getException() != null) {
+
+                                                task.getException()
+                                                                .printStackTrace();
+                                        }
+                                });
 
                 Thread thread = new Thread(task);
 
@@ -1372,51 +1822,33 @@ public class DoctorProfilePage {
                         Alert.AlertType type,
                         String message) {
 
-                Platform.runLater(() -> {
+                Platform.runLater(
+                                () -> {
 
-                        Alert alert = new Alert(type);
+                                        Alert alert = new Alert(type);
 
-                        alert.setTitle(
-                                        "Doctor Profile");
+                                        alert.setTitle(
+                                                        "Doctor Profile");
 
-                        alert.setHeaderText(null);
+                                        alert.setHeaderText(
+                                                        null);
 
-                        alert.setContentText(message);
+                                        alert.setContentText(
+                                                        message);
 
-                        alert.showAndWait();
-                });
+                                        alert.showAndWait();
+                                });
         }
 
         // =========================================================
         // SAFE STRING
         // =========================================================
 
-        private String safe(String value) {
+        private String safe(
+                        String value) {
 
                 return value == null
                                 ? ""
                                 : value;
-        }
-
-        // =========================================================
-        // COLUMN HELPER
-        // =========================================================
-
-        private static class ColumnConstraintsHelper {
-
-                static void setColumns(GridPane grid) {
-
-                        javafx.scene.layout.ColumnConstraints c1 = new javafx.scene.layout.ColumnConstraints();
-
-                        javafx.scene.layout.ColumnConstraints c2 = new javafx.scene.layout.ColumnConstraints();
-
-                        c1.setPercentWidth(50);
-
-                        c2.setPercentWidth(50);
-
-                        grid.getColumnConstraints().addAll(
-                                        c1,
-                                        c2);
-                }
         }
 }

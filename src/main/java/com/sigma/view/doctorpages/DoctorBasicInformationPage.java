@@ -24,7 +24,7 @@ public class DoctorBasicInformationPage extends Application {
 
                 BorderPane root = new BorderPane();
 
-                Theme.applyBackground(root);
+                DoctorTheme.applyBackground(root);
 
                 root.setPadding(
                                 new Insets(
@@ -50,7 +50,7 @@ public class DoctorBasicInformationPage extends Application {
                                 "-fx-background-color: white;" +
                                                 "-fx-background-radius: 18;" +
                                                 "-fx-border-color: " +
-                                                Theme.BORDER + ";" +
+                                                DoctorTheme.BORDER + ";" +
                                                 "-fx-border-radius: 18;" +
                                                 "-fx-effect: dropshadow(" +
                                                 "gaussian, rgba(154,139,194,0.15)," +
@@ -67,24 +67,24 @@ public class DoctorBasicInformationPage extends Application {
 
                 title.setFont(
                                 javafx.scene.text.Font.font(
-                                                Theme.FONT,
+                                                DoctorTheme.FONT,
                                                 javafx.scene.text.FontWeight.BOLD,
                                                 24));
 
                 title.setTextFill(
-                                Color.web(Theme.TEXT));
+                                Color.web(DoctorTheme.TEXT));
 
                 Label subtitle = new Label(
                                 "Please provide your basic information to set up your doctor profile.");
 
                 subtitle.setFont(
                                 javafx.scene.text.Font.font(
-                                                Theme.FONT,
+                                                DoctorTheme.FONT,
                                                 javafx.scene.text.FontWeight.NORMAL,
                                                 12));
 
                 subtitle.setTextFill(
-                                Color.web(Theme.SECONDARY_TEXT));
+                                Color.web(DoctorTheme.SECONDARY_TEXT));
 
                 heading.getChildren().addAll(
                                 title,
@@ -313,17 +313,17 @@ public class DoctorBasicInformationPage extends Application {
 
                 skip.setFont(
                                 javafx.scene.text.Font.font(
-                                                Theme.FONT,
+                                                DoctorTheme.FONT,
                                                 javafx.scene.text.FontWeight.BOLD,
                                                 12));
 
                 skip.setStyle(
                                 "-fx-background-color: transparent;" +
                                                 "-fx-text-fill: " +
-                                                Theme.SECONDARY_TEXT + ";" +
+                                                DoctorTheme.SECONDARY_TEXT + ";" +
                                                 "-fx-cursor: hand;");
 
-                Button save = Theme.primaryButton(
+                Button save = DoctorTheme.primaryButton(
                                 "Save & Continue");
 
                 HBox buttons = new HBox(15);
@@ -493,7 +493,7 @@ public class DoctorBasicInformationPage extends Application {
                                 ScrollPane.ScrollBarPolicy.AS_NEEDED);
                 scroll.setStyle(
                                 "-fx-background-color: transparent;" +
-                                "-fx-background: transparent;");
+                                                "-fx-background: transparent;");
 
                 root.setCenter(scroll);
 
@@ -504,8 +504,7 @@ public class DoctorBasicInformationPage extends Application {
                 Scene scene = new Scene(
                                 root,
                                 scenesettings.rectanguler2d.getWidth(),
-                                scenesettings.rectanguler2d.getHeight()
-                );
+                                scenesettings.rectanguler2d.getHeight());
 
                 stage.setScene(scene);
 
@@ -513,11 +512,9 @@ public class DoctorBasicInformationPage extends Application {
                 // STAGE SIZE
                 // =====================================================
 
-                double screenWidth =
-                                scenesettings.rectanguler2d.getWidth();
+                double screenWidth = scenesettings.rectanguler2d.getWidth();
 
-                double screenHeight =
-                                scenesettings.rectanguler2d.getHeight();
+                double screenHeight = scenesettings.rectanguler2d.getHeight();
 
                 stage.setWidth(screenWidth);
                 stage.setHeight(screenHeight);
@@ -543,12 +540,12 @@ public class DoctorBasicInformationPage extends Application {
 
                 label.setFont(
                                 javafx.scene.text.Font.font(
-                                                Theme.FONT,
+                                                DoctorTheme.FONT,
                                                 javafx.scene.text.FontWeight.BOLD,
                                                 15));
 
                 label.setTextFill(
-                                Color.web(Theme.PRIMARY));
+                                Color.web(DoctorTheme.PRIMARY));
 
                 return label;
         }
@@ -586,12 +583,12 @@ public class DoctorBasicInformationPage extends Application {
 
                 label.setFont(
                                 javafx.scene.text.Font.font(
-                                                Theme.FONT,
+                                                DoctorTheme.FONT,
                                                 javafx.scene.text.FontWeight.BOLD,
                                                 11));
 
                 label.setTextFill(
-                                Color.web(Theme.TEXT));
+                                Color.web(DoctorTheme.TEXT));
 
                 box.getChildren().addAll(
                                 label,

@@ -281,8 +281,9 @@ public class PatientReportController {
                     || patientName.contains(search)
                     || reportType.contains(search);
 
-            boolean matchesStatus = allStatus
-                    || selectedStatus.equalsIgnoreCase(status);
+                boolean matchesStatus = allStatus
+                    || selectedStatus != null
+                        && selectedStatus.equalsIgnoreCase(status);
 
             if (matchesSearch && matchesStatus) {
 

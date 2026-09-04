@@ -3,7 +3,6 @@ package com.sigma.controller.doctorController;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
-import com.google.cloud.firestore.WriteResult;
 import com.sigma.config.DoctorModule.FirebaseConfig;
 import com.sigma.model.DoctorModel.DoctorAppointment;
 
@@ -131,7 +130,7 @@ public class DoctorAppointmentController {
 
                 try {
 
-                        Object value = doc.get(field);
+                        Object value = doc.getData().get(field);
 
                         return value == null
                                         ? ""
@@ -454,7 +453,7 @@ public class DoctorAppointmentController {
                                         "payment",
                                         payment);
 
-                        WriteResult result = docRef.set(data).get();
+                        docRef.set(data).get();
 
                         // ----------------------------------------------------
                         // CREATE LOCAL OBJECT
