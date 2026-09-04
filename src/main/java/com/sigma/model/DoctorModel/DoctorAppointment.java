@@ -1,10 +1,13 @@
-
 package com.sigma.model.DoctorModel;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 public class DoctorAppointment {
+
+    // =====================================================
+    // PROPERTIES
+    // =====================================================
 
     private final StringProperty appointmentId;
     private final StringProperty doctorId;
@@ -16,6 +19,10 @@ public class DoctorAppointment {
     private final StringProperty status;
     private final StringProperty payment;
     private final StringProperty action;
+
+    // =====================================================
+    // MAIN CONSTRUCTOR - FIREBASE
+    // =====================================================
 
     public DoctorAppointment(
             String appointmentId,
@@ -29,36 +36,40 @@ public class DoctorAppointment {
             String payment,
             String action) {
 
-        this.appointmentId = new SimpleStringProperty(
-                appointmentId == null ? "" : appointmentId);
+        this.appointmentId =
+                new SimpleStringProperty(appointmentId);
 
-        this.doctorId = new SimpleStringProperty(
-                doctorId == null ? "" : doctorId);
+        this.doctorId =
+                new SimpleStringProperty(doctorId);
 
-        this.patientId = new SimpleStringProperty(
-                patientId == null ? "" : patientId);
+        this.patientId =
+                new SimpleStringProperty(patientId);
 
-        this.date = new SimpleStringProperty(
-                date == null ? "" : date);
+        this.date =
+                new SimpleStringProperty(date);
 
-        this.time = new SimpleStringProperty(
-                time == null ? "" : time);
+        this.time =
+                new SimpleStringProperty(time);
 
-        this.patient = new SimpleStringProperty(
-                patient == null ? "" : patient);
+        this.patient =
+                new SimpleStringProperty(patient);
 
-        this.type = new SimpleStringProperty(
-                type == null ? "" : type);
+        this.type =
+                new SimpleStringProperty(type);
 
-        this.status = new SimpleStringProperty(
-                status == null ? "" : status);
+        this.status =
+                new SimpleStringProperty(status);
 
-        this.payment = new SimpleStringProperty(
-                payment == null ? "" : payment);
+        this.payment =
+                new SimpleStringProperty(payment);
 
-        this.action = new SimpleStringProperty(
-                action == null ? "View" : action);
+        this.action =
+                new SimpleStringProperty(action);
     }
+
+    // =====================================================
+    // OLD CONSTRUCTOR - DAO COMPATIBILITY
+    // =====================================================
 
     public DoctorAppointment(
             String time,
@@ -80,6 +91,10 @@ public class DoctorAppointment {
                 payment,
                 action);
     }
+
+    // =====================================================
+    // GETTERS
+    // =====================================================
 
     public String getAppointmentId() {
         return appointmentId.get();
@@ -121,6 +136,10 @@ public class DoctorAppointment {
         return action.get();
     }
 
+    // =====================================================
+    // PROPERTY METHODS
+    // =====================================================
+
     public StringProperty appointmentIdProperty() {
         return appointmentId;
     }
@@ -161,58 +180,64 @@ public class DoctorAppointment {
         return action;
     }
 
-    public void setAppointmentId(String value) {
-        appointmentId.set(value == null ? "" : value);
+    // =====================================================
+    // SETTERS
+    // =====================================================
+
+    public void setAppointmentId(String appointmentId) {
+        this.appointmentId.set(appointmentId);
     }
 
-    public void setDoctorId(String value) {
-        doctorId.set(value == null ? "" : value);
+    public void setDoctorId(String doctorId) {
+        this.doctorId.set(doctorId);
     }
 
-    public void setPatientId(String value) {
-        patientId.set(value == null ? "" : value);
+    public void setPatientId(String patientId) {
+        this.patientId.set(patientId);
     }
 
-    public void setDate(String value) {
-        date.set(value == null ? "" : value);
+    public void setDate(String date) {
+        this.date.set(date);
     }
 
-    public void setTime(String value) {
-        time.set(value == null ? "" : value);
+    public void setTime(String time) {
+        this.time.set(time);
     }
 
-    public void setPatient(String value) {
-        patient.set(value == null ? "" : value);
+    public void setPatient(String patient) {
+        this.patient.set(patient);
     }
 
-    public void setType(String value) {
-        type.set(value == null ? "" : value);
+    public void setType(String type) {
+        this.type.set(type);
     }
 
-    public void setStatus(String value) {
-        status.set(value == null ? "" : value);
+    public void setStatus(String status) {
+        this.status.set(status);
     }
 
-    public void setPayment(String value) {
-        payment.set(value == null ? "" : value);
+    public void setPayment(String payment) {
+        this.payment.set(payment);
     }
 
-    public void setAction(String value) {
-        action.set(value == null ? "View" : value);
+    public void setAction(String action) {
+        this.action.set(action);
     }
 
-    @Override
-    public String toString() {
-        return "DoctorAppointment{" +
-                "appointmentId='" + getAppointmentId() + '\'' +
-                ", doctorId='" + getDoctorId() + '\'' +
-                ", patientId='" + getPatientId() + '\'' +
-                ", date='" + getDate() + '\'' +
-                ", time='" + getTime() + '\'' +
-                ", patient='" + getPatient() + '\'' +
-                ", type='" + getType() + '\'' +
-                ", status='" + getStatus() + '\'' +
-                ", payment='" + getPayment() + '\'' +
-                '}';
+    // =====================================================
+    // DETAILS
+    // =====================================================
+
+    public String getDetails() {
+
+        return "Appointment ID: " + getAppointmentId()
+                + "\nDoctor ID: " + getDoctorId()
+                + "\nPatient ID: " + getPatientId()
+                + "\nPatient: " + getPatient()
+                + "\nDate: " + getDate()
+                + "\nTime: " + getTime()
+                + "\nType: " + getType()
+                + "\nStatus: " + getStatus()
+                + "\nPayment: " + getPayment();
     }
 }

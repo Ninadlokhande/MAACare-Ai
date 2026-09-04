@@ -3,6 +3,9 @@ package com.sigma;
 
 import com.sigma.view.Loginpage;
 import com.sigma.view.Welcomepage;
+//import com.sigma.view.doctorpages.DoctorDashboard;
+import com.sigma.view.doctorpages.DoctorDashboard;
+
 import javafx.application.Application;
 
 public class Main {

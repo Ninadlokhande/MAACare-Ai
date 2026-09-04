@@ -1,6 +1,9 @@
 
 package com.sigma.view;
 
+import com.sigma.view.adminpages.AdminDashboard;
+import com.sigma.view.trial.AiChatbotPage;
+
 import javafx.animation.FadeTransition;
 import javafx.animation.Interpolator;
 import javafx.animation.ParallelTransition;
@@ -32,660 +35,733 @@ import javafx.util.Duration;
 
 public class Welcomepage extends Application {
 
+        AiChatbotPage aiPage = new AiChatbotPage();
+
+
+    // =========================================================
+    // COMMON STAGE
+    // =========================================================
+
+    public static Stage stage;
+
+    private Scene scene;
+
+    private SVGPath wave1;
+    private SVGPath wave2;
+
+    // =========================================================
+    // START
+    // =========================================================
+
+    @Override
+    public void start(Stage primaryStage) {
+
+        stage = primaryStage;
+
+        primaryStage.setTitle("MaaCare AI");
+
+        primaryStage.setMinWidth(1000);
+        primaryStage.setMinHeight(650);
+        primaryStage.setMaximized(true);
+
         // =========================================================
-        // COMMON STAGE
+        // ROOT
         // =========================================================
 
-        public static Stage stage;
+        StackPane root = new StackPane();
 
-        private SVGPath wave1;
-        private SVGPath wave2;
+        root.setStyle(
+                "-fx-background-color: linear-gradient(" +
+                        "to bottom right, " +
+                        "#FFFFFF 0%, " +
+                        "#FFF4F8 50%, " +
+                        "#F0E7FF 100%" +
+                        ");");
 
         // =========================================================
-        // START
+        // BACKGROUND GLOW 1
         // =========================================================
 
-        @Override
-        public void start(Stage primaryStage) {
+        Circle glow1 = new Circle();
 
-                // SAME COMMON STAGE
-                stage = primaryStage;
+        glow1.radiusProperty().bind(
+                root.heightProperty().multiply(0.30));
 
-                stage.setTitle("MaaCare AI");
+        glow1.setFill(
+                new RadialGradient(
+                        0,
+                        0,
+                        0.5,
+                        0.5,
+                        1,
+                        true,
+                        CycleMethod.NO_CYCLE,
+                        new Stop(
+                                0,
+                                Color.web("#FFD1E3", 0.55)),
+                        new Stop(
+                                1,
+                                Color.TRANSPARENT)));
 
-                stage.setMinWidth(1000);
-                stage.setMinHeight(650);
-                stage.setMaximized(false);
-                stage.setWidth(1200);
-                stage.setHeight(750);
-                stage.centerOnScreen();
+        StackPane.setAlignment(
+                glow1,
+                Pos.TOP_LEFT);
 
-                // =========================================================
-                // ROOT
-                // =========================================================
+        // =========================================================
+        // BACKGROUND GLOW 2
+        // =========================================================
 
-                StackPane root = new StackPane();
+        Circle glow2 = new Circle();
 
-                root.setStyle(
-                                "-fx-background-color: linear-gradient(" +
-                                                "to bottom right, " +
-                                                "#FFFFFF 0%, " +
-                                                "#FFF4F8 50%, " +
-                                                "#F0E7FF 100%" +
-                                                ");");
+        glow2.radiusProperty().bind(
+                root.heightProperty().multiply(0.25));
 
-                // =========================================================
-                // GLOW 1
-                // =========================================================
+        glow2.setFill(
+                new RadialGradient(
+                        0,
+                        0,
+                        0.5,
+                        0.5,
+                        1,
+                        true,
+                        CycleMethod.NO_CYCLE,
+                        new Stop(
+                                0,
+                                Color.web("#DCCBFF", 0.50)),
+                        new Stop(
+                                1,
+                                Color.TRANSPARENT)));
 
-                Circle glow1 = new Circle();
+        StackPane.setAlignment(
+                glow2,
+                Pos.BOTTOM_RIGHT);
 
-                glow1.radiusProperty().bind(
-                                root.heightProperty().multiply(0.30));
+        // =========================================================
+        // WAVE 1
+        // =========================================================
 
-                glow1.setFill(
-                                new RadialGradient(
-                                                0,
-                                                0,
-                                                0.5,
-                                                0.5,
-                                                1,
-                                                true,
-                                                CycleMethod.NO_CYCLE,
-                                                new Stop(
-                                                                0,
-                                                                Color.web("#FFD1E3", 0.55)),
-                                                new Stop(
-                                                                1,
-                                                                Color.TRANSPARENT)));
+        wave1 = new SVGPath();
 
-                StackPane.setAlignment(
-                                glow1,
-                                Pos.TOP_LEFT);
+        wave1.setFill(
+                new LinearGradient(
+                        0,
+                        0,
+                        1,
+                        0,
+                        true,
+                        CycleMethod.NO_CYCLE,
+                        new Stop(
+                                0,
+                                Color.web("#F54B87", 0.40)),
+                        new Stop(
+                                0.5,
+                                Color.web("#E78BC0", 0.30)),
+                        new Stop(
+                                1,
+                                Color.web("#9B4DCC", 0.40))));
 
-                // =========================================================
-                // GLOW 2
-                // =========================================================
+        // =========================================================
+        // WAVE 2
+        // =========================================================
 
-                Circle glow2 = new Circle();
+        wave2 = new SVGPath();
 
-                glow2.radiusProperty().bind(
-                                root.heightProperty().multiply(0.25));
+        wave2.setFill(
+                new LinearGradient(
+                        0,
+                        0,
+                        1,
+                        0,
+                        true,
+                        CycleMethod.NO_CYCLE,
+                        new Stop(
+                                0,
+                                Color.web("#FFB5D0", 0.30)),
+                        new Stop(
+                                0.5,
+                                Color.web("#E4B8F0", 0.25)),
+                        new Stop(
+                                1,
+                                Color.web("#B99BEA", 0.30))));
 
-                glow2.setFill(
-                                new RadialGradient(
-                                                0,
-                                                0,
-                                                0.5,
-                                                0.5,
-                                                1,
-                                                true,
-                                                CycleMethod.NO_CYCLE,
-                                                new Stop(
-                                                                0,
-                                                                Color.web("#DCCBFF", 0.50)),
-                                                new Stop(
-                                                                1,
-                                                                Color.TRANSPARENT)));
+        // =========================================================
+        // MAIN BORDERPANE
+        // =========================================================
 
-                StackPane.setAlignment(
-                                glow2,
-                                Pos.BOTTOM_RIGHT);
+        BorderPane borderPane = new BorderPane();
 
-                // =========================================================
-                // WAVES
-                // =========================================================
+        borderPane.setPadding(
+                new Insets(
+                        30,
+                        60,
+                        30,
+                        60));
 
-                wave1 = new SVGPath();
+        // =========================================================
+        // LOGO
+        // =========================================================
 
-                wave1.setFill(
-                                new LinearGradient(
-                                                0,
-                                                0,
-                                                1,
-                                                0,
-                                                true,
-                                                CycleMethod.NO_CYCLE,
-                                                new Stop(
-                                                                0,
-                                                                Color.web("#F54B87", 0.40)),
-                                                new Stop(
-                                                                0.5,
-                                                                Color.web("#E78BC0", 0.30)),
-                                                new Stop(
-                                                                1,
-                                                                Color.web("#9B4DCC", 0.40))));
+        var logoResource = getClass().getResource(
+                "/assets/images/logo/logo.png");
 
-                wave2 = new SVGPath();
+        if (logoResource == null) {
 
-                wave2.setFill(
-                                new LinearGradient(
-                                                0,
-                                                0,
-                                                1,
-                                                0,
-                                                true,
-                                                CycleMethod.NO_CYCLE,
-                                                new Stop(
-                                                                0,
-                                                                Color.web("#FFB5D0", 0.30)),
-                                                new Stop(
-                                                                0.5,
-                                                                Color.web("#E4B8F0", 0.25)),
-                                                new Stop(
-                                                                1,
-                                                                Color.web("#B99BEA", 0.30))));
+            System.out.println(
+                    "ERROR: logo.png not found!");
 
-                // =========================================================
-                // MAIN BORDERPANE
-                // =========================================================
+            return;
+        }
 
-                BorderPane borderPane = new BorderPane();
+        Image logoImage = new Image(
+                logoResource.toExternalForm());
 
-                borderPane.setPadding(
-                                new Insets(
-                                                30,
-                                                60,
-                                                30,
-                                                60));
+        ImageView logoView = new ImageView(logoImage);
 
-                // =========================================================
-                // LOGO
-                // =========================================================
+        logoView.setPreserveRatio(true);
+        logoView.setSmooth(true);
 
-                var logoResource = getClass().getResource(
-                                "/assets/images/logo/logo.png");
+        logoView.fitHeightProperty().bind(
+                root.heightProperty().multiply(0.30));
 
-                if (logoResource == null) {
+        // =========================================================
+        // GET STARTED BUTTON
+        // =========================================================
 
-                        System.out.println(
-                                        "ERROR: logo.png not found!");
+        Button getStartedBtn = new Button(" Get Started");
 
-                        return;
+        getStartedBtn.setStyle(
+                "-fx-background-color: linear-gradient(to right, #F54B87, #9B4DCC);" +
+                        "-fx-text-fill: white;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-font-size: 17px;" +
+                        "-fx-padding: 14px 45px;" +
+                        "-fx-background-radius: 30px;" +
+                        "-fx-border-radius: 30px;" +
+                        "-fx-cursor: hand;");
+
+        // =========================================================
+        // BUTTON HOVER
+        // =========================================================
+
+        getStartedBtn.setOnMouseEntered(e -> getStartedBtn.setStyle(
+                "-fx-background-color: linear-gradient(to right, #E83F7C, #8B42BD);" +
+                        "-fx-text-fill: white;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-font-size: 17px;" +
+                        "-fx-padding: 14px 45px;" +
+                        "-fx-background-radius: 30px;" +
+                        "-fx-border-radius: 30px;" +
+                        "-fx-cursor: hand;"));
+
+        getStartedBtn.setOnMouseExited(e -> getStartedBtn.setStyle(
+                "-fx-background-color: linear-gradient(to right, #F54B87, #9B4DCC);" +
+                        "-fx-text-fill: white;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-font-size: 17px;" +
+                        "-fx-padding: 14px 45px;" +
+                        "-fx-background-radius: 30px;" +
+                        "-fx-border-radius: 30px;" +
+                        "-fx-cursor: hand;"));
+
+        // =========================================================
+        // GET STARTED ACTION
+        // =========================================================
+
+        getStartedBtn.setOnAction(e -> {
+
+            try {
+
+                System.out.println(
+                        "[WELCOME] Opening Login page...");
+
+                Loginpage loginpage = new Loginpage();
+
+                Scene loginScene = loginpage.gotologinpage();
+
+                if (loginScene != null) {
+
+                    primaryStage.setScene(
+                            loginScene);
+
+                    primaryStage.setMaximized(
+                            true);
+
+                    primaryStage.show();
+
+                    System.out.println(
+                            "[WELCOME] Login page opened successfully.");
                 }
 
-                Image logoImage = new Image(
-                                logoResource.toExternalForm());
+            } catch (Exception ex) {
 
-                ImageView logoView = new ImageView(logoImage);
+                System.out.println(
+                        "[WELCOME] Failed to open Login page.");
 
-                logoView.setPreserveRatio(true);
-                logoView.setSmooth(true);
+                ex.printStackTrace();
+            }
+        });
 
-                logoView.fitHeightProperty().bind(
-                                root.heightProperty().multiply(0.30));
+        // =========================================================
+        // LOGO SHADOW
+        // =========================================================
 
-                // =========================================================
-                // GET STARTED BUTTON
-                // =========================================================
+        DropShadow logoShadow = new DropShadow();
 
-                Button getStartedBtn = new Button(" Get Started");
+        logoShadow.setRadius(25);
+        logoShadow.setSpread(0.08);
+        logoShadow.setOffsetY(8);
 
-                getStartedBtn.setStyle(
-                                "-fx-background-color: linear-gradient(to right, #F54B87, #9B4DCC);" +
-                                                "-fx-text-fill: white;" +
-                                                "-fx-font-weight: bold;" +
-                                                "-fx-font-size: 17px;" +
-                                                "-fx-padding: 14px 45px;" +
-                                                "-fx-background-radius: 30px;" +
-                                                "-fx-border-radius: 30px;" +
-                                                "-fx-cursor: hand;");
+        logoShadow.setColor(
+                Color.web(
+                        "#C94C91",
+                        0.22));
 
-                getStartedBtn.setOnMouseEntered(e -> getStartedBtn.setStyle(
-                                "-fx-background-color: linear-gradient(to right, #E83F7C, #8B42BD);" +
-                                                "-fx-text-fill: white;" +
-                                                "-fx-font-weight: bold;" +
-                                                "-fx-font-size: 17px;" +
-                                                "-fx-padding: 14px 45px;" +
-                                                "-fx-background-radius: 30px;" +
-                                                "-fx-border-radius: 30px;" +
-                                                "-fx-cursor: hand;"));
+        logoView.setEffect(
+                logoShadow);
 
-                getStartedBtn.setOnMouseExited(e -> getStartedBtn.setStyle(
-                                "-fx-background-color: linear-gradient(to right, #F54B87, #9B4DCC);" +
-                                                "-fx-text-fill: white;" +
-                                                "-fx-font-weight: bold;" +
-                                                "-fx-font-size: 17px;" +
-                                                "-fx-padding: 14px 45px;" +
-                                                "-fx-background-radius: 30px;" +
-                                                "-fx-border-radius: 30px;" +
-                                                "-fx-cursor: hand;"));
+        // =========================================================
+        // MAIN TEXT
+        // =========================================================
 
-                // =========================================================
-                // OPEN LOGIN ON SAME STAGE
-                // =========================================================
+        Text text1 = new Text("");
 
-                getStartedBtn.setOnAction(e -> {
+        text1.setStyle(
+                "-fx-fill: #24234F;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-font-size: 20px;");
 
-                        try {
+        Text pinkText = new Text(
+                "Smart Care for Every Mother & Baby");
 
-                                System.out.println(
-                                                "[WELCOME] Opening Login page on SAME Stage...");
+        pinkText.setStyle(
+                "-fx-fill: #E84A87;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-font-size: 36px;");
 
-                                Loginpage loginpage = new Loginpage();
+        Text text2 = new Text("");
 
-                                Scene loginScene = loginpage.gotologinpage();
+        text2.setStyle(
+                "-fx-fill: #24234F;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-font-size: 20px;");
 
-                                if (loginScene != null) {
+        TextFlow annotation = new TextFlow(
+                text1,
+                pinkText,
+                text2);
 
-                                        // SAME STAGE
-                                        stage.setScene(loginScene);
+        annotation.setTextAlignment(
+                TextAlignment.CENTER);
 
-                                        stage.setTitle("MaaCare AI - Login");
+        annotation.setMaxWidth(
+                700);
 
-                                        stage.show();
+        // =========================================================
+        // EXTRA INFORMATION
+        // =========================================================
 
-                                        stage.toFront();
-                                        stage.requestFocus();
+        Text extraInfo = new Text(
+                "Track Pregnancy . AI Health Assistant . Hospital Booking .");
 
-                                        System.out.println(
-                                                        "[WELCOME] Login page opened on SAME Stage.");
+        extraInfo.setStyle(
+                "-fx-fill: #666680;" +
+                        "-fx-font-size: 20px;" +
+                        "-fx-font-weight: normal;");
 
-                                }
+        Text smallInfo = new Text(
+                "Mother Care . Baby Care . Government Schemes");
 
-                        } catch (Exception ex) {
+        smallInfo.setStyle(
+                "-fx-fill: #77778D;" +
+                        "-fx-font-size: 20px;");
 
-                                System.out.println(
-                                                "[WELCOME] Failed to open Login page.");
+        // =========================================================
+        // CONTENT BOX
+        // =========================================================
 
-                                ex.printStackTrace();
-                        }
+        VBox logoSideBox = new VBox(
+                14,
+                logoView,
+                annotation,
+                extraInfo,
+                smallInfo,
+                getStartedBtn);
+
+        logoSideBox.setAlignment(
+                Pos.CENTER);
+
+        logoSideBox.setPadding(
+                new Insets(20));
+
+        logoSideBox.setMaxWidth(
+                750);
+
+        logoSideBox.setMaxHeight(
+                Double.MAX_VALUE);
+
+        // =========================================================
+        // RESPONSIVE SPACING
+        // =========================================================
+
+        logoSideBox.spacingProperty().bind(
+                root.heightProperty().multiply(0.018));
+
+        // =========================================================
+        // CENTER CONTENT
+        // =========================================================
+
+        borderPane.setCenter(
+                logoSideBox);
+
+        // =========================================================
+        // ADD BACKGROUND + CONTENT
+        // =========================================================
+
+        root.getChildren().addAll(
+                glow1,
+                glow2,
+                wave1,
+                wave2,
+                borderPane);
+
+        // =========================================================
+        // RESPONSIVE WAVES
+        // =========================================================
+
+        root.widthProperty().addListener(
+                (observable, oldValue, newValue) -> {
+
+                    updateWaves(
+                            newValue.doubleValue(),
+                            root.getHeight());
                 });
 
-                // =========================================================
-                // LOGO SHADOW
-                // =========================================================
+        root.heightProperty().addListener(
+                (observable, oldValue, newValue) -> {
 
-                DropShadow logoShadow = new DropShadow();
+                    updateWaves(
+                            root.getWidth(),
+                            newValue.doubleValue());
+                });
 
-                logoShadow.setRadius(25);
-                logoShadow.setSpread(0.08);
-                logoShadow.setOffsetY(8);
+        // =========================================================
+        // LOGO INTRO ANIMATION
+        // =========================================================
 
-                logoShadow.setColor(
-                                Color.web(
-                                                "#C94C91",
-                                                0.22));
+        logoView.setOpacity(0);
 
-                logoView.setEffect(logoShadow);
+        logoView.setScaleX(0.75);
+        logoView.setScaleY(0.75);
 
-                // =========================================================
-                // TEXT
-                // =========================================================
+        FadeTransition logoFade = new FadeTransition(
+                Duration.seconds(1.3),
+                logoView);
 
-                Text text1 = new Text("");
+        logoFade.setFromValue(0);
+        logoFade.setToValue(1);
 
-                text1.setStyle(
-                                "-fx-fill: #24234F;" +
-                                                "-fx-font-weight: bold;" +
-                                                "-fx-font-size: 20px;");
+        ScaleTransition logoScale = new ScaleTransition(
+                Duration.seconds(1.3),
+                logoView);
 
-                Text pinkText = new Text(
-                                "Smart Care for Every Mother & Baby");
+        logoScale.setFromX(0.75);
+        logoScale.setFromY(0.75);
 
-                pinkText.setStyle(
-                                "-fx-fill: #E84A87;" +
-                                                "-fx-font-weight: bold;" +
-                                                "-fx-font-size: 36px;");
+        logoScale.setToX(1);
+        logoScale.setToY(1);
 
-                Text text2 = new Text("");
+        logoScale.setInterpolator(
+                Interpolator.EASE_OUT);
 
-                text2.setStyle(
-                                "-fx-fill: #24234F;" +
-                                                "-fx-font-weight: bold;" +
-                                                "-fx-font-size: 20px;");
+        ParallelTransition logoIntro = new ParallelTransition(
+                logoFade,
+                logoScale);
 
-                TextFlow annotation = new TextFlow(
-                                text1,
-                                pinkText,
-                                text2);
+        // =========================================================
+        // FLOATING LOGO
+        // =========================================================
 
-                annotation.setTextAlignment(
-                                TextAlignment.CENTER);
+        TranslateTransition floating = new TranslateTransition(
+                Duration.seconds(3),
+                logoView);
 
-                annotation.setMaxWidth(700);
+        floating.setFromY(0);
+        floating.setToY(-10);
 
-                // =========================================================
-                // INFO
-                // =========================================================
+        floating.setAutoReverse(true);
 
-                Text extraInfo = new Text(
-                                "Track Pregnancy . AI Health Assistant . Hospital Booking .");
+        floating.setCycleCount(
+                TranslateTransition.INDEFINITE);
 
-                extraInfo.setStyle(
-                                "-fx-fill: #666680;" +
-                                                "-fx-font-size: 20px;");
+        floating.setInterpolator(
+                Interpolator.EASE_BOTH);
 
-                Text smallInfo = new Text(
-                                "Mother Care . Baby Care . Government Schemes");
+        logoIntro.setOnFinished(
+                event -> floating.play());
 
-                smallInfo.setStyle(
-                                "-fx-fill: #77778D;" +
-                                                "-fx-font-size: 20px;");
+        logoIntro.play();
 
-                // =========================================================
-                // CONTENT
-                // =========================================================
+        // =========================================================
+        // TEXT ANIMATIONS
+        // =========================================================
 
-                VBox logoSideBox = new VBox(
-                                14,
-                                logoView,
-                                annotation,
-                                extraInfo,
-                                smallInfo,
-                                getStartedBtn);
+        annotation.setOpacity(0);
+        extraInfo.setOpacity(0);
+        smallInfo.setOpacity(0);
 
-                logoSideBox.setAlignment(
-                                Pos.CENTER);
+        FadeTransition annotationFade = new FadeTransition(
+                Duration.seconds(0.9),
+                annotation);
 
-                logoSideBox.setPadding(
-                                new Insets(20));
+        annotationFade.setFromValue(0);
+        annotationFade.setToValue(1);
 
-                logoSideBox.setMaxWidth(750);
+        FadeTransition infoFade = new FadeTransition(
+                Duration.seconds(0.9),
+                extraInfo);
 
-                logoSideBox.setMaxHeight(
-                                Double.MAX_VALUE);
+        infoFade.setFromValue(0);
+        infoFade.setToValue(1);
 
-                logoSideBox.spacingProperty().bind(
-                                root.heightProperty().multiply(0.018));
+        FadeTransition smallFade = new FadeTransition(
+                Duration.seconds(0.9),
+                smallInfo);
 
-                borderPane.setCenter(
-                                logoSideBox);
+        smallFade.setFromValue(0);
+        smallFade.setToValue(1);
 
-                root.getChildren().addAll(
-                                glow1,
-                                glow2,
-                                wave1,
-                                wave2,
-                                borderPane);
+        // =========================================================
+        // TEXT DELAY
+        // =========================================================
 
-                // =========================================================
-                // RESPONSIVE WAVES
-                // =========================================================
+        javafx.animation.PauseTransition delay = new javafx.animation.PauseTransition(
+                Duration.seconds(0.8));
 
-                root.widthProperty().addListener(
-                                (observable, oldValue, newValue) -> updateWaves(
-                                                newValue.doubleValue(),
-                                                root.getHeight()));
+        delay.setOnFinished(
+                event -> {
 
-                root.heightProperty().addListener(
-                                (observable, oldValue, newValue) -> updateWaves(
-                                                root.getWidth(),
-                                                newValue.doubleValue()));
+                    annotationFade.play();
 
-                // =========================================================
-                // ANIMATION
-                // =========================================================
+                    javafx.animation.PauseTransition delay2 = new javafx.animation.PauseTransition(
+                            Duration.seconds(0.25));
 
-                logoView.setOpacity(0);
-
-                logoView.setScaleX(0.75);
-                logoView.setScaleY(0.75);
-
-                FadeTransition logoFade = new FadeTransition(
-                                Duration.seconds(1.3),
-                                logoView);
-
-                logoFade.setFromValue(0);
-                logoFade.setToValue(1);
-
-                ScaleTransition logoScale = new ScaleTransition(
-                                Duration.seconds(1.3),
-                                logoView);
-
-                logoScale.setFromX(0.75);
-                logoScale.setFromY(0.75);
-
-                logoScale.setToX(1);
-                logoScale.setToY(1);
-
-                logoScale.setInterpolator(
-                                Interpolator.EASE_OUT);
-
-                ParallelTransition logoIntro = new ParallelTransition(
-                                logoFade,
-                                logoScale);
-
-                TranslateTransition floating = new TranslateTransition(
-                                Duration.seconds(3),
-                                logoView);
-
-                floating.setFromY(0);
-                floating.setToY(-10);
-
-                floating.setAutoReverse(true);
-
-                floating.setCycleCount(
-                                TranslateTransition.INDEFINITE);
-
-                floating.setInterpolator(
-                                Interpolator.EASE_BOTH);
-
-                logoIntro.setOnFinished(
-                                event -> floating.play());
-
-                logoIntro.play();
-
-                annotation.setOpacity(0);
-                extraInfo.setOpacity(0);
-                smallInfo.setOpacity(0);
-
-                FadeTransition annotationFade = new FadeTransition(
-                                Duration.seconds(0.9),
-                                annotation);
-
-                annotationFade.setFromValue(0);
-                annotationFade.setToValue(1);
-
-                FadeTransition infoFade = new FadeTransition(
-                                Duration.seconds(0.9),
-                                extraInfo);
-
-                infoFade.setFromValue(0);
-                infoFade.setToValue(1);
-
-                FadeTransition smallFade = new FadeTransition(
-                                Duration.seconds(0.9),
-                                smallInfo);
-
-                smallFade.setFromValue(0);
-                smallFade.setToValue(1);
-
-                javafx.animation.PauseTransition delay = new javafx.animation.PauseTransition(
-                                Duration.seconds(0.8));
-
-                delay.setOnFinished(event -> {
-
-                        annotationFade.play();
-
-                        javafx.animation.PauseTransition delay2 = new javafx.animation.PauseTransition(
-                                        Duration.seconds(0.25));
-
-                        delay2.setOnFinished(event2 -> {
+                    delay2.setOnFinished(
+                            event2 -> {
 
                                 infoFade.play();
                                 smallFade.play();
-                        });
+                            });
 
-                        delay2.play();
+                    delay2.play();
                 });
 
-                delay.play();
+        delay.play();
 
-                // =========================================================
-                // SCENE
-                // =========================================================
+        // =========================================================
+        // WELCOME PAGE SCENE
+        // =========================================================
 
-                Scene sc = new Scene(
-                                root,
-                                1500,
-                                800);
+        Scene sc = new Scene(
+                root,
+                scenesettings.rectanguler2d.getWidth(),
+                scenesettings.rectanguler2d.getHeight());
 
-                stage.setScene(sc);
+        scene = sc;
+        
+        stage.setScene(sc);
 
-                stage.setTitle("MaaCare AI");
+        stage.setTitle(
+                "MaaCare AI");
 
-                stage.setMinWidth(1000);
-                stage.setMinHeight(650);
+        // =========================================================
+        // WINDOW SETTINGS
+        // =========================================================
 
-                stage.setMaximized(false);
-                stage.setWidth(1200);
-                stage.setHeight(750);
-                stage.centerOnScreen();
+        stage.setMinWidth(1500);
+        stage.setMinHeight(800);
+        stage.setMaximized(true);
+
+        stage.show();
+
+        // =========================================================
+        // INITIAL WAVE UPDATE
+        // =========================================================
+
+        updateWaves(
+                root.getWidth(),
+                root.getHeight());
+    }
+
+    // =============================================================
+    // SHOW WELCOME PAGE
+    // =============================================================
+
+    public static void show() {
+
+        try {
+
+            // -----------------------------------------------------
+            // If common stage already exists
+            // -----------------------------------------------------
+
+            if (stage != null) {
+
+                /*
+                 * New WelcomePage scene तयार करण्यासाठी
+                 * start() पुन्हा call केला आहे.
+                 *
+                 * त्यामुळे:
+                 * Doctor Dashboard
+                 * ↓
+                 * Logout
+                 * ↓
+                 * Welcome Page
+                 */
+
+                Welcomepage welcomePage = new Welcomepage();
+
+                welcomePage.start(stage);
+
+                stage.setTitle(
+                        "MaaCare AI");
+
+                stage.setMaximized(true);
 
                 stage.show();
 
-                updateWaves(
-                                root.getWidth(),
-                                root.getHeight());
+                return;
+            }
+
+            // -----------------------------------------------------
+            // If stage does not exist
+            // -----------------------------------------------------
+
+            Stage newStage = new Stage();
+
+            Welcomepage welcomePage = new Welcomepage();
+
+            welcomePage.start(newStage);
+
+        } catch (Exception ex) {
+
+            System.out.println(
+                    "[WELCOME] Failed to show Welcome Page.");
+
+            ex.printStackTrace();
+        }
+    }
+
+    // =============================================================
+    // RESPONSIVE WAVE METHOD
+    // =============================================================
+
+    private void updateWaves(
+            double width,
+            double height) {
+
+        if (width <= 0 ||
+                height <= 0) {
+            return;
         }
 
-        // =============================================================
-        // SHOW WELCOME ON COMMON STAGE
-        // =============================================================
+        // =========================================================
+        // WAVE 1
+        // =========================================================
 
-        public static void show() {
+        double startY1 = height * 0.77;
 
-                try {
+        wave1.setContent(
+                "M 0 " +
+                        startY1 +
 
-                        if (stage != null) {
+                        " C " +
+                        (width * 0.16) +
+                        " " +
+                        (height * 0.65) +
 
-                                Welcomepage welcomePage = new Welcomepage();
+                        ", " +
+                        (width * 0.30) +
+                        " " +
+                        (height * 0.88) +
 
-                                welcomePage.start(stage);
+                        ", " +
+                        (width * 0.50) +
+                        " " +
+                        (height * 0.73) +
 
-                                stage.setTitle("MaaCare AI");
+                        " C " +
+                        (width * 0.67) +
+                        " " +
+                        (height * 0.60) +
 
-                                stage.setMaximized(false);
-                                stage.setWidth(1200);
-                                stage.setHeight(750);
-                                stage.centerOnScreen();
+                        ", " +
+                        (width * 0.83) +
+                        " " +
+                        (height * 0.84) +
 
-                                stage.show();
+                        ", " +
+                        width +
+                        " " +
+                        (height * 0.69) +
 
-                                return;
-                        }
+                        " L " +
+                        width +
+                        " " +
+                        height +
 
-                        Stage newStage = new Stage();
+                        " L 0 " +
+                        height +
 
-                        stage = newStage;
+                        " Z");
 
-                        Welcomepage welcomePage = new Welcomepage();
+        // =========================================================
+        // WAVE 2
+        // =========================================================
 
-                        welcomePage.start(stage);
+        double startY2 = height * 0.82;
 
-                } catch (Exception ex) {
+        wave2.setContent(
+                "M 0 " +
+                        startY2 +
 
-                        System.out.println(
-                                        "[WELCOME] Failed to show Welcome Page.");
+                        " C " +
+                        (width * 0.18) +
+                        " " +
+                        (height * 0.72) +
 
-                        ex.printStackTrace();
-                }
-        }
+                        ", " +
+                        (width * 0.34) +
+                        " " +
+                        (height * 0.91) +
 
-        // =============================================================
-        // RESPONSIVE WAVES
-        // =============================================================
+                        ", " +
+                        (width * 0.53) +
+                        " " +
+                        (height * 0.78) +
 
-        private void updateWaves(
-                        double width,
-                        double height) {
+                        " C " +
+                        (width * 0.70) +
+                        " " +
+                        (height * 0.66) +
 
-                if (width <= 0 ||
-                                height <= 0) {
-                        return;
-                }
+                        ", " +
+                        (width * 0.86) +
+                        " " +
+                        (height * 0.88) +
 
-                double startY1 = height * 0.77;
+                        ", " +
+                        width +
+                        " " +
+                        (height * 0.75) +
 
-                wave1.setContent(
-                                "M 0 " +
-                                                startY1 +
+                        " L " +
+                        width +
+                        " " +
+                        height +
 
-                                                " C " +
-                                                (width * 0.16) +
-                                                " " +
-                                                (height * 0.65) +
+                        " L 0 " +
+                        height +
 
-                                                ", " +
-                                                (width * 0.30) +
-                                                " " +
-                                                (height * 0.88) +
-
-                                                ", " +
-                                                (width * 0.50) +
-                                                " " +
-                                                (height * 0.73) +
-
-                                                " C " +
-                                                (width * 0.67) +
-                                                " " +
-                                                (height * 0.60) +
-
-                                                ", " +
-                                                (width * 0.83) +
-                                                " " +
-                                                (height * 0.84) +
-
-                                                ", " +
-                                                width +
-                                                " " +
-                                                (height * 0.69) +
-
-                                                " L " +
-                                                width +
-                                                " " +
-                                                height +
-
-                                                " L 0 " +
-                                                height +
-
-                                                " Z");
-
-                double startY2 = height * 0.82;
-
-                wave2.setContent(
-                                "M 0 " +
-                                                startY2 +
-
-                                                " C " +
-                                                (width * 0.18) +
-                                                " " +
-                                                (height * 0.72) +
-
-                                                ", " +
-                                                (width * 0.34) +
-                                                " " +
-                                                (height * 0.91) +
-
-                                                ", " +
-                                                (width * 0.53) +
-                                                " " +
-                                                (height * 0.78) +
-
-                                                " C " +
-                                                (width * 0.70) +
-                                                " " +
-                                                (height * 0.66) +
-
-                                                ", " +
-                                                (width * 0.86) +
-                                                " " +
-                                                (height * 0.88) +
-
-                                                ", " +
-                                                width +
-                                                " " +
-                                                (height * 0.75) +
-
-                                                " L " +
-                                                width +
-                                                " " +
-                                                height +
-
-                                                " L 0 " +
-                                                height +
-
-                                                " Z");
-        }
+                        " Z");
+    }
 }
