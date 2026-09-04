@@ -1,5 +1,6 @@
 package com.sigma.view.doctorpages;
 
+import com.sigma.view.scenesettings;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -38,7 +39,9 @@ public class DoctorBasicInformationPage extends Application {
 
                 VBox container = new VBox(20);
 
-                container.setMaxWidth(850);
+                container.setMinWidth(650);
+                container.setMaxWidth(Double.MAX_VALUE);
+                container.setFillWidth(true);
 
                 container.setPadding(
                                 new Insets(30));
@@ -131,10 +134,14 @@ public class DoctorBasicInformationPage extends Application {
                 ColumnConstraints col1 = new ColumnConstraints();
 
                 col1.setPercentWidth(50);
+                col1.setHgrow(Priority.ALWAYS);
+                col1.setFillWidth(true);
 
                 ColumnConstraints col2 = new ColumnConstraints();
 
                 col2.setPercentWidth(50);
+                col2.setHgrow(Priority.ALWAYS);
+                col2.setFillWidth(true);
 
                 personalGrid.getColumnConstraints()
                                 .addAll(col1, col2);
@@ -472,16 +479,33 @@ public class DoctorBasicInformationPage extends Application {
 
                 StackPane center = new StackPane(container);
 
-                center.setAlignment(
-                                Pos.CENTER);
+                center.setAlignment(Pos.TOP_CENTER);
+                center.setPadding(new Insets(5));
+                center.setMinWidth(0);
+                center.setMaxWidth(Double.MAX_VALUE);
 
-                root.setCenter(center);
+                ScrollPane scroll = new ScrollPane(center);
+                scroll.setFitToWidth(true);
+                scroll.setFitToHeight(false);
+                scroll.setHbarPolicy(
+                                ScrollPane.ScrollBarPolicy.NEVER);
+                scroll.setVbarPolicy(
+                                ScrollPane.ScrollBarPolicy.AS_NEEDED);
+                scroll.setStyle(
+                                "-fx-background-color: transparent;" +
+                                "-fx-background: transparent;");
+
+                root.setCenter(scroll);
 
                 // =====================================================
                 // SCENE
                 // =====================================================
 
-                Scene scene = new Scene(root);
+                Scene scene = new Scene(
+                                root,
+                                scenesettings.rectanguler2d.getWidth(),
+                                scenesettings.rectanguler2d.getHeight()
+                );
 
                 stage.setScene(scene);
 
@@ -489,13 +513,22 @@ public class DoctorBasicInformationPage extends Application {
                 // STAGE SIZE
                 // =====================================================
 
-                stage.setWidth(1100);
-                stage.setHeight(750);
+                double screenWidth =
+                                scenesettings.rectanguler2d.getWidth();
 
-                stage.centerOnScreen();
+                double screenHeight =
+                                scenesettings.rectanguler2d.getHeight();
+
+                stage.setWidth(screenWidth);
+                stage.setHeight(screenHeight);
+
+                stage.setMinWidth(
+                                Math.min(1000, screenWidth));
+                stage.setMinHeight(
+                                Math.min(700, screenHeight));
 
                 stage.setResizable(true);
-
+                stage.centerOnScreen();
                 stage.show();
         }
 

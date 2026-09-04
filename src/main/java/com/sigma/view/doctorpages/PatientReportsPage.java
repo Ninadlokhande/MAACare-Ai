@@ -3,395 +3,852 @@ package com.sigma.view.doctorpages;
 import com.sigma.controller.doctorController.PatientReportController;
 import com.sigma.model.DoctorModel.PatientReport;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.util.Duration;
 
+import java.awt.Desktop;
+import java.io.File;
+import java.net.URI;
+
+/**
+ * Doctor - Patient Reports Page
+ *
+ * Features:
+ * - View patient reports
+ * - Search reports
+ * - Filter by status
+ * - Open uploaded report
+ * - Delete report
+ * - Functional refresh button
+ * - No Clear button
+ * - Same dashboard stage
+ */
 public class PatientReportsPage {
+
+        // =========================================================
+        // CONTROLLER
+        // =========================================================
 
         private static PatientReportController controller;
 
+        // =========================================================
+        // TABLE
+        // =========================================================
+
         private static TableView<PatientReport> table;
 
-        // =====================================================
-        // SHOW PAGE
-        // =====================================================
+        // =========================================================
+        // FILTERS
+        // =========================================================
+
+        private static TextField searchField;
+        private static ComboBox<String> statusCombo;
+
+        // =========================================================
+        // AUTO REFRESH
+        // =========================================================
+
+        private static Timeline realtimeRefreshTimeline;
+
+        // =========================================================
+        // SHOW
+        // =========================================================
 
         public static void show() {
 
-                if (controller == null) {
-                        controller = new PatientReportController();
-                }
+                try {
 
-                BorderPane root = new BorderPane();
+                        controller = getController();
 
-                Theme.applyBackground(root);
+                        if (controller == null) {
 
-                root.setPadding(
-                                new Insets(
-                                                28,
-                                                35,
-                                                28,
-                                                35));
+                                showError(
+                                                "Controller Error",
+                                                "Patient Report Controller is not available.");
 
-                // =====================================================
-                // HEADER
-                // =====================================================
+                                return;
+                        }
 
-                HBox header = new HBox();
+                        // -----------------------------------------------------
+                        // LOAD FIRESTORE DATA
+                        // -----------------------------------------------------
 
-                header.setAlignment(
-                                Pos.CENTER_LEFT);
+                        controller.refreshReports();
 
-                VBox heading = Theme.pageHeader(
-                                "Patient Reports",
-                                "View and manage patient medical reports.");
+                        // -----------------------------------------------------
+                        // ROOT
+                        // -----------------------------------------------------
 
-                Region spacer = new Region();
+                        BorderPane root = new BorderPane();
 
-                HBox.setHgrow(
-                                spacer,
-                                Priority.ALWAYS);
+                        Theme.applyBackground(root);
 
-                Button back = Theme.backButton();
+                        root.setPadding(
+                                        new Insets(25, 35, 25, 35));
 
-                header.getChildren().addAll(
-                                heading,
-                                spacer,
-                                back);
+                        // =====================================================
+                        // HEADER
+                        // =====================================================
 
-                // =====================================================
-                // FILTER
-                // =====================================================
+                        HBox header = new HBox();
 
-                HBox filter = new HBox(10);
+                        header.setAlignment(Pos.CENTER_LEFT);
 
-                filter.setAlignment(
-                                Pos.CENTER_LEFT);
+                        VBox heading = Theme.pageHeader(
+                                        "Patient Reports",
+                                        "View and manage patient medical reports.");
 
-                filter.setPadding(
-                                new Insets(14));
+                        Region spacer = new Region();
 
-                filter.setStyle(
-                                "-fx-background-color: white;" +
-                                                "-fx-background-radius: 10;" +
-                                                "-fx-border-color: " +
-                                                Theme.BORDER + ";" +
-                                                "-fx-border-radius: 10;");
+                        HBox.setHgrow(
+                                        spacer,
+                                        Priority.ALWAYS);
 
-                TextField search = new TextField();
+                        // =====================================================
+                        // REFRESH BUTTON
+                        // =====================================================
 
-                search.setPromptText(
-                                "Search report or patient...");
+                        Button refreshButton = new Button("↻ Refresh");
 
-                search.setPrefWidth(280);
+                        refreshButton.setPrefHeight(38);
 
-                ComboBox<String> status = new ComboBox<>();
+                        refreshButton.setPrefWidth(105);
 
-                status.getItems().addAll(
-                                "All Status",
-                                "Normal",
-                                "Abnormal",
-                                "Low",
-                                "High",
-                                "Pending");
+                        refreshButton.setStyle(
+                                        "-fx-background-color: #F3ECFF;" +
+                                                        "-fx-text-fill: #9B4DCC;" +
+                                                        "-fx-font-weight: bold;" +
+                                                        "-fx-background-radius: 10;" +
+                                                        "-fx-border-color: #E7DCE8;" +
+                                                        "-fx-border-radius: 10;" +
+                                                        "-fx-cursor: hand;");
 
-                status.setValue(
-                                "All Status");
+                        refreshButton.setOnAction(e -> {
 
-                Button upload = Theme.primaryButton(
-                                "+  Upload Report");
+                                refreshReportsNow(refreshButton);
 
-                Region filterSpacer = new Region();
+                        });
 
-                HBox.setHgrow(
-                                filterSpacer,
-                                Priority.ALWAYS);
+                        // =====================================================
+                        // UPLOAD BUTTON
+                        // =====================================================
 
-                filter.getChildren().addAll(
-                                search,
-                                status,
-                                filterSpacer,
-                                upload);
+                        Button uploadButton = Theme.primaryButton("+ Upload Report");
 
-                // =====================================================
-                // TABLE
-                // =====================================================
+                        uploadButton.setPrefHeight(38);
 
-                table = new TableView<>();
+                        uploadButton.setOnAction(
+                                        e -> UploadReportPage.show());
 
-                table.setColumnResizePolicy(
-                                TableView.CONSTRAINED_RESIZE_POLICY);
+                        // =====================================================
+                        // BACK BUTTON
+                        // =====================================================
 
-                TableColumn<PatientReport, String> reportName = new TableColumn<>("Report");
+                        Button back = Theme.backButton();
 
-                TableColumn<PatientReport, String> patientName = new TableColumn<>("Patient");
+                        back.setOnAction(e -> {
 
-                TableColumn<PatientReport, String> reportType = new TableColumn<>("Type");
+                                stopRealtimeRefresh();
 
-                TableColumn<PatientReport, String> date = new TableColumn<>("Date");
+                                DoctorDashboard.showDashboard();
 
-                TableColumn<PatientReport, String> reportStatus = new TableColumn<>("Status");
+                        });
 
-                TableColumn<PatientReport, String> action = new TableColumn<>("Action");
+                        // =====================================================
+                        // HEADER CHILDREN
+                        // =====================================================
 
-                reportName.setCellValueFactory(
-                                d -> d.getValue()
-                                                .reportNameProperty());
+                        header.getChildren().addAll(
+                                        heading,
+                                        spacer,
+                                        refreshButton,
+                                        uploadButton,
+                                        back);
 
-                patientName.setCellValueFactory(
-                                d -> d.getValue()
-                                                .patientNameProperty());
+                        HBox.setMargin(
+                                        refreshButton,
+                                        new Insets(0, 8, 0, 0));
 
-                reportType.setCellValueFactory(
-                                d -> d.getValue()
-                                                .reportTypeProperty());
+                        HBox.setMargin(
+                                        uploadButton,
+                                        new Insets(0, 10, 0, 0));
 
-                date.setCellValueFactory(
-                                d -> d.getValue()
-                                                .dateProperty());
+                        // =====================================================
+                        // FILTER BAR
+                        // =====================================================
 
-                reportStatus.setCellValueFactory(
-                                d -> d.getValue()
-                                                .statusProperty());
+                        HBox filterBar = new HBox(12);
 
-                // =====================================================
-                // ACTION COLUMN
-                // =====================================================
+                        filterBar.setAlignment(
+                                        Pos.CENTER_LEFT);
 
-                action.setCellFactory(
-                                column -> new TableCell<PatientReport, String>() {
+                        filterBar.setPadding(
+                                        new Insets(15));
 
-                                        private final Button view = new Button("👁");
+                        filterBar.setStyle(
+                                        "-fx-background-color: white;" +
+                                                        "-fx-background-radius: 14;" +
+                                                        "-fx-border-color: #E7DCE8;" +
+                                                        "-fx-border-radius: 14;");
 
-                                        private final Button delete = new Button("🗑");
+                        // =====================================================
+                        // SEARCH
+                        // =====================================================
 
-                                        private final HBox buttons = new HBox(6);
+                        searchField = new TextField();
 
-                                        {
+                        searchField.setPromptText(
+                                        "🔍 Search report, patient or type...");
 
-                                                view.setStyle(
-                                                                "-fx-background-color: #E0F2FE;" +
-                                                                                "-fx-text-fill: #0284C7;" +
-                                                                                "-fx-font-size: 14px;" +
-                                                                                "-fx-background-radius: 7;" +
-                                                                                "-fx-padding: 5 9;" +
-                                                                                "-fx-cursor: hand;");
+                        searchField.setPrefHeight(40);
 
-                                                delete.setStyle(
-                                                                "-fx-background-color: #FEE2E2;" +
-                                                                                "-fx-text-fill: #DC2626;" +
-                                                                                "-fx-font-size: 14px;" +
-                                                                                "-fx-background-radius: 7;" +
-                                                                                "-fx-padding: 5 9;" +
-                                                                                "-fx-cursor: hand;");
+                        searchField.setPrefWidth(330);
 
-                                                view.setTooltip(
-                                                                new Tooltip(
-                                                                                "View Report"));
+                        searchField.setStyle(
+                                        "-fx-background-color: #FAF8FF;" +
+                                                        "-fx-border-color: #E7DCE8;" +
+                                                        "-fx-border-radius: 9;" +
+                                                        "-fx-background-radius: 9;" +
+                                                        "-fx-padding: 0 12;");
 
-                                                delete.setTooltip(
-                                                                new Tooltip(
-                                                                                "Delete Report"));
+                        // =====================================================
+                        // STATUS
+                        // =====================================================
 
-                                                view.setOnAction(e -> {
+                        statusCombo = new ComboBox<>();
 
-                                                        PatientReport report = getTableView()
-                                                                        .getItems()
-                                                                        .get(getIndex());
+                        statusCombo.getItems().addAll(
+                                        "All Status",
+                                        "Normal",
+                                        "Abnormal",
+                                        "Low",
+                                        "High",
+                                        "Pending");
 
-                                                        showReportDetails(
-                                                                        report);
-                                                });
+                        statusCombo.setValue(
+                                        "All Status");
 
-                                                delete.setOnAction(e -> {
+                        statusCombo.setPrefHeight(40);
 
-                                                        PatientReport report = getTableView()
-                                                                        .getItems()
-                                                                        .get(getIndex());
+                        statusCombo.setPrefWidth(150);
 
-                                                        deleteReport(report);
-                                                });
+                        // =====================================================
+                        // FILTER BAR
+                        // =====================================================
 
-                                                buttons.setAlignment(
-                                                                Pos.CENTER);
+                        filterBar.getChildren().addAll(
+                                        searchField,
+                                        statusCombo);
 
-                                                buttons.getChildren()
-                                                                .addAll(
-                                                                                view,
-                                                                                delete);
-                                        }
+                        // =====================================================
+                        // SEARCH LISTENER
+                        // =====================================================
 
-                                        @Override
-                                        protected void updateItem(
-                                                        String item,
-                                                        boolean empty) {
+                        searchField.textProperty().addListener(
+                                        (obs, oldValue, newValue) -> applyFilters());
 
-                                                super.updateItem(
-                                                                item,
-                                                                empty);
+                        // =====================================================
+                        // STATUS LISTENER
+                        // =====================================================
 
-                                                if (empty) {
+                        statusCombo.valueProperty().addListener(
+                                        (obs, oldValue, newValue) -> applyFilters());
 
-                                                        setGraphic(null);
+                        // =====================================================
+                        // TABLE
+                        // =====================================================
 
-                                                } else {
+                        table = new TableView<>();
 
-                                                        setGraphic(buttons);
+                        table.setColumnResizePolicy(
+                                        TableView.CONSTRAINED_RESIZE_POLICY);
+
+                        table.setPlaceholder(
+                                        new Label(
+                                                        "📄 No patient reports found."));
+
+                        table.setStyle(
+                                        "-fx-background-color: white;" +
+                                                        "-fx-border-color: #E7DCE8;" +
+                                                        "-fx-border-radius: 14;" +
+                                                        "-fx-background-radius: 14;");
+
+                        // =====================================================
+                        // REPORT COLUMN
+                        // =====================================================
+
+                        TableColumn<PatientReport, String> reportColumn = new TableColumn<>("Report");
+
+                        reportColumn.setCellValueFactory(
+                                        data -> data.getValue()
+                                                        .reportNameProperty());
+
+                        // =====================================================
+                        // PATIENT COLUMN
+                        // =====================================================
+
+                        TableColumn<PatientReport, String> patientColumn = new TableColumn<>("Patient");
+
+                        patientColumn.setCellValueFactory(
+                                        data -> data.getValue()
+                                                        .patientNameProperty());
+
+                        // =====================================================
+                        // TYPE COLUMN
+                        // =====================================================
+
+                        TableColumn<PatientReport, String> typeColumn = new TableColumn<>("Type");
+
+                        typeColumn.setCellValueFactory(
+                                        data -> data.getValue()
+                                                        .reportTypeProperty());
+
+                        // =====================================================
+                        // DATE COLUMN
+                        // =====================================================
+
+                        TableColumn<PatientReport, String> dateColumn = new TableColumn<>("Date");
+
+                        dateColumn.setCellValueFactory(
+                                        data -> data.getValue()
+                                                        .dateProperty());
+
+                        // =====================================================
+                        // STATUS COLUMN
+                        // =====================================================
+
+                        TableColumn<PatientReport, String> statusColumn = new TableColumn<>("Status");
+
+                        statusColumn.setCellValueFactory(
+                                        data -> data.getValue()
+                                                        .statusProperty());
+
+                        statusColumn.setCellFactory(
+                                        column -> new TableCell<PatientReport, String>() {
+
+                                                @Override
+                                                protected void updateItem(
+                                                                String status,
+                                                                boolean empty) {
+
+                                                        super.updateItem(
+                                                                        status,
+                                                                        empty);
+
+                                                        if (empty ||
+                                                                        status == null ||
+                                                                        status.trim().isEmpty()) {
+
+                                                                setText(null);
+                                                                setGraphic(null);
+
+                                                                return;
+                                                        }
+
+                                                        Label pill = new Label(status);
+
+                                                        pill.setPadding(
+                                                                        new Insets(
+                                                                                        5,
+                                                                                        12,
+                                                                                        5,
+                                                                                        12));
+
+                                                        pill.setStyle(
+                                                                        getStatusStyle(status));
 
                                                         setAlignment(
                                                                         Pos.CENTER);
+
+                                                        setGraphic(pill);
+                                                        setText(null);
                                                 }
-                                        }
-                                });
+                                        });
 
-                table.getColumns().addAll(
-                                reportName,
-                                patientName,
-                                reportType,
-                                date,
-                                reportStatus,
-                                action);
+                        // =====================================================
+                        // ACTION COLUMN
+                        // =====================================================
 
-                table.setItems(
-                                controller.getReports());
+                        TableColumn<PatientReport, Void> actionColumn = new TableColumn<>("Action");
 
-                VBox.setVgrow(
-                                table,
-                                Priority.ALWAYS);
+                        actionColumn.setPrefWidth(190);
 
-                // =====================================================
-                // SEARCH
-                // =====================================================
+                        actionColumn.setCellFactory(
+                                        column -> new TableCell<PatientReport, Void>() {
 
-                search.textProperty()
-                                .addListener(
-                                                (obs, oldValue, newValue) -> {
+                                                private final Button viewButton = new Button("👁 View");
 
-                                                        table.setItems(
-                                                                        controller.searchReports(
-                                                                                        newValue));
-                                                });
+                                                private final Button deleteButton = new Button("🗑 Delete");
 
-                // =====================================================
-                // STATUS FILTER
-                // =====================================================
+                                                private final HBox box = new HBox(8);
 
-                status.setOnAction(e -> {
+                                                {
 
-                        table.setItems(
-                                        controller.filterByStatus(
-                                                        status.getValue()));
-                });
+                                                        box.setAlignment(
+                                                                        Pos.CENTER);
 
-                // =====================================================
-                // UPLOAD
-                // =====================================================
+                                                        // ---------------------------------
+                                                        // VIEW
+                                                        // ---------------------------------
 
-                upload.setOnAction(e -> {
+                                                        viewButton.setPrefHeight(32);
 
-                        UploadReportPage.show();
-                });
+                                                        viewButton.setStyle(
+                                                                        "-fx-background-color: #F3ECFF;" +
+                                                                                        "-fx-text-fill: #9B4DCC;" +
+                                                                                        "-fx-font-weight: bold;" +
+                                                                                        "-fx-background-radius: 8;" +
+                                                                                        "-fx-cursor: hand;");
 
-                // =====================================================
-                // ROOT
-                // =====================================================
+                                                        viewButton.setOnAction(event -> {
 
-                VBox content = new VBox(
-                                15,
-                                filter,
-                                table);
+                                                                int index = getIndex();
 
-                VBox.setVgrow(
-                                table,
-                                Priority.ALWAYS);
+                                                                if (index < 0 ||
+                                                                                index >= getTableView()
+                                                                                                .getItems()
+                                                                                                .size()) {
 
-                root.setTop(header);
+                                                                        return;
+                                                                }
 
-                BorderPane.setMargin(
-                                header,
-                                new Insets(
-                                                0,
-                                                0,
-                                                20,
-                                                0));
+                                                                PatientReport report = getTableView()
+                                                                                .getItems()
+                                                                                .get(index);
 
-                root.setCenter(content);
+                                                                openReport(report);
 
-                // =====================================================
-                // SCENE
-                // =====================================================
+                                                        });
 
-                Scene scene = new Scene(root);
+                                                        // ---------------------------------
+                                                        // DELETE
+                                                        // ---------------------------------
 
-                DoctorDashboard.changeScene(
-                                scene);
+                                                        deleteButton.setPrefHeight(32);
+
+                                                        deleteButton.setStyle(
+                                                                        "-fx-background-color: #FFEAF3;" +
+                                                                                        "-fx-text-fill: #D93678;" +
+                                                                                        "-fx-font-weight: bold;" +
+                                                                                        "-fx-background-radius: 8;" +
+                                                                                        "-fx-cursor: hand;");
+
+                                                        deleteButton.setOnAction(event -> {
+
+                                                                int index = getIndex();
+
+                                                                if (index < 0 ||
+                                                                                index >= getTableView()
+                                                                                                .getItems()
+                                                                                                .size()) {
+
+                                                                        return;
+                                                                }
+
+                                                                PatientReport report = getTableView()
+                                                                                .getItems()
+                                                                                .get(index);
+
+                                                                deleteReport(report);
+
+                                                        });
+
+                                                        box.getChildren().addAll(
+                                                                        viewButton,
+                                                                        deleteButton);
+                                                }
+
+                                                @Override
+                                                protected void updateItem(
+                                                                Void item,
+                                                                boolean empty) {
+
+                                                        super.updateItem(
+                                                                        item,
+                                                                        empty);
+
+                                                        if (empty) {
+
+                                                                setGraphic(null);
+
+                                                        } else {
+
+                                                                setGraphic(box);
+                                                        }
+                                                }
+                                        });
+
+                        // =====================================================
+                        // ADD COLUMNS
+                        // =====================================================
+
+                        table.getColumns().addAll(
+                                        reportColumn,
+                                        patientColumn,
+                                        typeColumn,
+                                        dateColumn,
+                                        statusColumn,
+                                        actionColumn);
+
+                        // =====================================================
+                        // LOAD DATA
+                        // =====================================================
+
+                        applyFilters();
+
+                        // =====================================================
+                        // CONTENT
+                        // =====================================================
+
+                        VBox content = new VBox(15);
+
+                        content.getChildren().addAll(
+                                        filterBar,
+                                        table);
+
+                        VBox.setVgrow(
+                                        table,
+                                        Priority.ALWAYS);
+
+                        // =====================================================
+                        // ROOT
+                        // =====================================================
+
+                        root.setTop(header);
+
+                        BorderPane.setMargin(
+                                        header,
+                                        new Insets(0, 0, 20, 0));
+
+                        root.setCenter(content);
+
+                        // =====================================================
+                        // SCENE
+                        // =====================================================
+
+                        Scene scene = new Scene(root);
+
+                        DoctorDashboard.changeScene(scene);
+
+                        // =====================================================
+                        // AUTO REFRESH
+                        // =====================================================
+
+                        startRealtimeRefresh();
+
+                } catch (Exception e) {
+
+                        System.out.println(
+                                        "[REPORT PAGE ERROR] Unable to open page.");
+
+                        e.printStackTrace();
+
+                        showError(
+                                        "Patient Reports",
+                                        "Unable to open Patient Reports page.");
+                }
         }
 
-        // =====================================================
-        // ADD REPORT
-        // =====================================================
+        // =========================================================
+        // REFRESH REPORTS
+        // =========================================================
 
-        public static void addReport(
-                        PatientReport report) {
+        private static void refreshReportsNow(
+                        Button refreshButton) {
 
-                if (controller == null) {
+                try {
 
-                        controller = new PatientReportController();
+                        if (controller == null) {
+
+                                showError(
+                                                "Refresh Error",
+                                                "Patient Report Controller is not available.");
+
+                                return;
+                        }
+
+                        // Disable while loading
+                        refreshButton.setDisable(true);
+
+                        refreshButton.setText(
+                                        "⟳ Loading...");
+
+                        System.out.println(
+                                        "[REPORT PAGE] Refresh started...");
+
+                        // Firestore refresh
+                        controller.refreshReports();
+
+                        // Reapply search/status filters
+                        applyFilters();
+
+                        System.out.println(
+                                        "[REPORT PAGE] Refresh completed.");
+
+                        // Small confirmation
+                        refreshButton.setText(
+                                        "✓ Updated");
+
+                        Timeline resetButton = new Timeline(
+                                        new KeyFrame(
+                                                        Duration.seconds(1),
+                                                        event -> {
+
+                                                                refreshButton.setText(
+                                                                                "↻ Refresh");
+
+                                                                refreshButton.setDisable(
+                                                                                false);
+                                                        }));
+
+                        resetButton.play();
+
+                } catch (Exception e) {
+
+                        e.printStackTrace();
+
+                        refreshButton.setText(
+                                        "↻ Refresh");
+
+                        refreshButton.setDisable(
+                                        false);
+
+                        showError(
+                                        "Refresh Error",
+                                        "Unable to load latest patient reports.");
+                }
+        }
+
+        // =========================================================
+        // GET CONTROLLER
+        // =========================================================
+
+        private static PatientReportController getController() {
+
+                try {
+
+                        PatientReportController existing = DoctorDashboard.getReportController();
+
+                        if (existing != null) {
+
+                                return existing;
+                        }
+
+                } catch (Exception e) {
+
+                        e.printStackTrace();
                 }
 
-                controller.addReport(
-                                report);
+                return null;
         }
 
-        // =====================================================
-        // VIEW REPORT
-        // =====================================================
+        // =========================================================
+        // APPLY FILTERS
+        // =========================================================
 
-        private static void showReportDetails(
+        private static void applyFilters() {
+
+                if (controller == null ||
+                                table == null) {
+
+                        return;
+                }
+
+                String search = searchField == null
+                                ? ""
+                                : searchField.getText();
+
+                String status = statusCombo == null
+                                ? "All Status"
+                                : statusCombo.getValue();
+
+                ObservableList<PatientReport> filtered = controller.filterReports(
+                                search,
+                                status);
+
+                table.setItems(
+                                FXCollections.observableArrayList(
+                                                filtered));
+        }
+
+        // =========================================================
+        // OPEN REPORT
+        // =========================================================
+
+        private static void openReport(
+                        PatientReport report) {
+
+                if (report == null) {
+
+                        showWarning(
+                                        "Report Error",
+                                        "Report information is not available.");
+
+                        return;
+                }
+
+                String reportUrl = safe(report.getReportUrl());
+
+                System.out.println(
+                                "======================================");
+
+                System.out.println(
+                                "[VIEW REPORT]");
+
+                System.out.println(
+                                "Report Name : "
+                                                + report.getReportName());
+
+                System.out.println(
+                                "Report URL  : "
+                                                + reportUrl);
+
+                System.out.println(
+                                "======================================");
+
+                // -----------------------------------------------------
+                // OLD RECORD FALLBACK
+                // -----------------------------------------------------
+
+                if (reportUrl.isEmpty()) {
+
+                        String action = safe(report.getAction());
+
+                        if (action.startsWith("http://") ||
+                                        action.startsWith("https://")) {
+
+                                reportUrl = action;
+                        }
+                }
+
+                // -----------------------------------------------------
+                // URL EMPTY
+                // -----------------------------------------------------
+
+                if (reportUrl.isEmpty()) {
+
+                        showWarning(
+                                        "Report Not Found",
+                                        "No uploaded report URL is available.\n\n"
+                                                        + "Please upload this report again.");
+
+                        return;
+                }
+
+                // -----------------------------------------------------
+                // CLOUDINARY URL
+                // -----------------------------------------------------
+
+                if (reportUrl.startsWith("http://") ||
+                                reportUrl.startsWith("https://")) {
+
+                        try {
+
+                                if (!Desktop.isDesktopSupported()) {
+
+                                        showWarning(
+                                                        "Cannot Open Report",
+                                                        "Your computer does not support "
+                                                                        + "opening browser links.");
+
+                                        return;
+                                }
+
+                                Desktop desktop = Desktop.getDesktop();
+
+                                if (!desktop.isSupported(
+                                                Desktop.Action.BROWSE)) {
+
+                                        showWarning(
+                                                        "Cannot Open Report",
+                                                        "Your system cannot open web links.");
+
+                                        return;
+                                }
+
+                                // -------------------------------------------------
+                                // OPEN IN DEFAULT BROWSER
+                                // -------------------------------------------------
+
+                                desktop.browse(
+                                                new URI(reportUrl));
+
+                                System.out.println(
+                                                "[VIEW REPORT] Browser opened successfully.");
+
+                                return;
+
+                        } catch (Exception e) {
+
+                                e.printStackTrace();
+
+                                showError(
+                                                "PDF Open Error",
+                                                "Unable to open the uploaded report.\n\n"
+                                                                + "The Cloudinary file URL may be invalid "
+                                                                + "or the PDF may not be available.");
+
+                                return;
+                        }
+                }
+
+                // -----------------------------------------------------
+                // LOCAL FILE
+                // -----------------------------------------------------
+
+                try {
+
+                        File localFile = new File(reportUrl);
+
+                        if (localFile.exists() &&
+                                        localFile.isFile()) {
+
+                                if (Desktop.isDesktopSupported() &&
+                                                Desktop.getDesktop()
+                                                                .isSupported(
+                                                                                Desktop.Action.OPEN)) {
+
+                                        Desktop.getDesktop()
+                                                        .open(localFile);
+
+                                        return;
+                                }
+                        }
+
+                } catch (Exception e) {
+
+                        e.printStackTrace();
+                }
+
+                // -----------------------------------------------------
+                // INVALID
+                // -----------------------------------------------------
+
+                showWarning(
+                                "Report Not Found",
+                                "The report file could not be opened.\n\n"
+                                                + "Stored value:\n"
+                                                + reportUrl);
+        }
+
+        // =========================================================
+        // DELETE
+        // =========================================================
+
+        private static void deleteReport(
                         PatientReport report) {
 
                 if (report == null) {
                         return;
                 }
-
-                Alert alert = new Alert(
-                                Alert.AlertType.INFORMATION);
-
-                alert.setTitle(
-                                "Patient Report");
-
-                alert.setHeaderText(
-                                report.getReportName());
-
-                alert.setContentText(
-
-                                "Patient: " +
-                                                report.getPatientName()
-
-                                                + "\n\nReport Type: " +
-                                                report.getReportType()
-
-                                                + "\n\nDate: " +
-                                                report.getDate()
-
-                                                + "\n\nStatus: " +
-                                                report.getStatus()
-
-                                                + "\n\nFile: " +
-                                                report.getAction());
-
-                alert.showAndWait();
-        }
-
-        // =====================================================
-        // DELETE REPORT
-        // =====================================================
-
-        private static void deleteReport(
-                        PatientReport report) {
 
                 Alert confirmation = new Alert(
                                 Alert.AlertType.CONFIRMATION);
@@ -400,22 +857,230 @@ public class PatientReportsPage {
                                 "Delete Report");
 
                 confirmation.setHeaderText(
-                                "Delete this report?");
+                                "Delete Patient Report?");
 
                 confirmation.setContentText(
-                                report.getReportName());
+                                "Report: "
+                                                + safe(report.getReportName())
+                                                + "\nPatient: "
+                                                + safe(report.getPatientName()));
+
+                ButtonType deleteButton = new ButtonType(
+                                "Delete",
+                                ButtonBar.ButtonData.OK_DONE);
+
+                ButtonType cancelButton = new ButtonType(
+                                "Cancel",
+                                ButtonBar.ButtonData.CANCEL_CLOSE);
+
+                confirmation.getButtonTypes().setAll(
+                                deleteButton,
+                                cancelButton);
 
                 confirmation.showAndWait()
-                                .ifPresent(response -> {
+                                .ifPresent(result -> {
 
-                                        if (response == ButtonType.OK) {
+                                        if (result == deleteButton) {
 
-                                                controller.deleteReport(
-                                                                report);
+                                                try {
 
-                                                table.setItems(
-                                                                controller.getReports());
+                                                        controller.deleteReport(
+                                                                        report);
+
+                                                        applyFilters();
+
+                                                        showInformation(
+                                                                        "Report Deleted",
+                                                                        "Patient report deleted successfully.");
+
+                                                } catch (Exception e) {
+
+                                                        e.printStackTrace();
+
+                                                        showError(
+                                                                        "Delete Error",
+                                                                        "Unable to delete patient report.");
+                                                }
                                         }
                                 });
+        }
+
+        // =========================================================
+        // STATUS STYLE
+        // =========================================================
+
+        private static String getStatusStyle(
+                        String status) {
+
+                if (status == null) {
+                        status = "";
+                }
+
+                switch (status.toLowerCase()) {
+
+                        case "normal":
+
+                                return "-fx-background-color: #E8F8F0;" +
+                                                "-fx-text-fill: #238B5A;" +
+                                                "-fx-background-radius: 20;" +
+                                                "-fx-font-weight: bold;";
+
+                        case "abnormal":
+
+                                return "-fx-background-color: #FFE8EE;" +
+                                                "-fx-text-fill: #D93678;" +
+                                                "-fx-background-radius: 20;" +
+                                                "-fx-font-weight: bold;";
+
+                        case "high":
+
+                                return "-fx-background-color: #FFF0E5;" +
+                                                "-fx-text-fill: #D66A1F;" +
+                                                "-fx-background-radius: 20;" +
+                                                "-fx-font-weight: bold;";
+
+                        case "low":
+
+                                return "-fx-background-color: #EAF3FF;" +
+                                                "-fx-text-fill: #3974B8;" +
+                                                "-fx-background-radius: 20;" +
+                                                "-fx-font-weight: bold;";
+
+                        case "pending":
+
+                                return "-fx-background-color: #FFF7DC;" +
+                                                "-fx-text-fill: #A47700;" +
+                                                "-fx-background-radius: 20;" +
+                                                "-fx-font-weight: bold;";
+
+                        default:
+
+                                return "-fx-background-color: #F3ECFF;" +
+                                                "-fx-text-fill: #9B4DCC;" +
+                                                "-fx-background-radius: 20;" +
+                                                "-fx-font-weight: bold;";
+                }
+        }
+
+        // =========================================================
+        // AUTO REFRESH
+        // =========================================================
+
+        private static void startRealtimeRefresh() {
+
+                stopRealtimeRefresh();
+
+                realtimeRefreshTimeline = new Timeline(
+                                new KeyFrame(
+                                                Duration.seconds(5),
+                                                event -> {
+
+                                                        try {
+
+                                                                if (controller == null) {
+                                                                        return;
+                                                                }
+
+                                                                controller.refreshReports();
+
+                                                                applyFilters();
+
+                                                        } catch (Exception e) {
+
+                                                                System.out.println(
+                                                                                "[REPORT] Auto refresh failed.");
+                                                        }
+                                                }));
+
+                realtimeRefreshTimeline.setCycleCount(
+                                Timeline.INDEFINITE);
+
+                realtimeRefreshTimeline.play();
+        }
+
+        // =========================================================
+        // STOP AUTO REFRESH
+        // =========================================================
+
+        public static void stopRealtimeRefresh() {
+
+                if (realtimeRefreshTimeline != null) {
+
+                        realtimeRefreshTimeline.stop();
+
+                        realtimeRefreshTimeline = null;
+                }
+        }
+
+        // =========================================================
+        // SAFE
+        // =========================================================
+
+        private static String safe(
+                        String value) {
+
+                return value == null
+                                ? ""
+                                : value.trim();
+        }
+
+        // =========================================================
+        // WARNING
+        // =========================================================
+
+        private static void showWarning(
+                        String title,
+                        String message) {
+
+                Alert alert = new Alert(
+                                Alert.AlertType.WARNING);
+
+                alert.setTitle(title);
+
+                alert.setHeaderText(null);
+
+                alert.setContentText(message);
+
+                alert.showAndWait();
+        }
+
+        // =========================================================
+        // ERROR
+        // =========================================================
+
+        private static void showError(
+                        String title,
+                        String message) {
+
+                Alert alert = new Alert(
+                                Alert.AlertType.ERROR);
+
+                alert.setTitle(title);
+
+                alert.setHeaderText(null);
+
+                alert.setContentText(message);
+
+                alert.showAndWait();
+        }
+
+        // =========================================================
+        // INFORMATION
+        // =========================================================
+
+        private static void showInformation(
+                        String title,
+                        String message) {
+
+                Alert alert = new Alert(
+                                Alert.AlertType.INFORMATION);
+
+                alert.setTitle(title);
+
+                alert.setHeaderText(null);
+
+                alert.setContentText(message);
+
+                alert.showAndWait();
         }
 }

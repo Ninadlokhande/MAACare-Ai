@@ -1,24 +1,36 @@
 package com.sigma.view.adminpages;
 
+import java.io.File;
+
+import com.sigma.controller.ImageUploadController;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
 
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.StackPane;
 
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 
 import javafx.scene.effect.DropShadow;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+import javafx.concurrent.Task;
 
 public class AdminProfile {
 
@@ -120,12 +132,10 @@ public class AdminProfile {
         // PROFILE AVATAR
         // =====================================================
 
-        Circle avatar =
-            new Circle(
-                45
-            );
+        Circle avatarBackground =
+            new Circle(45);
 
-        avatar.setFill(
+        avatarBackground.setFill(
             Color.web("#6C63A8")
         );
 
@@ -140,18 +150,255 @@ public class AdminProfile {
         );
 
 
-        VBox avatarBox =
-            new VBox(
-                avatar,
-                avatarText
+        ImageView avatarImage =
+            new ImageView();
+
+        avatarImage.setFitWidth(90);
+        avatarImage.setFitHeight(90);
+        avatarImage.setPreserveRatio(false);
+        avatarImage.setSmooth(true);
+
+        // Make the uploaded image circular.
+        Circle imageClip =
+            new Circle(
+                45,
+                45,
+                45
             );
+
+        avatarImage.setClip(imageClip);
+        avatarImage.setVisible(false);
+
+
+        StackPane avatarView =
+            new StackPane();
+
+        avatarView.setPrefSize(90, 90);
+
+        avatarView.getChildren().addAll(
+            avatarBackground,
+            avatarText,
+            avatarImage
+        );
+
+
+        Button changePhoto =
+            new Button("Change Photo");
+
+        changePhoto.setStyle(
+            "-fx-background-color: #6C63A8;" +
+            "-fx-text-fill: white;" +
+            "-fx-font-size: 12px;" +
+            "-fx-font-weight: bold;" +
+            "-fx-background-radius: 8px;" +
+            "-fx-padding: 8px 12px;" +
+            "-fx-cursor: hand;"
+        );
+
+
+        ProgressIndicator uploadProgress =
+            new ProgressIndicator();
+
+        uploadProgress.setPrefSize(22, 22);
+        uploadProgress.setVisible(false);
+
+
+        Label uploadStatus =
+            new Label("");
+
+        uploadStatus.setWrapText(true);
+
+        uploadStatus.setStyle(
+            "-fx-font-size: 11px;" +
+            "-fx-text-fill: #77778D;"
+        );
+
+
+        // Cloudinary uploader already used by your trial class.
+        ImageUploadController imageUploadController =
+            new ImageUploadController();
+
+
+        changePhoto.setOnAction(e -> {
+
+            FileChooser fileChooser =
+                new FileChooser();
+
+            fileChooser.setTitle(
+                "Select Profile Picture"
+            );
+
+            fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter(
+                    "Image Files",
+                    "*.png",
+                    "*.jpg",
+                    "*.jpeg",
+                    "*.webp"
+                )
+            );
+
+
+            // Get the current JavaFX window.
+            Stage stage =
+                (Stage) changePhoto.getScene().getWindow();
+
+
+            File file =
+                fileChooser.showOpenDialog(stage);
+
+
+            if (file == null) {
+                return;
+            }
+
+
+            // Prevent multiple uploads at the same time.
+            changePhoto.setDisable(true);
+            uploadProgress.setVisible(true);
+
+            uploadStatus.setText(
+                "Uploading image..."
+            );
+
+
+            Task<String> uploadTask =
+                new Task<>() {
+
+                    @Override
+                    protected String call()
+                            throws Exception {
+
+                        return imageUploadController
+                            .imageUpload(file);
+                    }
+                };
+
+
+            uploadTask.setOnSucceeded(event -> {
+
+                String url =
+                    uploadTask.getValue();
+
+
+                uploadProgress.setVisible(false);
+                changePhoto.setDisable(false);
+
+
+                if (url != null &&
+                    !url.isBlank()) {
+
+                    try {
+
+                        Image uploadedImage =
+                            new Image(
+                                url,
+                                90,
+                                90,
+                                false,
+                                true,
+                                true
+                            );
+
+
+                        avatarImage.setImage(
+                            uploadedImage
+                        );
+
+                        avatarImage.setVisible(
+                            true
+                        );
+
+                        avatarText.setVisible(
+                            false
+                        );
+
+                        uploadStatus.setText(
+                            "Profile picture uploaded successfully."
+                        );
+
+                        uploadStatus.setStyle(
+                            "-fx-font-size: 11px;" +
+                            "-fx-text-fill: #20A56A;"
+                        );
+
+
+                        System.out.println(
+                            "Cloudinary profile image URL: "
+                            + url
+                        );
+
+                    } catch (Exception ex) {
+
+                        ex.printStackTrace();
+
+                        uploadStatus.setText(
+                            "Image uploaded, but could not be displayed."
+                        );
+                    }
+
+                } else {
+
+                    uploadStatus.setText(
+                        "Upload failed. Cloudinary returned no URL."
+                    );
+
+                    uploadStatus.setStyle(
+                        "-fx-font-size: 11px;" +
+                        "-fx-text-fill: #D82F82;"
+                    );
+                }
+            });
+
+
+            uploadTask.setOnFailed(event -> {
+
+                uploadProgress.setVisible(false);
+                changePhoto.setDisable(false);
+
+                uploadStatus.setText(
+                    "Upload failed. Please try again."
+                );
+
+                uploadStatus.setStyle(
+                    "-fx-font-size: 11px;" +
+                    "-fx-text-fill: #D82F82;"
+                );
+
+                if (uploadTask.getException() != null) {
+                    uploadTask.getException()
+                        .printStackTrace();
+                }
+            });
+
+
+            Thread uploadThread =
+                new Thread(
+                    uploadTask,
+                    "cloudinary-profile-upload"
+                );
+
+            uploadThread.setDaemon(true);
+            uploadThread.start();
+        });
+
+
+        VBox avatarBox =
+            new VBox(8);
 
         avatarBox.setAlignment(
             Pos.CENTER
         );
 
         avatarBox.setPrefWidth(
-            100
+            120
+        );
+
+        avatarBox.getChildren().addAll(
+            avatarView,
+            changePhoto,
+            uploadProgress,
+            uploadStatus
         );
 
 

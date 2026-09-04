@@ -16,10 +16,11 @@ target/
 
 # OS
 .DS_Store
-Thumbs.db 
+Thumbs.db
 
-# Local backup files
-my_changes_backup.txt
+# Firebase service account credentials - never commit
+serviceAccountkey.json
+src/main/resources/serviceAccountKey.json
+src/main/resources/ServiceAccountKey.json
 
-# Firebase service account credentials
-java2026.json
+src/main/resources/assets

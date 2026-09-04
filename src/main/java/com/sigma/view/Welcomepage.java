@@ -1,55 +1,48 @@
 package com.sigma.view;
 
-import com.sigma.view.adminpages.AdminDashboard;
-import com.sigma.view.trial.ImageUplaodTrial;
-
 import javafx.animation.FadeTransition;
 import javafx.animation.Interpolator;
-import javafx.animation.ParallelTransition;
 import javafx.animation.ScaleTransition;
-import javafx.animation.TranslateTransition;
+import javafx.animation.ParallelTransition;
 import javafx.application.Application;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.effect.DropShadow;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.CycleMethod;
-import javafx.scene.paint.LinearGradient;
-import javafx.scene.paint.RadialGradient;
-import javafx.scene.paint.Stop;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.SVGPath;
-import javafx.scene.text.Text;
-import javafx.scene.text.TextAlignment;
-import javafx.scene.text.TextFlow;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+import javafx.scene.media.MediaView;
 import javafx.stage.Stage;
+import javafx.geometry.Pos;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.util.Duration;
 
 public class Welcomepage extends Application {
 
-    public static String Stage;
+    // =========================================================
+    // COMMON STAGE
+    // =========================================================
 
-    private Scene testingScene;
     public static Stage stage;
-    private Scene scene;
 
-    private SVGPath wave1;
-    private SVGPath wave2;
+    private Scene scene;
+    private MediaPlayer mediaPlayer;
+
+    // =========================================================
+    // START
+    // =========================================================
 
     @Override
     public void start(Stage primaryStage) {
 
         stage = primaryStage;
 
+        primaryStage.setTitle("MaaCare AI");
+
         primaryStage.setMinWidth(1000);
         primaryStage.setMinHeight(650);
+        primaryStage.setResizable(true);
         primaryStage.setMaximized(true);
 
         // =========================================================
@@ -59,767 +52,513 @@ public class Welcomepage extends Application {
         StackPane root = new StackPane();
 
         root.setStyle(
-            "-fx-background-color: linear-gradient(" +
-            "to bottom right, " +
-            "#FFFFFF 0%, " +
-            "#FFF4F8 50%, " +
-            "#F0E7FF 100%" +
-            ");"
+                "-fx-background-color: linear-gradient(" +
+                        "to bottom right, " +
+                        "#FFFFFF 0%, " +
+                        "#FFF4F8 50%, " +
+                        "#F0E7FF 100%" +
+                        ");"
         );
 
         // =========================================================
-        // BACKGROUND GLOW 1
+        // VIDEO
         // =========================================================
 
-        Circle glow1 = new Circle();
+        /*
+         * Put welcomevideo.mp4 here:
+         *
+         * src/main/resources/assets/videos/welcomevideo.mp4
+         *
+         * Because it is inside resources, JavaFX can load it
+         * directly using getResource().
+         */
 
-        glow1.radiusProperty().bind(
-            root.heightProperty().multiply(0.30)
+        var videoResource = getClass().getResource(
+                "/assets/videos/welcomevideo.mp4"
         );
 
-        glow1.setFill(
-            new RadialGradient(
-                0,
-                0,
-                0.5,
-                0.5,
-                1,
-                true,
-                CycleMethod.NO_CYCLE,
-                new Stop(
-                    0,
-                    Color.web("#FFD1E3", 0.55)
-                ),
-                new Stop(
-                    1,
-                    Color.TRANSPARENT
-                )
-            )
-        );
-
-        StackPane.setAlignment(
-            glow1,
-            Pos.TOP_LEFT
-        );
-
-        // =========================================================
-        // BACKGROUND GLOW 2
-        // =========================================================
-
-        Circle glow2 = new Circle();
-
-        glow2.radiusProperty().bind(
-            root.heightProperty().multiply(0.25)
-        );
-
-        glow2.setFill(
-            new RadialGradient(
-                0,
-                0,
-                0.5,
-                0.5,
-                1,
-                true,
-                CycleMethod.NO_CYCLE,
-                new Stop(
-                    0,
-                    Color.web("#DCCBFF", 0.50)
-                ),
-                new Stop(
-                    1,
-                    Color.TRANSPARENT
-                )
-            )
-        );
-
-        StackPane.setAlignment(
-            glow2,
-            Pos.BOTTOM_RIGHT
-        );
-
-        // =========================================================
-        // WAVE 1
-        // =========================================================
-
-        wave1 = new SVGPath();
-
-        wave1.setFill(
-            new LinearGradient(
-                0,
-                0,
-                1,
-                0,
-                true,
-                CycleMethod.NO_CYCLE,
-                new Stop(
-                    0,
-                    Color.web("#F54B87", 0.40)
-                ),
-                new Stop(
-                    0.5,
-                    Color.web("#E78BC0", 0.30)
-                ),
-                new Stop(
-                    1,
-                    Color.web("#9B4DCC", 0.40)
-                )
-            )
-        );
-
-        // =========================================================
-        // WAVE 2
-        // =========================================================
-
-        wave2 = new SVGPath();
-
-        wave2.setFill(
-            new LinearGradient(
-                0,
-                0,
-                1,
-                0,
-                true,
-                CycleMethod.NO_CYCLE,
-                new Stop(
-                    0,
-                    Color.web("#FFB5D0", 0.30)
-                ),
-                new Stop(
-                    0.5,
-                    Color.web("#E4B8F0", 0.25)
-                ),
-                new Stop(
-                    1,
-                    Color.web("#B99BEA", 0.30)
-                )
-            )
-        );
-
-        // =========================================================
-        // MAIN BORDERPANE
-        // =========================================================
-
-        BorderPane borderPane = new BorderPane();
-
-        borderPane.setPadding(
-            new Insets(
-                30,
-                60,
-                30,
-                60
-            )
-        );
-
-        // =========================================================
-        // LOGO
-        // =========================================================
-
-        var logoResource =
-            getClass().getResource(
-                "/assets/images/logo/logo.png"
-            );
-
-        if (logoResource == null) {
+        if (videoResource == null) {
 
             System.out.println(
-                "ERROR: logo.png not found!"
+                    "[WELCOME] ERROR: welcomevideo.mp4 not found!"
             );
 
+            showVideoError(root);
             return;
         }
 
-        Image logoImage =
-            new Image(
-                logoResource.toExternalForm()
+        Media media;
+
+        try {
+
+            media = new Media(
+                    videoResource.toExternalForm()
             );
 
-        ImageView logoView =
-            new ImageView(logoImage);
+        } catch (Exception ex) {
 
-        logoView.setPreserveRatio(true);
-        logoView.setSmooth(true);
+            System.out.println(
+                    "[WELCOME] ERROR: Unable to load welcome video."
+            );
 
-        // RESPONSIVE LOGO SIZE
+            ex.printStackTrace();
 
-        logoView.fitHeightProperty().bind(
-            root.heightProperty().multiply(0.30)
+            showVideoError(root);
+            return;
+        }
+
+        mediaPlayer = new MediaPlayer(media);
+
+        MediaView mediaView = new MediaView(mediaPlayer);
+
+        // =========================================================
+        // VIDEO SIZE
+        // =========================================================
+
+        /*
+         * The uploaded video is 1280 x 720.
+         *
+         * The MediaView automatically follows the application
+         * window while preserving the video's aspect ratio.
+         */
+
+        mediaView.setPreserveRatio(true);
+        mediaView.setSmooth(true);
+
+        mediaView.fitWidthProperty().bind(
+                root.widthProperty()
+        );
+
+        mediaView.fitHeightProperty().bind(
+                root.heightProperty()
         );
 
         // =========================================================
-        // GET STARTED BUTTON
+        // BLACK BACKGROUND BEHIND VIDEO
         // =========================================================
 
-        Button GetStartedbtn =
-            new Button(" Get Started");
+        StackPane videoContainer = new StackPane();
 
-        GetStartedbtn.setStyle(
-            "-fx-background-color: linear-gradient(to right, #F54B87, #9B4DCC);" +
-            "-fx-text-fill: white;" +
-            "-fx-font-weight: bold;" +
-            "-fx-font-size: 17px;" +
-            "-fx-padding: 14px 45px;" +
-            "-fx-background-radius: 30px;" +
-            "-fx-border-radius: 30px;" +
-            "-fx-cursor: hand;"
+        videoContainer.setStyle(
+                "-fx-background-color: black;"
+        );
+
+        videoContainer.getChildren().add(
+                mediaView
         );
 
         // =========================================================
-        // BUTTON HOVER
+        // OPTIONAL LOADING TEXT
         // =========================================================
 
-        GetStartedbtn.setOnMouseEntered(e ->
-            GetStartedbtn.setStyle(
-                "-fx-background-color: linear-gradient(to right, #E83F7C, #8B42BD);" +
-                "-fx-text-fill: white;" +
-                "-fx-font-weight: bold;" +
-                "-fx-font-size: 17px;" +
-                "-fx-padding: 14px 45px;" +
-                "-fx-background-radius: 30px;" +
-                "-fx-border-radius: 30px;" +
-                "-fx-cursor: hand;"
-            )
+        Label loadingLabel = new Label(
+                "Loading MaaCare AI..."
         );
 
-        GetStartedbtn.setOnMouseExited(e ->
-            GetStartedbtn.setStyle(
-                "-fx-background-color: linear-gradient(to right, #F54B87, #9B4DCC);" +
-                "-fx-text-fill: white;" +
-                "-fx-font-weight: bold;" +
-                "-fx-font-size: 17px;" +
-                "-fx-padding: 14px 45px;" +
-                "-fx-background-radius: 30px;" +
-                "-fx-border-radius: 30px;" +
-                "-fx-cursor: hand;"
-            )
+        loadingLabel.setTextFill(Color.WHITE);
+
+        loadingLabel.setFont(
+                Font.font(
+                        "Arial",
+                        FontWeight.BOLD,
+                        18
+                )
+        );
+
+        loadingLabel.setStyle(
+                "-fx-background-color: rgba(0,0,0,0.35);" +
+                        "-fx-background-radius: 20px;" +
+                        "-fx-padding: 10px 20px;"
+        );
+
+        StackPane.setAlignment(
+                loadingLabel,
+                Pos.CENTER
+        );
+
+        root.getChildren().addAll(
+                videoContainer,
+                loadingLabel
         );
 
         // =========================================================
-        // GET STARTED ACTION
-        // =========================================================
-        //
-        // WelcomePage is only responsible for opening the next
-        // Scene.
-        //
-        // AdminDashboard creates its own BorderPane and Scene.
-        //
+        // MEDIA READY
         // =========================================================
 
-        GetStartedbtn.setOnAction(e -> {
+        mediaPlayer.setOnReady(() -> {
 
-            try {
+            System.out.println(
+                    "[WELCOME] Welcome video loaded."
+            );
 
-                System.out.println(
-                    "[WELCOME] Opening Login page ."
-                );
+            loadingLabel.setVisible(false);
 
-                AdminDashboard adminDashboard =
-                    new AdminDashboard();
-                Loginpage loginpage = new Loginpage();
-                Scene loginScene = loginpage.gotologinpage();
+            /*
+             * Start the video automatically.
+             */
 
-                /*
-                 * AdminDashboard creates its own Scene.
-                 */
-                Scene adminScene =
-                    adminDashboard.gotoAdminDashboard();
-
-                /*
-                 * Replace the WelcomePage Scene.
-                 */
-                primaryStage.setScene(
-                    loginScene
-                );
-
-                primaryStage.setMaximized(
-                    true
-                );
-
-                primaryStage.show();
-
-                System.out.println(
-                    "[WELCOME] Admin Dashboard opened successfully."
-                );
-
-            } catch (Exception ex) {
-
-                System.out.println(
-                    "[WELCOME] Failed to open Admin Dashboard."
-                );
-
-                ex.printStackTrace();
-            }
+            mediaPlayer.play();
         });
 
         // =========================================================
-        // LOGO SHADOW
+        // VIDEO END
         // =========================================================
 
-        DropShadow logoShadow =
-            new DropShadow();
+        mediaPlayer.setOnEndOfMedia(() -> {
 
-        logoShadow.setRadius(25);
-        logoShadow.setSpread(0.08);
-        logoShadow.setOffsetY(8);
-
-        logoShadow.setColor(
-            Color.web(
-                "#C94C91",
-                0.22
-            )
-        );
-
-        logoView.setEffect(
-            logoShadow
-        );
-
-        // =========================================================
-        // MAIN TEXT
-        // =========================================================
-
-        Text text1 =
-            new Text("");
-
-        text1.setStyle(
-            "-fx-fill: #24234F;" +
-            "-fx-font-weight: bold;" +
-            "-fx-font-size: 20px;"
-        );
-
-        Text pinkText =
-            new Text(
-                "Smart Care for Every Mother & Baby"
+            System.out.println(
+                    "[WELCOME] Video finished."
             );
 
-        pinkText.setStyle(
-            "-fx-fill: #E84A87;" +
-            "-fx-font-weight: bold;" +
-            "-fx-font-size: 36px;"
-        );
+            openLoginPage(primaryStage);
+        });
 
-        Text text2 =
-            new Text("");
+        // =========================================================
+        // VIDEO ERROR
+        // =========================================================
 
-        text2.setStyle(
-            "-fx-fill: #24234F;" +
-            "-fx-font-weight: bold;" +
-            "-fx-font-size: 20px;"
-        );
+        mediaPlayer.setOnError(() -> {
 
-        TextFlow annotation =
-            new TextFlow(
-                text1,
-                pinkText,
-                text2
+            System.out.println(
+                    "[WELCOME] Video playback error."
             );
 
-        annotation.setTextAlignment(
-            TextAlignment.CENTER
-        );
-
-        annotation.setMaxWidth(
-            700
-        );
-
-        // =========================================================
-        // EXTRA INFORMATION
-        // =========================================================
-
-        Text extraInfo =
-            new Text(
-                "Track Pregnency . AI Heath Assistant . Hospital Booking ."
-            );
-
-        extraInfo.setStyle(
-            "-fx-fill: #666680;" +
-            "-fx-font-size: 20px;" +
-            "-fx-font-weight: normal;"
-        );
-
-        Text smallInfo =
-            new Text(
-                "Mother Care . Baby Care . Goverment Schemes"
-            );
-
-        smallInfo.setStyle(
-            "-fx-fill: #77778D;" +
-            "-fx-font-size: 20px;"
-        );
-
-        // =========================================================
-        // CONTENT BOX
-        // =========================================================
-
-        VBox logoSideBox =
-            new VBox(
-                14,
-                logoView,
-                annotation,
-                extraInfo,
-                smallInfo,
-                GetStartedbtn
-            );
-
-        logoSideBox.setAlignment(
-            Pos.CENTER
-        );
-
-        logoSideBox.setPadding(
-            new Insets(20)
-        );
-
-        logoSideBox.setMaxWidth(
-            750
-        );
-
-        logoSideBox.setMaxHeight(
-            Double.MAX_VALUE
-        );
-
-        // =========================================================
-        // RESPONSIVE SPACING
-        // =========================================================
-
-        logoSideBox.spacingProperty().bind(
-            root.heightProperty().multiply(0.018)
-        );
-
-        // =========================================================
-        // PUT CONTENT IN CENTER
-        // =========================================================
-
-        borderPane.setCenter(
-            logoSideBox
-        );
-
-        // =========================================================
-        // ADD BACKGROUND + CONTENT
-        // =========================================================
-
-        root.getChildren().addAll(
-            glow1,
-            glow2,
-            wave1,
-            wave2,
-            borderPane
-        );
-
-        // =========================================================
-        // RESPONSIVE WAVES
-        // =========================================================
-
-        root.widthProperty().addListener(
-            (observable, oldValue, newValue) -> {
-
-                updateWaves(
-                    newValue.doubleValue(),
-                    root.getHeight()
-                );
+            if (mediaPlayer.getError() != null) {
+                mediaPlayer.getError().printStackTrace();
             }
-        );
 
-        root.heightProperty().addListener(
-            (observable, oldValue, newValue) -> {
+            /*
+             * If the video cannot play, do not leave the user
+             * stuck on the Welcome page.
+             */
 
-                updateWaves(
-                    root.getWidth(),
-                    newValue.doubleValue()
-                );
-            }
-        );
-
-        // =========================================================
-        // LOGO INTRO ANIMATION
-        // =========================================================
-
-        logoView.setOpacity(0);
-
-        logoView.setScaleX(0.75);
-        logoView.setScaleY(0.75);
-
-        FadeTransition logoFade =
-            new FadeTransition(
-                Duration.seconds(1.3),
-                logoView
+            javafx.application.Platform.runLater(() ->
+                    openLoginPage(primaryStage)
             );
-
-        logoFade.setFromValue(0);
-        logoFade.setToValue(1);
-
-        ScaleTransition logoScale =
-            new ScaleTransition(
-                Duration.seconds(1.3),
-                logoView
-            );
-
-        logoScale.setFromX(0.75);
-        logoScale.setFromY(0.75);
-
-        logoScale.setToX(1);
-        logoScale.setToY(1);
-
-        logoScale.setInterpolator(
-            Interpolator.EASE_OUT
-        );
-
-        ParallelTransition logoIntro =
-            new ParallelTransition(
-                logoFade,
-                logoScale
-            );
+        });
 
         // =========================================================
-        // FLOATING LOGO ANIMATION
+        // SCENE
         // =========================================================
 
-        TranslateTransition floating =
-            new TranslateTransition(
-                Duration.seconds(3),
-                logoView
-            );
-
-        floating.setFromY(0);
-        floating.setToY(-10);
-
-        floating.setAutoReverse(true);
-
-        floating.setCycleCount(
-            TranslateTransition.INDEFINITE
-        );
-
-        floating.setInterpolator(
-            Interpolator.EASE_BOTH
-        );
-
-        logoIntro.setOnFinished(
-            event -> floating.play()
-        );
-
-        logoIntro.play();
-
-        // =========================================================
-        // TEXT ANIMATIONS
-        // =========================================================
-
-        annotation.setOpacity(0);
-        extraInfo.setOpacity(0);
-        smallInfo.setOpacity(0);
-
-        FadeTransition annotationFade =
-            new FadeTransition(
-                Duration.seconds(0.9),
-                annotation
-            );
-
-        annotationFade.setFromValue(0);
-        annotationFade.setToValue(1);
-
-        FadeTransition infoFade =
-            new FadeTransition(
-                Duration.seconds(0.9),
-                extraInfo
-            );
-
-        infoFade.setFromValue(0);
-        infoFade.setToValue(1);
-
-        FadeTransition smallFade =
-            new FadeTransition(
-                Duration.seconds(0.9),
-                smallInfo
-            );
-
-        smallFade.setFromValue(0);
-        smallFade.setToValue(1);
-
-        // =========================================================
-        // TEXT DELAY
-        // =========================================================
-
-        javafx.animation.PauseTransition delay =
-            new javafx.animation.PauseTransition(
-                Duration.seconds(0.8)
-            );
-
-        delay.setOnFinished(
-            event -> {
-
-                annotationFade.play();
-
-                javafx.animation.PauseTransition delay2 =
-                    new javafx.animation.PauseTransition(
-                        Duration.seconds(0.25)
-                    );
-
-                delay2.setOnFinished(
-                    event2 -> {
-
-                        infoFade.play();
-                        smallFade.play();
-                    }
-                );
-
-                delay2.play();
-            }
-        );
-
-        delay.play();
-
-        // =========================================================
-        // WELCOME PAGE SCENE
-        // =========================================================
-
-        Scene sc =
-            new Scene(
+        scene = new Scene(
                 root,
                 scenesettings.rectanguler2d.getWidth(),
                 scenesettings.rectanguler2d.getHeight()
-            );
-
-        stage.setScene(sc);
-
-        stage.setTitle(
-            "MaaCare AI"
         );
 
-        // =========================================================
-        // WINDOW SETTINGS
-        // =========================================================
+        primaryStage.setScene(scene);
 
-        stage.setMinWidth(1500);
-        stage.setMinHeight(800);
-        stage.setMaximized(true);
+        primaryStage.setTitle(
+                "MaaCare AI"
+        );
 
-        scene = sc;
+        primaryStage.setMinWidth(1000);
+        primaryStage.setMinHeight(650);
+        primaryStage.setMaximized(true);
 
-        stage.show();
+        primaryStage.show();
 
-        // =========================================================
-        // INITIAL WAVE UPDATE
-        // =========================================================
-
-        updateWaves(
-            root.getWidth(),
-            root.getHeight()
+        System.out.println(
+                "[WELCOME] Welcome page opened."
         );
     }
 
     // =============================================================
-    // RESPONSIVE WAVE METHOD
+    // OPEN LOGIN PAGE
     // =============================================================
 
-    private void updateWaves(
-            double width,
-            double height) {
+    private void openLoginPage(Stage primaryStage) {
 
-        if (
-            width <= 0 ||
-            height <= 0
-        ) {
-            return;
+        try {
+
+            /*
+             * Fade the Welcome page out first.
+             * The Login page is opened only after the fade finishes.
+             */
+
+            if (scene != null && scene.getRoot() != null) {
+
+                FadeTransition fadeOut =
+                        new FadeTransition(
+                                Duration.millis(400),
+                                scene.getRoot()
+                        );
+
+                fadeOut.setFromValue(1.0);
+                fadeOut.setToValue(0.0);
+                fadeOut.setInterpolator(
+                        Interpolator.EASE_BOTH
+                );
+
+                fadeOut.setOnFinished(event ->
+                        switchToLoginPage(primaryStage)
+                );
+
+                fadeOut.play();
+
+            } else {
+
+                switchToLoginPage(primaryStage);
+            }
+
+        } catch (Exception ex) {
+
+            System.out.println(
+                    "[WELCOME] Failed during transition to Login page."
+            );
+
+            ex.printStackTrace();
+
+            switchToLoginPage(primaryStage);
         }
+    }
 
-        // =========================================================
-        // WAVE 1
-        // =========================================================
+    // =============================================================
+    // SWITCH TO LOGIN PAGE WITH FADE + ZOOM
+    // =============================================================
 
-        double startY1 =
-            height * 0.77;
+    private void switchToLoginPage(Stage primaryStage) {
 
-        wave1.setContent(
-            "M 0 " +
-            startY1 +
+        try {
 
-            " C " +
-            (width * 0.16) +
-            " " +
-            (height * 0.65) +
+            /*
+             * Stop and release the video before changing scenes.
+             */
 
-            ", " +
-            (width * 0.30) +
-            " " +
-            (height * 0.88) +
+            if (mediaPlayer != null) {
 
-            ", " +
-            (width * 0.50) +
-            " " +
-            (height * 0.73) +
+                try {
+                    mediaPlayer.stop();
+                } catch (Exception ignored) {
+                }
 
-            " C " +
-            (width * 0.67) +
-            " " +
-            (height * 0.60) +
+                try {
+                    mediaPlayer.dispose();
+                } catch (Exception ignored) {
+                }
 
-            ", " +
-            (width * 0.83) +
-            " " +
-            (height * 0.84) +
+                mediaPlayer = null;
+            }
 
-            ", " +
-            width +
-            " " +
-            (height * 0.69) +
+            System.out.println(
+                    "[WELCOME] Opening Login page..."
+            );
 
-            " L " +
-            width +
-            " " +
-            height +
+            Loginpage loginpage =
+                    new Loginpage();
 
-            " L 0 " +
-            height +
+            Scene loginScene =
+                    loginpage.gotologinpage();
 
-            " Z"
+            if (loginScene != null) {
+
+                /*
+                 * Start the Login page slightly smaller and invisible.
+                 */
+
+                loginScene.getRoot().setOpacity(0.0);
+                loginScene.getRoot().setScaleX(0.98);
+                loginScene.getRoot().setScaleY(0.98);
+
+                primaryStage.setScene(loginScene);
+                primaryStage.setMaximized(true);
+                primaryStage.show();
+
+                /*
+                 * Fade Login page in.
+                 */
+
+                FadeTransition fadeIn =
+                        new FadeTransition(
+                                Duration.millis(500),
+                                loginScene.getRoot()
+                        );
+
+                fadeIn.setFromValue(0.0);
+                fadeIn.setToValue(1.0);
+                fadeIn.setInterpolator(
+                        Interpolator.EASE_BOTH
+                );
+
+                /*
+                 * Subtle zoom-in effect.
+                 */
+
+                ScaleTransition scaleIn =
+                        new ScaleTransition(
+                                Duration.millis(800),
+                                loginScene.getRoot()
+                        );
+
+                scaleIn.setFromX(0.98);
+                scaleIn.setFromY(0.98);
+                scaleIn.setToX(1.0);
+                scaleIn.setToY(1.0);
+                scaleIn.setInterpolator(
+                        Interpolator.EASE_OUT
+                );
+
+                ParallelTransition transition =
+                        new ParallelTransition(
+                                fadeIn,
+                                scaleIn
+                        );
+
+                transition.setOnFinished(event -> {
+
+                    loginScene.getRoot().setOpacity(1.0);
+                    loginScene.getRoot().setScaleX(1.0);
+                    loginScene.getRoot().setScaleY(1.0);
+
+                    System.out.println(
+                            "[WELCOME] Login page opened successfully."
+                    );
+                });
+
+                transition.play();
+            }
+
+        } catch (Exception ex) {
+
+            System.out.println(
+                    "[WELCOME] Failed to open Login page."
+            );
+
+            ex.printStackTrace();
+        }
+    }
+
+    // =============================================================
+    // SHOW WELCOME PAGE
+    // =============================================================
+
+    public static void show() {
+
+        try {
+
+            if (stage != null) {
+
+                Welcomepage welcomePage =
+                        new Welcomepage();
+
+                welcomePage.start(stage);
+
+                stage.setTitle(
+                        "MaaCare AI"
+                );
+
+                stage.setMaximized(
+                        true
+                );
+
+                stage.show();
+
+                return;
+            }
+
+            Stage newStage = new Stage();
+
+            Welcomepage welcomePage =
+                    new Welcomepage();
+
+            welcomePage.start(
+                    newStage
+            );
+
+        } catch (Exception ex) {
+
+            System.out.println(
+                    "[WELCOME] Failed to show Welcome Page."
+            );
+
+            ex.printStackTrace();
+        }
+    }
+
+    // =============================================================
+    // VIDEO LOAD ERROR SCREEN
+    // =============================================================
+
+    private void showVideoError(StackPane root) {
+
+        Label errorLabel = new Label(
+                "MaaCare AI\n\nUnable to load the welcome video."
         );
 
-        // =========================================================
-        // WAVE 2
-        // =========================================================
-
-        double startY2 =
-            height * 0.82;
-
-        wave2.setContent(
-            "M 0 " +
-            startY2 +
-
-            " C " +
-            (width * 0.18) +
-            " " +
-            (height * 0.72) +
-
-            ", " +
-            (width * 0.34) +
-            " " +
-            (height * 0.91) +
-
-            ", " +
-            (width * 0.53) +
-            " " +
-            (height * 0.78) +
-
-            " C " +
-            (width * 0.70) +
-            " " +
-            (height * 0.66) +
-
-            ", " +
-            (width * 0.86) +
-            " " +
-            (height * 0.88) +
-
-            ", " +
-            width +
-            " " +
-            (height * 0.75) +
-
-            " L " +
-            width +
-            " " +
-            height +
-
-            " L 0 " +
-            height +
-
-            " Z"
+        errorLabel.setTextFill(
+                Color.web("#24234F")
         );
+
+        errorLabel.setFont(
+                Font.font(
+                        "Arial",
+                        FontWeight.BOLD,
+                        22
+                )
+        );
+
+        errorLabel.setAlignment(
+                Pos.CENTER
+        );
+
+        errorLabel.setStyle(
+                "-fx-background-color: white;" +
+                        "-fx-background-radius: 20px;" +
+                        "-fx-padding: 35px;"
+        );
+
+        root.getChildren().add(
+                errorLabel
+        );
+
+        scene = new Scene(
+                root,
+                scenesettings.rectanguler2d.getWidth(),
+                scenesettings.rectanguler2d.getHeight()
+        );
+
+        stage.setScene(scene);
+        stage.setMaximized(true);
+        stage.show();
+
+        /*
+         * Give the application a short moment to display the
+         * error and then continue to Login.
+         */
+
+        javafx.animation.PauseTransition pause =
+                new javafx.animation.PauseTransition(
+                        Duration.seconds(1.5)
+                );
+
+        pause.setOnFinished(
+                event -> openLoginPage(stage)
+        );
+
+        pause.play();
+    }
+
+    // =============================================================
+    // STOP VIDEO WHEN APPLICATION CLOSES
+    // =============================================================
+
+    @Override
+    public void stop() {
+
+        if (mediaPlayer != null) {
+
+            try {
+                mediaPlayer.stop();
+            } catch (Exception ignored) {
+            }
+
+            try {
+                mediaPlayer.dispose();
+            } catch (Exception ignored) {
+            }
+
+            mediaPlayer = null;
+        }
     }
 }

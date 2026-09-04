@@ -270,7 +270,34 @@ AppointmentController appointmentController =
         new AppointmentController();
 
 int appointmentCount =
-        appointmentController.getAllAppointments().size(); 
+        appointmentController.getAllAppointments().size();  
+
+// ==========================================
+// TOTAL UNIQUE PATIENTS
+// ==========================================
+
+List<com.sigma.model.Appointment> allAppointments =
+        appointmentController.getAllAppointments();
+
+java.util.Set<String> uniquePatients =
+        new java.util.HashSet<>();
+
+for (com.sigma.model.Appointment appointment : allAppointments) {
+
+    String patientName = appointment.getPatient();
+
+    if (patientName != null &&
+            !patientName.trim().isEmpty()) {
+
+        uniquePatients.add(
+                patientName.trim().toLowerCase()
+        );
+    }
+}
+
+int totalPatientCount =
+        uniquePatients.size();
+
 
         BedBookingController bedBookingController =
         new BedBookingController();
@@ -320,7 +347,7 @@ int bedBookingCount =
                        String.valueOf(bedBookingCount),
                         PINK), 
 
-                        createStatCard(
+                      /*   createStatCard(
                         
                                         "🚑",
 
@@ -328,7 +355,7 @@ int bedBookingCount =
                       "48",
                     //  String.valueOf(bedBookingCount),
                         PINK
-                ),
+                ),*/
 
                // appointmentCard,
 
@@ -343,7 +370,7 @@ int bedBookingCount =
                         "👥",
 
                         "Total Patients",
-                       "150",
+                       String.valueOf(totalPatientCount),
                        BLUE
                )
         );  
@@ -380,7 +407,7 @@ int bedBookingCount =
         // BOTTOM
         // =================================================
 
-        HBox bottom =
+    /*     HBox bottom =
                 new HBox(20);
 
         VBox labPanel =
@@ -402,7 +429,76 @@ int bedBookingCount =
         bottom.getChildren().addAll(
                 labPanel,
                 emergencyPanel
-        );
+        );*/  
+
+HBox bottom =
+        new HBox(20);
+
+bottom.setAlignment(
+        Pos.TOP_LEFT
+);
+
+bottom.setFillHeight(false);
+
+VBox labPanel =
+        createLabPanel();
+
+VBox emergencyPanel =
+        createEmergencyPanel();
+
+
+// Lab Reports → Bigger
+/*labPanel.setPrefWidth(650);
+labPanel.setPrefHeight(280);
+
+HBox.setHgrow(
+        labPanel,
+        Priority.ALWAYS
+);
+
+
+// Emergency Overview → Smaller
+emergencyPanel.setPrefWidth(430);
+emergencyPanel.setPrefHeight(190);
+
+HBox.setHgrow(
+        emergencyPanel,
+        Priority.NEVER
+);*/ 
+// Lab Reports → Medium / Balanced
+labPanel.setPrefWidth(620);
+labPanel.setPrefHeight(280);
+
+HBox.setHgrow(
+        labPanel,
+        Priority.NEVER
+);
+
+
+// Emergency Overview → Smaller
+//emergencyPanel.setPrefWidth(430);
+//emergencyPanel.setPrefHeight(180); 
+
+emergencyPanel.setPrefWidth(550);
+emergencyPanel.setPrefHeight(180);
+
+HBox.setHgrow(
+        emergencyPanel,
+        Priority.NEVER
+);
+
+// Move Emergency Overview slightly down
+HBox.setMargin(
+        emergencyPanel,
+        new Insets(25, 0, 0, 0)
+);
+
+
+bottom.getChildren().addAll(
+        labPanel,
+        emergencyPanel
+);
+
 
         // =================================================
         // ADD CONTENT
@@ -1263,7 +1359,7 @@ dialog.getDialogPane().setStyle(
                 )
         );
 
-        Region spacer =
+      /*  Region spacer =
                 new Region();
 
         HBox.setHgrow(
@@ -1284,13 +1380,13 @@ dialog.getDialogPane().setStyle(
                         FontWeight.BOLD,
                         13
                 )
-        );
+        );*/
 
         HBox heading =
                 new HBox(
-                        title,
-                        spacer,
-                        view
+                        title
+                      //  spacer,
+                      //  view
                 );
 
         heading.setAlignment(
@@ -1876,7 +1972,8 @@ for (Labrecords record : labrecords) {
 
 
         table.setPrefHeight(
-                210
+               230
+           //  175
         );
 
         table.setColumnResizePolicy(
@@ -1980,7 +2077,7 @@ for (Labrecords record : labrecords) {
     // EMERGENCY PANEL
     // =====================================================
 
-    private VBox createEmergencyPanel() {
+  /*   private VBox createEmergencyPanel() {
 
         VBox panel =
                 createPanel();
@@ -2023,8 +2120,135 @@ for (Labrecords record : labrecords) {
         );
 
         return panel;
-    }
+    }*/  
 
+/*private VBox createEmergencyPanel() {
+
+    VBox panel =
+            createPanel();
+
+    panel.getChildren().add(
+            panelHeading(
+                    "Emergency Overview"
+            )
+    );
+
+    Label message =
+            new Label(
+                    "Emergency services are available 24/7.\n" +
+                    "For urgent cases, contact the hospital emergency team " +
+                    "and ambulance support immediately."
+            );
+
+    message.setWrapText(true);
+
+    message.setTextFill(
+            Color.web(NAVY)
+    );
+
+    message.setFont(
+            Font.font(
+                    "Arial",
+                    14
+            )
+    );
+
+    message.setPadding(
+            new Insets(10, 5, 10, 5)
+    );
+
+    panel.getChildren().add(
+            message
+    );
+
+    return panel;
+}*/ 
+
+private VBox createEmergencyPanel() {
+
+    VBox panel = createPanel();
+
+    panel.getChildren().add(
+            panelHeading("Emergency Overview")
+    );
+
+    // Emergency Information
+    VBox emergencyInfo = new VBox(8);
+
+    emergencyInfo.setPadding(
+            new Insets(10, 5, 10, 5)
+    );
+
+    Label mainText =
+            new Label(
+                    "Emergency services are available 24/7."
+            );
+
+    mainText.setFont(
+            Font.font(
+                    "Arial",
+                    FontWeight.BOLD,
+                    16
+            )
+    );
+
+    mainText.setTextFill(
+            Color.web(PINK)
+    );
+
+    Label subText =
+            new Label(
+                    "Fast, reliable and always ready to assist."
+            );
+
+    subText.setFont(
+            Font.font(
+                    "Arial",
+                    13
+            )
+    );
+
+    subText.setTextFill(
+            Color.web(GREY)
+    );
+
+    // 24/7 Badge
+    Label badge =
+            new Label("● 24/7 Emergency Support");
+
+    badge.setFont(
+            Font.font(
+                    "Arial",
+                    FontWeight.BOLD,
+                    12
+            )
+    );
+
+    badge.setTextFill(
+            Color.web(PINK)
+    );
+
+    badge.setStyle(
+            "-fx-background-color: #FFF0F7;" +
+            "-fx-background-radius: 10;" +
+            "-fx-padding: 7 12;"
+    );
+
+    emergencyInfo.getChildren().addAll(
+            mainText,
+            subText,
+            badge
+    );
+
+    panel.getChildren().add(
+            emergencyInfo
+    );
+
+    return panel;
+}
+
+
+ 
     // =====================================================
     // EMERGENCY CARD
     // =====================================================

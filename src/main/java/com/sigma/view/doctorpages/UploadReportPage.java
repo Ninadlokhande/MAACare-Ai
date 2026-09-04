@@ -1,5 +1,7 @@
 package com.sigma.view.doctorpages;
 
+import com.sigma.controller.doctorController.ImageUploadController;
+import com.sigma.controller.doctorController.PatientReportController;
 import com.sigma.model.DoctorModel.PatientReport;
 
 import javafx.geometry.Insets;
@@ -15,6 +17,10 @@ import java.time.format.DateTimeFormatter;
 
 public class UploadReportPage {
 
+        // =====================================================
+        // SHOW PAGE
+        // =====================================================
+
         public static void show() {
 
                 BorderPane root = new BorderPane();
@@ -22,11 +28,7 @@ public class UploadReportPage {
                 Theme.applyBackground(root);
 
                 root.setPadding(
-                                new Insets(
-                                                28,
-                                                35,
-                                                28,
-                                                35));
+                                new Insets(28, 35, 28, 35));
 
                 // =====================================================
                 // HEADER
@@ -34,8 +36,7 @@ public class UploadReportPage {
 
                 HBox header = new HBox();
 
-                header.setAlignment(
-                                Pos.CENTER_LEFT);
+                header.setAlignment(Pos.CENTER_LEFT);
 
                 VBox heading = Theme.pageHeader(
                                 "Upload Patient Report",
@@ -48,6 +49,8 @@ public class UploadReportPage {
                                 Priority.ALWAYS);
 
                 Button back = Theme.backButton();
+
+                back.setOnAction(e -> PatientReportsPage.show());
 
                 header.getChildren().addAll(
                                 heading,
@@ -62,32 +65,23 @@ public class UploadReportPage {
 
                 form.setMaxWidth(700);
 
-                form.setPadding(
-                                new Insets(30));
+                form.setPadding(new Insets(30));
 
                 form.setSpacing(15);
 
                 // =====================================================
-                // PATIENT
+                // PATIENT NAME
                 // =====================================================
 
-                ComboBox<String> patient = new ComboBox<>();
+                TextField patientName = new TextField();
 
-                patient.getItems().addAll(
-                                "Priya Sharma",
-                                "Neha Kulkarni",
-                                "Sneha Patil",
-                                "Ayesha Khan",
-                                "Ritika Singh",
-                                "Pooja Iyer");
+                patientName.setPromptText(
+                                "Enter patient name");
 
-                patient.setPromptText(
-                                "Select patient");
+                patientName.setPrefHeight(40);
 
-                patient.setMaxWidth(
+                patientName.setMaxWidth(
                                 Double.MAX_VALUE);
-
-                patient.setPrefHeight(40);
 
                 // =====================================================
                 // REPORT TYPE
@@ -123,7 +117,7 @@ public class UploadReportPage {
                 reportName.setPrefHeight(40);
 
                 // =====================================================
-                // SOURCE
+                // SOURCE / LABORATORY
                 // =====================================================
 
                 TextField source = new TextField();
@@ -146,7 +140,8 @@ public class UploadReportPage {
 
                 filePath.setPrefHeight(40);
 
-                Button chooseFile = new Button("Choose File");
+                Button chooseFile = new Button(
+                                "Choose File");
 
                 chooseFile.setPrefHeight(40);
 
@@ -161,6 +156,12 @@ public class UploadReportPage {
                                 chooseFile);
 
                 // =====================================================
+                // STORE SELECTED FILE
+                // =====================================================
+
+                final File[] selectedFile = new File[1];
+
+                // =====================================================
                 // CHOOSE FILE
                 // =====================================================
 
@@ -171,30 +172,34 @@ public class UploadReportPage {
                         chooser.setTitle(
                                         "Select Patient Report");
 
-                        chooser.getExtensionFilters()
-                                        .addAll(
+                        chooser.getExtensionFilters().addAll(
 
-                                                        new FileChooser.ExtensionFilter(
-                                                                        "PDF Files",
-                                                                        "*.pdf"),
+                                        new FileChooser.ExtensionFilter(
+                                                        "PDF Files",
+                                                        "*.pdf"),
 
-                                                        new FileChooser.ExtensionFilter(
-                                                                        "Image Files",
-                                                                        "*.png",
-                                                                        "*.jpg",
-                                                                        "*.jpeg"),
+                                        new FileChooser.ExtensionFilter(
+                                                        "Image Files",
+                                                        "*.png",
+                                                        "*.jpg",
+                                                        "*.jpeg"),
 
-                                                        new FileChooser.ExtensionFilter(
-                                                                        "All Files",
-                                                                        "*.*"));
+                                        new FileChooser.ExtensionFilter(
+                                                        "All Files",
+                                                        "*.*"));
 
-                        File file = chooser.showOpenDialog(
-                                        null);
+                        File file = chooser.showOpenDialog(null);
 
                         if (file != null) {
 
+                                selectedFile[0] = file;
+
                                 filePath.setText(
                                                 file.getAbsolutePath());
+
+                                System.out.println(
+                                                "[REPORT] Selected file: "
+                                                                + file.getAbsolutePath());
                         }
                 });
 
@@ -211,8 +216,7 @@ public class UploadReportPage {
                                 "High",
                                 "Pending");
 
-                status.setValue(
-                                "Normal");
+                status.setValue("Normal");
 
                 status.setMaxWidth(
                                 Double.MAX_VALUE);
@@ -223,12 +227,13 @@ public class UploadReportPage {
                 // BUTTONS
                 // =====================================================
 
-                Button cancel = new Button("Cancel");
+                Button cancel = new Button(
+                                "Cancel");
 
                 cancel.setStyle(
                                 "-fx-background-color: transparent;" +
-                                                "-fx-text-fill: " +
-                                                Theme.SECONDARY_TEXT + ";" +
+                                                "-fx-text-fill: "
+                                                + Theme.SECONDARY_TEXT + ";" +
                                                 "-fx-font-weight: bold;" +
                                                 "-fx-cursor: hand;");
 
@@ -248,25 +253,31 @@ public class UploadReportPage {
                 // CANCEL
                 // =====================================================
 
-                cancel.setOnAction(e -> {
-
-                        PatientReportsPage.show();
-                });
+                cancel.setOnAction(
+                                e -> PatientReportsPage.show());
 
                 // =====================================================
-                // UPLOAD
+                // UPLOAD REPORT
                 // =====================================================
 
                 upload.setOnAction(e -> {
 
-                        if (patient.getValue() == null
+                        // =================================================
+                        // GET PATIENT NAME
+                        // =================================================
+
+                        String enteredPatientName = patientName.getText().trim();
+
+                        // =================================================
+                        // VALIDATION
+                        // =================================================
+
+                        if (enteredPatientName.isEmpty()
                                         || reportType.getValue() == null
                                         || reportName.getText()
                                                         .trim()
                                                         .isEmpty()
-                                        || filePath.getText()
-                                                        .trim()
-                                                        .isEmpty()) {
+                                        || selectedFile[0] == null) {
 
                                 Alert alert = new Alert(
                                                 Alert.AlertType.WARNING);
@@ -277,14 +288,132 @@ public class UploadReportPage {
                                 alert.setHeaderText(null);
 
                                 alert.setContentText(
-                                                "Please select patient, " +
-                                                                "report type, report name " +
-                                                                "and report file.");
+                                                "Please enter patient name, "
+                                                                + "select report type, "
+                                                                + "enter report name and "
+                                                                + "select report file.");
 
                                 alert.showAndWait();
 
                                 return;
                         }
+
+                        // =================================================
+                        // GET SELECTED FILE
+                        // =================================================
+
+                        File file = selectedFile[0];
+
+                        if (!file.exists() || !file.isFile()) {
+
+                                Alert alert = new Alert(
+                                                Alert.AlertType.ERROR);
+
+                                alert.setTitle(
+                                                "File Error");
+
+                                alert.setHeaderText(
+                                                "Selected file not found");
+
+                                alert.setContentText(
+                                                "Please select the report file again.");
+
+                                alert.showAndWait();
+
+                                return;
+                        }
+
+                        // =================================================
+                        // DISABLE BUTTON DURING UPLOAD
+                        // =================================================
+
+                        upload.setDisable(true);
+
+                        chooseFile.setDisable(true);
+
+                        upload.setText(
+                                        "Uploading...");
+
+                        // =================================================
+                        // UPLOAD TO CLOUDINARY
+                        // =================================================
+
+                        String uploadedFileUrl;
+
+                        try {
+
+                                ImageUploadController imageUploadController = new ImageUploadController();
+
+                                uploadedFileUrl = imageUploadController.imageUpload(file);
+
+                        } catch (Exception ex) {
+
+                                ex.printStackTrace();
+
+                                upload.setDisable(false);
+
+                                chooseFile.setDisable(false);
+
+                                upload.setText(
+                                                "Upload Report");
+
+                                Alert error = new Alert(
+                                                Alert.AlertType.ERROR);
+
+                                error.setTitle(
+                                                "Cloudinary Upload Error");
+
+                                error.setHeaderText(
+                                                "Unable to upload report file");
+
+                                error.setContentText(
+                                                "The report file could not be uploaded "
+                                                                + "to Cloudinary.\n\n"
+                                                                + "Please check your Cloudinary configuration.");
+
+                                error.showAndWait();
+
+                                return;
+                        }
+
+                        // =================================================
+                        // CHECK CLOUDINARY URL
+                        // =================================================
+
+                        if (uploadedFileUrl == null
+                                        || uploadedFileUrl.trim().isEmpty()
+                                        || uploadedFileUrl.equalsIgnoreCase("null")) {
+
+                                upload.setDisable(false);
+
+                                chooseFile.setDisable(false);
+
+                                upload.setText(
+                                                "Upload Report");
+
+                                Alert error = new Alert(
+                                                Alert.AlertType.ERROR);
+
+                                error.setTitle(
+                                                "Upload Failed");
+
+                                error.setHeaderText(
+                                                "Cloudinary did not return a file URL");
+
+                                error.setContentText(
+                                                "The report was not saved because "
+                                                                + "the uploaded file URL is empty.");
+
+                                error.showAndWait();
+
+                                return;
+                        }
+
+                        System.out.println(
+                                        "[REPORT UPLOAD] Cloudinary URL:");
+
+                        System.out.println(
+                                        uploadedFileUrl);
 
                         // =================================================
                         // DATE
@@ -296,30 +425,85 @@ public class UploadReportPage {
                                                                         "dd MMM yyyy hh:mm a"));
 
                         // =================================================
-                        // CREATE REPORT
+                        // CREATE REPORT OBJECT
                         // =================================================
 
                         PatientReport report = new PatientReport(
 
+                                        // Report Name
                                         reportName.getText()
                                                         .trim(),
 
-                                        patient.getValue(),
+                                        // Patient Name
+                                        enteredPatientName,
 
+                                        // Report Type
                                         reportType.getValue(),
 
+                                        // Date
                                         date,
 
+                                        // Status
                                         status.getValue(),
 
-                                        filePath.getText());
+                                        // Action
+                                        "View",
+
+                                        // Cloudinary URL
+                                        uploadedFileUrl.trim());
 
                         // =================================================
-                        // ADD REPORT
+                        // SAVE REPORT TO FIRESTORE
                         // =================================================
 
-                        PatientReportsPage.addReport(
-                                        report);
+                        try {
+
+                                PatientReportController reportController = DoctorDashboard.getReportController();
+
+                                reportController.addReport(
+                                                report);
+
+                                System.out.println(
+                                                "[UPLOAD REPORT] Report saved to Firestore.");
+
+                                System.out.println(
+                                                "[UPLOAD REPORT] Patient: "
+                                                                + enteredPatientName);
+
+                                System.out.println(
+                                                "[UPLOAD REPORT] URL saved: "
+                                                                + report.getReportUrl());
+
+                        } catch (Exception ex) {
+
+                                ex.printStackTrace();
+
+                                upload.setDisable(false);
+
+                                chooseFile.setDisable(false);
+
+                                upload.setText(
+                                                "Upload Report");
+
+                                Alert error = new Alert(
+                                                Alert.AlertType.ERROR);
+
+                                error.setTitle(
+                                                "Firestore Error");
+
+                                error.setHeaderText(
+                                                "Unable to save report");
+
+                                error.setContentText(
+                                                "The file was uploaded to Cloudinary, "
+                                                                + "but the report information could not "
+                                                                + "be saved to Firestore.\n\n"
+                                                                + "Please check your Firebase connection.");
+
+                                error.showAndWait();
+
+                                return;
+                        }
 
                         // =================================================
                         // SUCCESS
@@ -335,23 +519,28 @@ public class UploadReportPage {
                                         "Report Uploaded Successfully");
 
                         alert.setContentText(
-                                        "The report has been added " +
-                                                        "to the patient reports list.");
+                                        "Report for "
+                                                        + enteredPatientName
+                                                        + " has been uploaded successfully.");
 
                         alert.showAndWait();
+
+                        // =================================================
+                        // GO TO REPORTS PAGE
+                        // =================================================
 
                         PatientReportsPage.show();
                 });
 
                 // =====================================================
-                // FORM
+                // FORM FIELDS
                 // =====================================================
 
                 form.getChildren().addAll(
 
                                 fieldBox(
-                                                "Patient",
-                                                patient),
+                                                "Patient Name",
+                                                patientName),
 
                                 fieldBox(
                                                 "Report Type",
@@ -410,8 +599,8 @@ public class UploadReportPage {
 
                 Scene scene = new Scene(root);
 
-                DoctorDashboard.changeScene(
-                                scene);
+                // SAME DASHBOARD STAGE
+                DoctorDashboard.changeScene(scene);
         }
 
         // =====================================================
@@ -429,8 +618,8 @@ public class UploadReportPage {
                 label.setStyle(
                                 "-fx-font-size: 11px;" +
                                                 "-fx-font-weight: bold;" +
-                                                "-fx-text-fill: " +
-                                                Theme.TEXT + ";");
+                                                "-fx-text-fill: "
+                                                + Theme.TEXT + ";");
 
                 box.getChildren().addAll(
                                 label,

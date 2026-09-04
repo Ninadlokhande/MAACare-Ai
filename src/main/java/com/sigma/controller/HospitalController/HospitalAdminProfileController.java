@@ -1,6 +1,3 @@
-
-
-
 package com.sigma.controller.HospitalController;
 
 import java.util.List;

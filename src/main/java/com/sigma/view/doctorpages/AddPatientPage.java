@@ -1,5 +1,6 @@
 package com.sigma.view.doctorpages;
 
+import com.sigma.controller.doctorController.PatientController;
 import com.sigma.model.DoctorModel.Patient;
 
 import javafx.geometry.Insets;
@@ -10,388 +11,399 @@ import javafx.scene.layout.*;
 
 public class AddPatientPage {
 
-    public static void show() {
+        public static void show() {
 
-        BorderPane root = new BorderPane();
+                BorderPane root = new BorderPane();
 
-        Theme.applyBackground(root);
+                Theme.applyBackground(root);
 
-        root.setPadding(
-                new Insets(28, 35, 28, 35));
+                root.setPadding(
+                                new Insets(28, 35, 28, 35));
 
-        // =====================================================
-        // HEADER
-        // =====================================================
+                // =====================================================
+                // HEADER
+                // =====================================================
 
-        HBox header = new HBox();
+                HBox header = new HBox();
 
-        header.setAlignment(
-                Pos.CENTER_LEFT);
+                header.setAlignment(Pos.CENTER_LEFT);
 
-        VBox heading = Theme.pageHeader(
-                "Add Patient",
-                "Enter patient information to add a new patient.");
+                VBox heading = Theme.pageHeader(
+                                "Add Patient",
+                                "Enter patient information to add a new patient.");
 
-        Region spacer = new Region();
+                Region spacer = new Region();
 
-        HBox.setHgrow(
-                spacer,
-                Priority.ALWAYS);
+                HBox.setHgrow(
+                                spacer,
+                                Priority.ALWAYS);
 
-        Button back = Theme.backButton();
+                Button back = Theme.backButton();
 
-        header.getChildren().addAll(
-                heading,
-                spacer,
-                back);
+                header.getChildren().addAll(
+                                heading,
+                                spacer,
+                                back);
 
-        // =====================================================
-        // FORM CARD
-        // =====================================================
+                // =====================================================
+                // FORM CARD
+                // =====================================================
 
-        VBox form = Theme.card();
+                VBox form = Theme.card();
 
-        form.setMaxWidth(850);
+                form.setMaxWidth(850);
 
-        form.setPadding(
-                new Insets(28));
+                form.setPadding(
+                                new Insets(28));
 
-        form.setSpacing(15);
+                form.setSpacing(15);
 
-        // =====================================================
-        // PERSONAL INFORMATION
-        // =====================================================
+                // =====================================================
+                // PERSONAL INFORMATION
+                // =====================================================
 
-        Label personalTitle = new Label("Personal Information");
+                Label personalTitle = new Label("Personal Information");
 
-        personalTitle.setStyle(
-                "-fx-font-size: 17px;" +
-                        "-fx-font-weight: bold;" +
-                        "-fx-text-fill: " +
-                        Theme.TEXT + ";");
+                personalTitle.setStyle(
+                                "-fx-font-size: 17px;" +
+                                                "-fx-font-weight: bold;" +
+                                                "-fx-text-fill: " + Theme.TEXT + ";");
 
-        // =====================================================
-        // NAME
-        // =====================================================
+                TextField name = textField("Full Name");
 
-        TextField name = textField("Full Name");
+                TextField age = textField("Age");
 
-        // =====================================================
-        // AGE
-        // =====================================================
+                ComboBox<String> gender = new ComboBox<>();
 
-        TextField age = textField("Age");
+                gender.getItems().addAll(
+                                "Female",
+                                "Male",
+                                "Other");
 
-        // =====================================================
-        // GENDER
-        // =====================================================
+                gender.setPromptText(
+                                "Select Gender");
 
-        ComboBox<String> gender = new ComboBox<>();
+                gender.setMaxWidth(
+                                Double.MAX_VALUE);
 
-        gender.getItems().addAll(
-                "Female",
-                "Male",
-                "Other");
+                gender.setPrefHeight(40);
 
-        gender.setPromptText(
-                "Select Gender");
+                TextField phone = textField("Contact Number");
 
-        gender.setMaxWidth(
-                Double.MAX_VALUE);
+                TextField address = textField("Address");
 
-        gender.setPrefHeight(40);
+                // =====================================================
+                // VISIT INFORMATION
+                // =====================================================
 
-        // =====================================================
-        // CONTACT
-        // =====================================================
+                Label visitTitle = new Label("Visit Information");
 
-        TextField phone = textField("Contact Number");
+                visitTitle.setStyle(
+                                "-fx-font-size: 17px;" +
+                                                "-fx-font-weight: bold;" +
+                                                "-fx-text-fill: " + Theme.TEXT + ";");
 
-        // =====================================================
-        // ADDRESS
-        // =====================================================
+                TextField lastVisit = textField("Last Visit");
 
-        TextField address = textField("Address");
+                TextField nextVisit = textField("Next Visit");
 
-        // =====================================================
-        // VISIT INFORMATION
-        // =====================================================
+                // =====================================================
+                // GRID
+                // =====================================================
 
-        Label visitTitle = new Label("Visit Information");
+                GridPane grid = new GridPane();
 
-        visitTitle.setStyle(
-                "-fx-font-size: 17px;" +
-                        "-fx-font-weight: bold;" +
-                        "-fx-text-fill: " +
-                        Theme.TEXT + ";");
+                grid.setHgap(20);
+                grid.setVgap(15);
 
-        TextField lastVisit = textField("Last Visit");
+                ColumnConstraints col1 = new ColumnConstraints();
 
-        TextField nextVisit = textField("Next Visit");
+                col1.setPercentWidth(50);
 
-        // =====================================================
-        // GRID
-        // =====================================================
+                ColumnConstraints col2 = new ColumnConstraints();
 
-        GridPane grid = new GridPane();
+                col2.setPercentWidth(50);
 
-        grid.setHgap(20);
-        grid.setVgap(15);
+                grid.getColumnConstraints().addAll(
+                                col1,
+                                col2);
 
-        ColumnConstraints col1 = new ColumnConstraints();
+                grid.add(
+                                fieldBox("Full Name", name),
+                                0,
+                                0);
 
-        col1.setPercentWidth(50);
+                grid.add(
+                                fieldBox("Age", age),
+                                1,
+                                0);
 
-        ColumnConstraints col2 = new ColumnConstraints();
+                grid.add(
+                                fieldBox("Gender", gender),
+                                0,
+                                1);
 
-        col2.setPercentWidth(50);
+                grid.add(
+                                fieldBox("Contact Number", phone),
+                                1,
+                                1);
 
-        grid.getColumnConstraints()
-                .addAll(col1, col2);
+                grid.add(
+                                fieldBox("Address", address),
+                                0,
+                                2);
 
-        grid.add(
-                fieldBox("Full Name", name),
-                0, 0);
+                grid.add(
+                                fieldBox("Last Visit", lastVisit),
+                                1,
+                                2);
 
-        grid.add(
-                fieldBox("Age", age),
-                1, 0);
+                grid.add(
+                                fieldBox("Next Visit", nextVisit),
+                                0,
+                                3);
 
-        grid.add(
-                fieldBox("Gender", gender),
-                0, 1);
+                // =====================================================
+                // BUTTONS
+                // =====================================================
 
-        grid.add(
-                fieldBox("Contact Number", phone),
-                1, 1);
+                Button cancel = new Button("Cancel");
 
-        grid.add(
-                fieldBox("Address", address),
-                0, 2);
+                cancel.setStyle(
+                                "-fx-background-color: transparent;" +
+                                                "-fx-text-fill: " + Theme.SECONDARY_TEXT + ";" +
+                                                "-fx-font-weight: bold;" +
+                                                "-fx-cursor: hand;");
 
-        grid.add(
-                fieldBox("Last Visit", lastVisit),
-                1, 2);
+                Button save = Theme.primaryButton(
+                                "Save Patient");
 
-        grid.add(
-                fieldBox("Next Visit", nextVisit),
-                0, 3);
+                HBox buttons = new HBox(15);
 
-        // =====================================================
-        // BUTTONS
-        // =====================================================
+                buttons.setAlignment(
+                                Pos.CENTER_RIGHT);
 
-        Button cancel = new Button("Cancel");
+                buttons.getChildren().addAll(
+                                cancel,
+                                save);
 
-        cancel.setStyle(
-                "-fx-background-color: transparent;" +
-                        "-fx-text-fill: " +
-                        Theme.SECONDARY_TEXT + ";" +
-                        "-fx-font-weight: bold;" +
-                        "-fx-cursor: hand;");
+                // =====================================================
+                // BACK / CANCEL
+                // =====================================================
 
-        Button save = Theme.primaryButton(
-                "Save Patient");
+                back.setOnAction(e -> PatientsPage.show());
 
-        HBox buttons = new HBox(15);
+                cancel.setOnAction(e -> PatientsPage.show());
 
-        buttons.setAlignment(
-                Pos.CENTER_RIGHT);
+                // =====================================================
+                // SAVE PATIENT
+                // =====================================================
 
-        buttons.getChildren().addAll(
-                cancel,
-                save);
+                save.setOnAction(e -> {
 
-        // =====================================================
-        // CANCEL
-        // =====================================================
+                        // -----------------------------------------------
+                        // VALIDATION
+                        // -----------------------------------------------
 
-        cancel.setOnAction(e -> {
+                        if (name.getText().trim().isEmpty()
+                                        || age.getText().trim().isEmpty()
+                                        || gender.getValue() == null
+                                        || phone.getText().trim().isEmpty()) {
 
-            PatientsPage.show();
+                                Alert alert = new Alert(
+                                                Alert.AlertType.WARNING);
 
-        });
+                                alert.setTitle(
+                                                "Incomplete Information");
 
-        // =====================================================
-        // SAVE
-        // =====================================================
+                                alert.setHeaderText(null);
 
-        save.setOnAction(e -> {
+                                alert.setContentText(
+                                                "Please fill all required fields.");
 
-            // -----------------------------------------
-            // VALIDATION
-            // -----------------------------------------
+                                alert.showAndWait();
 
-            if (name.getText().trim().isEmpty()
-                    || age.getText().trim().isEmpty()
-                    || gender.getValue() == null
-                    || phone.getText().trim().isEmpty()) {
+                                return;
+                        }
 
-                Alert alert = new Alert(
-                        Alert.AlertType.WARNING);
+                        // -----------------------------------------------
+                        // GET SHARED PATIENT CONTROLLER
+                        // -----------------------------------------------
 
-                alert.setTitle(
-                        "Incomplete Information");
+                        PatientController controller = DoctorDashboard.getPatientController();
 
-                alert.setHeaderText(null);
+                        if (controller == null) {
 
-                alert.setContentText(
-                        "Please fill all required fields.");
+                                Alert alert = new Alert(
+                                                Alert.AlertType.ERROR);
 
-                alert.showAndWait();
+                                alert.setTitle(
+                                                "Patient Controller Error");
 
-                return;
-            }
+                                alert.setHeaderText(null);
 
-            // -----------------------------------------
-            // AGE + GENDER
-            // -----------------------------------------
+                                alert.setContentText(
+                                                "Patient controller is not available.");
 
-            String ageGender = age.getText().trim()
-                    + " Y / "
-                    + gender.getValue();
+                                alert.showAndWait();
 
-            // -----------------------------------------
-            // CREATE PATIENT
-            // -----------------------------------------
+                                return;
+                        }
 
-            Patient patient = new Patient(
+                        // -----------------------------------------------
+                        // SAVE TO FIRESTORE
+                        // -----------------------------------------------
 
-                    name.getText().trim(),
+                        Patient savedPatient = controller.addPatient(
+                                        name.getText().trim(),
+                                        age.getText().trim(),
+                                        gender.getValue(),
+                                        phone.getText().trim(),
+                                        lastVisit.getText().trim(),
+                                        nextVisit.getText().trim());
 
-                    ageGender,
+                        // -----------------------------------------------
+                        // SAVE FAILED
+                        // -----------------------------------------------
 
-                    phone.getText().trim(),
+                        if (savedPatient == null) {
 
-                    lastVisit.getText().trim(),
+                                Alert alert = new Alert(
+                                                Alert.AlertType.ERROR);
 
-                    nextVisit.getText().trim(),
+                                alert.setTitle(
+                                                "Save Error");
 
-                    "");
+                                alert.setHeaderText(
+                                                "Unable to add patient");
 
-            // -----------------------------------------
-            // ADD TO PATIENT LIST
-            // -----------------------------------------
+                                alert.setContentText(
+                                                "Patient could not be saved to Firebase. "
+                                                                + "Please check your Firebase connection.");
 
-            PatientsPage.addPatient(
-                    patient);
+                                alert.showAndWait();
 
-            // -----------------------------------------
-            // SUCCESS MESSAGE
-            // -----------------------------------------
+                                return;
+                        }
 
-            Alert alert = new Alert(
-                    Alert.AlertType.INFORMATION);
+                        // -----------------------------------------------
+                        // SUCCESS
+                        // -----------------------------------------------
 
-            alert.setTitle(
-                    "Patient Added");
+                        Alert alert = new Alert(
+                                        Alert.AlertType.INFORMATION);
 
-            alert.setHeaderText(
-                    "Patient Added Successfully");
+                        alert.setTitle(
+                                        "Patient Added");
 
-            alert.setContentText(
-                    name.getText().trim()
-                            + " has been added to your patient list.");
+                        alert.setHeaderText(
+                                        "Patient Added Successfully");
 
-            alert.showAndWait();
+                        alert.setContentText(
+                                        name.getText().trim()
+                                                        + " has been added successfully.");
 
-            // -----------------------------------------
-            // BACK TO PATIENT PAGE
-            // -----------------------------------------
+                        alert.showAndWait();
 
-            PatientsPage.show();
-        });
+                        // -----------------------------------------------
+                        // GO BACK TO PATIENT PAGE
+                        // -----------------------------------------------
 
-        // =====================================================
-        // FORM CONTENT
-        // =====================================================
+                        PatientsPage.show();
+                });
 
-        form.getChildren().addAll(
+                // =====================================================
+                // ADD FORM CONTENT
+                // =====================================================
 
-                personalTitle,
+                form.getChildren().addAll(
+                                personalTitle,
+                                grid,
+                                visitTitle,
+                                buttons);
 
-                grid,
+                // =====================================================
+                // CENTER
+                // =====================================================
 
-                visitTitle,
+                StackPane center = new StackPane(form);
 
-                buttons);
+                center.setAlignment(
+                                Pos.CENTER);
 
-        // =====================================================
-        // CENTER
-        // =====================================================
+                // =====================================================
+                // SCROLL
+                // =====================================================
 
-        StackPane center = new StackPane(form);
+                ScrollPane scroll = new ScrollPane(center);
 
-        center.setAlignment(
-                Pos.CENTER);
+                scroll.setFitToWidth(true);
 
-        ScrollPane scroll = new ScrollPane(center);
+                scroll.setStyle(
+                                "-fx-background-color: transparent;" +
+                                                "-fx-background: transparent;");
 
-        scroll.setFitToWidth(true);
+                // =====================================================
+                // ROOT
+                // =====================================================
 
-        scroll.setStyle(
-                "-fx-background-color: transparent;" +
-                        "-fx-background: transparent;");
+                root.setTop(header);
 
-        root.setTop(header);
+                BorderPane.setMargin(
+                                header,
+                                new Insets(0, 0, 20, 0));
 
-        BorderPane.setMargin(
-                header,
-                new Insets(0, 0, 20, 0));
+                root.setCenter(scroll);
 
-        root.setCenter(scroll);
+                // =====================================================
+                // SAME DASHBOARD STAGE
+                // =====================================================
 
-        // =====================================================
-        // SCENE
-        // =====================================================
+                Scene scene = new Scene(root);
 
-        Scene scene = new Scene(root);
+                DoctorDashboard.changeScene(scene);
+        }
 
-        DoctorDashboard.changeScene(
-                scene);
-    }
+        // =========================================================
+        // TEXT FIELD
+        // =========================================================
 
-    // =====================================================
-    // TEXT FIELD
-    // =====================================================
+        private static TextField textField(
+                        String prompt) {
 
-    private static TextField textField(
-            String prompt) {
+                TextField field = new TextField();
 
-        TextField field = new TextField();
+                field.setPromptText(prompt);
 
-        field.setPromptText(prompt);
+                field.setPrefHeight(40);
 
-        field.setPrefHeight(40);
+                field.setMaxWidth(
+                                Double.MAX_VALUE);
 
-        field.setMaxWidth(
-                Double.MAX_VALUE);
+                return field;
+        }
 
-        return field;
-    }
+        // =========================================================
+        // FIELD BOX
+        // =========================================================
 
-    // =====================================================
-    // FIELD BOX
-    // =====================================================
+        private static VBox fieldBox(
+                        String labelText,
+                        Control control) {
 
-    private static VBox fieldBox(
-            String labelText,
-            Control control) {
+                VBox box = new VBox(5);
 
-        VBox box = new VBox(5);
+                Label label = new Label(labelText);
 
-        Label label = new Label(labelText);
+                label.setStyle(
+                                "-fx-font-size: 11px;" +
+                                                "-fx-font-weight: bold;" +
+                                                "-fx-text-fill: " + Theme.TEXT + ";");
 
-        label.setStyle(
-                "-fx-font-size: 11px;" +
-                        "-fx-font-weight: bold;" +
-                        "-fx-text-fill: " +
-                        Theme.TEXT + ";");
+                box.getChildren().addAll(
+                                label,
+                                control);
 
-        box.getChildren().addAll(
-                label,
-                control);
-
-        return box;
-    }
+                return box;
+        }
 }

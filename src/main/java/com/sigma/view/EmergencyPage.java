@@ -99,7 +99,7 @@ root=new BorderPane();
         // MAIN CONTENT
         // =====================================================
 
-        VBox content = new VBox(18);
+        VBox content = new VBox(25);
 
         content.setPadding(
                 new Insets(5, 38, 35, 38)
@@ -135,9 +135,13 @@ root=new BorderPane();
         );
 
 
-        Label subtitle = new Label(
+      /*   Label subtitle = new Label(
                 "Monitor and manage all emergency cases"
-        );
+        );*/ 
+
+        Label subtitle = new Label(
+        "24/7 Emergency Support and Assistance"
+);
 
         subtitle.setFont(
                 Font.font("Arial", 16)
@@ -377,7 +381,7 @@ ambulanceSpacer.setMinWidth(60);
         // STAT CARDS
         // =====================================================
 
-        HBox stats = new HBox(15);
+     /*   HBox stats = new HBox(15);
 
         stats.setAlignment(
                 Pos.CENTER
@@ -440,14 +444,95 @@ ambulanceSpacer.setMinWidth(60);
                 stabilizedCard,
                 admittedCard,
                 dischargedCard
+        );*/   
+
+// =====================================================
+// EMERGENCY INFORMATION CARDS
+// =====================================================
+
+HBox stats = new HBox(30);
+
+stats.setAlignment(
+        Pos.CENTER
+);
+
+/*VBox helplineCard =
+        createStatCard(
+                "📞",
+                "Emergency Helpline",
+                "108",
+                "Available 24/7",
+                PINK
         );
+
+VBox ambulanceCard =
+        createStatCard(
+                "🚑",
+                "Ambulance Support",
+                "Available",
+                "Emergency Transport",
+                ORANGE
+        );
+
+VBox emergencyCareCard =
+        createStatCard(
+                "🏥",
+                "Emergency Care",
+                "24/7",
+                "Hospital Emergency Services",
+                PURPLE
+        );
+
+stats.getChildren().addAll(
+        helplineCard,
+        ambulanceCard,
+        emergencyCareCard
+);*/ 
+
+
+VBox ambulanceCard =
+        createStatCard(
+                "🚑",
+                "Ambulance Support",
+                "Available",
+                "Emergency Transport",
+                ORANGE
+        );
+
+VBox emergencyCareCard =
+        createStatCard(
+                "🏥",
+                "Emergency Care",
+                "24/7",
+                "Hospital Emergency Services",
+                PURPLE
+        );
+
+VBox emergencyTeamCard =
+        createStatCard(
+             //   "🩺",
+                             "👥",
+
+                "Emergency Team",
+                "Ready",
+                "Immediate Assistance",
+                GREEN
+        ); 
+
+        stats.getChildren().addAll(
+        ambulanceCard,
+        emergencyCareCard,
+        emergencyTeamCard
+);
+
+
 
 
         // =====================================================
         // STATUS OVERVIEW
         // =====================================================
 
-        VBox statusMain =
+     /*    VBox statusMain =
                 new VBox(15);
 
         Label statusTitle =
@@ -524,14 +609,14 @@ ambulanceSpacer.setMinWidth(60);
                 "-fx-border-color: " + BORDER + ";" +
                 "-fx-border-radius: 15;" +
                 "-fx-background-radius: 15;"
-        );
+        );*/
 
 
         // =====================================================
         // EMERGENCY SUMMARY CHART
         // =====================================================
 
-        VBox chartBox =
+    /*   VBox chartBox =
                 new VBox(10);
 
 
@@ -615,14 +700,14 @@ ambulanceSpacer.setMinWidth(60);
                 "-fx-border-color: " + BORDER + ";" +
                 "-fx-border-radius: 15;" +
                 "-fx-background-radius: 15;"
-        );
+        );*/
 
 
         // =====================================================
         // SECOND ROW
         // =====================================================
 
-        HBox secondRow =
+     /*   HBox secondRow =
                 new HBox(18);
 
 
@@ -641,7 +726,7 @@ ambulanceSpacer.setMinWidth(60);
         secondRow.getChildren().addAll(
                 statusMain,
                 chartBox
-        );
+        );*/
 
 
         // =====================================================
@@ -649,7 +734,9 @@ ambulanceSpacer.setMinWidth(60);
         // =====================================================
 
         HBox bottom =
-                new HBox();
+                new HBox(); 
+
+                bottom.setPrefHeight(150);
 
 
         bottom.setAlignment(
@@ -659,12 +746,17 @@ ambulanceSpacer.setMinWidth(60);
 
         bottom.setPadding(
                 new Insets(
-                        12,
+                     //   12,
+                     20,
                         25,
-                        12,
+                      //  12,
+                      20,
                         25
                 )
         );
+
+
+
 
 
         bottom.setStyle(
@@ -679,7 +771,7 @@ ambulanceSpacer.setMinWidth(60);
         // ACTUAL BOTTOM AMBULANCE IMAGE
         // =====================================================
 
-        Image bottomAmbulanceImage =
+     /*   Image bottomAmbulanceImage =
                 new Image("assets\\images\\logo\\ambulanceImage.png");
 
 
@@ -693,13 +785,15 @@ ambulanceSpacer.setMinWidth(60);
         bottomAmbulance.setFitHeight(120);
 
         bottomAmbulance.setPreserveRatio(true);
-        bottomAmbulance.setSmooth(true);
+        bottomAmbulance.setSmooth(true);*/
 
 
         // Bottom text
 
         VBox bottomText =
-                new VBox(5);
+                new VBox(8); 
+
+                bottomText.setAlignment(Pos.CENTER_LEFT);
 
 
         Label everySecond =
@@ -745,8 +839,8 @@ ambulanceSpacer.setMinWidth(60);
 
 
         bottom.getChildren().addAll(
-                bottomAmbulance,
-                new Label("     "),
+              //  bottomAmbulance,
+              //  new Label("     "),
                 bottomText
         );
 
@@ -759,7 +853,12 @@ ambulanceSpacer.setMinWidth(60);
         // =====================================================
 
         HBox bottomRow =
-                new HBox(18);
+                new HBox(18); 
+
+                VBox.setMargin(
+        bottomRow,
+        new Insets(25, 0, 0, 0)
+);
 
 
         HBox.setHgrow(
@@ -788,7 +887,7 @@ ambulanceSpacer.setMinWidth(60);
                 titleRow,
                 ambulanceBox,
                 stats,
-                secondRow,
+             //   secondRow,
                 bottomRow
         );
 
@@ -942,7 +1041,7 @@ ambulanceSpacer.setMinWidth(60);
     // STATUS CARD METHOD
     // =========================================================
 
-    private static VBox createStatusCard(
+  /* private static VBox createStatusCard(
             String icon,
             String title,
             String number,
@@ -1050,5 +1149,5 @@ ambulanceSpacer.setMinWidth(60);
 
 
         return card;
-    }
+    }*/
 } 
