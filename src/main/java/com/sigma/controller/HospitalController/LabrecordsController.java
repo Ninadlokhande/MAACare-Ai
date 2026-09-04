@@ -1,18 +1,34 @@
-
 package com.sigma.controller.HospitalController;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
+import com.sigma.config.CloudinaryDocumentUploader;
 import com.sigma.dao.LabrecordsDao;
 import com.sigma.model.Labrecords;
-import com.sigma.controller.HospitalController.NotificationController;
 
 public class LabrecordsController {
 
-    LabrecordsDao dao = new LabrecordsDao();
+    // =========================================================
+    // DAO
+    // =========================================================
 
-    NotificationController notificationController =
-        new NotificationController();
+    private final LabrecordsDao dao =
+            new LabrecordsDao();
+
+
+    // =========================================================
+    // NOTIFICATION CONTROLLER
+    // =========================================================
+
+    private final NotificationController notificationController =
+            new NotificationController();
+
+
+    // =========================================================
+    // ADD LAB RECORD
+    // =========================================================
 
     public void addLabrecord(
             String number,
@@ -21,7 +37,8 @@ public class LabrecordsController {
             String department,
             String date,
             String status,
-            String results) {
+            String results,
+            String documentUrl) {
 
         Labrecords labrecord =
                 new Labrecords(
@@ -31,20 +48,60 @@ public class LabrecordsController {
                         department,
                         date,
                         status,
-                        results);
+                        results,
+                        documentUrl
+                );
 
+
+        // Save record to Firebase
         dao.saveLabrecord(labrecord);
-notificationController.addNotification(
-        number,
-        "New lab record added for " + patientName,
-        "LAB_RECORD"
-);
 
+
+        // Add notification
+        notificationController.addNotification(
+                number,
+                "New lab record added for " + patientName,
+                "LAB_RECORD"
+        );
     }
 
-    public Labrecords getLabrecord(String number) {
+
+    // =========================================================
+    // UPLOAD LAB REPORT DOCUMENT
+    // =========================================================
+
+    public String uploadLabReportDocument(
+            File file
+    ) throws IOException {
+
+        if (file == null) {
+
+            throw new IOException(
+                    "No document selected."
+            );
+        }
+
+
+        return CloudinaryDocumentUploader
+                .uploadDocument(file);
+    }
+
+
+    // =========================================================
+    // GET SINGLE LAB RECORD
+    // =========================================================
+
+    public Labrecords getLabrecord(
+            String number
+    ) {
+
         return dao.getLabrecord(number);
     }
+
+
+    // =========================================================
+    // UPDATE LAB RECORD
+    // =========================================================
 
     public void updateLabrecord(
             String number,
@@ -53,7 +110,8 @@ notificationController.addNotification(
             String department,
             String date,
             String status,
-            String results) {
+            String results,
+            String documentUrl) {
 
         Labrecords labrecord =
                 new Labrecords(
@@ -63,16 +121,34 @@ notificationController.addNotification(
                         department,
                         date,
                         status,
-                        results);
+                        results,
+                        documentUrl
+                );
 
+
+        // Update record in Firebase
         dao.updateLabrecord(labrecord);
     }
 
-    public void deleteLabrecord(String number) {
+
+    // =========================================================
+    // DELETE LAB RECORD
+    // =========================================================
+
+    public void deleteLabrecord(
+            String number
+    ) {
+
         dao.deleteLabrecord(number);
     }
 
+
+    // =========================================================
+    // GET ALL LAB RECORDS
+    // =========================================================
+
     public List<Labrecords> getAllLabrecords() {
+
         return dao.getLabrecords();
     }
 }

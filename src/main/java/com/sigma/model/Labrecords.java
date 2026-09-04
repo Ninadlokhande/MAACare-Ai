@@ -1,36 +1,60 @@
 package com.sigma.model;
 
-
 public class Labrecords {
+
+    // =========================================================
+    // FIELDS
+    // =========================================================
+
     private String number;
     private String PatientName;
     private String TestName;
     private String Department;
-    private String  Date;
+    private String Date;
     private String Status;
-    private String Results; 
+    private String Results;
 
-    // Constructor  
+    // Cloudinary document URL
+    private String documentUrl;
 
-    public Labrecords(){ 
-        
+
+    // =========================================================
+    // DEFAULT CONSTRUCTOR
+    // =========================================================
+
+    public Labrecords() {
+
     }
 
-    public Labrecords(String number,
-        String PatientName,
-        String TestName,
-        String Department,
-        String Date,
-        String Status,
-        String Results) { 
-            this.number=number;
-            this.PatientName=PatientName;
-            this.TestName=TestName;
-            this.Department=Department;
-            this.Date=Date;
-            this.Status=Status;
-            this.Results=Results;
-        }
+
+    // =========================================================
+    // PARAMETERIZED CONSTRUCTOR
+    // =========================================================
+
+    public Labrecords(
+            String number,
+            String PatientName,
+            String TestName,
+            String Department,
+            String Date,
+            String Status,
+            String Results,
+            String documentUrl) {
+
+        this.number = number;
+        this.PatientName = PatientName;
+        this.TestName = TestName;
+        this.Department = Department;
+        this.Date = Date;
+        this.Status = Status;
+        this.Results = Results;
+        this.documentUrl = documentUrl;
+    }
+
+
+    // =========================================================
+    // NUMBER
+    // =========================================================
 
     public String getNumber() {
         return number;
@@ -40,6 +64,11 @@ public class Labrecords {
         this.number = number;
     }
 
+
+    // =========================================================
+    // PATIENT NAME
+    // =========================================================
+
     public String getPatientName() {
         return PatientName;
     }
@@ -47,6 +76,11 @@ public class Labrecords {
     public void setPatientName(String patientName) {
         PatientName = patientName;
     }
+
+
+    // =========================================================
+    // TEST NAME
+    // =========================================================
 
     public String getTestName() {
         return TestName;
@@ -56,6 +90,11 @@ public class Labrecords {
         TestName = testName;
     }
 
+
+    // =========================================================
+    // DEPARTMENT
+    // =========================================================
+
     public String getDepartment() {
         return Department;
     }
@@ -63,6 +102,11 @@ public class Labrecords {
     public void setDepartment(String department) {
         Department = department;
     }
+
+
+    // =========================================================
+    // DATE
+    // =========================================================
 
     public String getDate() {
         return Date;
@@ -72,6 +116,11 @@ public class Labrecords {
         Date = date;
     }
 
+
+    // =========================================================
+    // STATUS
+    // =========================================================
+
     public String getStatus() {
         return Status;
     }
@@ -79,6 +128,11 @@ public class Labrecords {
     public void setStatus(String status) {
         Status = status;
     }
+
+
+    // =========================================================
+    // RESULTS
+    // =========================================================
 
     public String getResults() {
         return Results;
@@ -89,7 +143,15 @@ public class Labrecords {
     }
 
 
-    
-    
-}
+    // =========================================================
+    // DOCUMENT URL
+    // =========================================================
 
+    public String getDocumentUrl() {
+        return documentUrl;
+    }
+
+    public void setDocumentUrl(String documentUrl) {
+        this.documentUrl = documentUrl;
+    }
+}

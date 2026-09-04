@@ -114,7 +114,8 @@ public class Loginpage {
         // =========================================================
 
         String imagePath =
-                "file:Maacare-Ai\\src\\main\\resources\\assets\\images\\logo\\logo.png";
+             //   "file:Maacare-Ai\\src\\main\\resources\\assets\\images\\logo\\logo.png";
+             "assets\\images\\logo\\logo.png";
 
         Image logoImage = new Image(imagePath);
 
