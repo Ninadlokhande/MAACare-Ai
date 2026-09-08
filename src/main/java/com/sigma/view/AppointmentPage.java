@@ -48,8 +48,11 @@ private static final String BG = "#FFFFFF"; */
 
 
 
-private static final String PINK = "#E98FB3";
-private static final String ICON_PINK = "#D85A8A";
+//private static final String PINK = "#E98FB3";
+//private static final String ICON_PINK = "#D85A8A";
+
+private static final String PINK = "#E84A87";
+private static final String ICON_PINK = "#E84A87";
 
 
 private static final String LIGHT_PINK = "#FFEAF3";
@@ -186,7 +189,8 @@ Content.setStyle(
 
                 "-fx-border-radius: 8;" +
                 "-fx-background-radius: 8;" +
-                "-fx-padding: 0 12;"
+                "-fx-padding: 0 12;" +
+                "-fx-font-size: 13px;"
         );
 
         // NOTIFICATION
@@ -338,7 +342,15 @@ VBox todayCard = createStatCard(
         );
 
         statusCombo.setPrefWidth(105);
-        statusCombo.setPrefHeight(35);
+        statusCombo.setPrefHeight(35); 
+
+        statusCombo.setStyle(
+        "-fx-background-color: white;" +
+        "-fx-border-color: " + BORDER + ";" +
+        "-fx-border-radius: 8;" +
+        "-fx-background-radius: 8;" +
+        "-fx-font-size: 13px;"
+);
 
         DatePicker datePicker =
                 new DatePicker();
@@ -360,13 +372,21 @@ datePicker.valueProperty().addListener(
         );
 
         datePicker.setPrefWidth(105);
-        datePicker.setPrefHeight(35);
+        datePicker.setPrefHeight(35); 
+
+        datePicker.setStyle(
+        "-fx-background-color: white;" +
+        "-fx-border-color: " + BORDER + ";" +
+        "-fx-border-radius: 8;" +
+        "-fx-background-radius: 8;" +
+        "-fx-font-size: 13px;"
+);
 
         Button newAppointment =
                 new Button("+  New Appointment");
 
         newAppointment.setPrefHeight(38);
-        newAppointment.setPrefWidth(130);
+        newAppointment.setPrefWidth(170);
 
         newAppointment.setTextFill(
                 Color.WHITE
@@ -387,7 +407,7 @@ datePicker.valueProperty().addListener(
                 Cursor.HAND
         );
 
-        newAppointment.setStyle(
+     /*    newAppointment.setStyle(
              //   "-fx-background-color: " + PINK + ";" +
                         //   "-fx-background-color: #E98FB3;" +
                            "-fx-background-color: #E91E63;" +
@@ -396,7 +416,44 @@ datePicker.valueProperty().addListener(
 
                 "-fx-background-radius: 7;" +
                 "-fx-border-radius: 7;"
-        );
+        );*/ 
+
+newAppointment.setStyle(
+        "-fx-background-color: linear-gradient(" +
+        "to right, #F54B87, #9B4DCC);" +
+        "-fx-text-fill: white;" +
+        "-fx-font-size: 13px;" +
+        "-fx-font-weight: bold;" +
+        "-fx-background-radius: 20;" +
+        "-fx-padding: 8px 20px;" +
+        "-fx-border-radius: 20;"
+);  
+
+
+newAppointment.setOnMouseEntered(e -> {
+    newAppointment.setStyle(
+            "-fx-background-color: linear-gradient(" +
+            "to right, #E84A87, #9B4DCC);" +
+            "-fx-text-fill: white;" +
+            "-fx-font-size: 13px;" +
+            "-fx-font-weight: bold;" +
+            "-fx-background-radius: 20;" +
+            "-fx-padding: 8px 20px;"
+    );
+});
+
+newAppointment.setOnMouseExited(e -> {
+    newAppointment.setStyle(
+            "-fx-background-color: linear-gradient(" +
+            "to right, #F54B87, #9B4DCC);" +
+            "-fx-text-fill: white;" +
+            "-fx-font-size: 13px;" +
+            "-fx-font-weight: bold;" +
+            "-fx-background-radius: 20;" +
+            "-fx-padding: 8px 20px;"
+    );
+});
+
 
         Region filterSpace = new Region();
 
@@ -435,11 +492,19 @@ datePicker.valueProperty().addListener(
         );
         
 
-        table.setStyle(
+     /* table.setStyle(
                 "-fx-background-color: white;" +
                 "-fx-border-color: " + BORDER + ";" +
                 "-fx-border-radius: 8;"
-        );
+        );*/ 
+
+        table.setStyle(
+        "-fx-background-color: white;" +
+        "-fx-border-color: " + BORDER + ";" +
+        "-fx-border-radius: 12;" +
+        "-fx-background-radius: 12;"
+); 
+
 
         // NUMBER
       
@@ -652,7 +717,7 @@ actionCol.setCellFactory(column ->
                 // BUTTON STYLE
                 // =================================================
 
-                styleActionButton(
+             /*   styleActionButton(
                         view,
                         "#FFF0F6",
                         PINK
@@ -668,7 +733,25 @@ actionCol.setCellFactory(column ->
                         delete,
                         "#FFF0F0",
                         "#D94A5A"
-                );
+                );*/
+
+                styleActionButton(
+        view,
+        LIGHT_PINK,
+        PINK
+);
+
+styleActionButton(
+        edit,
+        "#F3ECFF",
+        "#9B4DCC"
+);
+
+styleActionButton(
+        delete,
+        "#FFF0F0",
+        "#D94A5A"
+);
 
                 // =================================================
                 // VIEW BUTTON
@@ -1237,10 +1320,15 @@ updateTodayAppointments(java.time.LocalDate.now());
         StackPane iconBox =
                 new StackPane(iconLabel);
 
-        iconBox.setPrefSize(
+       /* iconBox.setPrefSize(
                 42,
                 42
-        );
+        );*/ 
+
+        iconBox.setPrefSize(
+        46,
+        46
+);
 
         iconBox.setBackground(
                 new Background(
@@ -1315,12 +1403,19 @@ if (title.equals("Total Appointments")) {
                         bottomLabel
                 );
 
-        HBox cardContent =
+    /*     HBox cardContent =
                 new HBox(
                         12,
                         iconBox,
                         text
-                );
+                );*/ 
+
+                HBox cardContent =
+        new HBox(
+                14,
+                iconBox,
+                text
+        );
 
         cardContent.setAlignment(
                 Pos.CENTER_LEFT
@@ -1329,11 +1424,19 @@ if (title.equals("Total Appointments")) {
         VBox card =
                 new VBox(cardContent);
 
-        card.setPadding(
+      /*  card.setPadding(
                 new Insets(
                         14, 16, 14, 16
                 )
-        );
+        );*/ 
+
+        card.setPadding(
+        new Insets(
+                16, 18, 16, 18
+        )
+);
+
+card.setPrefHeight(90);
 
         card.setPrefHeight(82);
 
@@ -1346,8 +1449,10 @@ if (title.equals("Total Appointments")) {
                 "-fx-background-color: white;" +
               //  "-fx-border-color: #E8E8EF;" +
                 "-fx-border-color: " + BORDER + ";" +
-                "-fx-border-radius: 10;" +
-                "-fx-background-radius: 10;"
+               // "-fx-border-radius: 10;" +
+                //"-fx-background-radius: 10;"
+                "-fx-border-radius: 12;" +
+"-fx-background-radius: 12;"
         );
 
         return card;

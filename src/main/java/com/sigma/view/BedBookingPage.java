@@ -26,7 +26,7 @@ public class BedBookingPage {
     // =========================================================
 
 
-       private static final String BG="#F7EAF5";
+    /*  private static final String BG="#F7EAF5";
 
 
     private static final String WHITE = "#FFFFFF";
@@ -41,7 +41,25 @@ public class BedBookingPage {
     private static final String ORANGE = "#F2A33A";
 
     private static final String BORDER = "#E9E6EF";
-    private static final String GREY = "#77758A"; 
+    private static final String GREY = "#77758A"; */ 
+
+private static final String BG = "#FFFFFF";
+private static final String WHITE = "#FFFFFF";
+
+private static final String NAVY = "#24234F";
+
+private static final String PINK = "#E84A87";
+private static final String LIGHT_PINK = "#FFEAF3";
+
+private static final String PURPLE = "#9B4DCC";
+
+private static final String GREEN = "#67C98F";
+private static final String BLUE = "#5578D6";
+private static final String ORANGE = "#F2A33A";
+
+private static final String BORDER = "#E7DCE8";
+private static final String GREY = "#77778D";
+
 
 
     private BedBookingController controller=new BedBookingController();
@@ -71,9 +89,17 @@ public BedBookingPage(){
 private void createView(){
 root=new BorderPane();
 
-        root.setStyle(
+        /*root.setStyle(
                 "-fx-background-color: " + BG + ";"
-        );
+        );*/ 
+
+        root.setStyle(
+        "-fx-background-color: linear-gradient(" +
+        "to bottom right, " +
+        "#FFFFFF 0%, " +
+        "#FFF6FA 55%, " +
+        "#F3ECFF 100%);"
+);
 
         // =====================================================
         // MAIN CONTENT
@@ -146,20 +172,60 @@ addBedButton.setFont(
                 FontWeight.BOLD,
                 13
         )
-);
+); 
+addBedButton.setPrefWidth(170);
+addBedButton.setPrefHeight(38);
+
 
 addBedButton.setCursor(Cursor.HAND);
 
-addBedButton.setStyle(
+/*addBedButton.setStyle(
         "-fx-background-color: " + PINK + ";" +
         "-fx-text-fill: white;" +
         "-fx-background-radius: 8;" +
         "-fx-border-radius: 8;" +
         "-fx-padding: 10 16;"
+);*/
+
+
+
+addBedButton.setStyle(
+        "-fx-background-color: linear-gradient(" +
+        "to right, #F54B87, #9B4DCC);" +
+        "-fx-text-fill: white;" +
+        "-fx-font-size: 13px;" +
+        "-fx-font-weight: bold;" +
+        "-fx-background-radius: 20;" +
+        "-fx-padding: 8px 20px;" +
+        "-fx-border-radius: 20;"
 );
 
 
+addBedButton.setOnMouseEntered(e -> {
+    addBedButton.setStyle(
+            "-fx-background-color: linear-gradient(" +
+            "to right, #E84A87, #9B4DCC);" +
+            "-fx-text-fill: white;" +
+            "-fx-font-size: 13px;" +
+            "-fx-font-weight: bold;" +
+            "-fx-background-radius: 20;" +
+            "-fx-padding: 8px 20px;" +
+            "-fx-border-radius: 20;"
+    );
+});
 
+addBedButton.setOnMouseExited(e -> {
+    addBedButton.setStyle(
+            "-fx-background-color: linear-gradient(" +
+            "to right, #F54B87, #9B4DCC);" +
+            "-fx-text-fill: white;" +
+            "-fx-font-size: 13px;" +
+            "-fx-font-weight: bold;" +
+            "-fx-background-radius: 20;" +
+            "-fx-padding: 8px 20px;" +
+            "-fx-border-radius: 20;"
+    );
+});
 
 
 
@@ -300,7 +366,17 @@ addButtonBox.getChildren().add(
         );
 
         departmentBox.setPrefWidth(200);
-        departmentBox.setPrefHeight(45);
+        departmentBox.setPrefHeight(45);  
+
+
+departmentBox.setStyle(
+        "-fx-background-color: white;" +
+        "-fx-border-color: " + BORDER + ";" +
+        "-fx-border-radius: 8;" +
+        "-fx-background-radius: 8;" +
+        "-fx-font-size: 14px;"
+);
+
 
         // =====================================================
         // BED TYPE
@@ -324,6 +400,14 @@ addButtonBox.getChildren().add(
         bedTypeBox.setPrefWidth(200);
         bedTypeBox.setPrefHeight(45);
 
+        bedTypeBox.setStyle(
+                "-fx-background-color: white;" +
+                "-fx-border-color: " + BORDER + ";" +
+                "-fx-border-radius: 8;" +
+                "-fx-background-radius: 8;" +
+                "-fx-font-size: 14px;"
+        );
+
         // =====================================================
         // STATUS
         // =====================================================
@@ -344,7 +428,15 @@ addButtonBox.getChildren().add(
         );
 
         statusBox.setPrefWidth(170);
-        statusBox.setPrefHeight(45);
+        statusBox.setPrefHeight(45); 
+
+        statusBox.setStyle(
+        "-fx-background-color: white;" +
+        "-fx-border-color: " + BORDER + ";" +
+        "-fx-border-radius: 8;" +
+        "-fx-background-radius: 8;" +
+        "-fx-font-size: 14px;"
+);
 
         filterBox.getChildren().addAll(
                 searchField,
@@ -491,7 +583,8 @@ actionColumn.setCellFactory(column ->
                 // =================================================
 
                 view.setStyle(
-                        "-fx-background-color: #FFF0F7;" +
+                       // "-fx-background-color: #FFF0F7;" +
+                       "-fx-background-color " + LIGHT_PINK + ";" +
                         "-fx-text-fill: " + PINK + ";" +
                         "-fx-border-color: " + BORDER + ";" +
                         "-fx-border-radius: 5;" +
@@ -502,13 +595,22 @@ actionColumn.setCellFactory(column ->
                 // EDIT STYLE
                 // =================================================
 
-                edit.setStyle(
+              /*   edit.setStyle(
                         "-fx-background-color: #EEF5FF;" +
                         "-fx-text-fill: #3274C6;" +
                         "-fx-border-color: " + BORDER + ";" +
                         "-fx-border-radius: 5;" +
                         "-fx-background-radius: 5;"
-                );
+                );*/ 
+
+edit.setStyle(
+        "-fx-background-color: #F3ECFF;" +
+        "-fx-text-fill: " + PURPLE + ";" +
+        "-fx-border-color: " + BORDER + ";" +
+        "-fx-border-radius: 5;" +
+        "-fx-background-radius: 5;"
+);
+
 
                 // =================================================
                 // DELETE STYLE

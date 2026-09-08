@@ -25,9 +25,9 @@ public class HospitalAdminProfilePage {
 
     // ================= COLORS =================
    // private static final String BG = "#FCFAFD";
-       private static final String BG="#F7EAF5";
+      // private static final String BG="#F7EAF5";
 
-    private static final String WHITE = "#FFFFFF";
+  /*  private static final String WHITE = "#FFFFFF";
     private static final String NAVY = "#17184F";
     private static final String PINK = "#E83E83";
     private static final String LIGHT_PINK = "#FFF0F7";
@@ -40,7 +40,32 @@ public class HospitalAdminProfilePage {
     private static final String ORANGE = "#F2A33A";
     private static final String LIGHT_ORANGE = "#FFF6E8";
     private static final String BORDER = "#E9E6EF";
-    private static final String GREY = "#77758A";  
+    private static final String GREY = "#77758A";  */ 
+
+// ================= COLORS =================
+
+private static final String BG = "#FFFFFF";
+private static final String WHITE = "#FFFFFF";
+
+private static final String NAVY = "#24234F";
+
+private static final String PINK = "#E84A87";
+private static final String LIGHT_PINK = "#FFEAF3";
+
+private static final String PURPLE = "#9B4DCC";
+private static final String LIGHT_PURPLE = "#F3ECFF";
+
+private static final String GREEN = "#67C98F";
+private static final String LIGHT_GREEN = "#ECFAF3";
+
+private static final String BLUE = "#5578D6";
+private static final String LIGHT_BLUE = "#F0F5FF";
+
+private static final String ORANGE = "#F2A33A";
+private static final String LIGHT_ORANGE = "#FFF6E8";
+
+private static final String BORDER = "#E7DCE8";
+private static final String GREY = "#77778D";
 
     
 
@@ -90,7 +115,7 @@ if (existingprofile == null) {
 
        BorderPane root = new BorderPane();
        //root=new BorderPane();
-        root.setBackground(
+      /*  root.setBackground(
                 new Background(
                         new BackgroundFill(
                                 Color.web(BG),
@@ -98,7 +123,15 @@ if (existingprofile == null) {
                                 Insets.EMPTY
                         )
                 )
-        );
+        );*/ 
+
+        root.setStyle(
+        "-fx-background-color: linear-gradient(" +
+        "to bottom right, " +
+        "#FFFFFF 0%, " +
+        "#FFF6FA 55%, " +
+        "#F3ECFF 100%);"
+);
 
         // ================= HEADER =================
 
@@ -237,21 +270,77 @@ Label adminName=new Label(existingprofile.getAdminName());
 
         // ================= BACK BUTTON =================
 
-        Button backButton = new Button("←  Back to Dashboard");
+        Button backButton = new Button("←  Back");
 
-        backButton.setFont(Font.font("Arial", FontWeight.BOLD, 14));
+        backButton.setPrefHeight(32);
+backButton.setPrefWidth(90);
+
+        backButton.setFont(Font.font("Arial", FontWeight.BOLD, 13));
         backButton.setTextFill(Color.web(PINK));
-        backButton.setPadding(new Insets(11, 20, 11, 20));
+        //backButton.setPadding(new Insets(11, 20, 11, 20));
+        backButton.setPadding(new Insets(7, 14, 7, 14));
+        
 
-        backButton.setStyle(
+     /*   backButton.setStyle(
                 "-fx-background-color: " + WHITE + ";" +
                 "-fx-border-color: " + BORDER + ";" +
                 "-fx-border-radius: 10;" +
                 "-fx-background-radius: 10;" +
                 "-fx-cursor: hand;"
-        );
+        );*/
+/*backButton.setStyle(
+        "-fx-background-color: white;" +
+        "-fx-text-fill: " + PINK + ";" +
+        "-fx-border-color: " + BORDER + ";" +
+        "-fx-border-radius: 10;" +
+        "-fx-background-radius: 10;" +
+        "-fx-font-weight: bold;" +
+        "-fx-cursor: hand;"
+);*/   
 
-        backButton.setOnMouseEntered(e ->
+/*backButton.setStyle(
+        "-fx-background-color: linear-gradient(" +
+        "to right, #FFEAF3, #F3ECFF);" +
+        "-fx-text-fill: #E84A87;" +
+        "-fx-border-color: #E7DCE8;" +
+        "-fx-border-radius: 10;" +
+        "-fx-background-radius: 10;" +
+        "-fx-font-size: 14px;" +
+        "-fx-font-weight: bold;" +
+        "-fx-cursor: hand;"
+);*/ 
+
+backButton.setStyle(
+        "-fx-background-color: linear-gradient(" +
+        "to right, #F54B87, #9B4DCC);" +
+        "-fx-text-fill: white;" +
+        "-fx-border-color: transparent;" +
+        "-fx-border-radius: 20;" +
+        "-fx-background-radius: 20;" +
+        "-fx-font-size: 13px;" +
+        "-fx-font-weight: bold;" +
+        "-fx-padding: 7px 12px;" +
+        "-fx-cursor: hand;"
+);
+
+
+/*backButton.setOnMouseEntered(e ->
+        backButton.setStyle(
+                "-fx-background-color: linear-gradient(" +
+                "to right, #F54B87, #9B4DCC);" +
+                "-fx-text-fill: white;" +
+                "-fx-border-color: #9B4DCC;" +
+                "-fx-border-radius: 10;" +
+                "-fx-background-radius: 10;" +
+                "-fx-font-size: 14px;" +
+                "-fx-font-weight: bold;" +
+                "-fx-cursor: hand;"
+        )
+);*/
+
+
+
+    /*    backButton.setOnMouseEntered(e ->
                 backButton.setStyle(
                         "-fx-background-color: " + LIGHT_PINK + ";" +
                         "-fx-border-color: " + PINK + ";" +
@@ -259,9 +348,50 @@ Label adminName=new Label(existingprofile.getAdminName());
                         "-fx-background-radius: 10;" +
                         "-fx-cursor: hand;"
                 )
-        );
+        );*/  
 
-        backButton.setOnMouseExited(e ->
+      /*   backButton.setOnMouseEntered(e ->
+        backButton.setStyle(
+                "-fx-background-color: " + LIGHT_PINK + ";" +
+                "-fx-text-fill: " + PINK + ";" +
+                "-fx-border-color: " + PINK + ";" +
+                "-fx-border-radius: 10;" +
+                "-fx-background-radius: 10;" +
+                "-fx-font-weight: bold;" +
+                "-fx-cursor: hand;"
+        )
+);*/ 
+/*backButton.setOnMouseEntered(e ->
+        backButton.setStyle(
+                "-fx-background-color: linear-gradient(" +
+                "to right, #F54B87, #9B4DCC);" +
+                "-fx-text-fill: white;" +
+                "-fx-border-color: #9B4DCC;" +
+                "-fx-border-radius: 10;" +
+                "-fx-background-radius: 10;" +
+                "-fx-font-size: 14px;" +
+                "-fx-font-weight: bold;" +
+                "-fx-cursor: hand;"
+        )
+);*/ 
+
+backButton.setOnMouseEntered(e ->
+        backButton.setStyle(
+                "-fx-background-color: linear-gradient(" +
+                "to right, #E84A87, #9B4DCC);" +
+                "-fx-text-fill: white;" +
+                "-fx-border-color: transparent;" +
+                "-fx-border-radius: 20;" +
+                "-fx-background-radius: 20;" +
+                "-fx-font-size: 13px;" +
+                "-fx-font-weight: bold;" +
+                "-fx-padding: 7px 12px;" +
+                "-fx-cursor: hand;"
+        )
+);
+
+
+    /*    backButton.setOnMouseExited(e ->
                 backButton.setStyle(
                         "-fx-background-color: " + WHITE + ";" +
                         "-fx-border-color: " + BORDER + ";" +
@@ -269,7 +399,47 @@ Label adminName=new Label(existingprofile.getAdminName());
                         "-fx-background-radius: 10;" +
                         "-fx-cursor: hand;"
                 )
-        );
+        );*/ 
+/*backButton.setOnMouseExited(e ->
+        backButton.setStyle(
+                "-fx-background-color: white;" +
+                "-fx-text-fill: " + PINK + ";" +
+                "-fx-border-color: " + BORDER + ";" +
+                "-fx-border-radius: 10;" +
+                "-fx-background-radius: 10;" +
+                "-fx-font-weight: bold;" +
+                "-fx-cursor: hand;"
+        )
+);*/ 
+/*backButton.setOnMouseExited(e ->
+        backButton.setStyle(
+                "-fx-background-color: linear-gradient(" +
+                "to right, #FFEAF3, #F3ECFF);" +
+                "-fx-text-fill: #E84A87;" +
+                "-fx-border-color: #E7DCE8;" +
+                "-fx-border-radius: 10;" +
+                "-fx-background-radius: 10;" +
+                "-fx-font-size: 14px;" +
+                "-fx-font-weight: bold;" +
+                "-fx-cursor: hand;"
+        )
+);*/
+backButton.setOnMouseExited(e ->
+        backButton.setStyle(
+                "-fx-background-color: linear-gradient(" +
+                "to right, #F54B87, #9B4DCC);" +
+                "-fx-text-fill: white;" +
+                "-fx-border-color: transparent;" +
+                "-fx-border-radius: 20;" +
+                "-fx-background-radius: 20;" +
+                "-fx-font-size: 13px;" +
+                "-fx-font-weight: bold;" +
+                "-fx-padding: 7px 12px;" +
+                "-fx-cursor: hand;"
+        )
+);
+
+
 
         // BACK TO DASHBOARD
         backButton.setOnAction(e -> {
@@ -311,10 +481,15 @@ Label adminName=new Label(existingprofile.getAdminName());
       profileImageArea.setPrefHeight(180);
       profileImageArea.setMinHeight(180);
 
-        profileImageArea.setStyle(
+      /*  profileImageArea.setStyle(
                 "-fx-background-color: linear-gradient(to bottom right, "
                 + "#F7B3D0, #FFF0F7);"
-        );
+        );*/ 
+profileImageArea.setStyle(
+        "-fx-background-color: linear-gradient(" +
+        "to bottom right, #F54B87, #9B4DCC);"
+);
+
 
         // Admin Logo
 
@@ -424,11 +599,21 @@ uploadPhotoButton.setTextFill(
         Color.web(PINK)
 );
 
-uploadPhotoButton.setStyle(
+/*uploadPhotoButton.setStyle(
         "-fx-background-color: " + LIGHT_PINK + ";" +
         "-fx-background-radius: 10;" +
         "-fx-border-color: " + PINK + ";" +
         "-fx-border-radius: 10;" +
+        "-fx-cursor: hand;"
+);*/
+
+uploadPhotoButton.setStyle(
+        "-fx-background-color: " + LIGHT_PINK + ";" +
+        "-fx-text-fill: " + PINK + ";" +
+        "-fx-background-radius: 10;" +
+        "-fx-border-color: " + BORDER + ";" +
+        "-fx-border-radius: 10;" +
+        "-fx-font-weight: bold;" +
         "-fx-cursor: hand;"
 );
 
@@ -735,7 +920,7 @@ existingprofile.setProfileImageUrl(
 
         // EDIT PROFILE BUTTON
 
-        Button editProfile =
+    /*     Button editProfile =
                 createActionButton(
                         "👤",
                         "Edit Profile",
@@ -743,7 +928,16 @@ existingprofile.setProfileImageUrl(
                         PURPLE,
                         LIGHT_PURPLE
 
-                ); 
+                ); */ 
+
+                Button editProfile =
+        createActionButton(
+                "👤",
+                "Edit Profile",
+                "Update profile information",
+                PINK,
+                LIGHT_PINK
+        );
 editProfile.setPrefWidth(190);
 editProfile.setMinWidth(190);
 editProfile.setMaxWidth(190);
@@ -872,28 +1066,71 @@ createActivityBox(
 
         logoutButton.setTextFill(Color.WHITE);
 
-        logoutButton.setStyle(
+     /*    logoutButton.setStyle(
                 "-fx-background-color: " + PINK + ";" +
                 "-fx-background-radius: 12;" +
                 "-fx-cursor: hand;"
-        );   
+        );   */ 
+
+logoutButton.setStyle(
+        "-fx-background-color: linear-gradient(" +
+        "to right, #F54B87, #9B4DCC);" +
+        "-fx-text-fill: white;" +
+        "-fx-font-size: 15px;" +
+        "-fx-font-weight: bold;" +
+        "-fx-background-radius: 20;" +
+        "-fx-border-radius: 20;" +
+        "-fx-padding: 8px 20px;" +
+        "-fx-cursor: hand;"
+);
+
         logoutButton.setTranslateX(630);
 
-        logoutButton.setOnMouseEntered(e ->
+      /*  logoutButton.setOnMouseEntered(e ->
                 logoutButton.setStyle(
                         "-fx-background-color: #D92F70;" +
                         "-fx-background-radius: 12;" +
                         "-fx-cursor: hand;"
                 )
-        );
+        );*/ 
 
-        logoutButton.setOnMouseExited(e ->
+        logoutButton.setOnMouseEntered(e ->
+        logoutButton.setStyle(
+                "-fx-background-color: linear-gradient(" +
+                "to right, #E84A87, #9B4DCC);" +
+                "-fx-text-fill: white;" +
+                "-fx-font-size: 15px;" +
+                "-fx-font-weight: bold;" +
+                "-fx-background-radius: 20;" +
+                "-fx-border-radius: 20;" +
+                "-fx-padding: 8px 20px;" +
+                "-fx-cursor: hand;"
+        )
+);
+
+
+
+      /*  logoutButton.setOnMouseExited(e ->
                 logoutButton.setStyle(
                         "-fx-background-color: " + PINK + ";" +
                         "-fx-background-radius: 12;" +
                         "-fx-cursor: hand;"
                 )
-        );
+        );*/ 
+
+        logoutButton.setOnMouseExited(e ->
+        logoutButton.setStyle(
+                "-fx-background-color: linear-gradient(" +
+                "to right, #F54B87, #9B4DCC);" +
+                "-fx-text-fill: white;" +
+                "-fx-font-size: 15px;" +
+                "-fx-font-weight: bold;" +
+                "-fx-background-radius: 20;" +
+                "-fx-border-radius: 20;" +
+                "-fx-padding: 8px 20px;" +
+                "-fx-cursor: hand;"
+        )
+);
 
       
 

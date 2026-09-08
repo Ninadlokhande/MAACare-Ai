@@ -40,7 +40,7 @@ import javafx.animation.Interpolator;
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
-
+import com.sigma.view.HospitalInfoPage;
 import java.util.prefs.Preferences;
 
 public class Loginpage {
@@ -114,8 +114,8 @@ public class Loginpage {
         // =========================================================
 
         String imagePath =
-             //   "file:Maacare-Ai\\src\\main\\resources\\assets\\images\\logo\\logo.png";
-             "assets\\images\\logo\\logo.png";
+        // "file:Maacare-Ai\\src\\main\\resources\\assets\\images\\logo\\logo.png";
+              "assets\\images\\logo\\logo.png";
 
         Image logoImage = new Image(imagePath);
 
@@ -1051,6 +1051,15 @@ public class Loginpage {
         addButtonMotion(signUp, 1.025);
 
         signUp.setOnAction(e -> {
+
+                // Hospital SignUp
+
+                
+                if("hospital".equals(role)){ 
+                        HospitalInfoPage.show(Welcomepage.stage);
+
+                        return;
+                }
 
             if (role == null ||
                     role.isBlank()) {
@@ -2057,7 +2066,6 @@ public class Loginpage {
         transition.setInterpolator(Interpolator.EASE_OUT);
         transition.play();
     }
-
     private void addButtonMotion(
             Button button,
             double hoverScale) {

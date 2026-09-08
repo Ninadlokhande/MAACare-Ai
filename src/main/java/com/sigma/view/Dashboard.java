@@ -31,6 +31,8 @@ import com.sigma.model.HospitalAdminProfile;
 
 import com.sigma.controller.HospitalController.NotificationController;
 import com.sigma.model.Notification;
+
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 public class Dashboard  {
         
 
@@ -57,8 +59,8 @@ public class Dashboard  {
 // MAACARE AI - MOTHER DASHBOARD THEME
 // =====================================================
 
-//private static final String BG = "#FFFFFF";
-private static final String BG = "#FDE7F0";
+private static final String BG = "#FFFFFF";
+//private static final String BG = "#FDE7F0";
 
 
 private static final String WHITE = "#FFFFFF";
@@ -125,8 +127,17 @@ root.setStyle(
                 "-fx-border-radius: 0 25 25 0;"
         );*/ 
 
-sidebar.setStyle(
+/*sidebar.setStyle(
     "-fx-background-color: white;" +
+    "-fx-border-color: #E7DCE8;" +
+    "-fx-border-width: 0 1 0 0;"
+);*/
+
+sidebar.setStyle(
+    "-fx-background-color: linear-gradient(" +
+    "to bottom, " +
+    "#FFF0F7 0%, " +
+    "#F8F0FF 100%);" +
     "-fx-border-color: #E7DCE8;" +
     "-fx-border-width: 0 1 0 0;"
 );
@@ -140,11 +151,20 @@ sidebar.setStyle(
 
         logoBox.setAlignment(Pos.CENTER);
 
-        logoBox.setPadding(
+       /*  logoBox.setPadding(
                 new Insets(5, 0, 20, 0)
-        );
+        );*/
+logoBox.setPadding(
+        new Insets(5, 0, 15, 0)
+);
+        Image logoImage = new Image("assets\\images\\logo\\logo.png"
+        //   "C:\\JAVA_2026\\Sigma\\MAACare-Ai\\src\\main\\resources\\assets\\images\\logo\\logo.png"
+      //  getClass().getResource("/assets/images/logo/logo.png").toExternalForm()
+            // "file:Maacare-Ai\\src\\main\\resources\\assets\\images\\logo\\logo.png"
 
-        Image logoImage = new Image("assets\\images\\logo\\logo.png");
+
+         // ("/assets/images/logo/logo.png")
+        );
         
 
         ImageView logoView =
@@ -161,7 +181,12 @@ sidebar.setStyle(
         // =================================================
 
         Button dashboardBtn =
-                menuButton("⌂", "Dashboard", true);
+                menuButton(//"⌂", "Dashboard",
+               " 🏠", "Dashboard",
+
+                                     // FontAwesomeIcon.HOME,
+
+                false);
 
               
 dashboardBtn.setOnAction(e -> {
@@ -175,7 +200,8 @@ dashboardBtn.setOnAction(e -> {
 
 
         Button appointmentBtn =
-                menuButton("▣", "Appointments", false);
+                menuButton(            "📅",
+ "Appointments", false);
 
         // =================================================
         // APPOINTMENTS NAVIGATION ONLY
@@ -203,8 +229,10 @@ appointmentBtn.setOnAction(e -> {
 
         Button labBtn =
                 menuButton(
-                        "⚗",
-                        "Lab Records",
+                       // "⚗",
+                      // "🧪",
+                     "🔍",
+                     "Lab Records",
                         false
                 ); 
 
@@ -226,7 +254,8 @@ LabrecordsPage labPage =
 
      Button bedBtn =
                 menuButton(
-                        "▤",
+                       // "▤",
+                        "🛌",
                         "Bed Booking",
                         false
                 );
@@ -269,10 +298,22 @@ emergencyBtn.setOnAction(e->{
                 emergencyBtn
         );
 
-        sidebar.getChildren().addAll(
+       /*  Separator separator = new Separator();
+
+separator.setStyle(
+        "-fx-background-color: #E7DCE8;"
+);*/
+
+sidebar.getChildren().addAll(
+        logoBox,
+      //  separator,
+        menu
+);
+
+     /*   sidebar.getChildren().addAll(
                 logoBox,
                 menu
-        );
+        );*/
 
         root.setLeft(sidebar);
 
@@ -285,6 +326,13 @@ emergencyBtn.setOnAction(e->{
         content.setPadding(
                 new Insets(28, 35, 30, 35)
         );
+        content.setStyle(
+        "-fx-background-color: linear-gradient(" +
+        "to bottom right, " +
+        "#FFFFFF 0%, " +
+        "#FFF6FA 55%, " +
+        "#F3ECFF 100%);"
+);
 
         // =================================================
         // HEADER
@@ -367,7 +415,9 @@ int bedBookingCount =
 
                        createStatCard( 
                                     //   "🧪",
-                               "⚗",         
+                     "🔍",
+
+                            //   "⚗",         
 
 
                         "Lab Reports",
@@ -554,7 +604,7 @@ bottom.getChildren().addAll(
         // SCROLL
         // =================================================
 
-        ScrollPane scrollPane =
+         ScrollPane scrollPane =
                 new ScrollPane(content);
 
         scrollPane.setFitToWidth(true);
@@ -562,7 +612,20 @@ bottom.getChildren().addAll(
         scrollPane.setStyle(
                 "-fx-background-color: " + BG + ";" +
                 "-fx-background: " + BG + ";"
+
         );
+/*ScrollPane scrollPane =
+        new ScrollPane(content);
+
+scrollPane.setFitToWidth(true);
+
+scrollPane.setStyle(
+        "-fx-background-color: transparent;" +
+        "-fx-background: transparent;"
+); */
+
+
+
 
         root.setCenter(scrollPane);
         dashboardContent=scrollPane;
@@ -576,6 +639,9 @@ bottom.getChildren().addAll(
                         root,
                         1500,
                         800
+                                           //    scenesettings.rectanguler2d.getWidth(),
+                      //  scenesettings.rectanguler2d.getHeight()
+
                 );
 
         stage.setTitle(
@@ -1216,12 +1282,19 @@ row.setStyle(
         } 
  else {
 
-    button.setStyle(
+   /*  button.setStyle(
             "-fx-background-color: " + LIGHT_PINK + ";" +
             "-fx-background-radius: 12;" +
             "-fx-padding: 0 15;" +
             "-fx-cursor: hand;"
-    );
+    );*/
+
+    button.setStyle(
+        "-fx-background-color: transparent;" +
+        "-fx-background-radius: 12;" +
+        "-fx-padding: 0 15;" +
+        "-fx-cursor: hand;"
+);
 
     iconLabel.setTextFill(
             Color.web(NAVY)
