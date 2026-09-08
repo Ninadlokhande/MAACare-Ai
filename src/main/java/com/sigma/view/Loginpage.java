@@ -40,6 +40,8 @@ import javafx.animation.Interpolator;
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
+import com.sigma.view.Ashaworkerinformationpage;
+
 
 import java.util.prefs.Preferences;
 
@@ -1070,6 +1072,36 @@ public class Loginpage {
 
                 return;
             }
+            // =========================================================
+// ASHA WORKER SIGN UP
+// =========================================================
+
+if (role.equals("asha")) {
+
+    System.out.println(
+            "[SIGNUP] ASHA Worker -> Opening ASHA Worker Information Page..."
+    );
+
+    try {
+
+        Ashaworkerinformationpage ashaInformationPage =
+                new Ashaworkerinformationpage();
+
+        ashaInformationPage.show(
+                Welcomepage.stage
+        );
+
+    } catch (Exception ex) {
+
+        ex.printStackTrace();
+
+        loginStatus.setText(
+                "Unable to open ASHA Worker Information Page."
+        );
+    }
+
+    return;
+}
 
             String enteredEmail =
                     email.getText().trim();

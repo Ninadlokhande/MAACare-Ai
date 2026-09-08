@@ -42,6 +42,10 @@ public class Ashabeneficiariescontroller {
                 beneficiary
         );
     }
+    public boolean renumberAshaBeneficiaries() {
+
+    return dao.renumberAshaBeneficiaries();
+}
 
     // =========================================================
     // GET BY ID

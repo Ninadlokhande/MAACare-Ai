@@ -87,6 +87,7 @@ private static final String COLOR_BLUE = "#6B7FD7";
 private static final String COLOR_LIGHT_BLUE = "#F0F4FF";
 
 private static final String COLOR_BABY_PINK = "#FFEAF3";
+private static final String COLOR_BLACK = "#000000";
     // =========================================================
     // STAGE / SCENE
     // =========================================================
@@ -1269,18 +1270,10 @@ private LocalDate parseDate(String dateText) {
         Button dashboardButton =
                 createNavItem(
                         "Dashboard",
-                        false
+                        true
                 );
 
-        dashboardButton.setOnAction(
-                e -> {
-
-                    showDashboardContent();
-
-                    // Refresh Firebase data
-                    loadDashboardData();
-                }
-        );
+        
 
         // -----------------------------------------------------
         // BENEFICIARIES
@@ -1292,10 +1285,7 @@ private LocalDate parseDate(String dateText) {
                         false
                 );
 
-        beneficiariesButton.setOnAction(
-                e -> openBeneficiaries()
-        );
-
+       
         // -----------------------------------------------------
         // HEALTH VISIT
         // -----------------------------------------------------
@@ -1306,9 +1296,7 @@ private LocalDate parseDate(String dateText) {
                         false
                 );
 
-        healthVisitButton.setOnAction(
-                e -> openHealthVisit()
-        );
+        
 
         // -----------------------------------------------------
         // PROFILE
@@ -1320,16 +1308,84 @@ private LocalDate parseDate(String dateText) {
                         false
                 );
 
-        profileButton.setOnAction(
-                e -> openProfile()
-        );
+       dashboardButton.setOnAction(
+                                e -> {
 
+                                        setSelectedNavButton(
+                                                        dashboardButton,
+                                                        dashboardButton,
+                                                        beneficiariesButton,
+                                                        healthVisitButton,
+                                                        profileButton);
+
+                                        showDashboardContent();
+
+                                        loadDashboardData();
+                                });
+
+                // =====================================================
+                // BENEFICIARIES CLICK
+                // =====================================================
+
+                beneficiariesButton.setOnAction(
+                                e -> {
+
+                                        setSelectedNavButton(
+                                                        beneficiariesButton,
+                                                        dashboardButton,
+                                                        beneficiariesButton,
+                                                        healthVisitButton,
+                                                        profileButton);
+
+                                        openBeneficiaries();
+                                });
+
+                // =====================================================
+                // HEALTH VISIT CLICK
+                // =====================================================
+
+                healthVisitButton.setOnAction(
+                                e -> {
+
+                                        setSelectedNavButton(
+                                                        healthVisitButton,
+                                                        dashboardButton,
+                                                        beneficiariesButton,
+                                                        healthVisitButton,
+                                                        profileButton);
+
+                                        openHealthVisit();
+                                });
+
+                // =====================================================
+                // PROFILE CLICK
+                // =====================================================
+
+                profileButton.setOnAction(
+                                e -> {
+
+                                        setSelectedNavButton(
+                                                        profileButton,
+                                                        dashboardButton,
+                                                        beneficiariesButton,
+                                                        healthVisitButton,
+                                                        profileButton);
+
+                                        openProfile();
+                                });
         navList.getChildren().addAll(
                 dashboardButton,
                 beneficiariesButton,
                 healthVisitButton,
                 profileButton
         );
+        setSelectedNavButton(
+    dashboardButton,
+    dashboardButton,
+    beneficiariesButton,
+    healthVisitButton,
+    profileButton
+);
 
         // =====================================================
         // BOTTOM WORKER IMAGE
@@ -1406,6 +1462,105 @@ private LocalDate parseDate(String dateText) {
 
         return sidebar;
     }
+    private void setSelectedNavButton(
+        Button selectedButton,
+        Button dashboardButton,
+        Button beneficiariesButton,
+        Button healthVisitButton,
+        Button profileButton) {
+
+    Button[] buttons = {
+            dashboardButton,
+            beneficiariesButton,
+            healthVisitButton,
+            profileButton
+    };
+
+    for (Button button : buttons) {
+
+        // Normal button
+        button.setStyle(
+                "-fx-background-color: transparent;" +
+                "-fx-background-radius: 12;" +
+                "-fx-border-color: transparent;" +
+                "-fx-border-radius: 12;" +
+                "-fx-cursor: hand;"
+        );
+
+        // Button madhla graphic
+        if (button.getGraphic() instanceof HBox) {
+
+            HBox content = (HBox) button.getGraphic();
+
+            for (Node node : content.getChildren()) {
+
+                // Dot
+                if (node instanceof Circle) {
+
+                    Circle dot = (Circle) node;
+
+                    dot.setFill(
+                            Color.web(COLOR_TEXT_MUTED)
+                    );
+                }
+
+                // Text
+                if (node instanceof Label) {
+
+                    Label label = (Label) node;
+
+                    label.setStyle(
+                            "-fx-text-fill: " +
+                            COLOR_TEXT_MUTED + ";"
+                    );
+                }
+            }
+        }
+    }
+
+    // =====================================================
+    // SELECTED BUTTON
+    // =====================================================
+
+    selectedButton.setStyle(
+            "-fx-background-color: linear-gradient(" +
+            "to right, #F54B87, #C45BD6);" +
+            "-fx-background-radius: 12;" +
+            "-fx-border-color: transparent;" +
+            "-fx-border-radius: 12;" +
+            "-fx-cursor: hand;"
+    );
+
+    // Selected button cha dot + text
+    if (selectedButton.getGraphic() instanceof HBox) {
+
+        HBox content =
+                (HBox) selectedButton.getGraphic();
+
+        for (Node node : content.getChildren()) {
+
+            // Pink/white dot
+            if (node instanceof Circle) {
+
+                Circle dot = (Circle) node;
+
+                dot.setFill(
+                        Color.WHITE
+                );
+            }
+
+            // White text
+            if (node instanceof Label) {
+
+                Label label = (Label) node;
+
+                label.setStyle(
+                        "-fx-text-fill: white;"
+                );
+            }
+        }
+    }
+}
 
     // =========================================================
     // BENEFICIARIES
@@ -1583,26 +1738,9 @@ private LocalDate parseDate(String dateText) {
                 baseStyle
         );
 
-        button.setOnMouseEntered(
-                e -> {
+       
 
-                    if (!active) {
-
-                        button.setStyle(
-                                "-fx-background-color: #F3F4F6;" +
-                                "-fx-background-radius: 12;" +
-                                "-fx-border-color: transparent;" +
-                                "-fx-cursor: hand;"
-                        );
-                    }
-                }
-        );
-
-        button.setOnMouseExited(
-                e -> button.setStyle(
-                        baseStyle
-                )
-        );
+       
 
         return button;
     }
@@ -1848,7 +1986,8 @@ private LocalDate parseDate(String dateText) {
                                 pregnantWomen
                         ),
                         "Firebase Data",
-                        COLOR_LIGHT_PINK
+                        COLOR_LIGHT_PINK,
+                        "🤰"
                 );
 
         VBox c2 =
@@ -1858,7 +1997,8 @@ private LocalDate parseDate(String dateText) {
                                 children
                         ),
                         "Firebase Data",
-                        "#E0E7FF"
+                        "#E0E7FF",
+                        "👶"
                 );
 
         VBox c3 =
@@ -1868,7 +2008,8 @@ private LocalDate parseDate(String dateText) {
                                 totalVisits
                         ),
                         "Firebase Data",
-                        "#E0F2FE"
+                        "#E0F2FE",
+                        "🏠"
                 );
 
         VBox c4 =
@@ -1878,7 +2019,8 @@ private LocalDate parseDate(String dateText) {
                                 immunizations
                         ),
                         "Firebase Data",
-                        "#FFEDD5"
+                        "#FFEDD5",
+                        "💉"
                 );
 
         HBox.setHgrow(
@@ -1919,7 +2061,8 @@ private LocalDate parseDate(String dateText) {
             String title,
             String val,
             String trend,
-            String iconBg
+            String iconBg,
+            String iconText
     ) {
 
         VBox card =
@@ -1950,6 +2093,30 @@ private LocalDate parseDate(String dateText) {
                         22,
                         Color.web(iconBg)
                 );
+                Label icon =
+        new Label(iconText);
+
+icon.setFont(
+        Font.font(
+                "System",
+                FontWeight.BOLD,
+                20
+        )
+);
+
+
+icon.setStyle(
+        "-fx-text-fill: " + COLOR_BLACK + ";"
+);
+icon.setStyle("-fx-font-size:25px");
+
+StackPane iconContainer =
+        new StackPane();
+
+iconContainer.getChildren().addAll(
+        iconCircle,
+        icon
+);
 
         VBox txt =
                 new VBox(2);
@@ -1992,7 +2159,7 @@ private LocalDate parseDate(String dateText) {
         );
 
         top.getChildren().addAll(
-                iconCircle,
+                iconContainer,
                 txt
         );
 
@@ -2516,14 +2683,14 @@ btn2.setOnMouseClicked(e -> {
                 new Insets(14)
         );
 
-        box.setStyle(
-                "-fx-background-color: #F3F4F6;" +
-                "-fx-background-radius: 12;" +
-                "-fx-border-color: " +
-                COLOR_BORDER + ";" +
-                "-fx-border-radius: 12;" +
-                "-fx-cursor: hand;"
-        );
+       box.setStyle(
+        "-fx-background-color: linear-gradient(" +
+        "to right, #F54B87, #9B4DCC);" +
+        "-fx-background-radius: 20;" +
+        "-fx-border-color: transparent;" +
+        "-fx-border-radius: 20;" +
+        "-fx-cursor: hand;"
+);
 
         HBox inner =
                 new HBox(14);
@@ -2549,10 +2716,10 @@ btn2.setOnMouseClicked(e -> {
                 )
         );
 
-        l.setStyle(
-                "-fx-text-fill: " +
-                COLOR_TEXT_DARK + ";"
-        );
+      l.setStyle(
+        "-fx-text-fill: white;"
+);
+
 
         Label arrow =
                 new Label(">");

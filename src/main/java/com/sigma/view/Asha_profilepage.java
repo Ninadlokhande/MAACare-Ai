@@ -338,14 +338,17 @@ if (sessionAshaId != null && !sessionAshaId.isBlank()) {
                 new Button("Set ASHA ID");
 
         setIdButton.setStyle(
-                "-fx-background-color: #EC4988;" +
-                "-fx-text-fill: white;" +
-                "-fx-font-size: 12px;" +
-                "-fx-font-weight: bold;" +
-                "-fx-background-radius: 10px;" +
-                "-fx-padding: 8 18;" +
-                "-fx-cursor: hand;"
-        );
+          "-fx-background-color: linear-gradient(" +
+                "to right, #F54B87, #9B4DCC);" +
+        "-fx-text-fill: white;" +
+        "-fx-font-size: 12px;" +
+        "-fx-font-weight: bold;" +
+        "-fx-background-radius: 20px;" +
+        "-fx-border-color: transparent;" +
+        "-fx-border-radius: 20px;" +
+        "-fx-padding: 8 18;" +
+        "-fx-cursor: hand;"
+);     
 
 
         /*
@@ -987,15 +990,20 @@ if (sessionAshaId != null && !sessionAshaId.isBlank()) {
                         "Edit Profile"
                 );
 
-        editProfileButton.setStyle(
-                "-fx-background-color: #EC4988;" +
-                "-fx-text-fill: white;" +
-                "-fx-font-size: 12px;" +
-                "-fx-font-weight: bold;" +
-                "-fx-background-radius: 10px;" +
-                "-fx-padding: 8 18;" +
-                "-fx-cursor: hand;"
-        );
+        
+editProfileButton.setStyle(
+        "-fx-background-color: linear-gradient(" +
+                "to right, #F54B87, #9B4DCC);" +
+        "-fx-text-fill: white;" +
+        "-fx-font-size: 12px;" +
+        "-fx-font-weight: bold;" +
+        "-fx-background-radius: 20px;" +
+        "-fx-border-color: transparent;" +
+        "-fx-border-radius: 20px;" +
+        "-fx-padding: 8 18;" +
+        "-fx-cursor: hand;"
+);
+
 
 
         HBox editButtonBox =

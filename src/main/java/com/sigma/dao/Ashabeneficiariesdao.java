@@ -1,6 +1,7 @@
 package com.sigma.dao;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import com.google.api.core.ApiFuture;
@@ -12,13 +13,11 @@ import com.google.cloud.firestore.QuerySnapshot;
 
 import com.sigma.config.FirebaseConfig;
 import com.sigma.model.AshaBeneficiary;
-//import com.sigma.controller.Controller;
 
 public class Ashabeneficiariesdao {
 
     private final Firestore db =
             FirebaseConfig.getFirestore();
-            //private final Controller controller = new Controller();
 
     // =========================================================
     // COLLECTION NAME
@@ -35,7 +34,6 @@ public class Ashabeneficiariesdao {
             AshaBeneficiary beneficiary) {
 
         try {
-               // beneficiary.setUserUid(controller.getUserUID());
 
             db.collection(COLLECTION)
                     .document(
@@ -173,74 +171,203 @@ public class Ashabeneficiariesdao {
     }
 
     // =========================================================
-    // GET ALL
+    // RENUMBER BENEFICIARIES
     // =========================================================
-    public List<AshaBeneficiary>
-getAshaBeneficiaries() {
 
-    List<AshaBeneficiary> list =
-            new ArrayList<>();
+    public boolean renumberAshaBeneficiaries() {
 
-    try {
+        try {
 
-        ApiFuture<QuerySnapshot> future =
-                db.collection(COLLECTION)
-                       // .whereEqualTo(
-                               // "userUid"
-                               // controller.getUserUID()
-                      //  )
-                        .get();
+            // Get all beneficiaries
+            List<AshaBeneficiary> list =
+                    getAshaBeneficiaries();
 
-        QuerySnapshot snapshot =
-                future.get();
-
-        System.out.println(
-                "Firebase documents found: "
-                        + snapshot.getDocuments().size()
-        );
-
-        for (DocumentSnapshot doc :
-                snapshot.getDocuments()) {
-
-            try {
-
-                AshaBeneficiary beneficiary =
-                        doc.toObject(
-                                AshaBeneficiary.class
-                        );
-
-                if (beneficiary != null) {
-
-                    list.add(beneficiary);
-
-                    System.out.println(
-                            "Loaded beneficiary: "
-                                    + beneficiary
-                    );
-                }
-
-            } catch (Exception e) {
+            if (list == null || list.isEmpty()) {
 
                 System.out.println(
-                        "Unable to convert document: "
-                                + doc.getId()
+                        "No beneficiaries available for renumbering."
                 );
 
-                e.printStackTrace();
+                return true;
             }
+
+            // -------------------------------------------------
+            // STEP 1:
+            // Sort according to existing ID
+            // -------------------------------------------------
+
+            list.sort(
+                    Comparator.comparingInt(
+                            AshaBeneficiary::getId
+                    )
+            );
+
+            // -------------------------------------------------
+            // STEP 2:
+            // Save all existing records temporarily
+            // -------------------------------------------------
+
+            for (AshaBeneficiary beneficiary : list) {
+
+                int oldId =
+                        beneficiary.getId();
+
+                db.collection(COLLECTION)
+                        .document(
+                                "temp_" + oldId
+                        )
+                        .set(beneficiary)
+                        .get();
+            }
+
+            // -------------------------------------------------
+            // STEP 3:
+            // Delete original numeric documents
+            // -------------------------------------------------
+
+            for (AshaBeneficiary beneficiary : list) {
+
+                int oldId =
+                        beneficiary.getId();
+
+                db.collection(COLLECTION)
+                        .document(
+                                String.valueOf(oldId)
+                        )
+                        .delete()
+                        .get();
+            }
+
+            // -------------------------------------------------
+            // STEP 4:
+            // Create new continuous IDs
+            // -------------------------------------------------
+
+            int newId = 1;
+
+            for (AshaBeneficiary beneficiary : list) {
+
+                beneficiary.setId(newId);
+
+                db.collection(COLLECTION)
+                        .document(
+                                String.valueOf(newId)
+                        )
+                        .set(beneficiary)
+                        .get();
+
+                newId++;
+            }
+
+            // -------------------------------------------------
+            // STEP 5:
+            // Delete temporary documents
+            // -------------------------------------------------
+
+            for (int i = 1; i <= list.size(); i++) {
+
+                db.collection(COLLECTION)
+                        .document(
+                                "temp_" + i
+                        )
+                        .delete()
+                        .get();
+            }
+
+            System.out.println(
+                    "Beneficiary IDs renumbered successfully."
+            );
+
+            return true;
+
+        } catch (Exception e) {
+
+            System.out.println(
+                    "Error renumbering beneficiaries:"
+            );
+
+            e.printStackTrace();
+
+            return false;
         }
-
-    } catch (Exception e) {
-
-        System.out.println(
-                "Error loading beneficiaries:"
-        );
-
-        e.printStackTrace();
     }
 
-    return list;
-}
+    // =========================================================
+    // GET ALL
+    // =========================================================
+
+    public List<AshaBeneficiary>
+    getAshaBeneficiaries() {
+
+        List<AshaBeneficiary> list =
+                new ArrayList<>();
+
+        try {
+
+            ApiFuture<QuerySnapshot> future =
+                    db.collection(COLLECTION)
+                            .get();
+
+            QuerySnapshot snapshot =
+                    future.get();
+
+            System.out.println(
+                    "Firebase documents found: "
+                            + snapshot.getDocuments().size()
+            );
+
+            for (DocumentSnapshot doc :
+                    snapshot.getDocuments()) {
+
+                try {
+
+                    AshaBeneficiary beneficiary =
+                            doc.toObject(
+                                    AshaBeneficiary.class
+                            );
+
+                    if (beneficiary != null) {
+
+                        list.add(beneficiary);
+
+                        System.out.println(
+                                "Loaded beneficiary: "
+                                        + beneficiary
+                        );
+                    }
+
+                } catch (Exception e) {
+
+                    System.out.println(
+                            "Unable to convert document: "
+                                    + doc.getId()
+                    );
+
+                    e.printStackTrace();
+                }
+            }
+
+            // -------------------------------------------------
+            // Keep beneficiaries in ID order
+            // -------------------------------------------------
+
+            list.sort(
+                    Comparator.comparingInt(
+                            AshaBeneficiary::getId
+                    )
+            );
+
+        } catch (Exception e) {
+
+            System.out.println(
+                    "Error loading beneficiaries:"
+            );
+
+            e.printStackTrace();
+        }
+
+        return list;
+    }
 
     // =========================================================
     // REAL-TIME LISTENER

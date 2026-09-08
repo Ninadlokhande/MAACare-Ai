@@ -602,15 +602,15 @@ public class Asha_workervisit {
                 455
         );
 
-        box.setStyle(
-                "-fx-background-color: white;"
-                        + "-fx-border-color: "
-                        + BORDER
-                        + ";"
-                        + "-fx-border-width: 1;"
-                        + "-fx-border-radius: 14;"
-                        + "-fx-background-radius: 14;"
-        );
+      box.setStyle(
+        "-fx-background-color: white;" +
+        "-fx-border-color: " +
+        BORDER +
+        ";" +
+        "-fx-border-width: 1;" +
+        "-fx-border-radius: 14;" +
+        "-fx-background-radius: 14;"
+);
 
 
         Label title =
@@ -618,13 +618,13 @@ public class Asha_workervisit {
                         "◷   Recent Visits"
                 );
 
-        title.setStyle(
-                "-fx-font-size: 18px;"
-                        + "-fx-font-weight: bold;"
-                        + "-fx-text-fill: "
-                        + PRIMARY_PINK
-                        + ";"
-        );
+       title.setStyle(
+        "-fx-font-size: 18px;" +
+        "-fx-font-weight: bold;" +
+        "-fx-text-fill: " +
+        PRIMARY_PINK +
+        ";"
+);
 
 
         VBox content =
@@ -683,41 +683,10 @@ public class Asha_workervisit {
         // SCROLL
         // =========================================================
 
-        ScrollPane scroll =
-                new ScrollPane();
-
-        scroll.setContent(
-                content
-        );
-
-        scroll.setFitToWidth(
-                true
-        );
-
-        scroll.setHbarPolicy(
-                ScrollPane.ScrollBarPolicy.NEVER
-        );
-
-        scroll.setVbarPolicy(
-                ScrollPane.ScrollBarPolicy.AS_NEEDED
-        );
-
-        scroll.setStyle(
-                "-fx-background-color: transparent;"
-                        + "-fx-border-color: transparent;"
-        );
-
-
-        VBox.setVgrow(
-                scroll,
-                Priority.ALWAYS
-        );
-
-
-        box.getChildren().addAll(
-                title,
-                scroll
-        );
+       box.getChildren().addAll(
+        title,
+        content
+);
 
 
         return box;
@@ -741,15 +710,15 @@ public class Asha_workervisit {
                 455
         );
 
-        box.setStyle(
-                "-fx-background-color: white;"
-                        + "-fx-border-color: "
-                        + BORDER
-                        + ";"
-                        + "-fx-border-width: 1;"
-                        + "-fx-border-radius: 14;"
-                        + "-fx-background-radius: 14;"
-        );
+     box.setStyle(
+        "-fx-background-color: white;" +
+        "-fx-border-color: " +
+        BORDER +
+        ";" +
+        "-fx-border-width: 1;" +
+        "-fx-border-radius: 14;" +
+        "-fx-background-radius: 14;"
+);
 
 
         Label title =
@@ -757,13 +726,13 @@ public class Asha_workervisit {
                         "▦   Upcoming Visits"
                 );
 
-        title.setStyle(
-                "-fx-font-size: 18px;"
-                        + "-fx-font-weight: bold;"
-                        + "-fx-text-fill: "
-                        + PRIMARY_PINK
-                        + ";"
-        );
+      title.setStyle(
+        "-fx-font-size: 18px;" +
+        "-fx-font-weight: bold;" +
+        "-fx-text-fill: " +
+        PRIMARY_PINK +
+        ";"
+);
 
 
         VBox content =
@@ -816,42 +785,10 @@ public class Asha_workervisit {
         // SCROLL
         // =========================================================
 
-        ScrollPane scroll =
-                new ScrollPane();
-
-        scroll.setContent(
-                content
-        );
-
-        scroll.setFitToWidth(
-                true
-        );
-
-        scroll.setHbarPolicy(
-                ScrollPane.ScrollBarPolicy.NEVER
-        );
-
-        scroll.setVbarPolicy(
-                ScrollPane.ScrollBarPolicy.AS_NEEDED
-        );
-
-        scroll.setStyle(
-                "-fx-background-color: transparent;"
-                        + "-fx-border-color: transparent;"
-        );
-
-
-        VBox.setVgrow(
-                scroll,
-                Priority.ALWAYS
-        );
-
-
-        box.getChildren().addAll(
-                title,
-                scroll
-        );
-
+       box.getChildren().addAll(
+        title,
+        content
+);
 
         return box;
     }
