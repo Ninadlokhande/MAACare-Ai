@@ -36,2551 +36,1870 @@ import javafx.scene.layout.VBox;
 
 import javafx.scene.paint.Color;
 
-
 // =============================================================
 // PREGNANCY TRACKING PAGE
 // =============================================================
 
 public class PregnancyTracker {
 
-    private final String PINK = "#E84A87";
-    private final String DARK = "#24234F";
-    private final String PURPLE = "#9B4DCC";
-    private final String TEXT_GRAY = "#77778D";
-    private final String GREEN = "#43A66A";
-    private final String LIGHT_PINK = "#FFF3F8";
-    private final String LIGHT_PURPLE = "#F7F1FF";
+        private final String PINK = "#E84A87";
+        private final String DARK = "#24234F";
+        private final String PURPLE = "#9B4DCC";
+        private final String TEXT_GRAY = "#77778D";
+        private final String GREEN = "#43A66A";
+        private final String LIGHT_PINK = "#FFF3F8";
+        private final String LIGHT_PURPLE = "#F7F1FF";
 
+        // =========================================================
+        // MOTHER MODEL
+        // =========================================================
 
-    // =========================================================
-    // MOTHER MODEL
-    // =========================================================
+        private MotherWlcModel motherModel;
 
-    private MotherWlcModel motherModel;
+        // =========================================================
+        // PREGNANCY WEEK CONTROLLER
+        // =========================================================
 
+        private final PregnancyWeekController pregnancyWeekController = new PregnancyWeekController();
 
-    // =========================================================
-    // PREGNANCY WEEK CONTROLLER
-    // =========================================================
+        // =========================================================
+        // CURRENT WEEK
+        // =========================================================
 
-    private final PregnancyWeekController pregnancyWeekController =
-            new PregnancyWeekController();
+        private int currentWeek = 20;
 
+        // =========================================================
+        // UI COMPONENTS
+        // =========================================================
 
-    // =========================================================
-    // CURRENT WEEK
-    // =========================================================
+        private VBox motherDetailsBox;
+        private VBox babyDetailsBox;
 
-    private int currentWeek = 20;
+        private Label weekTitle;
+        private Label weekSubtitle;
 
+        private Label progressWeekLabel;
 
-    // =========================================================
-    // UI COMPONENTS
-    // =========================================================
+        private StackPane journeyImageBox;
+        private StackPane motherImageBox;
+        private StackPane babyImageBox;
+        private StackPane milestoneImageBox;
 
-    private VBox motherDetailsBox;
-    private VBox babyDetailsBox;
+        private ComboBox<Integer> weekCombo;
 
-    private Label weekTitle;
-    private Label weekSubtitle;
+        private LineChart<String, Number> babyDevelopmentChart;
 
-    private Label progressWeekLabel;
+        // Dynamic UI elements
+        private Label journeySubtitleLabel;
+        private Label trimesterLabel;
+        private Label trimesterDescriptionLabel;
+        private ProgressBar pregnancyProgressBar;
+        private Label motherWeekHint;
+        private Label babyWeekHint;
+        private Label milestoneWeekLabel;
+        private Label milestoneLabel;
+        private Label milestoneDevelopmentLabel;
 
-    private StackPane journeyImageBox;
-    private StackPane motherImageBox;
-    private StackPane babyImageBox;
-    private StackPane milestoneImageBox;
+        // =========================================================
+        // WEEK DATA
+        // =========================================================
 
-    private ComboBox<Integer> weekCombo;
+        private final Map<Integer, PregnancyWeekModel> weekData = new HashMap<>();
 
-    private LineChart<String, Number> babyDevelopmentChart;
+        // =========================================================
+        // DEFAULT CONSTRUCTOR
+        // =========================================================
 
-    // Dynamic UI elements
-    private Label journeySubtitleLabel;
-    private Label trimesterLabel;
-    private Label trimesterDescriptionLabel;
-    private ProgressBar pregnancyProgressBar;
-    private Label motherWeekHint;
-    private Label babyWeekHint;
-    private Label milestoneWeekLabel;
-    private Label milestoneLabel;
-    private Label milestoneDevelopmentLabel;
+        public PregnancyTracker() {
 
+                currentWeek = 20;
 
-    // =========================================================
-    // WEEK DATA
-    // =========================================================
-
-    private final Map<Integer, PregnancyWeekModel> weekData =
-            new HashMap<>();
-
-
-    // =========================================================
-    // DEFAULT CONSTRUCTOR
-    // =========================================================
-
-    public PregnancyTracker() {
-
-        currentWeek = 20;
-
-        loadWeekDataFromFirebase();
-    }
-
-
-    // =========================================================
-    // MODEL CONSTRUCTOR
-    // =========================================================
-
-    public PregnancyTracker(
-            MotherWlcModel motherModel) {
-
-        this.motherModel = motherModel;
-
-        calculateCurrentWeekFromLMP();
-
-        loadWeekDataFromFirebase();
-    }
-
-
-    // =========================================================
-    // SET MODEL
-    // =========================================================
-
-    public void setMotherModel(
-            MotherWlcModel motherModel) {
-
-        this.motherModel = motherModel;
-
-        calculateCurrentWeekFromLMP();
-
-        if (weekCombo != null) {
-
-            weekCombo.setValue(currentWeek);
+                loadWeekDataFromFirebase();
         }
 
-        updateWeekContent();
-    }
+        // =========================================================
+        // MODEL CONSTRUCTOR
+        // =========================================================
 
+        public PregnancyTracker(
+                        MotherWlcModel motherModel) {
 
-    // =========================================================
-    // LOAD WEEK DATA FROM FIREBASE
-    // =========================================================
+                this.motherModel = motherModel;
 
-    private void loadWeekDataFromFirebase() {
+                calculateCurrentWeekFromLMP();
 
-        new Thread(() -> {
+                loadWeekDataFromFirebase();
+        }
 
-            try {
+        // =========================================================
+        // SET MODEL
+        // =========================================================
 
-                List<PregnancyWeekModel> weeks =
-                        pregnancyWeekController.getAllWeeks();
+        public void setMotherModel(
+                        MotherWlcModel motherModel) {
 
-                weekData.clear();
+                this.motherModel = motherModel;
 
-                for (PregnancyWeekModel week : weeks) {
+                calculateCurrentWeekFromLMP();
 
-                    weekData.put(
-                            week.getWeek(),
-                            week
-                    );
-                }
-
-                Platform.runLater(() -> {
-
-                    if (weekCombo != null) {
+                if (weekCombo != null) {
 
                         weekCombo.setValue(currentWeek);
-                    }
+                }
 
-                    updateWeekContent();
+                updateWeekContent();
+        }
+
+        // =========================================================
+        // LOAD WEEK DATA FROM FIREBASE
+        // =========================================================
+
+        private void loadWeekDataFromFirebase() {
+
+                new Thread(() -> {
+
+                        try {
+
+                                List<PregnancyWeekModel> weeks = pregnancyWeekController.getAllWeeks();
+
+                                weekData.clear();
+
+                                for (PregnancyWeekModel week : weeks) {
+
+                                        weekData.put(
+                                                        week.getWeek(),
+                                                        week);
+                                }
+
+                                Platform.runLater(() -> {
+
+                                        if (weekCombo != null) {
+
+                                                weekCombo.setValue(currentWeek);
+                                        }
+
+                                        updateWeekContent();
+                                });
+
+                        } catch (Exception e) {
+
+                                e.printStackTrace();
+
+                                Platform.runLater(() -> {
+
+                                        if (motherDetailsBox != null) {
+
+                                                motherDetailsBox
+                                                                .getChildren()
+                                                                .clear();
+
+                                                Label errorLabel = new Label(
+                                                                "Unable to load pregnancy data.");
+
+                                                errorLabel.setStyle(
+                                                                "-fx-font-size: 14px;" +
+                                                                                "-fx-text-fill: #E84A87;");
+
+                                                motherDetailsBox
+                                                                .getChildren()
+                                                                .add(
+                                                                                errorLabel);
+                                        }
+                                });
+                        }
+                }).start();
+        }
+
+        // =========================================================
+        // CALCULATE CURRENT WEEK FROM LMP
+        // =========================================================
+
+        private void calculateCurrentWeekFromLMP() {
+
+                if (motherModel == null) {
+
+                        currentWeek = 20;
+
+                        return;
+                }
+
+                LocalDate lmpDate = motherModel.getLmpDate();
+
+                if (lmpDate == null) {
+
+                        currentWeek = 20;
+
+                        return;
+                }
+
+                LocalDate today = LocalDate.now();
+
+                if (lmpDate.isAfter(today)) {
+
+                        currentWeek = 1;
+
+                        return;
+                }
+
+                long days = ChronoUnit.DAYS.between(
+                                lmpDate,
+                                today);
+
+                int calculatedWeek = (int) (days / 7) + 1;
+
+                if (calculatedWeek < 1) {
+
+                        calculatedWeek = 1;
+                }
+
+                if (calculatedWeek > 40) {
+
+                        calculatedWeek = 40;
+                }
+
+                currentWeek = calculatedWeek;
+        }
+
+        // =========================================================
+        // MAIN PAGE
+        // =========================================================
+
+        public VBox createPregnancyTrackingPage() {
+
+                calculateCurrentWeekFromLMP();
+
+                VBox page = new VBox();
+
+                page.setFillWidth(true);
+
+                page.setStyle(
+                                "-fx-background-color: linear-gradient(" +
+                                                "to bottom right, " +
+                                                "#FFFFFF 0%, " +
+                                                "#FFF7FB 55%, " +
+                                                "#F5EEFF 100%);");
+
+                VBox content = new VBox();
+
+                content.setSpacing(20);
+
+                content.setPadding(
+                                new Insets(
+                                                25,
+                                                30,
+                                                40,
+                                                30));
+
+                // =====================================================
+                // PAGE TITLE
+                // =====================================================
+
+                content.getChildren().add(
+                                createPageTitle());
+
+                // =====================================================
+                // WEEK SELECTOR
+                // =====================================================
+
+                content.getChildren().add(
+                                createWeekSelector());
+
+                // =====================================================
+                // PREGNANCY JOURNEY
+                // =====================================================
+
+                content.getChildren().add(
+                                createPregnancyProgressCard());
+
+                // =====================================================
+                // CURRENT WEEK
+                // =====================================================
+
+                content.getChildren().add(
+                                createCurrentWeekCard());
+
+                // =====================================================
+                // MOTHER + BABY
+                // =====================================================
+
+                HBox detailsLayout = new HBox();
+
+                detailsLayout.setSpacing(20);
+
+                VBox motherCard = createMotherChangesCard();
+
+                VBox babyCard = createBabyDevelopmentCard();
+
+                HBox.setHgrow(
+                                motherCard,
+                                Priority.ALWAYS);
+
+                HBox.setHgrow(
+                                babyCard,
+                                Priority.ALWAYS);
+
+                detailsLayout.getChildren().addAll(
+                                motherCard,
+                                babyCard);
+
+                content.getChildren().add(
+                                detailsLayout);
+
+                // =====================================================
+                // WEEKLY MILESTONES
+                // =====================================================
+
+                content.getChildren().add(
+                                createMilestoneCard());
+
+                // =====================================================
+                // CARE TIPS
+                // =====================================================
+
+                content.getChildren().add(
+                                createTipsCard());
+
+                // =====================================================
+                // NAVIGATION
+                // =====================================================
+
+                content.getChildren().add(
+                                createWeekNavigation());
+
+                // =====================================================
+                // SCROLL
+                // =====================================================
+
+                ScrollPane scrollPane = new ScrollPane(content);
+
+                scrollPane.setFitToWidth(true);
+
+                scrollPane.setPannable(true);
+
+                scrollPane.setHbarPolicy(
+                                ScrollPane.ScrollBarPolicy.NEVER);
+
+                scrollPane.setVbarPolicy(
+                                ScrollPane.ScrollBarPolicy.AS_NEEDED);
+
+                scrollPane.setStyle(
+                                "-fx-background-color: transparent;" +
+                                                "-fx-background: transparent;" +
+                                                "-fx-border-color: transparent;");
+
+                page.getChildren().add(
+                                scrollPane);
+
+                VBox.setVgrow(
+                                scrollPane,
+                                Priority.ALWAYS);
+
+                return page;
+        }
+
+        // =========================================================
+        // PAGE TITLE
+        // =========================================================
+
+        private VBox createPageTitle() {
+
+                VBox box = new VBox();
+
+                box.setSpacing(5);
+
+                Label title = new Label(
+                                "Pregnancy Tracking 🤰");
+
+                title.setStyle(
+                                "-fx-font-size: 29px;" +
+                                                "-fx-font-weight: bold;" +
+                                                "-fx-text-fill: #24234F;");
+
+                Label subtitle = new Label(
+                                "Follow your pregnancy journey and " +
+                                                "your baby's development week by week.");
+
+                subtitle.setStyle(
+                                "-fx-font-size: 16px;" +
+                                                "-fx-text-fill: #77778D;");
+
+                box.getChildren().addAll(
+                                title,
+                                subtitle);
+
+                return box;
+        }
+
+        // =========================================================
+        // WEEK SELECTOR
+        // =========================================================
+
+        private HBox createWeekSelector() {
+
+                HBox card = new HBox();
+
+                card.setAlignment(
+                                Pos.CENTER_LEFT);
+
+                card.setSpacing(15);
+
+                card.setPadding(
+                                new Insets(16));
+
+                card.setStyle(
+                                "-fx-background-color: white;" +
+                                                "-fx-background-radius: 16;" +
+                                                "-fx-border-color: #E7DCE8;" +
+                                                "-fx-border-radius: 16;");
+
+                FontAwesomeIconView calendarIcon = new FontAwesomeIconView(
+                                FontAwesomeIcon.CALENDAR);
+
+                calendarIcon.setSize("22");
+
+                calendarIcon.setFill(
+                                Color.web(PINK));
+
+                Label label = new Label(
+                                "Select Pregnancy Week");
+
+                label.setStyle(
+                                "-fx-font-size: 15px;" +
+                                                "-fx-font-weight: bold;" +
+                                                "-fx-text-fill: #24234F;");
+
+                weekCombo = new ComboBox<>();
+
+                for (int i = 1; i <= 40; i++) {
+
+                        weekCombo.getItems().add(i);
+                }
+
+                weekCombo.setValue(
+                                currentWeek);
+
+                weekCombo.setPrefWidth(130);
+
+                weekCombo.setStyle(
+                                "-fx-font-size: 14px;" +
+                                                "-fx-background-color: #FFF5F9;" +
+                                                "-fx-border-color: #F0C6D8;" +
+                                                "-fx-border-radius: 10;" +
+                                                "-fx-background-radius: 10;");
+
+                Label weekLabel = new Label("Week");
+
+                weekLabel.setStyle(
+                                "-fx-font-size: 14px;" +
+                                                "-fx-text-fill: #77778D;");
+
+                weekCombo.setOnAction(e -> {
+
+                        if (weekCombo.getValue() != null) {
+
+                                currentWeek = weekCombo.getValue();
+
+                                updateWeekContent();
+                        }
                 });
 
-            } catch (Exception e) {
+                card.getChildren().addAll(
+                                calendarIcon,
+                                label,
+                                weekCombo,
+                                weekLabel);
 
-                e.printStackTrace();
+                return card;
+        }
+
+        // =========================================================
+        // PREGNANCY JOURNEY
+        // =========================================================
+
+        private VBox createPregnancyProgressCard() {
+
+                VBox card = createWhiteCard();
+
+                card.setSpacing(15);
+
+                HBox heading = new HBox();
+
+                heading.setAlignment(
+                                Pos.CENTER_LEFT);
+
+                VBox titleBox = new VBox();
+
+                titleBox.setSpacing(4);
+
+                Label title = new Label(
+                                "Your Pregnancy Journey 🌸");
+
+                title.setStyle(
+                                "-fx-font-size: 21px;" +
+                                                "-fx-font-weight: bold;" +
+                                                "-fx-text-fill: #24234F;");
+
+                journeySubtitleLabel = new Label(
+                                getTrimesterName(currentWeek) +
+                                                " • Week " + currentWeek + " of 40");
+
+                journeySubtitleLabel.setStyle(
+                                "-fx-font-size: 14px;" +
+                                                "-fx-text-fill: #77778D;");
+
+                titleBox.getChildren().addAll(
+                                title,
+                                journeySubtitleLabel);
+
+                HBox.setHgrow(
+                                titleBox,
+                                Priority.ALWAYS);
+
+                progressWeekLabel = new Label(
+                                currentWeek + " / 40");
+
+                progressWeekLabel.setStyle(
+                                "-fx-font-size: 16px;" +
+                                                "-fx-font-weight: bold;" +
+                                                "-fx-text-fill: #E84A87;");
+
+                heading.getChildren().addAll(
+                                titleBox,
+                                progressWeekLabel);
+
+                // =====================================================
+                // IMAGE + INFO
+                // =====================================================
+
+                HBox journey = new HBox();
+
+                journey.setSpacing(20);
+
+                journey.setAlignment(
+                                Pos.CENTER_LEFT);
+
+                journeyImageBox = createTrimesterImage(
+                                currentWeek,
+                                300,
+                                170);
+
+                VBox info = new VBox();
+
+                info.setSpacing(10);
+
+                trimesterLabel = new Label(
+                                getTrimesterName(currentWeek));
+
+                trimesterLabel.setStyle(
+                                "-fx-font-size: 20px;" +
+                                                "-fx-font-weight: bold;" +
+                                                "-fx-text-fill: #7041A5;");
+
+                trimesterDescriptionLabel = new Label(
+                                getTrimesterDescription(currentWeek));
+
+                trimesterDescriptionLabel.setWrapText(true);
+
+                trimesterDescriptionLabel.setStyle(
+                                "-fx-font-size: 15px;" +
+                                                "-fx-text-fill: #55556D;" +
+                                                "-fx-line-spacing: 5px;");
+
+                HBox.setHgrow(
+                                info,
+                                Priority.ALWAYS);
+
+                info.getChildren().addAll(
+                                trimesterLabel,
+                                trimesterDescriptionLabel);
+
+                journey.getChildren().addAll(
+                                journeyImageBox,
+                                info);
+
+                // =====================================================
+                // PROGRESS BAR
+                // =====================================================
+
+                pregnancyProgressBar = new ProgressBar(
+                                currentWeek / 40.0);
+
+                pregnancyProgressBar.setMaxWidth(
+                                Double.MAX_VALUE);
+
+                pregnancyProgressBar.setPrefHeight(14);
+
+                pregnancyProgressBar.setStyle(
+                                "-fx-accent: #E84A87;");
+
+                HBox.setHgrow(
+                                pregnancyProgressBar,
+                                Priority.ALWAYS);
+
+                HBox labels = new HBox();
+
+                labels.setAlignment(
+                                Pos.CENTER_LEFT);
+
+                Label start = new Label("Week 1");
+
+                start.setStyle(
+                                "-fx-font-size: 13px;" +
+                                                "-fx-text-fill: #77778D;");
+
+                Label end = new Label("Week 40");
+
+                end.setStyle(
+                                "-fx-font-size: 13px;" +
+                                                "-fx-text-fill: #77778D;");
+
+                HBox.setHgrow(
+                                start,
+                                Priority.ALWAYS);
+
+                labels.getChildren().addAll(
+                                start,
+                                end);
+
+                card.getChildren().addAll(
+                                heading,
+                                journey,
+                                pregnancyProgressBar,
+                                labels);
+
+                return card;
+        }
+
+        // =========================================================
+        // CURRENT WEEK CARD
+        // =========================================================
+
+        private VBox createCurrentWeekCard() {
+
+                VBox card = new VBox();
+
+                card.setSpacing(12);
+
+                card.setPadding(
+                                new Insets(20));
+
+                card.setStyle(
+                                "-fx-background-color: linear-gradient(" +
+                                                "to right, #FFF0F6, #F7F0FF);" +
+                                                "-fx-background-radius: 18;" +
+                                                "-fx-border-color: #EBD5E5;" +
+                                                "-fx-border-radius: 18;");
+
+                HBox top = new HBox();
+
+                top.setAlignment(
+                                Pos.CENTER_LEFT);
+
+                VBox text = new VBox();
+
+                text.setSpacing(5);
+
+                weekTitle = new Label(
+                                "Week " + currentWeek);
+
+                weekTitle.setStyle(
+                                "-fx-font-size: 25px;" +
+                                                "-fx-font-weight: bold;" +
+                                                "-fx-text-fill: #24234F;");
+
+                weekSubtitle = new Label(
+                                getWeekSubtitle(currentWeek));
+
+                weekSubtitle.setStyle(
+                                "-fx-font-size: 15px;" +
+                                                "-fx-text-fill: #77778D;");
+
+                text.getChildren().addAll(
+                                weekTitle,
+                                weekSubtitle);
+
+                HBox.setHgrow(
+                                text,
+                                Priority.ALWAYS);
+
+                VBox babyIcon = createIconCircle(
+                                FontAwesomeIcon.HEART,
+                                PURPLE);
+
+                top.getChildren().addAll(
+                                text,
+                                babyIcon);
+
+                card.getChildren().add(
+                                top);
+
+                return card;
+        }
+
+        // =========================================================
+        // MOTHER CHANGES CARD
+        // =========================================================
+
+        private VBox createMotherChangesCard() {
+
+                VBox card = createWhiteCard();
+
+                HBox heading = createHeading(
+                                "Mother Changes",
+                                FontAwesomeIcon.HEART,
+                                PINK);
+
+                motherWeekHint = new Label(
+                                "How your body may change during Week "
+                                                + currentWeek);
+
+                motherWeekHint.setStyle(
+                                "-fx-font-size: 14px;" +
+                                                "-fx-text-fill: #77778D;");
+
+                motherImageBox = createTrimesterImage(
+                                currentWeek,
+                                250,
+                                150);
+
+                motherDetailsBox = new VBox();
+
+                motherDetailsBox.setSpacing(12);
+
+                updateMotherDetails();
+
+                card.getChildren().addAll(
+                                heading,
+                                motherWeekHint,
+                                motherImageBox,
+                                motherDetailsBox);
+
+                return card;
+        }
+
+        // =========================================================
+        // BABY DEVELOPMENT CARD
+        // =========================================================
+
+        private VBox createBabyDevelopmentCard() {
+
+                VBox card = createWhiteCard();
+
+                HBox heading = createHeading(
+                                "Baby Development",
+                                FontAwesomeIcon.CHILD,
+                                PURPLE);
+
+                babyWeekHint = new Label(
+                                "Your baby's growth during Week "
+                                                + currentWeek);
+
+                babyWeekHint.setStyle(
+                                "-fx-font-size: 14px;" +
+                                                "-fx-text-fill: #77778D;");
+
+                babyDevelopmentChart = createBabyDevelopmentChart(
+                                currentWeek);
+
+                babyDetailsBox = new VBox();
+
+                babyDetailsBox.setSpacing(12);
+
+                updateBabyDetails();
+
+                card.getChildren().addAll(
+                                heading,
+                                babyWeekHint,
+                                babyDevelopmentChart,
+                                babyDetailsBox);
+
+                return card;
+        }
+
+        // =========================================================
+        // BABY DEVELOPMENT LINE CHART
+        // =========================================================
+
+        private LineChart<String, Number> createBabyDevelopmentChart(
+                        int week) {
+
+                CategoryAxis xAxis = new CategoryAxis();
+
+                NumberAxis yAxis = new NumberAxis();
+
+                xAxis.setLabel(
+                                "Pregnancy Week");
+
+                yAxis.setLabel(
+                                "Development Progress (%)");
+
+                xAxis.setTickLabelFont(
+                                javafx.scene.text.Font.font(11));
+
+                yAxis.setTickLabelFont(
+                                javafx.scene.text.Font.font(11));
+
+                LineChart<String, Number> chart = new LineChart<>(
+                                xAxis,
+                                yAxis);
+
+                chart.setTitle(
+                                "Baby Development Progress");
+
+                chart.setTitleSide(
+                                javafx.geometry.Side.TOP);
+
+                chart.setLegendVisible(false);
+
+                chart.setAnimated(false);
+
+                chart.setCreateSymbols(true);
+
+                chart.setPrefHeight(245);
+
+                chart.setMinHeight(245);
+
+                chart.setMaxHeight(245);
+
+                chart.setPrefWidth(390);
+
+                chart.setMinWidth(390);
+
+                chart.setMaxWidth(390);
+
+                chart.setHorizontalGridLinesVisible(true);
+
+                chart.setVerticalGridLinesVisible(false);
+
+                chart.setStyle(
+                                "-fx-background-color: #FFF9FC;" +
+                                                "-fx-background-radius: 14;" +
+                                                "-fx-border-color: #F4D5E2;" +
+                                                "-fx-border-radius: 14;" +
+                                                "-fx-padding: 8;");
+
+                XYChart.Series<String, Number> progressSeries = new XYChart.Series<>();
+
+                progressSeries.setName(
+                                "Development Progress");
+
+                for (int i = 1; i <= week; i++) {
+
+                        double progress = (i / 40.0) * 100.0;
+
+                        progressSeries
+                                        .getData()
+                                        .add(
+                                                        new XYChart.Data<>(
+                                                                        "Week " + i,
+                                                                        progress));
+                }
+
+                chart.getData().add(
+                                progressSeries);
 
                 Platform.runLater(() -> {
 
-                    if (motherDetailsBox != null) {
+                        Node line = progressSeries.getNode();
 
-                        motherDetailsBox
+                        if (line != null) {
+
+                                line.setStyle(
+                                                "-fx-stroke: #F3A6C2;" +
+                                                                "-fx-stroke-width: 3px;");
+                        }
+
+                        for (XYChart.Data<String, Number> data : progressSeries.getData()) {
+
+                                Node symbol = data.getNode();
+
+                                if (symbol != null) {
+
+                                        symbol.setStyle(
+                                                        "-fx-background-color: #F3A6C2, white;" +
+                                                                        "-fx-background-insets: 0, 2;" +
+                                                                        "-fx-background-radius: 7px;" +
+                                                                        "-fx-padding: 5px;");
+                                }
+                        }
+                });
+
+                return chart;
+        }
+
+        // =========================================================
+        // UPDATE BABY DEVELOPMENT CHART
+        // =========================================================
+
+        private void updateBabyDevelopmentChart() {
+
+                if (babyDevelopmentChart == null) {
+
+                        return;
+                }
+
+                babyDevelopmentChart
+                                .getData()
+                                .clear();
+
+                XYChart.Series<String, Number> progressSeries = new XYChart.Series<>();
+
+                progressSeries.setName(
+                                "Development Progress");
+
+                for (int i = 1; i <= currentWeek; i++) {
+
+                        double progress = (i / 40.0) * 100.0;
+
+                        progressSeries
+                                        .getData()
+                                        .add(
+                                                        new XYChart.Data<>(
+                                                                        "Week " + i,
+                                                                        progress));
+                }
+
+                babyDevelopmentChart
+                                .getData()
+                                .add(
+                                                progressSeries);
+
+                Platform.runLater(() -> {
+
+                        Node line = progressSeries.getNode();
+
+                        if (line != null) {
+
+                                line.setStyle(
+                                                "-fx-stroke: #F3A6C2;" +
+                                                                "-fx-stroke-width: 3px;");
+                        }
+
+                        for (XYChart.Data<String, Number> data : progressSeries.getData()) {
+
+                                Node symbol = data.getNode();
+
+                                if (symbol != null) {
+
+                                        symbol.setStyle(
+                                                        "-fx-background-color: #F3A6C2, white;" +
+                                                                        "-fx-background-insets: 0, 2;" +
+                                                                        "-fx-background-radius: 7px;" +
+                                                                        "-fx-padding: 5px;");
+                                }
+                        }
+                });
+        }
+
+        // =========================================================
+        // MOTHER DETAILS
+        // =========================================================
+
+        private void updateMotherDetails() {
+
+                if (motherDetailsBox == null) {
+
+                        return;
+                }
+
+                PregnancyWeekModel data = weekData.get(currentWeek);
+
+                if (data == null) {
+
+                        return;
+                }
+
+                motherDetailsBox
                                 .getChildren()
                                 .clear();
 
-                        Label errorLabel =
-                                new Label(
-                                        "Unable to load pregnancy data."
-                                );
-
-                        errorLabel.setStyle(
-                                "-fx-font-size: 14px;" +
-                                "-fx-text-fill: #E84A87;"
-                        );
-
-                        motherDetailsBox
-                                .getChildren()
-                                .add(
-                                        errorLabel
-                                );
-                    }
-                });
-            }
-        }).start();
-    }
-
-
-    // =========================================================
-    // CALCULATE CURRENT WEEK FROM LMP
-    // =========================================================
-
-    private void calculateCurrentWeekFromLMP() {
-
-        if (motherModel == null) {
-
-            currentWeek = 20;
-
-            return;
-        }
-
-
-        LocalDate lmpDate =
-                motherModel.getLmpDate();
-
-
-        if (lmpDate == null) {
-
-            currentWeek = 20;
-
-            return;
-        }
-
-
-        LocalDate today =
-                LocalDate.now();
-
-
-        if (lmpDate.isAfter(today)) {
-
-            currentWeek = 1;
-
-            return;
-        }
-
-
-        long days =
-                ChronoUnit.DAYS.between(
-                        lmpDate,
-                        today
-                );
-
-
-        int calculatedWeek =
-                (int) (days / 7) + 1;
-
-
-        if (calculatedWeek < 1) {
-
-            calculatedWeek = 1;
-        }
-
-
-        if (calculatedWeek > 40) {
-
-            calculatedWeek = 40;
-        }
-
-
-        currentWeek =
-                calculatedWeek;
-    }
-
-
-    // =========================================================
-    // MAIN PAGE
-    // =========================================================
-
-    public VBox createPregnancyTrackingPage() {
-
-        calculateCurrentWeekFromLMP();
-
-
-        VBox page =
-                new VBox();
-
-        page.setFillWidth(true);
-
-        page.setStyle(
-                "-fx-background-color: linear-gradient(" +
-                "to bottom right, " +
-                "#FFFFFF 0%, " +
-                "#FFF7FB 55%, " +
-                "#F5EEFF 100%);"
-        );
-
-
-        VBox content =
-                new VBox();
-
-        content.setSpacing(20);
-
-        content.setPadding(
-                new Insets(
-                        25,
-                        30,
-                        40,
-                        30
-                )
-        );
-
-
-        // =====================================================
-        // PAGE TITLE
-        // =====================================================
-
-        content.getChildren().add(
-                createPageTitle()
-        );
-
-
-        // =====================================================
-        // WEEK SELECTOR
-        // =====================================================
-
-        content.getChildren().add(
-                createWeekSelector()
-        );
-
-
-        // =====================================================
-        // PREGNANCY JOURNEY
-        // =====================================================
-
-        content.getChildren().add(
-                createPregnancyProgressCard()
-        );
-
-
-        // =====================================================
-        // CURRENT WEEK
-        // =====================================================
-
-        content.getChildren().add(
-                createCurrentWeekCard()
-        );
-
-
-        // =====================================================
-        // MOTHER + BABY
-        // =====================================================
-
-        HBox detailsLayout =
-                new HBox();
-
-        detailsLayout.setSpacing(20);
-
-
-        VBox motherCard =
-                createMotherChangesCard();
-
-
-        VBox babyCard =
-                createBabyDevelopmentCard();
-
-
-        HBox.setHgrow(
-                motherCard,
-                Priority.ALWAYS
-        );
-
-        HBox.setHgrow(
-                babyCard,
-                Priority.ALWAYS
-        );
-
-
-        detailsLayout.getChildren().addAll(
-                motherCard,
-                babyCard
-        );
-
-
-        content.getChildren().add(
-                detailsLayout
-        );
-
-
-        // =====================================================
-        // WEEKLY MILESTONES
-        // =====================================================
-
-        content.getChildren().add(
-                createMilestoneCard()
-        );
-
-
-        // =====================================================
-        // CARE TIPS
-        // =====================================================
-
-        content.getChildren().add(
-                createTipsCard()
-        );
-
-
-        // =====================================================
-        // NAVIGATION
-        // =====================================================
-
-        content.getChildren().add(
-                createWeekNavigation()
-        );
-
-
-        // =====================================================
-        // SCROLL
-        // =====================================================
-
-        ScrollPane scrollPane =
-                new ScrollPane(content);
-
-        scrollPane.setFitToWidth(true);
-
-        scrollPane.setPannable(true);
-
-        scrollPane.setHbarPolicy(
-                ScrollPane.ScrollBarPolicy.NEVER
-        );
-
-        scrollPane.setVbarPolicy(
-                ScrollPane.ScrollBarPolicy.AS_NEEDED
-        );
-
-        scrollPane.setStyle(
-                "-fx-background-color: transparent;" +
-                "-fx-background: transparent;" +
-                "-fx-border-color: transparent;"
-        );
-
-
-        page.getChildren().add(
-                scrollPane
-        );
-
-
-        VBox.setVgrow(
-                scrollPane,
-                Priority.ALWAYS
-        );
-
-
-        return page;
-    }
-
-
-    // =========================================================
-    // PAGE TITLE
-    // =========================================================
-
-    private VBox createPageTitle() {
-
-        VBox box =
-                new VBox();
-
-        box.setSpacing(5);
-
-
-        Label title =
-                new Label(
-                        "Pregnancy Tracking 🤰"
-                );
-
-        title.setStyle(
-                "-fx-font-size: 29px;" +
-                "-fx-font-weight: bold;" +
-                "-fx-text-fill: #24234F;"
-        );
-
-
-        Label subtitle =
-                new Label(
-                        "Follow your pregnancy journey and " +
-                        "your baby's development week by week."
-                );
-
-        subtitle.setStyle(
-                "-fx-font-size: 16px;" +
-                "-fx-text-fill: #77778D;"
-        );
-
-
-        box.getChildren().addAll(
-                title,
-                subtitle
-        );
-
-
-        return box;
-    }
-
-
-    // =========================================================
-    // WEEK SELECTOR
-    // =========================================================
-
-    private HBox createWeekSelector() {
-
-        HBox card =
-                new HBox();
-
-        card.setAlignment(
-                Pos.CENTER_LEFT
-        );
-
-        card.setSpacing(15);
-
-        card.setPadding(
-                new Insets(16)
-        );
-
-        card.setStyle(
-                "-fx-background-color: white;" +
-                "-fx-background-radius: 16;" +
-                "-fx-border-color: #E7DCE8;" +
-                "-fx-border-radius: 16;"
-        );
-
-
-        FontAwesomeIconView calendarIcon =
-                new FontAwesomeIconView(
-                        FontAwesomeIcon.CALENDAR
-                );
-
-        calendarIcon.setSize("22");
-
-        calendarIcon.setFill(
-                Color.web(PINK)
-        );
-
-
-        Label label =
-                new Label(
-                        "Select Pregnancy Week"
-                );
-
-        label.setStyle(
-                "-fx-font-size: 15px;" +
-                "-fx-font-weight: bold;" +
-                "-fx-text-fill: #24234F;"
-        );
-
-
-        weekCombo =
-                new ComboBox<>();
-
-
-        for (int i = 1; i <= 40; i++) {
-
-            weekCombo.getItems().add(i);
-        }
-
-
-        weekCombo.setValue(
-                currentWeek
-        );
-
-
-        weekCombo.setPrefWidth(130);
-
-
-        weekCombo.setStyle(
-                "-fx-font-size: 14px;" +
-                "-fx-background-color: #FFF5F9;" +
-                "-fx-border-color: #F0C6D8;" +
-                "-fx-border-radius: 10;" +
-                "-fx-background-radius: 10;"
-        );
-
-
-        Label weekLabel =
-                new Label("Week");
-
-
-        weekLabel.setStyle(
-                "-fx-font-size: 14px;" +
-                "-fx-text-fill: #77778D;"
-        );
-
-
-        weekCombo.setOnAction(e -> {
-
-            if (weekCombo.getValue() != null) {
-
-                currentWeek =
-                        weekCombo.getValue();
-
-                updateWeekContent();
-            }
-        });
-
-
-        card.getChildren().addAll(
-                calendarIcon,
-                label,
-                weekCombo,
-                weekLabel
-        );
-
-
-        return card;
-    }
-
-
-    // =========================================================
-    // PREGNANCY JOURNEY
-    // =========================================================
-
-    private VBox createPregnancyProgressCard() {
-
-        VBox card =
-                createWhiteCard();
-
-        card.setSpacing(15);
-
-
-        HBox heading =
-                new HBox();
-
-        heading.setAlignment(
-                Pos.CENTER_LEFT
-        );
-
-
-        VBox titleBox =
-                new VBox();
-
-        titleBox.setSpacing(4);
-
-
-        Label title =
-                new Label(
-                        "Your Pregnancy Journey 🌸"
-                );
-
-        title.setStyle(
-                "-fx-font-size: 21px;" +
-                "-fx-font-weight: bold;" +
-                "-fx-text-fill: #24234F;"
-        );
-
-
-        journeySubtitleLabel =
-                new Label(
-                        getTrimesterName(currentWeek) +
-                        " • Week " + currentWeek + " of 40"
-                );
-
-        journeySubtitleLabel.setStyle(
-                "-fx-font-size: 14px;" +
-                "-fx-text-fill: #77778D;"
-        );
-
-
-        titleBox.getChildren().addAll(
-                title,
-                journeySubtitleLabel
-        );
-
-
-        HBox.setHgrow(
-                titleBox,
-                Priority.ALWAYS
-        );
-
-
-        progressWeekLabel =
-                new Label(
-                        currentWeek + " / 40"
-                );
-
-
-        progressWeekLabel.setStyle(
-                "-fx-font-size: 16px;" +
-                "-fx-font-weight: bold;" +
-                "-fx-text-fill: #E84A87;"
-        );
-
-
-        heading.getChildren().addAll(
-                titleBox,
-                progressWeekLabel
-        );
-
-
-        // =====================================================
-        // IMAGE + INFO
-        // =====================================================
-
-        HBox journey =
-                new HBox();
-
-        journey.setSpacing(20);
-
-        journey.setAlignment(
-                Pos.CENTER_LEFT
-        );
-
-
-        journeyImageBox =
-                createTrimesterImage(
-                        currentWeek,
-                        300,
-                        170
-                );
-
-
-        VBox info =
-                new VBox();
-
-        info.setSpacing(10);
-
-
-        trimesterLabel =
-                new Label(
-                        getTrimesterName(currentWeek)
-                );
-
-
-        trimesterLabel.setStyle(
-                "-fx-font-size: 20px;" +
-                "-fx-font-weight: bold;" +
-                "-fx-text-fill: #7041A5;"
-        );
-
-
-        trimesterDescriptionLabel =
-                new Label(
-                        getTrimesterDescription(currentWeek)
-                );
-
-
-        trimesterDescriptionLabel.setWrapText(true);
-
-
-        trimesterDescriptionLabel.setStyle(
-                "-fx-font-size: 15px;" +
-                "-fx-text-fill: #55556D;" +
-                "-fx-line-spacing: 5px;"
-        );
-
-
-        HBox.setHgrow(
-                info,
-                Priority.ALWAYS
-        );
-
-
-        info.getChildren().addAll(
-                trimesterLabel,
-                trimesterDescriptionLabel
-        );
-
-
-        journey.getChildren().addAll(
-                journeyImageBox,
-                info
-        );
-
-
-        // =====================================================
-        // PROGRESS BAR
-        // =====================================================
-
-        pregnancyProgressBar =
-                new ProgressBar(
-                        currentWeek / 40.0
-                );
-
-
-        pregnancyProgressBar.setMaxWidth(
-                Double.MAX_VALUE
-        );
-
-
-        pregnancyProgressBar.setPrefHeight(14);
-
-
-        pregnancyProgressBar.setStyle(
-                "-fx-accent: #E84A87;"
-        );
-
-
-        HBox.setHgrow(
-                pregnancyProgressBar,
-                Priority.ALWAYS
-        );
-
-
-        HBox labels =
-                new HBox();
-
-
-        labels.setAlignment(
-                Pos.CENTER_LEFT
-        );
-
-
-        Label start =
-                new Label("Week 1");
-
-
-        start.setStyle(
-                "-fx-font-size: 13px;" +
-                "-fx-text-fill: #77778D;"
-        );
-
-
-        Label end =
-                new Label("Week 40");
-
-
-        end.setStyle(
-                "-fx-font-size: 13px;" +
-                "-fx-text-fill: #77778D;"
-        );
-
-
-        HBox.setHgrow(
-                start,
-                Priority.ALWAYS
-        );
-
-
-        labels.getChildren().addAll(
-                start,
-                end
-        );
-
-
-        card.getChildren().addAll(
-                heading,
-                journey,
-                pregnancyProgressBar,
-                labels
-        );
-
-
-        return card;
-    }
-
-
-    // =========================================================
-    // CURRENT WEEK CARD
-    // =========================================================
-
-    private VBox createCurrentWeekCard() {
-
-        VBox card =
-                new VBox();
-
-        card.setSpacing(12);
-
-        card.setPadding(
-                new Insets(20)
-        );
-
-
-        card.setStyle(
-                "-fx-background-color: linear-gradient(" +
-                "to right, #FFF0F6, #F7F0FF);" +
-                "-fx-background-radius: 18;" +
-                "-fx-border-color: #EBD5E5;" +
-                "-fx-border-radius: 18;"
-        );
-
-
-        HBox top =
-                new HBox();
-
-
-        top.setAlignment(
-                Pos.CENTER_LEFT
-        );
-
-
-        VBox text =
-                new VBox();
-
-        text.setSpacing(5);
-
-
-        weekTitle =
-                new Label(
-                        "Week " + currentWeek
-                );
-
-
-        weekTitle.setStyle(
-                "-fx-font-size: 25px;" +
-                "-fx-font-weight: bold;" +
-                "-fx-text-fill: #24234F;"
-        );
-
-
-        weekSubtitle =
-                new Label(
-                        getWeekSubtitle(currentWeek)
-                );
-
-
-        weekSubtitle.setStyle(
-                "-fx-font-size: 15px;" +
-                "-fx-text-fill: #77778D;"
-        );
-
-
-        text.getChildren().addAll(
-                weekTitle,
-                weekSubtitle
-        );
-
-
-        HBox.setHgrow(
-                text,
-                Priority.ALWAYS
-        );
-
-
-        VBox babyIcon =
-                createIconCircle(
-                        FontAwesomeIcon.HEART,
-                        PURPLE
-                );
-
-
-        top.getChildren().addAll(
-                text,
-                babyIcon
-        );
-
-
-        card.getChildren().add(
-                top
-        );
-
-
-        return card;
-    }
-
-
-    // =========================================================
-    // MOTHER CHANGES CARD
-    // =========================================================
-
-    private VBox createMotherChangesCard() {
-
-        VBox card =
-                createWhiteCard();
-
-
-        HBox heading =
-                createHeading(
-                        "Mother Changes",
-                        FontAwesomeIcon.HEART,
-                        PINK
-                );
-
-
-        motherWeekHint =
-                new Label(
-                        "How your body may change during Week "
-                        + currentWeek
-                );
-
-
-        motherWeekHint.setStyle(
-                "-fx-font-size: 14px;" +
-                "-fx-text-fill: #77778D;"
-        );
-
-
-        motherImageBox =
-                createTrimesterImage(
-                        currentWeek,
-                        250,
-                        150
-                );
-
-
-        motherDetailsBox =
-                new VBox();
-
-
-        motherDetailsBox.setSpacing(12);
-
-
-        updateMotherDetails();
-
-
-        card.getChildren().addAll(
-                heading,
-                motherWeekHint,
-                motherImageBox,
                 motherDetailsBox
-        );
+                                .getChildren()
+                                .addAll(
 
+                                                createInfoBox(
+                                                                "Body Changes",
+                                                                data.getMotherChanges(),
+                                                                PINK),
 
-        return card;
-    }
+                                                createInfoBox(
+                                                                "Common Feelings",
+                                                                data.getSymptoms(),
+                                                                PURPLE),
 
+                                                createInfoBox(
+                                                                "Care Focus",
+                                                                data.getTips(),
+                                                                GREEN));
+        }
 
-    // =========================================================
-    // BABY DEVELOPMENT CARD
-    // =========================================================
+        // =========================================================
+        // BABY DETAILS
+        // =========================================================
 
-    private VBox createBabyDevelopmentCard() {
+        private void updateBabyDetails() {
 
-        VBox card =
-                createWhiteCard();
+                if (babyDetailsBox == null) {
 
+                        return;
+                }
 
-        HBox heading =
-                createHeading(
-                        "Baby Development",
-                        FontAwesomeIcon.CHILD,
-                        PURPLE
-                );
+                PregnancyWeekModel data = weekData.get(currentWeek);
 
+                if (data == null) {
 
-        babyWeekHint =
-                new Label(
-                        "Your baby's growth during Week "
-                        + currentWeek
-                );
+                        return;
+                }
 
-
-        babyWeekHint.setStyle(
-                "-fx-font-size: 14px;" +
-                "-fx-text-fill: #77778D;"
-        );
-
-
-        babyDevelopmentChart =
-                createBabyDevelopmentChart(
-                        currentWeek
-                );
-
-
-        babyDetailsBox =
-                new VBox();
-
-
-        babyDetailsBox.setSpacing(12);
-
-
-        updateBabyDetails();
-
-
-        card.getChildren().addAll(
-                heading,
-                babyWeekHint,
-                babyDevelopmentChart,
                 babyDetailsBox
-        );
+                                .getChildren()
+                                .clear();
 
+                babyDetailsBox
+                                .getChildren()
+                                .addAll(
 
-        return card;
-    }
+                                                createInfoBox(
+                                                                "Development",
+                                                                data.getBabyDevelopment(),
+                                                                PURPLE),
 
+                                                createInfoBox(
+                                                                "Baby Size",
+                                                                data.getBabySize(),
+                                                                PINK),
 
-    // =========================================================
-    // BABY DEVELOPMENT LINE CHART
-    // =========================================================
-
-    private LineChart<String, Number>
-            createBabyDevelopmentChart(
-                    int week) {
-
-
-        CategoryAxis xAxis =
-                new CategoryAxis();
-
-
-        NumberAxis yAxis =
-                new NumberAxis();
-
-
-        xAxis.setLabel(
-                "Pregnancy Week"
-        );
-
-
-        yAxis.setLabel(
-                "Development Progress (%)"
-        );
-
-
-        xAxis.setTickLabelFont(
-                javafx.scene.text.Font.font(11)
-        );
-
-
-        yAxis.setTickLabelFont(
-                javafx.scene.text.Font.font(11)
-        );
-
-
-        LineChart<String, Number> chart =
-                new LineChart<>(
-                        xAxis,
-                        yAxis
-                );
-
-
-        chart.setTitle(
-                "Baby Development Progress"
-        );
-
-
-        chart.setTitleSide(
-                javafx.geometry.Side.TOP
-        );
-
-
-        chart.setLegendVisible(false);
-
-
-        chart.setAnimated(false);
-
-
-        chart.setCreateSymbols(true);
-
-
-        chart.setPrefHeight(245);
-
-        chart.setMinHeight(245);
-
-        chart.setMaxHeight(245);
-
-
-        chart.setPrefWidth(390);
-
-        chart.setMinWidth(390);
-
-        chart.setMaxWidth(390);
-
-
-        chart.setHorizontalGridLinesVisible(true);
-
-        chart.setVerticalGridLinesVisible(false);
-
-
-        chart.setStyle(
-                "-fx-background-color: #FFF9FC;" +
-                "-fx-background-radius: 14;" +
-                "-fx-border-color: #F4D5E2;" +
-                "-fx-border-radius: 14;" +
-                "-fx-padding: 8;"
-        );
-
-
-        XYChart.Series<String, Number>
-                progressSeries =
-                new XYChart.Series<>();
-
-
-        progressSeries.setName(
-                "Development Progress"
-        );
-
-
-        for (
-                int i = 1;
-                i <= week;
-                i++
-        ) {
-
-
-            double progress =
-                    (i / 40.0) * 100.0;
-
-
-            progressSeries
-                    .getData()
-                    .add(
-                            new XYChart.Data<>(
-                                    "Week " + i,
-                                    progress
-                            )
-                    );
+                                                createInfoBox(
+                                                                "This Week's Milestone",
+                                                                data.getMilestone(),
+                                                                GREEN));
         }
 
+        // =========================================================
+        // INFO BOX
+        // =========================================================
 
-        chart.getData().add(
-                progressSeries
-        );
+        private VBox createInfoBox(
+                        String title,
+                        String description,
+                        String color) {
 
+                VBox box = new VBox();
 
-        Platform.runLater(() -> {
+                box.setSpacing(5);
 
-            Node line =
-                    progressSeries.getNode();
+                box.setPadding(
+                                new Insets(12));
 
-            if (line != null) {
+                box.setStyle(
+                                "-fx-background-color: #FAF8FC;" +
+                                                "-fx-background-radius: 12;" +
+                                                "-fx-border-color: #EDE4F0;" +
+                                                "-fx-border-radius: 12;");
 
-                line.setStyle(
-                        "-fx-stroke: #F3A6C2;" +
-                        "-fx-stroke-width: 3px;"
-                );
-            }
+                Label titleLabel = new Label(title);
 
+                titleLabel.setStyle(
+                                "-fx-font-size: 15px;" +
+                                                "-fx-font-weight: bold;" +
+                                                "-fx-text-fill: " + color + ";");
 
-            for (
-                    XYChart.Data<String, Number> data :
-                    progressSeries.getData()
-            ) {
+                Label descriptionLabel = new Label(
+                                description != null
+                                                ? description
+                                                : "");
 
-                Node symbol =
-                        data.getNode();
+                descriptionLabel.setWrapText(true);
 
-                if (symbol != null) {
+                descriptionLabel.setStyle(
+                                "-fx-font-size: 14px;" +
+                                                "-fx-text-fill: #55556D;" +
+                                                "-fx-line-spacing: 4px;");
 
-                    symbol.setStyle(
-                            "-fx-background-color: #F3A6C2, white;" +
-                            "-fx-background-insets: 0, 2;" +
-                            "-fx-background-radius: 7px;" +
-                            "-fx-padding: 5px;"
-                    );
-                }
-            }
-        });
+                box.getChildren().addAll(
+                                titleLabel,
+                                descriptionLabel);
 
-
-        return chart;
-    }
-
-
-    // =========================================================
-    // UPDATE BABY DEVELOPMENT CHART
-    // =========================================================
-
-    private void updateBabyDevelopmentChart() {
-
-        if (babyDevelopmentChart == null) {
-
-            return;
+                return box;
         }
 
+        // =========================================================
+        // WEEKLY MILESTONES
+        // =========================================================
 
-        babyDevelopmentChart
-                .getData()
-                .clear();
+        private VBox createMilestoneCard() {
 
+                VBox card = createWhiteCard();
 
-        XYChart.Series<String, Number>
-                progressSeries =
-                new XYChart.Series<>();
+                card.setSpacing(15);
 
+                HBox heading = createHeading(
+                                "Weekly Milestones ✨",
+                                FontAwesomeIcon.STAR,
+                                PINK);
 
-        progressSeries.setName(
-                "Development Progress"
-        );
+                HBox content = new HBox();
 
+                content.setSpacing(20);
 
-        for (
-                int i = 1;
-                i <= currentWeek;
-                i++
-        ) {
+                content.setAlignment(
+                                Pos.CENTER_LEFT);
 
+                milestoneImageBox = createWeekImage(
+                                currentWeek,
+                                210,
+                                145);
 
-            double progress =
-                    (i / 40.0) * 100.0;
+                VBox milestoneInfo = new VBox();
 
+                milestoneInfo.setSpacing(10);
 
-            progressSeries
-                    .getData()
-                    .add(
-                            new XYChart.Data<>(
-                                    "Week " + i,
-                                    progress
-                            )
-                    );
+                milestoneWeekLabel = new Label(
+                                "Week " + currentWeek +
+                                                " Development");
+
+                milestoneWeekLabel.setStyle(
+                                "-fx-font-size: 20px;" +
+                                                "-fx-font-weight: bold;" +
+                                                "-fx-text-fill: #24234F;");
+
+                PregnancyWeekModel data = weekData.get(currentWeek);
+
+                milestoneLabel = new Label(
+                                data != null
+                                                ? data.getMilestone()
+                                                : "Loading...");
+
+                milestoneLabel.setWrapText(true);
+
+                milestoneLabel.setStyle(
+                                "-fx-font-size: 15px;" +
+                                                "-fx-text-fill: #55556D;" +
+                                                "-fx-line-spacing: 5px;");
+
+                milestoneDevelopmentLabel = new Label(
+                                data != null
+                                                ? "👶 " + data.getBabyDevelopment()
+                                                : "👶 Loading...");
+
+                milestoneDevelopmentLabel.setWrapText(true);
+
+                milestoneDevelopmentLabel.setStyle(
+                                "-fx-font-size: 14px;" +
+                                                "-fx-text-fill: #7041A5;" +
+                                                "-fx-line-spacing: 4px;");
+
+                HBox.setHgrow(
+                                milestoneInfo,
+                                Priority.ALWAYS);
+
+                milestoneInfo
+                                .getChildren()
+                                .addAll(
+                                                milestoneWeekLabel,
+                                                milestoneLabel,
+                                                milestoneDevelopmentLabel);
+
+                content.getChildren()
+                                .addAll(
+                                                milestoneImageBox,
+                                                milestoneInfo);
+
+                card.getChildren().addAll(
+                                heading,
+                                content);
+
+                return card;
         }
 
+        // =========================================================
+        // TIPS
+        // =========================================================
 
-        babyDevelopmentChart
-                .getData()
-                .add(
-                        progressSeries
-                );
+        private VBox createTipsCard() {
 
+                VBox card = new VBox();
 
-        Platform.runLater(() -> {
+                card.setSpacing(14);
 
-            Node line =
-                    progressSeries.getNode();
+                card.setPadding(
+                                new Insets(18));
 
-            if (line != null) {
+                card.setStyle(
+                                "-fx-background-color: #F8F1FF;" +
+                                                "-fx-background-radius: 18;" +
+                                                "-fx-border-color: #E4D4F3;" +
+                                                "-fx-border-radius: 18;");
 
-                line.setStyle(
-                        "-fx-stroke: #F3A6C2;" +
-                        "-fx-stroke-width: 3px;"
-                );
-            }
+                HBox heading = createHeading(
+                                "Pregnancy Care Tips",
+                                FontAwesomeIcon.LIGHTBULB_ALT,
+                                PURPLE);
 
+                HBox tips = new HBox();
 
-            for (
-                    XYChart.Data<String, Number> data :
-                    progressSeries.getData()
-            ) {
+                tips.setSpacing(20);
 
-                Node symbol =
-                        data.getNode();
+                tips.getChildren().addAll(
 
-                if (symbol != null) {
+                                createTip(
+                                                "💧",
+                                                "Stay Hydrated",
+                                                "Drink water regularly throughout the day."),
 
-                    symbol.setStyle(
-                            "-fx-background-color: #F3A6C2, white;" +
-                            "-fx-background-insets: 0, 2;" +
-                            "-fx-background-radius: 7px;" +
-                            "-fx-padding: 5px;"
-                    );
-                }
-            }
-        });
-    }
+                                createTip(
+                                                "🥗",
+                                                "Balanced Nutrition",
+                                                "Choose a variety of nutritious foods."),
 
+                                createTip(
+                                                "😴",
+                                                "Rest Well",
+                                                "Give your body enough time to rest."),
 
-    // =========================================================
-    // MOTHER DETAILS
-    // =========================================================
+                                createTip(
+                                                "📅",
+                                                "Regular Checkups",
+                                                "Follow your healthcare provider's appointments."));
 
-    private void updateMotherDetails() {
+                card.getChildren().addAll(
+                                heading,
+                                tips);
 
-        if (motherDetailsBox == null) {
-
-            return;
+                return card;
         }
 
+        // =========================================================
+        // TIP ITEM
+        // =========================================================
 
-        PregnancyWeekModel data =
-                weekData.get(currentWeek);
+        private VBox createTip(
+                        String emoji,
+                        String title,
+                        String description) {
 
+                VBox box = new VBox();
 
-        if (data == null) {
+                box.setSpacing(5);
 
-            return;
+                box.setPrefWidth(210);
+
+                Label icon = new Label(emoji);
+
+                icon.setStyle(
+                                "-fx-font-size: 25px;");
+
+                Label titleLabel = new Label(title);
+
+                titleLabel.setStyle(
+                                "-fx-font-size: 14px;" +
+                                                "-fx-font-weight: bold;" +
+                                                "-fx-text-fill: #7041A5;");
+
+                Label descriptionLabel = new Label(description);
+
+                descriptionLabel.setWrapText(true);
+
+                descriptionLabel.setStyle(
+                                "-fx-font-size: 13px;" +
+                                                "-fx-text-fill: #77778D;" +
+                                                "-fx-line-spacing: 3px;");
+
+                box.getChildren().addAll(
+                                icon,
+                                titleLabel,
+                                descriptionLabel);
+
+                return box;
         }
 
+        // =========================================================
+        // WEEK NAVIGATION
+        // =========================================================
 
-        motherDetailsBox
-                .getChildren()
-                .clear();
+        private HBox createWeekNavigation() {
 
+                HBox navigation = new HBox();
 
-        motherDetailsBox
-                .getChildren()
-                .addAll(
+                navigation.setAlignment(
+                                Pos.CENTER);
 
-                        createInfoBox(
-                                "Body Changes",
-                                data.getMotherChanges(),
-                                PINK
-                        ),
+                navigation.setSpacing(15);
 
-                        createInfoBox(
-                                "Common Feelings",
-                                data.getSymptoms(),
-                                PURPLE
-                        ),
+                Button previous = createOutlineButton(
+                                "← Previous Week");
 
-                        createInfoBox(
-                                "Care Focus",
-                                data.getTips(),
-                                GREEN
-                        )
-                );
-    }
+                Button next = createGradientButton(
+                                "Next Week →");
 
+                previous.setOnAction(e -> {
 
-    // =========================================================
-    // BABY DETAILS
-    // =========================================================
+                        if (currentWeek > 1) {
 
-    private void updateBabyDetails() {
+                                currentWeek--;
 
-        if (babyDetailsBox == null) {
+                                if (weekCombo != null) {
 
-            return;
+                                        weekCombo.setValue(
+                                                        currentWeek);
+                                }
+
+                                updateWeekContent();
+                        }
+                });
+
+                next.setOnAction(e -> {
+
+                        if (currentWeek < 40) {
+
+                                currentWeek++;
+
+                                if (weekCombo != null) {
+
+                                        weekCombo.setValue(
+                                                        currentWeek);
+                                }
+
+                                updateWeekContent();
+                        }
+                });
+
+                navigation.getChildren().addAll(
+                                previous,
+                                next);
+
+                return navigation;
         }
 
+        // =========================================================
+        // UPDATE WEEK CONTENT
+        // =========================================================
 
-        PregnancyWeekModel data =
-                weekData.get(currentWeek);
+        private void updateWeekContent() {
 
+                if (weekTitle != null) {
 
-        if (data == null) {
-
-            return;
-        }
-
-
-        babyDetailsBox
-                .getChildren()
-                .clear();
-
-
-        babyDetailsBox
-                .getChildren()
-                .addAll(
-
-                        createInfoBox(
-                                "Development",
-                                data.getBabyDevelopment(),
-                                PURPLE
-                        ),
-
-                        createInfoBox(
-                                "Baby Size",
-                                data.getBabySize(),
-                                PINK
-                        ),
-
-                        createInfoBox(
-                                "This Week's Milestone",
-                                data.getMilestone(),
-                                GREEN
-                        )
-                );
-    }
-
-
-    // =========================================================
-    // INFO BOX
-    // =========================================================
-
-    private VBox createInfoBox(
-            String title,
-            String description,
-            String color) {
-
-
-        VBox box =
-                new VBox();
-
-
-        box.setSpacing(5);
-
-
-        box.setPadding(
-                new Insets(12)
-        );
-
-
-        box.setStyle(
-                "-fx-background-color: #FAF8FC;" +
-                "-fx-background-radius: 12;" +
-                "-fx-border-color: #EDE4F0;" +
-                "-fx-border-radius: 12;"
-        );
-
-
-        Label titleLabel =
-                new Label(title);
-
-
-        titleLabel.setStyle(
-                "-fx-font-size: 15px;" +
-                "-fx-font-weight: bold;" +
-                "-fx-text-fill: " + color + ";"
-        );
-
-
-        Label descriptionLabel =
-                new Label(
-                        description != null
-                                ? description
-                                : ""
-                );
-
-
-        descriptionLabel.setWrapText(true);
-
-
-        descriptionLabel.setStyle(
-                "-fx-font-size: 14px;" +
-                "-fx-text-fill: #55556D;" +
-                "-fx-line-spacing: 4px;"
-        );
-
-
-        box.getChildren().addAll(
-                titleLabel,
-                descriptionLabel
-        );
-
-
-        return box;
-    }
-
-
-    // =========================================================
-    // WEEKLY MILESTONES
-    // =========================================================
-
-    private VBox createMilestoneCard() {
-
-        VBox card =
-                createWhiteCard();
-
-
-        card.setSpacing(15);
-
-
-        HBox heading =
-                createHeading(
-                        "Weekly Milestones ✨",
-                        FontAwesomeIcon.STAR,
-                        PINK
-                );
-
-
-        HBox content =
-                new HBox();
-
-
-        content.setSpacing(20);
-
-
-        content.setAlignment(
-                Pos.CENTER_LEFT
-        );
-
-
-        milestoneImageBox =
-                createWeekImage(
-                        currentWeek,
-                        210,
-                        145
-                );
-
-
-        VBox milestoneInfo =
-                new VBox();
-
-
-        milestoneInfo.setSpacing(10);
-
-
-        milestoneWeekLabel =
-                new Label(
-                        "Week " + currentWeek +
-                        " Development"
-                );
-
-
-        milestoneWeekLabel.setStyle(
-                "-fx-font-size: 20px;" +
-                "-fx-font-weight: bold;" +
-                "-fx-text-fill: #24234F;"
-        );
-
-
-        PregnancyWeekModel data =
-                weekData.get(currentWeek);
-
-
-        milestoneLabel =
-                new Label(
-                        data != null
-                                ? data.getMilestone()
-                                : "Loading..."
-                );
-
-
-        milestoneLabel.setWrapText(true);
-
-
-        milestoneLabel.setStyle(
-                "-fx-font-size: 15px;" +
-                "-fx-text-fill: #55556D;" +
-                "-fx-line-spacing: 5px;"
-        );
-
-
-        milestoneDevelopmentLabel =
-                new Label(
-                        data != null
-                                ? "👶 " + data.getBabyDevelopment()
-                                : "👶 Loading..."
-                );
-
-
-        milestoneDevelopmentLabel.setWrapText(true);
-
-
-        milestoneDevelopmentLabel.setStyle(
-                "-fx-font-size: 14px;" +
-                "-fx-text-fill: #7041A5;" +
-                "-fx-line-spacing: 4px;"
-        );
-
-
-        HBox.setHgrow(
-                milestoneInfo,
-                Priority.ALWAYS
-        );
-
-
-        milestoneInfo
-                .getChildren()
-                .addAll(
-                        milestoneWeekLabel,
-                        milestoneLabel,
-                        milestoneDevelopmentLabel
-                );
-
-
-        content.getChildren()
-                .addAll(
-                        milestoneImageBox,
-                        milestoneInfo
-                );
-
-
-        card.getChildren().addAll(
-                heading,
-                content
-        );
-
-
-        return card;
-    }
-
-
-    // =========================================================
-    // TIPS
-    // =========================================================
-
-    private VBox createTipsCard() {
-
-        VBox card =
-                new VBox();
-
-
-        card.setSpacing(14);
-
-
-        card.setPadding(
-                new Insets(18)
-        );
-
-
-        card.setStyle(
-                "-fx-background-color: #F8F1FF;" +
-                "-fx-background-radius: 18;" +
-                "-fx-border-color: #E4D4F3;" +
-                "-fx-border-radius: 18;"
-        );
-
-
-        HBox heading =
-                createHeading(
-                        "Pregnancy Care Tips",
-                        FontAwesomeIcon.LIGHTBULB_ALT,
-                        PURPLE
-                );
-
-
-        HBox tips =
-                new HBox();
-
-
-        tips.setSpacing(20);
-
-
-        tips.getChildren().addAll(
-
-                createTip(
-                        "💧",
-                        "Stay Hydrated",
-                        "Drink water regularly throughout the day."
-                ),
-
-                createTip(
-                        "🥗",
-                        "Balanced Nutrition",
-                        "Choose a variety of nutritious foods."
-                ),
-
-                createTip(
-                        "😴",
-                        "Rest Well",
-                        "Give your body enough time to rest."
-                ),
-
-                createTip(
-                        "📅",
-                        "Regular Checkups",
-                        "Follow your healthcare provider's appointments."
-                )
-        );
-
-
-        card.getChildren().addAll(
-                heading,
-                tips
-        );
-
-
-        return card;
-    }
-
-
-    // =========================================================
-    // TIP ITEM
-    // =========================================================
-
-    private VBox createTip(
-            String emoji,
-            String title,
-            String description) {
-
-
-        VBox box =
-                new VBox();
-
-
-        box.setSpacing(5);
-
-
-        box.setPrefWidth(210);
-
-
-        Label icon =
-                new Label(emoji);
-
-
-        icon.setStyle(
-                "-fx-font-size: 25px;"
-        );
-
-
-        Label titleLabel =
-                new Label(title);
-
-
-        titleLabel.setStyle(
-                "-fx-font-size: 14px;" +
-                "-fx-font-weight: bold;" +
-                "-fx-text-fill: #7041A5;"
-        );
-
-
-        Label descriptionLabel =
-                new Label(description);
-
-
-        descriptionLabel.setWrapText(true);
-
-
-        descriptionLabel.setStyle(
-                "-fx-font-size: 13px;" +
-                "-fx-text-fill: #77778D;" +
-                "-fx-line-spacing: 3px;"
-        );
-
-
-        box.getChildren().addAll(
-                icon,
-                titleLabel,
-                descriptionLabel
-        );
-
-
-        return box;
-    }
-
-
-    // =========================================================
-    // WEEK NAVIGATION
-    // =========================================================
-
-    private HBox createWeekNavigation() {
-
-        HBox navigation =
-                new HBox();
-
-
-        navigation.setAlignment(
-                Pos.CENTER
-        );
-
-
-        navigation.setSpacing(15);
-
-
-        Button previous =
-                createOutlineButton(
-                        "← Previous Week"
-                );
-
-
-        Button next =
-                createGradientButton(
-                        "Next Week →"
-                );
-
-
-        previous.setOnAction(e -> {
-
-            if (currentWeek > 1) {
-
-                currentWeek--;
-
-
-                if (weekCombo != null) {
-
-                    weekCombo.setValue(
-                            currentWeek
-                    );
+                        weekTitle.setText(
+                                        "Week " + currentWeek);
                 }
 
+                if (weekSubtitle != null) {
 
-                updateWeekContent();
-            }
-        });
-
-
-        next.setOnAction(e -> {
-
-            if (currentWeek < 40) {
-
-                currentWeek++;
-
-
-                if (weekCombo != null) {
-
-                    weekCombo.setValue(
-                            currentWeek
-                    );
+                        weekSubtitle.setText(
+                                        getWeekSubtitle(currentWeek));
                 }
 
+                if (progressWeekLabel != null) {
 
-                updateWeekContent();
-            }
-        });
+                        progressWeekLabel.setText(
+                                        currentWeek + " / 40");
+                }
 
+                if (journeySubtitleLabel != null) {
 
-        navigation.getChildren().addAll(
-                previous,
-                next
-        );
+                        journeySubtitleLabel.setText(
+                                        getTrimesterName(currentWeek) +
+                                                        " • Week " + currentWeek + " of 40");
+                }
 
+                if (trimesterLabel != null) {
 
-        return navigation;
-    }
+                        trimesterLabel.setText(
+                                        getTrimesterName(currentWeek));
+                }
 
+                if (trimesterDescriptionLabel != null) {
 
-    // =========================================================
-    // UPDATE WEEK CONTENT
-    // =========================================================
+                        trimesterDescriptionLabel.setText(
+                                        getTrimesterDescription(currentWeek));
+                }
 
-    private void updateWeekContent() {
+                if (pregnancyProgressBar != null) {
 
+                        pregnancyProgressBar.setProgress(
+                                        currentWeek / 40.0);
+                }
 
-        if (weekTitle != null) {
+                if (motherWeekHint != null) {
 
-            weekTitle.setText(
-                    "Week " + currentWeek
-            );
+                        motherWeekHint.setText(
+                                        "How your body may change during Week " +
+                                                        currentWeek);
+                }
+
+                if (babyWeekHint != null) {
+
+                        babyWeekHint.setText(
+                                        "Your baby's growth during Week " +
+                                                        currentWeek);
+                }
+
+                PregnancyWeekModel currentData = weekData.get(currentWeek);
+
+                if (currentData != null) {
+
+                        if (milestoneWeekLabel != null) {
+
+                                milestoneWeekLabel.setText(
+                                                "Week " +
+                                                                currentWeek +
+                                                                " Development");
+                        }
+
+                        if (milestoneLabel != null) {
+
+                                milestoneLabel.setText(
+                                                currentData.getMilestone());
+                        }
+
+                        if (milestoneDevelopmentLabel != null) {
+
+                                milestoneDevelopmentLabel.setText(
+                                                "👶 " +
+                                                                currentData.getBabyDevelopment());
+                        }
+                }
+
+                if (journeyImageBox != null) {
+
+                        updateImageBox(
+                                        journeyImageBox,
+                                        getTrimesterImage(currentWeek),
+                                        "🤰");
+                }
+
+                if (motherImageBox != null) {
+
+                        updateImageBox(
+                                        motherImageBox,
+                                        getTrimesterImage(currentWeek),
+                                        "🤰");
+                }
+
+                if (babyImageBox != null) {
+
+                        updateImageBox(
+                                        babyImageBox,
+                                        getWeekImagePath(currentWeek),
+                                        "👶");
+                }
+
+                if (milestoneImageBox != null) {
+
+                        updateImageBox(
+                                        milestoneImageBox,
+                                        getWeekImagePath(currentWeek),
+                                        "👶");
+                }
+
+                updateBabyDevelopmentChart();
+
+                updateMotherDetails();
+
+                updateBabyDetails();
         }
 
+        // =========================================================
+        // TRIMESTER IMAGE
+        // =========================================================
 
-        if (weekSubtitle != null) {
+        private StackPane createTrimesterImage(
+                        int week,
+                        double width,
+                        double height) {
 
-            weekSubtitle.setText(
-                    getWeekSubtitle(currentWeek)
-            );
+                StackPane box = new StackPane();
+
+                box.setPrefSize(
+                                width,
+                                height);
+
+                box.setMinSize(
+                                width,
+                                height);
+
+                box.setMaxSize(
+                                width,
+                                height);
+
+                box.setAlignment(
+                                Pos.CENTER);
+
+                box.setStyle(
+                                "-fx-background-color: #FFF7FA;" +
+                                                "-fx-background-radius: 15;" +
+                                                "-fx-border-color: #F0D8E3;" +
+                                                "-fx-border-radius: 15;");
+
+                updateImageBox(
+                                box,
+                                getTrimesterImage(week),
+                                "🤰");
+
+                return box;
         }
 
+        // =========================================================
+        // WEEK IMAGE
+        // =========================================================
 
-        if (progressWeekLabel != null) {
+        private StackPane createWeekImage(
+                        int week,
+                        double width,
+                        double height) {
 
-            progressWeekLabel.setText(
-                    currentWeek + " / 40"
-            );
+                StackPane box = new StackPane();
+
+                box.setPrefSize(
+                                width,
+                                height);
+
+                box.setMinSize(
+                                width,
+                                height);
+
+                box.setMaxSize(
+                                width,
+                                height);
+
+                box.setAlignment(
+                                Pos.CENTER);
+
+                box.setStyle(
+                                "-fx-background-color: #FFF7FA;" +
+                                                "-fx-background-radius: 15;" +
+                                                "-fx-border-color: #E9D9ED;" +
+                                                "-fx-border-radius: 15;");
+
+                updateImageBox(
+                                box,
+                                getWeekImagePath(week),
+                                "👶");
+
+                return box;
         }
 
+        // =========================================================
+        // UPDATE IMAGE BOX
+        // =========================================================
 
-        if (journeySubtitleLabel != null) {
+        private void updateImageBox(
+                        StackPane box,
+                        String imagePath,
+                        String emoji) {
 
-            journeySubtitleLabel.setText(
-                    getTrimesterName(currentWeek) +
-                    " • Week " + currentWeek + " of 40"
-            );
-        }
+                box.getChildren().clear();
 
+                if (imagePath != null) {
 
-        if (trimesterLabel != null) {
+                        var resource = getClass().getResource(
+                                        imagePath);
 
-            trimesterLabel.setText(
-                    getTrimesterName(currentWeek)
-            );
-        }
+                        if (resource != null) {
 
+                                javafx.scene.image.Image image = new javafx.scene.image.Image(
+                                                resource.toExternalForm());
 
-        if (trimesterDescriptionLabel != null) {
+                                javafx.scene.image.ImageView imageView = new javafx.scene.image.ImageView(
+                                                image);
 
-            trimesterDescriptionLabel.setText(
-                    getTrimesterDescription(currentWeek)
-            );
-        }
+                                imageView.setFitWidth(
+                                                box.getPrefWidth() - 8);
 
+                                imageView.setFitHeight(
+                                                box.getPrefHeight() - 8);
 
-        if (pregnancyProgressBar != null) {
+                                imageView.setPreserveRatio(
+                                                true);
 
-            pregnancyProgressBar.setProgress(
-                    currentWeek / 40.0
-            );
-        }
+                                imageView.setSmooth(
+                                                true);
 
+                                box.getChildren().add(
+                                                imageView);
 
-        if (motherWeekHint != null) {
+                                return;
+                        }
+                }
 
-            motherWeekHint.setText(
-                    "How your body may change during Week " +
-                    currentWeek
-            );
-        }
+                Label fallback = new Label(emoji);
 
-
-        if (babyWeekHint != null) {
-
-            babyWeekHint.setText(
-                    "Your baby's growth during Week " +
-                    currentWeek
-            );
-        }
-
-
-        PregnancyWeekModel currentData =
-                weekData.get(currentWeek);
-
-
-        if (currentData != null) {
-
-            if (milestoneWeekLabel != null) {
-
-                milestoneWeekLabel.setText(
-                        "Week " +
-                        currentWeek +
-                        " Development"
-                );
-            }
-
-
-            if (milestoneLabel != null) {
-
-                milestoneLabel.setText(
-                        currentData.getMilestone()
-                );
-            }
-
-
-            if (milestoneDevelopmentLabel != null) {
-
-                milestoneDevelopmentLabel.setText(
-                        "👶 " +
-                        currentData.getBabyDevelopment()
-                );
-            }
-        }
-
-
-        if (journeyImageBox != null) {
-
-            updateImageBox(
-                    journeyImageBox,
-                    getTrimesterImage(currentWeek),
-                    "🤰"
-            );
-        }
-
-
-        if (motherImageBox != null) {
-
-            updateImageBox(
-                    motherImageBox,
-                    getTrimesterImage(currentWeek),
-                    "🤰"
-            );
-        }
-
-
-        if (babyImageBox != null) {
-
-            updateImageBox(
-                    babyImageBox,
-                    getWeekImagePath(currentWeek),
-                    "👶"
-            );
-        }
-
-
-        if (milestoneImageBox != null) {
-
-            updateImageBox(
-                    milestoneImageBox,
-                    getWeekImagePath(currentWeek),
-                    "👶"
-            );
-        }
-
-
-        updateBabyDevelopmentChart();
-
-
-        updateMotherDetails();
-
-
-        updateBabyDetails();
-    }
-
-
-    // =========================================================
-    // TRIMESTER IMAGE
-    // =========================================================
-
-    private StackPane createTrimesterImage(
-            int week,
-            double width,
-            double height) {
-
-
-        StackPane box =
-                new StackPane();
-
-
-        box.setPrefSize(
-                width,
-                height
-        );
-
-
-        box.setMinSize(
-                width,
-                height
-        );
-
-
-        box.setMaxSize(
-                width,
-                height
-        );
-
-
-        box.setAlignment(
-                Pos.CENTER
-        );
-
-
-        box.setStyle(
-                "-fx-background-color: #FFF7FA;" +
-                "-fx-background-radius: 15;" +
-                "-fx-border-color: #F0D8E3;" +
-                "-fx-border-radius: 15;"
-        );
-
-
-        updateImageBox(
-                box,
-                getTrimesterImage(week),
-                "🤰"
-        );
-
-
-        return box;
-    }
-
-
-    // =========================================================
-    // WEEK IMAGE
-    // =========================================================
-
-    private StackPane createWeekImage(
-            int week,
-            double width,
-            double height) {
-
-
-        StackPane box =
-                new StackPane();
-
-
-        box.setPrefSize(
-                width,
-                height
-        );
-
-
-        box.setMinSize(
-                width,
-                height
-        );
-
-
-        box.setMaxSize(
-                width,
-                height
-        );
-
-
-        box.setAlignment(
-                Pos.CENTER
-        );
-
-
-        box.setStyle(
-                "-fx-background-color: #FFF7FA;" +
-                "-fx-background-radius: 15;" +
-                "-fx-border-color: #E9D9ED;" +
-                "-fx-border-radius: 15;"
-        );
-
-
-        updateImageBox(
-                box,
-                getWeekImagePath(week),
-                "👶"
-        );
-
-
-        return box;
-    }
-
-
-    // =========================================================
-    // UPDATE IMAGE BOX
-    // =========================================================
-
-    private void updateImageBox(
-            StackPane box,
-            String imagePath,
-            String emoji) {
-
-
-        box.getChildren().clear();
-
-
-        if (imagePath != null) {
-
-
-            var resource =
-                    getClass().getResource(
-                            imagePath
-                    );
-
-
-            if (resource != null) {
-
-
-                javafx.scene.image.Image image =
-                        new javafx.scene.image.Image(
-                                resource.toExternalForm()
-                        );
-
-
-                javafx.scene.image.ImageView imageView =
-                        new javafx.scene.image.ImageView(
-                                image
-                        );
-
-
-                imageView.setFitWidth(
-                        box.getPrefWidth() - 8
-                );
-
-
-                imageView.setFitHeight(
-                        box.getPrefHeight() - 8
-                );
-
-
-                imageView.setPreserveRatio(
-                        true
-                );
-
-
-                imageView.setSmooth(
-                        true
-                );
-
+                fallback.setStyle(
+                                "-fx-font-size: 55px;");
 
                 box.getChildren().add(
-                        imageView
-                );
-
-
-                return;
-            }
+                                fallback);
         }
 
+        // =========================================================
+        // TRIMESTER IMAGE PATH
+        // =========================================================
 
-        Label fallback =
-                new Label(emoji);
+        private String getTrimesterImage(
+                        int week) {
 
+                if (week <= 13) {
 
-        fallback.setStyle(
-                "-fx-font-size: 55px;"
-        );
+                        return "/assets/images/mother/first_trimester.png";
 
+                } else if (week <= 27) {
 
-        box.getChildren().add(
-                fallback
-        );
-    }
+                        return "/assets/images/mother/second_trimester.png";
 
+                } else {
 
-    // =========================================================
-    // TRIMESTER IMAGE PATH
-    // =========================================================
-
-    private String getTrimesterImage(
-            int week) {
-
-
-        if (week <= 13) {
-
-            return "/assets/images/mother/first_trimester.png";
-
-        } else if (week <= 27) {
-
-            return "/assets/images/mother/second_trimester.png";
-
-        } else {
-
-            return "/assets/images/mother/third_trimester.png";
+                        return "/assets/images/mother/third_trimester.png";
+                }
         }
-    }
 
+        // =========================================================
+        // WEEK IMAGE PATH
+        // =========================================================
 
-    // =========================================================
-    // WEEK IMAGE PATH
-    // =========================================================
+        private String getWeekImagePath(
+                        int week) {
 
-    private String getWeekImagePath(
-            int week) {
-
-
-        return "/assets/images/week" +
-                week +
-                ".png";
-    }
-
-
-    // =========================================================
-    // TRIMESTER NAME
-    // =========================================================
-
-    private String getTrimesterName(
-            int week) {
-
-
-        if (week <= 13) {
-
-            return "🌱 First Trimester";
-
-        } else if (week <= 27) {
-
-            return "🌸 Second Trimester";
-
-        } else {
-
-            return "🌷 Third Trimester";
+                return "/assets/images/week" +
+                                week +
+                                ".png";
         }
-    }
 
+        // =========================================================
+        // TRIMESTER NAME
+        // =========================================================
 
-    // =========================================================
-    // TRIMESTER DESCRIPTION
-    // =========================================================
+        private String getTrimesterName(
+                        int week) {
 
-    private String getTrimesterDescription(
-            int week) {
+                if (week <= 13) {
 
+                        return "🌱 First Trimester";
 
-        if (week <= 13) {
+                } else if (week <= 27) {
 
-            return
-                    "Early pregnancy is a period of rapid " +
-                    "development. Your baby's basic organs " +
-                    "and body structures begin forming.";
+                        return "🌸 Second Trimester";
 
-        } else if (week <= 27) {
+                } else {
 
-            return
-                    "During the second trimester, your baby " +
-                    "continues growing and becoming more " +
-                    "active. Many body systems mature further.";
-
-        } else {
-
-            return
-                    "The third trimester focuses on continued " +
-                    "growth, brain development and preparation " +
-                    "for birth.";
+                        return "🌷 Third Trimester";
+                }
         }
-    }
 
+        // =========================================================
+        // TRIMESTER DESCRIPTION
+        // =========================================================
 
-    // =========================================================
-    // WEEK SUBTITLE
-    // =========================================================
+        private String getTrimesterDescription(
+                        int week) {
 
-    private String getWeekSubtitle(
-            int week) {
+                if (week <= 13) {
 
+                        return "Early pregnancy is a period of rapid " +
+                                        "development. Your baby's basic organs " +
+                                        "and body structures begin forming.";
 
-        if (week <= 4) {
+                } else if (week <= 27) {
 
-            return "Early pregnancy development";
+                        return "During the second trimester, your baby " +
+                                        "continues growing and becoming more " +
+                                        "active. Many body systems mature further.";
 
-        } else if (week <= 8) {
+                } else {
 
-            return "Baby's early development begins";
-
-        } else if (week <= 12) {
-
-            return "First trimester milestones";
-
-        } else if (week <= 16) {
-
-            return "Baby continues to grow";
-
-        } else if (week <= 20) {
-
-            return "Your baby is becoming more active";
-
-        } else if (week <= 24) {
-
-            return "Baby's senses and movement continue developing";
-
-        } else if (week <= 28) {
-
-            return "Baby continues preparing for the third trimester";
-
-        } else if (week <= 32) {
-
-            return "Baby continues gaining strength and growth";
-
-        } else if (week <= 36) {
-
-            return "Getting closer to meeting your baby";
-
-        } else {
-
-            return "Final weeks of pregnancy";
+                        return "The third trimester focuses on continued " +
+                                        "growth, brain development and preparation " +
+                                        "for birth.";
+                }
         }
-    }
 
+        // =========================================================
+        // WEEK SUBTITLE
+        // =========================================================
 
-    // =========================================================
-    // HEADING
-    // =========================================================
+        private String getWeekSubtitle(
+                        int week) {
 
-    private HBox createHeading(
-            String text,
-            FontAwesomeIcon iconType,
-            String color) {
+                if (week <= 4) {
 
+                        return "Early pregnancy development";
 
-        HBox heading =
-                new HBox();
+                } else if (week <= 8) {
 
+                        return "Baby's early development begins";
 
-        heading.setAlignment(
-                Pos.CENTER_LEFT
-        );
+                } else if (week <= 12) {
 
+                        return "First trimester milestones";
 
-        heading.setSpacing(10);
+                } else if (week <= 16) {
 
+                        return "Baby continues to grow";
 
-        FontAwesomeIconView icon =
-                new FontAwesomeIconView(
-                        iconType
-                );
+                } else if (week <= 20) {
 
+                        return "Your baby is becoming more active";
 
-        icon.setSize("20");
+                } else if (week <= 24) {
 
+                        return "Baby's senses and movement continue developing";
 
-        icon.setFill(
-                Color.web(color)
-        );
+                } else if (week <= 28) {
 
+                        return "Baby continues preparing for the third trimester";
 
-        Label title =
-                new Label(text);
+                } else if (week <= 32) {
 
+                        return "Baby continues gaining strength and growth";
 
-        title.setStyle(
-                "-fx-font-size: 19px;" +
-                "-fx-font-weight: bold;" +
-                "-fx-text-fill: #24234F;"
-        );
+                } else if (week <= 36) {
 
+                        return "Getting closer to meeting your baby";
 
-        heading.getChildren().addAll(
-                icon,
-                title
-        );
+                } else {
 
+                        return "Final weeks of pregnancy";
+                }
+        }
 
-        return heading;
-    }
+        // =========================================================
+        // HEADING
+        // =========================================================
 
+        private HBox createHeading(
+                        String text,
+                        FontAwesomeIcon iconType,
+                        String color) {
 
-    // =========================================================
-    // ICON CIRCLE
-    // =========================================================
+                HBox heading = new HBox();
 
-    private VBox createIconCircle(
-            FontAwesomeIcon iconType,
-            String color) {
+                heading.setAlignment(
+                                Pos.CENTER_LEFT);
 
+                heading.setSpacing(10);
 
-        VBox box =
-                new VBox();
+                FontAwesomeIconView icon = new FontAwesomeIconView(
+                                iconType);
 
+                icon.setSize("20");
 
-        box.setAlignment(
-                Pos.CENTER
-        );
+                icon.setFill(
+                                Color.web(color));
 
+                Label title = new Label(text);
 
-        box.setPrefSize(
-                58,
-                58
-        );
+                title.setStyle(
+                                "-fx-font-size: 19px;" +
+                                                "-fx-font-weight: bold;" +
+                                                "-fx-text-fill: #24234F;");
 
+                heading.getChildren().addAll(
+                                icon,
+                                title);
 
-        box.setStyle(
-                "-fx-background-color: white;" +
-                "-fx-background-radius: 50%;" +
-                "-fx-border-color: #E8D6ED;" +
-                "-fx-border-radius: 50%;"
-        );
+                return heading;
+        }
 
+        // =========================================================
+        // ICON CIRCLE
+        // =========================================================
 
-        FontAwesomeIconView icon =
-                new FontAwesomeIconView(
-                        iconType
-                );
+        private VBox createIconCircle(
+                        FontAwesomeIcon iconType,
+                        String color) {
 
+                VBox box = new VBox();
 
-        icon.setSize("24");
+                box.setAlignment(
+                                Pos.CENTER);
 
+                box.setPrefSize(
+                                58,
+                                58);
 
-        icon.setFill(
-                Color.web(color)
-        );
+                box.setStyle(
+                                "-fx-background-color: white;" +
+                                                "-fx-background-radius: 50%;" +
+                                                "-fx-border-color: #E8D6ED;" +
+                                                "-fx-border-radius: 50%;");
 
+                FontAwesomeIconView icon = new FontAwesomeIconView(
+                                iconType);
 
-        box.getChildren().add(
-                icon
-        );
+                icon.setSize("24");
 
+                icon.setFill(
+                                Color.web(color));
 
-        return box;
-    }
+                box.getChildren().add(
+                                icon);
 
+                return box;
+        }
 
-    // =========================================================
-    // WHITE CARD
-    // =========================================================
+        // =========================================================
+        // WHITE CARD
+        // =========================================================
 
-    private VBox createWhiteCard() {
+        private VBox createWhiteCard() {
 
+                VBox card = new VBox();
 
-        VBox card =
-                new VBox();
+                card.setSpacing(12);
 
+                card.setPadding(
+                                new Insets(18));
 
-        card.setSpacing(12);
+                card.setStyle(
+                                "-fx-background-color: white;" +
+                                                "-fx-background-radius: 18;" +
+                                                "-fx-border-color: #E7DCE8;" +
+                                                "-fx-border-radius: 18;");
 
+                return card;
+        }
 
-        card.setPadding(
-                new Insets(18)
-        );
+        // =========================================================
+        // OUTLINE BUTTON
+        // =========================================================
 
+        private Button createOutlineButton(
+                        String text) {
 
-        card.setStyle(
-                "-fx-background-color: white;" +
-                "-fx-background-radius: 18;" +
-                "-fx-border-color: #E7DCE8;" +
-                "-fx-border-radius: 18;"
-        );
+                Button button = new Button(text);
 
+                button.setStyle(
+                                "-fx-background-color: white;" +
+                                                "-fx-text-fill: #7041A5;" +
+                                                "-fx-font-size: 13px;" +
+                                                "-fx-font-weight: bold;" +
+                                                "-fx-border-color: #DCC9EC;" +
+                                                "-fx-border-radius: 10;" +
+                                                "-fx-background-radius: 10;" +
+                                                "-fx-padding: 10px 20px;" +
+                                                "-fx-cursor: hand;");
 
-        return card;
-    }
+                return button;
+        }
 
+        // =========================================================
+        // GRADIENT BUTTON
+        // =========================================================
 
-    // =========================================================
-    // OUTLINE BUTTON
-    // =========================================================
+        private Button createGradientButton(
+                        String text) {
 
-    private Button createOutlineButton(
-            String text) {
+                Button button = new Button(text);
 
+                button.setStyle(
+                                "-fx-background-color: linear-gradient(" +
+                                                "to right, #F54B87, #9B4DCC);" +
+                                                "-fx-text-fill: white;" +
+                                                "-fx-font-size: 13px;" +
+                                                "-fx-font-weight: bold;" +
+                                                "-fx-background-radius: 20;" +
+                                                "-fx-padding: 10px 22px;" +
+                                                "-fx-cursor: hand;");
 
-        Button button =
-                new Button(text);
-
-
-        button.setStyle(
-                "-fx-background-color: white;" +
-                "-fx-text-fill: #7041A5;" +
-                "-fx-font-size: 13px;" +
-                "-fx-font-weight: bold;" +
-                "-fx-border-color: #DCC9EC;" +
-                "-fx-border-radius: 10;" +
-                "-fx-background-radius: 10;" +
-                "-fx-padding: 10px 20px;" +
-                "-fx-cursor: hand;"
-        );
-
-
-        return button;
-    }
-
-
-    // =========================================================
-    // GRADIENT BUTTON
-    // =========================================================
-
-    private Button createGradientButton(
-            String text) {
-
-
-        Button button =
-                new Button(text);
-
-
-        button.setStyle(
-                "-fx-background-color: linear-gradient(" +
-                "to right, #F54B87, #9B4DCC);" +
-                "-fx-text-fill: white;" +
-                "-fx-font-size: 13px;" +
-                "-fx-font-weight: bold;" +
-                "-fx-background-radius: 20;" +
-                "-fx-padding: 10px 22px;" +
-                "-fx-cursor: hand;"
-        );
-
-
-        return button;
-    }
+                return button;
+        }
 }

@@ -9,112 +9,183 @@ import com.sigma.config.CloudinaryConfig;
 
 public class ImageUploadController {
 
-        // =========================================================
+        // ============================================================
         // UPLOAD FILE TO CLOUDINARY
-        // =========================================================
+        // ============================================================
 
         public String imageUpload(File file) {
 
-                // -----------------------------------------------------
+                // ========================================================
                 // CHECK FILE
-                // -----------------------------------------------------
+                // ========================================================
 
                 if (file == null) {
 
                         System.out.println(
-                                        "[CLOUDINARY] File is null.");
-
-                        return null;
-                }
-
-                if (!file.exists() || !file.isFile()) {
-
-                        System.out.println(
-                                        "[CLOUDINARY] File does not exist: "
-                                                        + file.getAbsolutePath());
+                                        "[CLOUDINARY] File is null");
 
                         return null;
                 }
 
                 try {
 
-                        // -------------------------------------------------
+                        // ====================================================
                         // GET CLOUDINARY INSTANCE
-                        // -------------------------------------------------
+                        // ====================================================
 
                         Cloudinary cloudinary = CloudinaryConfig.getCloudinary();
 
-                        if (cloudinary == null) {
+                        // ====================================================
+                        // GET FILE NAME
+                        // ====================================================
 
-                                System.out.println(
-                                                "[CLOUDINARY ERROR] Cloudinary configuration is null.");
+                        String fileName = file.getName().toLowerCase();
 
-                                return null;
+                        String resourceType;
+
+                        // ====================================================
+                        // PDF
+                        // ====================================================
+                        // IMPORTANT:
+                        // PDF is uploaded as IMAGE resource type.
+                        // This avoids the RAW PDF delivery issue.
+                        // ====================================================
+
+                        if (fileName.endsWith(".pdf")) {
+
+                                resourceType = "image";
                         }
 
-                        // -------------------------------------------------
+                        // ====================================================
+                        // PNG / JPG / JPEG
+                        // ====================================================
+
+                        else if (fileName.endsWith(".png")
+                                        || fileName.endsWith(".jpg")
+                                        || fileName.endsWith(".jpeg")) {
+
+                                resourceType = "image";
+                        }
+
+                        // ====================================================
+                        // OTHER FILE TYPES
+                        // ====================================================
+
+                        else {
+
+                                resourceType = "auto";
+                        }
+
+                        // ====================================================
+                        // PRINT UPLOAD INFORMATION
+                        // ====================================================
+
+                        System.out.println(
+                                        "==========================================");
+
+                        System.out.println(
+                                        "[CLOUDINARY] Uploading file: "
+                                                        + file.getName());
+
+                        System.out.println(
+                                        "[CLOUDINARY] File path: "
+                                                        + file.getAbsolutePath());
+
+                        System.out.println(
+                                        "[CLOUDINARY] Resource type: "
+                                                        + resourceType);
+
+                        // ====================================================
                         // UPLOAD FILE
-                        // -------------------------------------------------
+                        // ====================================================
 
                         Map<String, Object> result = cloudinary.uploader().upload(
                                         file,
                                         ObjectUtils.asMap(
                                                         "resource_type",
-                                                        "auto"));
+                                                        resourceType));
+
+                        // ====================================================
+                        // PRINT UPLOAD RESULT
+                        // ====================================================
 
                         System.out.println(
-                                        "[CLOUDINARY] Upload result:");
+                                        "[CLOUDINARY] Upload Result:");
 
                         System.out.println(result);
 
-                        // -------------------------------------------------
+                        // ====================================================
                         // GET SECURE URL
-                        // -------------------------------------------------
+                        // ====================================================
 
                         Object secureUrlObject = result.get("secure_url");
 
                         if (secureUrlObject == null) {
 
                                 System.out.println(
-                                                "[CLOUDINARY ERROR] secure_url is null.");
+                                                "[CLOUDINARY] secure_url is null");
 
                                 return null;
                         }
 
-                        String url = String.valueOf(
+                        // ====================================================
+                        // CONVERT URL TO STRING
+                        // ====================================================
+
+                        String secureUrl = String.valueOf(
                                         secureUrlObject).trim();
 
-                        // -------------------------------------------------
-                        // VALIDATE URL
-                        // -------------------------------------------------
+                        // ====================================================
+                        // PRINT SECURE URL
+                        // ====================================================
 
-                        if (url.isEmpty()
-                                        || url.equalsIgnoreCase("null")) {
+                        System.out.println(
+                                        "[CLOUDINARY] Secure URL:");
+
+                        System.out.println(
+                                        secureUrl);
+
+                        // ====================================================
+                        // CHECK GENERATED URL TYPE
+                        // ====================================================
+
+                        if (secureUrl.contains("/image/upload/")) {
 
                                 System.out.println(
-                                                "[CLOUDINARY ERROR] Uploaded URL is empty.");
+                                                "[CLOUDINARY] Image delivery URL generated.");
 
-                                return null;
+                        } else if (secureUrl.contains("/raw/upload/")) {
+
+                                System.out.println(
+                                                "[CLOUDINARY] WARNING: Raw delivery URL generated.");
+
+                        } else {
+
+                                System.out.println(
+                                                "[CLOUDINARY] Delivery URL type could not be determined.");
                         }
 
-                        // -------------------------------------------------
-                        // SUCCESS
-                        // -------------------------------------------------
-
                         System.out.println(
-                                        "[CLOUDINARY] File uploaded successfully.");
+                                        "==========================================");
 
-                        System.out.println(
-                                        "[CLOUDINARY] Uploaded File URL:");
+                        // ====================================================
+                        // RETURN URL
+                        // ====================================================
 
-                        System.out.println(url);
-
-                        return url;
+                        return secureUrl;
 
                 } catch (Exception e) {
 
+                        // ====================================================
+                        // UPLOAD ERROR
+                        // ====================================================
+
                         System.out.println(
-                                        "[CLOUDINARY ERROR] Upload failed.");
+                                        "[CLOUDINARY] Upload failed");
+
+                        System.out.println(
+                                        "[CLOUDINARY] Error message: "
+                                                        + e.getMessage());
 
                         e.printStackTrace();
 

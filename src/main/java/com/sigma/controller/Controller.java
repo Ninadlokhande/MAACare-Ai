@@ -1,4 +1,3 @@
-
 package com.sigma.controller;
 
 import java.net.URI;
@@ -12,726 +11,702 @@ import com.sigma.config.DoctorModule.FirebaseConfig;
 
 public class Controller {
 
-        // =============================================================
-        // FIREBASE WEB API KEY
-        // =============================================================
+    // =============================================================
+    // FIREBASE WEB API KEY
+    // =============================================================
 
-        private static final String API_KEY = "AIzaSyAhkH0AhllTx10IFjFA3VzbKvZSxIMA5bQ";
+    private static final String API_KEY =
+            "AIzaSyAhkH0AhllTx10IFjFA3VzbKvZSxIMA5bQ";
 
-        // =============================================================
-        // STATUS CODE
-        // =============================================================
+    // =============================================================
+    // STATUS CODE
+    // =============================================================
 
-        public int status_code = 0;
+    public int status_code = 0;
 
-        // =============================================================
-        // LAST ERROR
-        // =============================================================
+    // =============================================================
+    // LAST ERROR
+    // =============================================================
 
-        private String lastError = "";
+    private String lastError = "";
 
-        public String getLastError() {
-                return lastError;
+    public String getLastError() {
+        return lastError;
+    }
+
+    // =============================================================
+    // FIREBASE UID
+    // =============================================================
+
+    private String firebaseUid = "";
+
+    public String getFirebaseUid() {
+        return firebaseUid;
+    }
+
+    public void setFirebaseUid(String firebaseUid) {
+
+        this.firebaseUid =
+                firebaseUid == null
+                        ? ""
+                        : firebaseUid.trim();
+
+        if (!this.firebaseUid.isEmpty()) {
+
+            FirebaseConfig.setCurrentDoctorUid(
+                    this.firebaseUid);
+
+            System.out.println(
+                    "[CONTROLLER] Firebase UID stored: "
+                            + this.firebaseUid);
+        }
+    }
+
+    // =============================================================
+    // HTTP CLIENT
+    // =============================================================
+
+    private final HttpClient client =
+            HttpClient.newHttpClient();
+
+    // =============================================================
+    // SIGN UP
+    // =============================================================
+
+    public boolean signup(
+            String email,
+            String password) {
+
+        status_code = 0;
+        lastError = "";
+        firebaseUid = "";
+
+        // ---------------------------------------------------------
+        // VALIDATE EMAIL
+        // ---------------------------------------------------------
+
+        if (email == null ||
+                email.trim().isEmpty()) {
+
+            lastError = "Please enter email.";
+            status_code = 400;
+
+            return false;
         }
 
-        // =============================================================
-        // FIREBASE UID
-        // =============================================================
+        String cleanEmail = email.trim();
 
-        private String firebaseUid = "";
+        // ---------------------------------------------------------
+        // BASIC EMAIL VALIDATION
+        // ---------------------------------------------------------
 
-        public String getFirebaseUid() {
-                return firebaseUid;
+        if (!cleanEmail.contains("@") ||
+                !cleanEmail.contains(".")) {
+
+            lastError =
+                    "Please enter a valid email address.";
+
+            status_code = 400;
+
+            return false;
         }
 
-        public void setFirebaseUid(String firebaseUid) {
+        // ---------------------------------------------------------
+        // VALIDATE PASSWORD
+        // ---------------------------------------------------------
 
-                this.firebaseUid = firebaseUid == null
-                                ? ""
-                                : firebaseUid.trim();
+        if (password == null ||
+                password.isEmpty()) {
 
-                // -----------------------------------------------------
-                // ALSO STORE UID IN FIREBASE CONFIG
-                // -----------------------------------------------------
+            lastError =
+                    "Please enter password.";
 
-                if (this.firebaseUid != null
-                                && !this.firebaseUid.isEmpty()) {
+            status_code = 400;
 
-                        FirebaseConfig.setCurrentDoctorUid(
-                                        this.firebaseUid);
-
-                        System.out.println(
-                                        "[CONTROLLER] Firebase UID stored in FirebaseConfig: "
-                                                        + this.firebaseUid);
-                }
+            return false;
         }
 
-        // =============================================================
-        // HTTP CLIENT
-        // =============================================================
+        if (password.length() < 6) {
 
-        private final HttpClient client = HttpClient.newHttpClient();
+            lastError =
+                    "Password must contain at least 6 characters.";
 
-        // =============================================================
-        // SIGN UP
-        // =============================================================
+            status_code = 400;
 
-        public boolean signup(
-                        String email,
-                        String password) {
-
-                status_code = 0;
-                lastError = "";
-
-                // -----------------------------------------------------
-                // VALIDATION
-                // -----------------------------------------------------
-
-                if (email == null ||
-                                email.trim().isEmpty()) {
-
-                        lastError = "Please enter email.";
-                        status_code = 400;
-
-                        System.out.println(
-                                        "[FIREBASE SIGNUP] "
-                                                        + lastError);
-
-                        return false;
-                }
-
-                if (password == null ||
-                                password.isEmpty()) {
-
-                        lastError = "Please enter password.";
-                        status_code = 400;
-
-                        System.out.println(
-                                        "[FIREBASE SIGNUP] "
-                                                        + lastError);
-
-                        return false;
-                }
-
-                if (password.length() < 6) {
-
-                        lastError = "Password must contain at least 6 characters.";
-
-                        status_code = 400;
-
-                        System.out.println(
-                                        "[FIREBASE SIGNUP] "
-                                                        + lastError);
-
-                        return false;
-                }
-
-                // -----------------------------------------------------
-                // PAYLOAD
-                // -----------------------------------------------------
-
-                JSONObject payload = new JSONObject();
-
-                payload.put(
-                                "email",
-                                email.trim());
-
-                payload.put(
-                                "password",
-                                password);
-
-                payload.put(
-                                "returnSecureToken",
-                                true);
-
-                // -----------------------------------------------------
-                // FIREBASE SIGNUP URL
-                // -----------------------------------------------------
-
-                String url = "https://identitytoolkit.googleapis.com/v1/"
-                                + "accounts:signUp?key="
-                                + API_KEY;
-
-                try {
-
-                        URI uri = URI.create(url);
-
-                        HttpRequest request = HttpRequest.newBuilder()
-                                        .uri(uri)
-                                        .header(
-                                                        "Content-Type",
-                                                        "application/json")
-                                        .POST(
-                                                        HttpRequest.BodyPublishers
-                                                                        .ofString(
-                                                                                        payload.toString()))
-                                        .build();
-
-                        System.out.println(
-                                        "========================================");
-
-                        System.out.println(
-                                        "[FIREBASE SIGNUP] Sending request");
-
-                        System.out.println(
-                                        "[FIREBASE SIGNUP] Email: "
-                                                        + email.trim());
-
-                        HttpResponse<String> response = client.send(
-                                        request,
-                                        HttpResponse.BodyHandlers
-                                                        .ofString());
-
-                        status_code = response.statusCode();
-
-                        System.out.println(
-                                        "[FIREBASE SIGNUP] Status: "
-                                                        + status_code);
-
-                        System.out.println(
-                                        "[FIREBASE SIGNUP] Response: "
-                                                        + response.body());
-
-                        // -------------------------------------------------
-                        // SUCCESS
-                        // -------------------------------------------------
-
-                        if (status_code == 200) {
-
-                                JSONObject result = new JSONObject(
-                                                response.body());
-
-                                String localId = result.optString(
-                                                "localId",
-                                                "");
-
-                                System.out.println(
-                                                "[FIREBASE SIGNUP] "
-                                                                + "Account created successfully.");
-
-                                System.out.println(
-                                                "[FIREBASE SIGNUP] Firebase UID: "
-                                                                + localId);
-
-                                lastError = "";
-
-                                return true;
-                        }
-
-                        // -------------------------------------------------
-                        // ERROR
-                        // -------------------------------------------------
-
-                        handleFirebaseError(
-                                        response.body(),
-                                        "SIGNUP");
-
-                        return false;
-
-                } catch (Exception e) {
-
-                        status_code = 500;
-
-                        lastError = "Unable to connect to Firebase.";
-
-                        System.out.println(
-                                        "[FIREBASE SIGNUP] "
-                                                        + "Connection error.");
-
-                        e.printStackTrace();
-
-                        return false;
-                }
+            return false;
         }
 
-        // =============================================================
-        // SIGN IN
-        // =============================================================
+        // ---------------------------------------------------------
+        // PAYLOAD
+        // ---------------------------------------------------------
 
-        public boolean signin(
-                        String email,
-                        String password) {
+        JSONObject payload =
+                new JSONObject();
 
-                status_code = 0;
-                lastError = "";
+        payload.put(
+                "email",
+                cleanEmail);
 
-                // -----------------------------------------------------
-                // CLEAR PREVIOUS LOGIN UID
-                // -----------------------------------------------------
+        payload.put(
+                "password",
+                password);
 
-                firebaseUid = "";
+        payload.put(
+                "returnSecureToken",
+                true);
 
-                FirebaseConfig.clearCurrentDoctorUid();
+        // ---------------------------------------------------------
+        // FIREBASE SIGNUP URL
+        // ---------------------------------------------------------
 
-                // -----------------------------------------------------
-                // VALIDATION
-                // -----------------------------------------------------
+        String url =
+                "https://identitytoolkit.googleapis.com/v1/"
+                        + "accounts:signUp?key="
+                        + API_KEY;
 
-                if (email == null ||
-                                email.trim().isEmpty()) {
+        try {
 
-                        lastError = "Please enter email.";
+            HttpRequest request =
+                    HttpRequest.newBuilder()
+                            .uri(URI.create(url))
+                            .header(
+                                    "Content-Type",
+                                    "application/json")
+                            .POST(
+                                    HttpRequest.BodyPublishers
+                                            .ofString(
+                                                    payload.toString()))
+                            .build();
 
-                        status_code = 400;
+            System.out.println(
+                    "========================================");
 
-                        System.out.println(
-                                        "[FIREBASE LOGIN] "
-                                                        + lastError);
+            System.out.println(
+                    "[FIREBASE SIGNUP] Sending request");
 
-                        return false;
+            System.out.println(
+                    "[FIREBASE SIGNUP] Email: "
+                            + cleanEmail);
+
+            HttpResponse<String> response =
+                    client.send(
+                            request,
+                            HttpResponse.BodyHandlers
+                                    .ofString());
+
+            status_code =
+                    response.statusCode();
+
+            System.out.println(
+                    "[FIREBASE SIGNUP] Status: "
+                            + status_code);
+
+            System.out.println(
+                    "[FIREBASE SIGNUP] Response: "
+                            + response.body());
+
+            // -----------------------------------------------------
+            // SUCCESS
+            // -----------------------------------------------------
+
+            if (status_code == 200) {
+
+                JSONObject result =
+                        new JSONObject(
+                                response.body());
+
+                String localId =
+                        result.optString(
+                                "localId",
+                                "");
+
+                // -------------------------------------------------
+                // CHECK UID
+                // -------------------------------------------------
+
+                if (localId == null ||
+                        localId.trim().isEmpty()) {
+
+                    lastError =
+                            "Firebase UID was not returned.";
+
+                    status_code = 500;
+
+                    return false;
                 }
 
-                if (password == null ||
-                                password.isEmpty()) {
+                // -------------------------------------------------
+                // STORE FIREBASE UID
+                // -------------------------------------------------
 
-                        lastError = "Please enter password.";
-
-                        status_code = 400;
-
-                        System.out.println(
-                                        "[FIREBASE LOGIN] "
-                                                        + lastError);
-
-                        return false;
-                }
-
-                // -----------------------------------------------------
-                // PAYLOAD
-                // -----------------------------------------------------
-
-                JSONObject payload = new JSONObject();
-
-                payload.put(
-                                "email",
-                                email.trim());
-
-                payload.put(
-                                "password",
-                                password);
-
-                payload.put(
-                                "returnSecureToken",
-                                true);
-
-                // -----------------------------------------------------
-                // FIREBASE LOGIN URL
-                // -----------------------------------------------------
-
-                String url = "https://identitytoolkit.googleapis.com/v1/"
-                                + "accounts:signInWithPassword?key="
-                                + API_KEY;
-
-                try {
-
-                        URI uri = URI.create(url);
-
-                        HttpRequest request = HttpRequest.newBuilder()
-                                        .uri(uri)
-                                        .header(
-                                                        "Content-Type",
-                                                        "application/json")
-                                        .POST(
-                                                        HttpRequest.BodyPublishers
-                                                                        .ofString(
-                                                                                        payload.toString()))
-                                        .build();
-
-                        System.out.println(
-                                        "========================================");
-
-                        System.out.println(
-                                        "[FIREBASE LOGIN] Sending request");
-
-                        System.out.println(
-                                        "[FIREBASE LOGIN] Email: "
-                                                        + email.trim());
-
-                        HttpResponse<String> response = client.send(
-                                        request,
-                                        HttpResponse.BodyHandlers
-                                                        .ofString());
-
-                        status_code = response.statusCode();
-
-                        System.out.println(
-                                        "[FIREBASE LOGIN] Status: "
-                                                        + status_code);
-
-                        System.out.println(
-                                        "[FIREBASE LOGIN] Response: "
-                                                        + response.body());
-
-                        // -------------------------------------------------
-                        // SUCCESS
-                        // -------------------------------------------------
-
-                        if (status_code == 200) {
-
-                                JSONObject result = new JSONObject(
-                                                response.body());
-
-                                // -------------------------------------------------
-                                // GET FIREBASE AUTHENTICATION UID
-                                // -------------------------------------------------
-
-                                String localId = result.optString(
-                                                "localId",
-                                                "");
-
-                                // -------------------------------------------------
-                                // CHECK UID
-                                // -------------------------------------------------
-
-                                if (localId == null ||
-                                                localId.trim().isEmpty()) {
-
-                                        lastError = "Firebase UID was not returned.";
-
-                                        System.out.println(
-                                                        "[FIREBASE LOGIN] ERROR: "
-                                                                        + lastError);
-
-                                        return false;
-                                }
-
-                                // -------------------------------------------------
-                                // STORE UID
-                                // -------------------------------------------------
-
-                                setFirebaseUid(localId);
-
-                                // -------------------------------------------------
-                                // IMPORTANT:
-                                // setFirebaseUid() automatically stores
-                                // the same UID in FirebaseConfig.
-                                // -------------------------------------------------
-
-                                System.out.println(
-                                                "[FIREBASE LOGIN] Login successful.");
-
-                                System.out.println(
-                                                "[FIREBASE LOGIN] Firebase UID stored: "
-                                                                + getFirebaseUid());
-
-                                System.out.println(
-                                                "[FIREBASE LOGIN] FirebaseConfig UID: "
-                                                                + FirebaseConfig
-                                                                                .getCurrentDoctorUid());
-
-                                lastError = "";
-
-                                return true;
-                        }
-
-                        // -------------------------------------------------
-                        // ERROR
-                        // -------------------------------------------------
-
-                        handleFirebaseError(
-                                        response.body(),
-                                        "LOGIN");
-
-                        return false;
-
-                } catch (Exception e) {
-
-                        status_code = 500;
-
-                        lastError = "Unable to connect to Firebase.";
-
-                        System.out.println(
-                                        "[FIREBASE LOGIN] "
-                                                        + "Connection error.");
-
-                        e.printStackTrace();
-
-                        return false;
-                }
-        }
-
-        // =============================================================
-        // SIGN OUT / CLEAR SESSION
-        // =============================================================
-
-        public void logout() {
-
-                firebaseUid = "";
-
-                // -----------------------------------------------------
-                // CLEAR GLOBAL DOCTOR UID
-                // -----------------------------------------------------
-
-                FirebaseConfig.clearCurrentDoctorUid();
+                setFirebaseUid(localId);
 
                 System.out.println(
-                                "[FIREBASE LOGIN] Firebase UID cleared.");
+                        "[FIREBASE SIGNUP] "
+                                + "Account created successfully.");
 
                 System.out.println(
-                                "[FIREBASE LOGIN] FirebaseConfig UID cleared.");
-        }
+                        "[FIREBASE SIGNUP] Firebase UID: "
+                                + getFirebaseUid());
 
-        // =============================================================
-        // FORGOT PASSWORD / PASSWORD RESET
-        // =============================================================
-
-        public boolean resetPassword(
-                        String email) {
-
-                status_code = 0;
                 lastError = "";
 
-                // -----------------------------------------------------
-                // VALIDATION
-                // -----------------------------------------------------
+                return true;
+            }
 
-                if (email == null ||
-                                email.trim().isEmpty()) {
+            // -----------------------------------------------------
+            // ERROR
+            // -----------------------------------------------------
 
-                        lastError = "Please enter your email address.";
+            handleFirebaseError(
+                    response.body(),
+                    "SIGNUP");
 
-                        status_code = 400;
+            return false;
 
-                        System.out.println(
-                                        "[FIREBASE PASSWORD RESET] "
-                                                        + lastError);
+        } catch (Exception e) {
 
-                        return false;
-                }
+            status_code = 500;
 
-                String cleanEmail = email.trim();
+            lastError =
+                    "Unable to connect to Firebase.";
 
-                // -----------------------------------------------------
-                // BASIC EMAIL VALIDATION
-                // -----------------------------------------------------
+            System.out.println(
+                    "[FIREBASE SIGNUP] "
+                            + "Connection error.");
 
-                if (!cleanEmail.contains("@") ||
-                                !cleanEmail.contains(".")) {
+            e.printStackTrace();
 
-                        lastError = "Please enter a valid email address.";
+            return false;
+        }
+    }
 
-                        status_code = 400;
+    // =============================================================
+    // SIGN IN
+    // =============================================================
 
-                        System.out.println(
-                                        "[FIREBASE PASSWORD RESET] "
-                                                        + lastError);
+    public boolean signin(
+            String email,
+            String password) {
 
-                        return false;
-                }
+        status_code = 0;
+        lastError = "";
+        firebaseUid = "";
 
-                // -----------------------------------------------------
-                // PAYLOAD
-                // -----------------------------------------------------
+        // ---------------------------------------------------------
+        // CLEAR OLD UID
+        // ---------------------------------------------------------
 
-                JSONObject payload = new JSONObject();
+        FirebaseConfig.clearCurrentDoctorUid();
 
-                payload.put(
-                                "requestType",
-                                "PASSWORD_RESET");
+        // ---------------------------------------------------------
+        // VALIDATE EMAIL
+        // ---------------------------------------------------------
 
-                payload.put(
-                                "email",
-                                cleanEmail);
+        if (email == null ||
+                email.trim().isEmpty()) {
 
-                // -----------------------------------------------------
-                // FIREBASE PASSWORD RESET URL
-                // -----------------------------------------------------
+            lastError =
+                    "Please enter email.";
 
-                String url = "https://identitytoolkit.googleapis.com/v1/"
-                                + "accounts:sendOobCode?key="
-                                + API_KEY;
+            status_code = 400;
 
-                try {
-
-                        URI uri = URI.create(url);
-
-                        HttpRequest request = HttpRequest.newBuilder()
-                                        .uri(uri)
-                                        .header(
-                                                        "Content-Type",
-                                                        "application/json")
-                                        .POST(
-                                                        HttpRequest.BodyPublishers
-                                                                        .ofString(
-                                                                                        payload.toString()))
-                                        .build();
-
-                        System.out.println(
-                                        "========================================");
-
-                        System.out.println(
-                                        "[FIREBASE PASSWORD RESET] "
-                                                        + "Sending request");
-
-                        System.out.println(
-                                        "[FIREBASE PASSWORD RESET] Email: "
-                                                        + cleanEmail);
-
-                        HttpResponse<String> response = client.send(
-                                        request,
-                                        HttpResponse.BodyHandlers
-                                                        .ofString());
-
-                        status_code = response.statusCode();
-
-                        System.out.println(
-                                        "[FIREBASE PASSWORD RESET] Status: "
-                                                        + status_code);
-
-                        System.out.println(
-                                        "[FIREBASE PASSWORD RESET] Response: "
-                                                        + response.body());
-
-                        // -------------------------------------------------
-                        // SUCCESS
-                        // -------------------------------------------------
-
-                        if (status_code == 200) {
-
-                                lastError = "";
-
-                                System.out.println(
-                                                "[FIREBASE PASSWORD RESET] "
-                                                                + "Password reset email sent successfully.");
-
-                                return true;
-                        }
-
-                        // -------------------------------------------------
-                        // ERROR
-                        // -------------------------------------------------
-
-                        handleFirebaseError(
-                                        response.body(),
-                                        "PASSWORD_RESET");
-
-                        return false;
-
-                } catch (Exception e) {
-
-                        status_code = 500;
-
-                        lastError = "Unable to connect to Firebase.";
-
-                        System.out.println(
-                                        "[FIREBASE PASSWORD RESET] "
-                                                        + "Connection error.");
-
-                        e.printStackTrace();
-
-                        return false;
-                }
+            return false;
         }
 
-        // =============================================================
-        // FIREBASE ERROR HANDLER
-        // =============================================================
+        String cleanEmail =
+                email.trim();
 
-        private void handleFirebaseError(
-                        String responseBody,
-                        String operation) {
+        // ---------------------------------------------------------
+        // VALIDATE PASSWORD
+        // ---------------------------------------------------------
 
-                try {
+        if (password == null ||
+                password.isEmpty()) {
 
-                        JSONObject response = new JSONObject(
-                                        responseBody);
+            lastError =
+                    "Please enter password.";
 
-                        JSONObject error = response.optJSONObject(
-                                        "error");
+            status_code = 400;
 
-                        if (error == null) {
-
-                                lastError = "Unknown Firebase error.";
-
-                                return;
-                        }
-
-                        String message = error.optString(
-                                        "message",
-                                        "UNKNOWN_ERROR");
-
-                        System.out.println(
-                                        "[FIREBASE ERROR] "
-                                                        + message);
-
-                        // -------------------------------------------------
-                        // SIGNUP ERRORS
-                        // -------------------------------------------------
-
-                        if (message.equals(
-                                        "EMAIL_EXISTS")) {
-
-                                lastError = "Email already exists.";
-
-                        } else if (message.equals(
-                                        "INVALID_EMAIL")) {
-
-                                lastError = "Invalid email address.";
-
-                        } else if (message.equals(
-                                        "WEAK_PASSWORD")) {
-
-                                lastError = "Password is too weak.";
-                        }
-
-                        // -------------------------------------------------
-                        // LOGIN ERRORS
-                        // -------------------------------------------------
-
-                        else if (message.equals(
-                                        "INVALID_LOGIN_CREDENTIALS")) {
-
-                                lastError = "Invalid email or password.";
-
-                        } else if (message.equals(
-                                        "EMAIL_NOT_FOUND")) {
-
-                                lastError = "No account found with this email.";
-
-                        } else if (message.equals(
-                                        "INVALID_PASSWORD")) {
-
-                                lastError = "Incorrect password.";
-                        }
-
-                        // -------------------------------------------------
-                        // PASSWORD RESET ERRORS
-                        // -------------------------------------------------
-
-                        else if (message.equals(
-                                        "USER_NOT_FOUND")) {
-
-                                lastError = "No account found with this email.";
-
-                        } else if (message.equals(
-                                        "OPERATION_NOT_ALLOWED")) {
-
-                                lastError = "Password reset is not enabled.";
-                        }
-
-                        // -------------------------------------------------
-                        // OTHER
-                        // -------------------------------------------------
-
-                        else {
-
-                                lastError = message;
-                        }
-
-                        System.out.println(
-                                        "[FIREBASE "
-                                                        + operation
-                                                        + "] "
-                                                        + lastError);
-
-                } catch (Exception e) {
-
-                        lastError = "Invalid Firebase response.";
-
-                        System.out.println(
-                                        "[FIREBASE ERROR] "
-                                                        + "Could not parse response.");
-
-                        e.printStackTrace();
-                }
+            return false;
         }
+
+        // ---------------------------------------------------------
+        // PAYLOAD
+        // ---------------------------------------------------------
+
+        JSONObject payload =
+                new JSONObject();
+
+        payload.put(
+                "email",
+                cleanEmail);
+
+        payload.put(
+                "password",
+                password);
+
+        payload.put(
+                "returnSecureToken",
+                true);
+
+        // ---------------------------------------------------------
+        // FIREBASE LOGIN URL
+        // ---------------------------------------------------------
+
+        String url =
+                "https://identitytoolkit.googleapis.com/v1/"
+                        + "accounts:signInWithPassword?key="
+                        + API_KEY;
+
+        try {
+
+            HttpRequest request =
+                    HttpRequest.newBuilder()
+                            .uri(URI.create(url))
+                            .header(
+                                    "Content-Type",
+                                    "application/json")
+                            .POST(
+                                    HttpRequest.BodyPublishers
+                                            .ofString(
+                                                    payload.toString()))
+                            .build();
+
+            System.out.println(
+                    "========================================");
+
+            System.out.println(
+                    "[FIREBASE LOGIN] Sending request");
+
+            System.out.println(
+                    "[FIREBASE LOGIN] Email: "
+                            + cleanEmail);
+
+            HttpResponse<String> response =
+                    client.send(
+                            request,
+                            HttpResponse.BodyHandlers
+                                    .ofString());
+
+            status_code =
+                    response.statusCode();
+
+            System.out.println(
+                    "[FIREBASE LOGIN] Status: "
+                            + status_code);
+
+            System.out.println(
+                    "[FIREBASE LOGIN] Response: "
+                            + response.body());
+
+            // -----------------------------------------------------
+            // SUCCESS
+            // -----------------------------------------------------
+
+            if (status_code == 200) {
+
+                JSONObject result =
+                        new JSONObject(
+                                response.body());
+
+                String localId =
+                        result.optString(
+                                "localId",
+                                "");
+
+                // -------------------------------------------------
+                // CHECK UID
+                // -------------------------------------------------
+
+                if (localId == null ||
+                        localId.trim().isEmpty()) {
+
+                    lastError =
+                            "Firebase UID was not returned.";
+
+                    status_code = 500;
+
+                    return false;
+                }
+
+                // -------------------------------------------------
+                // STORE UID
+                // -------------------------------------------------
+
+                setFirebaseUid(localId);
+
+                System.out.println(
+                        "[FIREBASE LOGIN] "
+                                + "Login successful.");
+
+                System.out.println(
+                        "[FIREBASE LOGIN] Firebase UID: "
+                                + getFirebaseUid());
+
+                System.out.println(
+                        "[FIREBASE LOGIN] FirebaseConfig UID: "
+                                + FirebaseConfig
+                                        .getCurrentDoctorUid());
+
+                lastError = "";
+
+                return true;
+            }
+
+            // -----------------------------------------------------
+            // ERROR
+            // -----------------------------------------------------
+
+            handleFirebaseError(
+                    response.body(),
+                    "LOGIN");
+
+            return false;
+
+        } catch (Exception e) {
+
+            status_code = 500;
+
+            lastError =
+                    "Unable to connect to Firebase.";
+
+            System.out.println(
+                    "[FIREBASE LOGIN] "
+                            + "Connection error.");
+
+            e.printStackTrace();
+
+            return false;
+        }
+    }
+
+    // =============================================================
+    // LOGOUT
+    // =============================================================
+
+    public void logout() {
+
+        firebaseUid = "";
+
+        FirebaseConfig.clearCurrentDoctorUid();
+
+        System.out.println(
+                "[FIREBASE LOGIN] UID cleared.");
+    }
+
+    // =============================================================
+    // PASSWORD RESET
+    // =============================================================
+
+    public boolean resetPassword(
+            String email) {
+
+        status_code = 0;
+        lastError = "";
+
+        if (email == null ||
+                email.trim().isEmpty()) {
+
+            lastError =
+                    "Please enter your email address.";
+
+            status_code = 400;
+
+            return false;
+        }
+
+        String cleanEmail =
+                email.trim();
+
+        if (!cleanEmail.contains("@") ||
+                !cleanEmail.contains(".")) {
+
+            lastError =
+                    "Please enter a valid email address.";
+
+            status_code = 400;
+
+            return false;
+        }
+
+        JSONObject payload =
+                new JSONObject();
+
+        payload.put(
+                "requestType",
+                "PASSWORD_RESET");
+
+        payload.put(
+                "email",
+                cleanEmail);
+
+        String url =
+                "https://identitytoolkit.googleapis.com/v1/"
+                        + "accounts:sendOobCode?key="
+                        + API_KEY;
+
+        try {
+
+            HttpRequest request =
+                    HttpRequest.newBuilder()
+                            .uri(URI.create(url))
+                            .header(
+                                    "Content-Type",
+                                    "application/json")
+                            .POST(
+                                    HttpRequest.BodyPublishers
+                                            .ofString(
+                                                    payload.toString()))
+                            .build();
+
+            HttpResponse<String> response =
+                    client.send(
+                            request,
+                            HttpResponse.BodyHandlers
+                                    .ofString());
+
+            status_code =
+                    response.statusCode();
+
+            if (status_code == 200) {
+
+                lastError = "";
+
+                return true;
+            }
+
+            handleFirebaseError(
+                    response.body(),
+                    "PASSWORD_RESET");
+
+            return false;
+
+        } catch (Exception e) {
+
+            status_code = 500;
+
+            lastError =
+                    "Unable to connect to Firebase.";
+
+            e.printStackTrace();
+
+            return false;
+        }
+    }
+
+    // =============================================================
+    // FIREBASE ERROR HANDLER
+    // =============================================================
+
+    private void handleFirebaseError(
+            String responseBody,
+            String operation) {
+
+        try {
+
+            JSONObject response =
+                    new JSONObject(
+                            responseBody);
+
+            JSONObject error =
+                    response.optJSONObject(
+                            "error");
+
+            if (error == null) {
+
+                lastError =
+                        "Unknown Firebase error.";
+
+                return;
+            }
+
+            String message =
+                    error.optString(
+                            "message",
+                            "UNKNOWN_ERROR");
+
+            System.out.println(
+                    "[FIREBASE ERROR] "
+                            + message);
+
+            switch (message) {
+
+                case "EMAIL_EXISTS":
+
+                    lastError =
+                            "Email already exists. Please login.";
+
+                    break;
+
+                case "INVALID_EMAIL":
+
+                    lastError =
+                            "Invalid email address.";
+
+                    break;
+
+                case "WEAK_PASSWORD":
+
+                    lastError =
+                            "Password must contain at least 6 characters.";
+
+                    break;
+
+                case "INVALID_LOGIN_CREDENTIALS":
+
+                    lastError =
+                            "Invalid email or password.";
+
+                    break;
+
+                case "EMAIL_NOT_FOUND":
+
+                    lastError =
+                            "No account found with this email.";
+
+                    break;
+
+                case "INVALID_PASSWORD":
+
+                    lastError =
+                            "Incorrect password.";
+
+                    break;
+
+                case "USER_NOT_FOUND":
+
+                    lastError =
+                            "No account found with this email.";
+
+                    break;
+
+                case "OPERATION_NOT_ALLOWED":
+
+                    lastError =
+                            "Email/password authentication is not enabled.";
+
+                    break;
+
+                default:
+
+                    lastError =
+                            message;
+            }
+
+            System.out.println(
+                    "[FIREBASE "
+                            + operation
+                            + "] "
+                            + lastError);
+
+        } catch (Exception e) {
+
+            lastError =
+                    "Invalid Firebase response.";
+
+            e.printStackTrace();
+        }
+    }
 }

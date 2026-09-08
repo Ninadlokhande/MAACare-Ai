@@ -21,10 +21,8 @@ public class CloudinaryDocumentUploader {
         Map<?, ?> uploadResult = cloudinary.uploader().upload(
                 file,
                 ObjectUtils.asMap(
-                        "resource_type", "auto",
-                        "folder", "maacare/lab_reports"
-                )
-        );
+                        "resource_type", "raw",
+                        "folder", "maacare/lab_reports"));
 
         Object secureUrl = uploadResult.get("secure_url");
 

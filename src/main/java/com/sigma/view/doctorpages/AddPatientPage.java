@@ -3,6 +3,7 @@ package com.sigma.view.doctorpages;
 
 import com.sigma.controller.doctorController.PatientController;
 import com.sigma.model.DoctorModel.Patient;
+import com.sigma.view.scenesettings;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -13,6 +14,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -20,553 +22,843 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 public class AddPatientPage {
 
-        // =========================================================
-        // SHOW PAGE
-        // =========================================================
+    // =========================================================
+    // MOTHER DASHBOARD THEME COLORS
+    // =========================================================
 
-        public static void show() {
+    private static final String PINK = "#E84A87";
+    private static final String DARK_PINK = "#D93678";
 
-                BorderPane root = new BorderPane();
+    private static final String PURPLE = "#9B4DCC";
 
-                // Apply common theme
-                DoctorTheme.applyBackground(root);
+    private static final String LIGHT_PINK = "#FFEAF3";
+    private static final String LIGHT_PURPLE = "#F3ECFF";
 
-                root.setPadding(
-                                new Insets(28, 35, 28, 35));
+    private static final String TEXT = "#24234F";
+    private static final String SECONDARY_TEXT = "#666680";
 
-                // =====================================================
-                // HEADER
-                // =====================================================
+    private static final String BORDER = "#E7DCE8";
 
-                HBox header = new HBox();
+    private static final String PAGE_BACKGROUND = "#FFF8FC";
 
-                header.setAlignment(
-                                Pos.CENTER_LEFT);
+    private static final String BACKGROUND_GRADIENT =
+            "linear-gradient(to bottom right, "
+            + "#FFFFFF 0%, "
+            + "#FFF6FA 55%, "
+            + "#F3ECFF 100%)";
 
-                VBox heading = DoctorTheme.pageHeader(
-                                "Add Patient",
-                                "Enter patient information to add a new patient.");
+    // =========================================================
+    // SHOW PAGE
+    // =========================================================
 
-                Region spacer = new Region();
+    public static void show() {
 
-                HBox.setHgrow(
-                                spacer,
-                                Priority.ALWAYS);
+        BorderPane root = new BorderPane();
 
-                header.getChildren().addAll(
-                                heading,
-                                spacer);
+        root.setStyle(
+                "-fx-background-color: " + BACKGROUND_GRADIENT + ";"
+        );
 
-                // =====================================================
-                // FORM CARD
-                // =====================================================
+        root.setPadding(
+                new Insets(28, 35, 28, 35)
+        );
 
-                VBox form = DoctorTheme.card();
+        // =====================================================
+        // HEADER
+        // =====================================================
 
-                form.setMaxWidth(850);
+        HBox header = new HBox();
 
-                form.setPadding(
-                                new Insets(28));
+        header.setAlignment(
+                Pos.CENTER_LEFT
+        );
 
-                form.setSpacing(18);
+        VBox heading = DoctorTheme.pageHeader(
+                "Add Patient",
+                "Enter patient information to add a new patient."
+        );
 
-                // =====================================================
-                // PERSONAL INFORMATION
-                // =====================================================
+        Region spacer = new Region();
 
-                Label personalTitle = new Label(
-                                "Personal Information");
+        HBox.setHgrow(
+                spacer,
+                Priority.ALWAYS
+        );
 
-                personalTitle.setStyle(
-                                "-fx-font-size: 18px;" +
-                                                "-fx-font-weight: bold;" +
-                                                "-fx-text-fill: " + DoctorTheme.TEXT + ";");
+        header.getChildren().addAll(
+                heading,
+                spacer
+        );
 
-                // =====================================================
-                // PATIENT FIELDS
-                // =====================================================
+        // =====================================================
+        // FORM CARD
+        // =====================================================
 
-                TextField name = createTextField(
-                                "Full Name");
+        VBox form = DoctorTheme.card();
 
-                TextField age = createTextField(
-                                "Age");
+        form.setStyle(
+                "-fx-background-color: #FFFFFF;"
+                + "-fx-background-radius: 18px;"
+                + "-fx-border-color: " + BORDER + ";"
+                + "-fx-border-width: 1px;"
+                + "-fx-border-radius: 18px;"
+                + "-fx-effect: dropshadow(gaussian, rgba(155,77,204,0.10), 18, 0.15, 0, 5);"
+        );
 
-                ComboBox<String> gender = new ComboBox<>();
+        form.setMaxWidth(850);
 
-                gender.getItems().addAll(
-                                "Female",
-                                "Male",
-                                "Other");
+        form.setPadding(
+                new Insets(28)
+        );
 
-                gender.setPromptText(
-                                "Select Gender");
+        form.setSpacing(18);
 
-                gender.setPrefHeight(40);
+        // =====================================================
+        // PERSONAL INFORMATION
+        // =====================================================
 
-                gender.setMaxWidth(
-                                Double.MAX_VALUE);
+        Label personalTitle = new Label(
+                "Personal Information"
+        );
 
-                TextField phone = createTextField(
-                                "Contact Number");
+        personalTitle.setStyle(
+                "-fx-font-family: Arial;"
+                + "-fx-font-size: 18px;"
+                + "-fx-font-weight: bold;"
+                + "-fx-text-fill: " + TEXT + ";"
+        );
+
+        // =====================================================
+        // PATIENT FIELDS
+        // =====================================================
+
+        TextField name = createTextField(
+                "Full Name"
+        );
+
+        TextField age = createTextField(
+                "Age"
+        );
+
+        ComboBox<String> gender = new ComboBox<>();
+
+        gender.getItems().addAll(
+                "Female",
+                "Male",
+                "Other"
+        );
+
+        gender.setPromptText(
+                "Select Gender"
+        );
+
+        gender.setPrefHeight(40);
+
+        gender.setMaxWidth(
+                Double.MAX_VALUE
+        );
+
+        gender.setStyle(
+                "-fx-background-color: #FFFFFF;"
+                + "-fx-border-color: " + BORDER + ";"
+                + "-fx-border-radius: 8px;"
+                + "-fx-background-radius: 8px;"
+                + "-fx-font-family: Arial;"
+                + "-fx-font-size: 13px;"
+                + "-fx-text-fill: " + TEXT + ";"
+        );
+
+        TextField phone = createTextField(
+                "Contact Number"
+        );
+
+        TextField address = createTextField(
+                "Address"
+        );
+
+        // =====================================================
+        // ROW 1
+        // =====================================================
+
+        HBox row1 = new HBox(20);
+
+        VBox nameBox = fieldBox(
+                "Full Name *",
+                name
+        );
+
+        VBox ageBox = fieldBox(
+                "Age *",
+                age
+        );
+
+        HBox.setHgrow(
+                nameBox,
+                Priority.ALWAYS
+        );
+
+        HBox.setHgrow(
+                ageBox,
+                Priority.ALWAYS
+        );
+
+        row1.getChildren().addAll(
+                nameBox,
+                ageBox
+        );
+
+        // =====================================================
+        // ROW 2
+        // =====================================================
+
+        HBox row2 = new HBox(20);
+
+        VBox genderBox = fieldBox(
+                "Gender *",
+                gender
+        );
+
+        VBox phoneBox = fieldBox(
+                "Contact Number *",
+                phone
+        );
+
+        HBox.setHgrow(
+                genderBox,
+                Priority.ALWAYS
+        );
+
+        HBox.setHgrow(
+                phoneBox,
+                Priority.ALWAYS
+        );
+
+        row2.getChildren().addAll(
+                genderBox,
+                phoneBox
+        );
+
+        // =====================================================
+        // ROW 3 - ADDRESS
+        // =====================================================
+
+        HBox row3 = new HBox();
+
+        VBox addressBox = fieldBox(
+                "Address",
+                address
+        );
+
+        HBox.setHgrow(
+                addressBox,
+                Priority.ALWAYS
+        );
+
+        row3.getChildren().add(
+                addressBox
+        );
+
+        // =====================================================
+        // VISIT INFORMATION
+        // =====================================================
+
+        Label visitTitle = new Label(
+                "Visit Information"
+        );
+
+        visitTitle.setStyle(
+                "-fx-font-family: Arial;"
+                + "-fx-font-size: 18px;"
+                + "-fx-font-weight: bold;"
+                + "-fx-text-fill: " + TEXT + ";"
+        );
+
+        TextField lastVisit = createTextField(
+                "Last Visit"
+        );
+
+        TextField nextVisit = createTextField(
+                "Next Visit"
+        );
+
+        // =====================================================
+        // VISIT ROW
+        // =====================================================
+
+        HBox visitRow = new HBox(20);
+
+        VBox lastVisitBox = fieldBox(
+                "Last Visit",
+                lastVisit
+        );
+
+        VBox nextVisitBox = fieldBox(
+                "Next Visit",
+                nextVisit
+        );
 
-                TextField address = createTextField(
-                                "Address");
+        HBox.setHgrow(
+                lastVisitBox,
+                Priority.ALWAYS
+        );
 
-                // =====================================================
-                // ROW 1
-                // =====================================================
+        HBox.setHgrow(
+                nextVisitBox,
+                Priority.ALWAYS
+        );
 
-                HBox row1 = new HBox(20);
+        visitRow.getChildren().addAll(
+                lastVisitBox,
+                nextVisitBox
+        );
 
-                VBox nameBox = fieldBox(
-                                "Full Name *",
-                                name);
+        // =====================================================
+        // BUTTONS
+        // =====================================================
 
-                VBox ageBox = fieldBox(
-                                "Age *",
-                                age);
+        Button cancel = new Button(
+                "Cancel"
+        );
 
-                HBox.setHgrow(
-                                nameBox,
-                                Priority.ALWAYS);
+        cancel.setPrefHeight(42);
 
-                HBox.setHgrow(
-                                ageBox,
-                                Priority.ALWAYS);
+        cancel.setMinWidth(110);
 
-                row1.getChildren().addAll(
-                                nameBox,
-                                ageBox);
+        /*
+         * CANCEL BUTTON SAME AS PROFILE PAGE SAVE BUTTON
+         */
+        styleGradientButton(cancel);
 
-                // =====================================================
-                // ROW 2
-                // =====================================================
+        Button save = new Button(
+                "Save Patient"
+        );
 
-                HBox row2 = new HBox(20);
+        save.setPrefHeight(42);
 
-                VBox genderBox = fieldBox(
-                                "Gender *",
-                                gender);
+        save.setMinWidth(145);
 
-                VBox phoneBox = fieldBox(
-                                "Contact Number *",
-                                phone);
+        styleGradientButton(save);
 
-                HBox.setHgrow(
-                                genderBox,
-                                Priority.ALWAYS);
+        HBox buttons = new HBox(15);
 
-                HBox.setHgrow(
-                                phoneBox,
-                                Priority.ALWAYS);
+        buttons.setAlignment(
+                Pos.CENTER_RIGHT
+        );
 
-                row2.getChildren().addAll(
-                                genderBox,
-                                phoneBox);
+        buttons.getChildren().addAll(
+                cancel,
+                save
+        );
 
-                // =====================================================
-                // ROW 3 - ADDRESS
-                // =====================================================
+        // =====================================================
+        // CANCEL BUTTON ACTION
+        // =====================================================
 
-                HBox row3 = new HBox();
+        cancel.setOnAction(
+                e -> PatientsPage.show()
+        );
 
-                VBox addressBox = fieldBox(
-                                "Address",
-                                address);
+        // =====================================================
+        // SAVE PATIENT
+        // =====================================================
 
-                HBox.setHgrow(
-                                addressBox,
-                                Priority.ALWAYS);
+        save.setOnAction(e -> {
 
-                row3.getChildren().add(
-                                addressBox);
+            if (name.getText().trim().isEmpty()
+                    || age.getText().trim().isEmpty()
+                    || gender.getValue() == null
+                    || phone.getText().trim().isEmpty()) {
 
-                // =====================================================
-                // VISIT INFORMATION
-                // =====================================================
+                Alert alert = new Alert(
+                        Alert.AlertType.WARNING
+                );
 
-                Label visitTitle = new Label(
-                                "Visit Information");
+                alert.setTitle(
+                        "Incomplete Information"
+                );
 
-                visitTitle.setStyle(
-                                "-fx-font-size: 18px;" +
-                                                "-fx-font-weight: bold;" +
-                                                "-fx-text-fill: " + DoctorTheme.TEXT + ";");
+                alert.setHeaderText(null);
 
-                // =====================================================
-                // VISIT FIELDS
-                // =====================================================
+                alert.setContentText(
+                        "Please fill all required fields."
+                );
 
-                TextField lastVisit = createTextField(
-                                "Last Visit");
+                styleAlertButtons(alert);
 
-                TextField nextVisit = createTextField(
-                                "Next Visit");
+                alert.showAndWait();
 
-                // =====================================================
-                // VISIT ROW
-                // =====================================================
+                return;
+            }
 
-                HBox visitRow = new HBox(20);
+            // =================================================
+            // AGE VALIDATION
+            // =================================================
 
-                VBox lastVisitBox = fieldBox(
-                                "Last Visit",
-                                lastVisit);
+            try {
 
-                VBox nextVisitBox = fieldBox(
-                                "Next Visit",
-                                nextVisit);
+                int enteredAge = Integer.parseInt(
+                        age.getText().trim()
+                );
 
-                HBox.setHgrow(
-                                lastVisitBox,
-                                Priority.ALWAYS);
+                if (enteredAge < 0
+                        || enteredAge > 120) {
 
-                HBox.setHgrow(
-                                nextVisitBox,
-                                Priority.ALWAYS);
+                    Alert alert = new Alert(
+                            Alert.AlertType.WARNING
+                    );
 
-                visitRow.getChildren().addAll(
-                                lastVisitBox,
-                                nextVisitBox);
+                    alert.setTitle(
+                            "Invalid Age"
+                    );
 
-                // =====================================================
-                // BUTTONS
-                // =====================================================
+                    alert.setHeaderText(null);
 
-                Button cancel = new Button(
-                                "Cancel");
+                    alert.setContentText(
+                            "Please enter a valid age between 0 and 120."
+                    );
 
-                cancel.setPrefHeight(40);
+                    styleAlertButtons(alert);
 
-                cancel.setStyle(
-                                "-fx-background-color: transparent;" +
-                                                "-fx-text-fill: " + DoctorTheme.SECONDARY_TEXT + ";" +
-                                                "-fx-font-weight: bold;" +
-                                                "-fx-cursor: hand;");
+                    alert.showAndWait();
 
-                Button save = DoctorTheme.primaryButton(
-                                "Save Patient");
+                    return;
+                }
 
-                HBox buttons = new HBox(15);
+            } catch (NumberFormatException ex) {
 
-                buttons.setAlignment(
-                                Pos.CENTER_RIGHT);
+                Alert alert = new Alert(
+                        Alert.AlertType.WARNING
+                );
 
-                buttons.getChildren().addAll(
-                                cancel,
-                                save);
+                alert.setTitle(
+                        "Invalid Age"
+                );
 
-                // =====================================================
-                // CANCEL BUTTON
-                // =====================================================
+                alert.setHeaderText(null);
 
-                cancel.setOnAction(
-                                e -> PatientsPage.show());
+                alert.setContentText(
+                        "Age must contain numbers only."
+                );
 
-                // =====================================================
-                // SAVE PATIENT
-                // =====================================================
+                styleAlertButtons(alert);
 
-                save.setOnAction(e -> {
+                alert.showAndWait();
 
-                        // -------------------------------------------------
-                        // VALIDATION
-                        // -------------------------------------------------
+                return;
+            }
 
-                        if (name.getText().trim().isEmpty()
-                                        || age.getText().trim().isEmpty()
-                                        || gender.getValue() == null
-                                        || phone.getText().trim().isEmpty()) {
+            // =================================================
+            // GET PATIENT CONTROLLER
+            // =================================================
 
-                                Alert alert = new Alert(
-                                                Alert.AlertType.WARNING);
+            PatientController controller =
+                    DoctorDashboard.getPatientController();
 
-                                alert.setTitle(
-                                                "Incomplete Information");
+            if (controller == null) {
 
-                                alert.setHeaderText(null);
+                Alert alert = new Alert(
+                        Alert.AlertType.ERROR
+                );
 
-                                alert.setContentText(
-                                                "Please fill all required fields.");
+                alert.setTitle(
+                        "Controller Error"
+                );
 
-                                alert.showAndWait();
+                alert.setHeaderText(
+                        "Patient Controller Error"
+                );
 
-                                return;
-                        }
+                alert.setContentText(
+                        "Patient controller is not available."
+                );
 
-                        // -------------------------------------------------
-                        // AGE VALIDATION
-                        // -------------------------------------------------
+                styleAlertButtons(alert);
 
-                        try {
+                alert.showAndWait();
 
-                                int enteredAge = Integer.parseInt(
-                                                age.getText().trim());
+                return;
+            }
 
-                                if (enteredAge < 0
-                                                || enteredAge > 120) {
+            // =================================================
+            // SAVE TO FIRESTORE
+            // =================================================
 
-                                        Alert alert = new Alert(
-                                                        Alert.AlertType.WARNING);
+            try {
 
-                                        alert.setTitle(
-                                                        "Invalid Age");
+                Patient savedPatient =
+                        controller.addPatient(
+                                name.getText().trim(),
+                                age.getText().trim(),
+                                gender.getValue(),
+                                phone.getText().trim(),
+                                lastVisit.getText().trim(),
+                                nextVisit.getText().trim()
+                        );
 
-                                        alert.setHeaderText(null);
+                if (savedPatient == null) {
 
-                                        alert.setContentText(
-                                                        "Please enter a valid age between 0 and 120.");
+                    Alert alert = new Alert(
+                            Alert.AlertType.ERROR
+                    );
 
-                                        alert.showAndWait();
+                    alert.setTitle(
+                            "Save Error"
+                    );
 
-                                        return;
-                                }
+                    alert.setHeaderText(
+                            "Unable to add patient"
+                    );
 
-                        } catch (NumberFormatException ex) {
+                    alert.setContentText(
+                            "Patient could not be saved."
+                    );
 
-                                Alert alert = new Alert(
-                                                Alert.AlertType.WARNING);
+                    styleAlertButtons(alert);
 
-                                alert.setTitle(
-                                                "Invalid Age");
+                    alert.showAndWait();
 
-                                alert.setHeaderText(null);
+                    return;
+                }
 
-                                alert.setContentText(
-                                                "Age must contain numbers only.");
+                // =================================================
+                // SUCCESS
+                // =================================================
 
-                                alert.showAndWait();
+                Alert alert = new Alert(
+                        Alert.AlertType.INFORMATION
+                );
 
-                                return;
-                        }
+                alert.setTitle(
+                        "Patient Added"
+                );
 
-                        // -------------------------------------------------
-                        // GET PATIENT CONTROLLER
-                        // -------------------------------------------------
+                alert.setHeaderText(
+                        "Patient added successfully"
+                );
 
-                        PatientController controller = DoctorDashboard.getPatientController();
+                alert.setContentText(
+                        name.getText().trim()
+                                + " has been added successfully."
+                );
 
-                        if (controller == null) {
+                styleAlertButtons(alert);
 
-                                Alert alert = new Alert(
-                                                Alert.AlertType.ERROR);
+                alert.showAndWait();
 
-                                alert.setTitle(
-                                                "Controller Error");
+                PatientsPage.show();
 
-                                alert.setHeaderText(
-                                                "Patient Controller Error");
+            } catch (Exception ex) {
 
-                                alert.setContentText(
-                                                "Patient controller is not available.");
+                ex.printStackTrace();
 
-                                alert.showAndWait();
+                Alert alert = new Alert(
+                        Alert.AlertType.ERROR
+                );
 
-                                return;
-                        }
+                alert.setTitle(
+                        "Save Error"
+                );
 
-                        // -------------------------------------------------
-                        // SAVE TO FIRESTORE
-                        // -------------------------------------------------
+                alert.setHeaderText(
+                        "Unable to add patient"
+                );
 
-                        try {
+                alert.setContentText(
+                        "An error occurred while saving the patient:\n"
+                                + ex.getMessage()
+                );
 
-                                Patient savedPatient = controller.addPatient(
-                                                name.getText().trim(),
-                                                age.getText().trim(),
-                                                gender.getValue(),
-                                                phone.getText().trim(),
-                                                lastVisit.getText().trim(),
-                                                nextVisit.getText().trim());
+                styleAlertButtons(alert);
 
-                                // -------------------------------------------------
-                                // CHECK RESULT
-                                // -------------------------------------------------
+                alert.showAndWait();
+            }
+        });
 
-                                if (savedPatient == null) {
+        // =====================================================
+        // FORM CONTENT
+        // =====================================================
 
-                                        Alert alert = new Alert(
-                                                        Alert.AlertType.ERROR);
+        form.getChildren().addAll(
+                personalTitle,
+                row1,
+                row2,
+                row3,
+                visitTitle,
+                visitRow,
+                buttons
+        );
 
-                                        alert.setTitle(
-                                                        "Save Error");
+        // =====================================================
+        // CENTER
+        // =====================================================
 
-                                        alert.setHeaderText(
-                                                        "Unable to add patient");
+        StackPane center = new StackPane();
 
-                                        alert.setContentText(
-                                                        "Patient could not be saved.");
+        center.setAlignment(
+                Pos.CENTER
+        );
 
-                                        alert.showAndWait();
+        center.setPadding(
+                new Insets(10)
+        );
 
-                                        return;
-                                }
+        center.getChildren().add(
+                form
+        );
 
-                                // -------------------------------------------------
-                                // SUCCESS
-                                // -------------------------------------------------
+        // =====================================================
+        // SCROLL PANE
+        // =====================================================
 
-                                Alert alert = new Alert(
-                                                Alert.AlertType.INFORMATION);
+        ScrollPane scroll = new ScrollPane();
 
-                                alert.setTitle(
-                                                "Patient Added");
+        scroll.setContent(
+                center
+        );
 
-                                alert.setHeaderText(
-                                                "Patient added successfully");
+        scroll.setFitToWidth(true);
 
-                                alert.setContentText(
-                                                name.getText().trim()
-                                                                + " has been added successfully.");
+        scroll.setFitToHeight(true);
 
-                                alert.showAndWait();
+        scroll.setHbarPolicy(
+                ScrollPane.ScrollBarPolicy.NEVER
+        );
 
-                                // -------------------------------------------------
-                                // BACK TO PATIENT PAGE
-                                // -------------------------------------------------
+        scroll.setVbarPolicy(
+                ScrollPane.ScrollBarPolicy.AS_NEEDED
+        );
 
-                                PatientsPage.show();
+        scroll.setStyle(
+                "-fx-background-color: transparent;"
+                + "-fx-background: transparent;"
+                + "-fx-border-color: transparent;"
+        );
 
-                        } catch (Exception ex) {
+        // =====================================================
+        // ROOT
+        // =====================================================
 
-                                ex.printStackTrace();
+        root.setTop(
+                header
+        );
 
-                                Alert alert = new Alert(
-                                                Alert.AlertType.ERROR);
+        root.setLeft(
+                DoctorDashboard.createSidebar(
+                        "Patients"
+                )
+        );
 
-                                alert.setTitle(
-                                                "Save Error");
+        BorderPane.setMargin(
+                header,
+                new Insets(0, 0, 20, 0)
+        );
 
-                                alert.setHeaderText(
-                                                "Unable to add patient");
+        root.setCenter(
+                scroll
+        );
 
-                                alert.setContentText(
-                                                "An error occurred while saving the patient:\n"
-                                                                + ex.getMessage());
+        // =====================================================
+        // SCENE
+        // =====================================================
 
-                                alert.showAndWait();
-                        }
-                });
+        Scene scene = new Scene(
+                root,
+                scenesettings.rectanguler2d.getWidth(),
+                scenesettings.rectanguler2d.getHeight()
+        );
 
-                // =====================================================
-                // ADD FORM CONTENT
-                // =====================================================
+        // =====================================================
+        // COMMON DASHBOARD STAGE
+        // =====================================================
 
-                form.getChildren().addAll(
-                                personalTitle,
-                                row1,
-                                row2,
-                                row3,
-                                visitTitle,
-                                visitRow,
-                                buttons);
+        DoctorDashboard.getInstance();
 
-                // =====================================================
-                // CENTER
-                // =====================================================
+        DoctorDashboard.changeScene(
+                scene
+        );
 
-                StackPane center = new StackPane();
+        Stage dashboardStage =
+                DoctorDashboard.dashboardStage;
 
-                center.setAlignment(
-                                Pos.CENTER);
+        if (dashboardStage != null) {
 
-                center.getChildren().add(
-                                form);
+            dashboardStage.setResizable(true);
 
-                // =====================================================
-                // SCROLL PANE
-                // =====================================================
+            dashboardStage.setMaximized(true);
 
-                ScrollPane scroll = new ScrollPane();
-
-                scroll.setContent(
-                                center);
-
-                scroll.setFitToWidth(
-                                true);
-
-                scroll.setFitToHeight(
-                                true);
-
-                scroll.setHbarPolicy(
-                                ScrollPane.ScrollBarPolicy.NEVER);
-
-                scroll.setVbarPolicy(
-                                ScrollPane.ScrollBarPolicy.AS_NEEDED);
-
-                scroll.setStyle(
-                                "-fx-background-color: transparent;" +
-                                                "-fx-background: transparent;");
-
-                // =====================================================
-                // ROOT
-                // =====================================================
-
-                root.setTop(
-                                header);
-
-                root.setLeft(DoctorDashboard.createSidebar("Patients"));
-
-                BorderPane.setMargin(
-                                header,
-                                new Insets(0, 0, 20, 0));
-
-                root.setCenter(
-                                scroll);
-
-                Scene scene = new Scene(root);
-                DoctorDashboard.getInstance();
-                DoctorDashboard.changeScene(scene);
+            dashboardStage.show();
         }
+    }
 
-        // =========================================================
-        // CREATE TEXT FIELD
-        // =========================================================
+    // =========================================================
+    // CREATE TEXT FIELD
+    // =========================================================
 
-        private static TextField createTextField(String prompt) {
-                TextField field = new TextField();
+    private static TextField createTextField(
+            String prompt) {
 
-                field.setPromptText(
-                                prompt);
+        TextField field = new TextField();
 
-                field.setPrefHeight(
-                                40);
+        field.setPromptText(
+                prompt
+        );
 
-                field.setMaxWidth(
-                                Double.MAX_VALUE);
+        field.setPrefHeight(40);
 
-                return field;
-        }
+        field.setMaxWidth(
+                Double.MAX_VALUE
+        );
 
-        // =========================================================
-        // FIELD BOX
-        // =========================================================
+        field.setStyle(
+                "-fx-background-color: #FFFFFF;"
+                + "-fx-border-color: " + BORDER + ";"
+                + "-fx-border-width: 1px;"
+                + "-fx-border-radius: 8px;"
+                + "-fx-background-radius: 8px;"
+                + "-fx-font-family: Arial;"
+                + "-fx-font-size: 13px;"
+                + "-fx-text-fill: " + TEXT + ";"
+                + "-fx-prompt-text-fill: " + SECONDARY_TEXT + ";"
+                + "-fx-padding: 0 12px 0 12px;"
+        );
 
-        private static VBox fieldBox(
-                        String labelText,
-                        Node field) {
+        return field;
+    }
 
-                Label label = new Label(
-                                labelText);
+    // =========================================================
+    // FIELD BOX
+    // =========================================================
 
-                label.setStyle(
-                                "-fx-font-size: 13px;" +
-                                                "-fx-font-weight: bold;" +
-                                                "-fx-text-fill: " + DoctorTheme.TEXT + ";");
+    private static VBox fieldBox(
+            String labelText,
+            Node field) {
 
-                VBox box = new VBox(7);
+        Label label = new Label(
+                labelText
+        );
 
-                box.setMaxWidth(
-                                Double.MAX_VALUE);
+        label.setStyle(
+                "-fx-font-family: Arial;"
+                + "-fx-font-size: 13px;"
+                + "-fx-font-weight: bold;"
+                + "-fx-text-fill: " + TEXT + ";"
+        );
 
-                box.getChildren().addAll(
-                                label,
-                                field);
+        VBox box = new VBox(7);
 
-                return box;
-        }
+        box.setMaxWidth(
+                Double.MAX_VALUE
+        );
+
+        box.getChildren().addAll(
+                label,
+                field
+        );
+
+        return box;
+    }
+
+    // =========================================================
+    // GRADIENT BUTTON
+    // SAME AS PROFILE PAGE SAVE BUTTON
+    // =========================================================
+
+    private static void styleGradientButton(
+            Button button) {
+
+        button.setStyle(
+                "-fx-background-color: linear-gradient("
+                        + "to right, #F54B87, #9B4DCC);"
+                        + "-fx-text-fill: white;"
+                        + "-fx-font-family: Arial;"
+                        + "-fx-font-size: 14px;"
+                        + "-fx-font-weight: bold;"
+                        + "-fx-background-radius: 20px;"
+                        + "-fx-border-radius: 20px;"
+                        + "-fx-border-color: transparent;"
+                        + "-fx-padding: 10px 20px;"
+                        + "-fx-cursor: hand;"
+        );
+
+        button.setOnMouseEntered(e -> {
+
+            if (!button.isDisabled()) {
+
+                button.setStyle(
+                        "-fx-background-color: linear-gradient("
+                                + "to right, #9B4DCC, #F54B87);"
+                                + "-fx-text-fill: white;"
+                                + "-fx-font-family: Arial;"
+                                + "-fx-font-size: 14px;"
+                                + "-fx-font-weight: bold;"
+                                + "-fx-background-radius: 20px;"
+                                + "-fx-border-radius: 20px;"
+                                + "-fx-border-color: transparent;"
+                                + "-fx-padding: 10px 20px;"
+                                + "-fx-cursor: hand;"
+                );
+            }
+        });
+
+        button.setOnMouseExited(e -> {
+
+            if (!button.isDisabled()) {
+
+                button.setStyle(
+                        "-fx-background-color: linear-gradient("
+                                + "to right, #F54B87, #9B4DCC);"
+                                + "-fx-text-fill: white;"
+                                + "-fx-font-family: Arial;"
+                                + "-fx-font-size: 14px;"
+                                + "-fx-font-weight: bold;"
+                                + "-fx-background-radius: 20px;"
+                                + "-fx-border-radius: 20px;"
+                                + "-fx-border-color: transparent;"
+                                + "-fx-padding: 10px 20px;"
+                                + "-fx-cursor: hand;"
+                );
+            }
+        });
+    }
+
+    // =========================================================
+    // ALERT BUTTON STYLE
+    // =========================================================
+
+    private static void styleAlertButtons(
+            Alert alert) {
+
+        alert.setOnShown(e -> {
+
+            Button okButton =
+                    (Button) alert.getDialogPane()
+                            .lookupButton(
+                                    ButtonType.OK
+                            );
+
+            Button cancelButton =
+                    (Button) alert.getDialogPane()
+                            .lookupButton(
+                                    ButtonType.CANCEL
+                            );
+
+            if (okButton != null) {
+
+                styleGradientButton(
+                        okButton
+                );
+            }
+
+            if (cancelButton != null) {
+
+                styleGradientButton(
+                        cancelButton
+                );
+            }
+        });
+    }
 }
