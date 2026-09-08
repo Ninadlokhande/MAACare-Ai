@@ -1,5 +1,6 @@
 package com.sigma.controller;
 
+import com.google.cloud.firestore.ListenerRegistration;
 import com.sigma.dao.MedicalReportDAO;
 import com.sigma.model.MedicalReportMother;
 
@@ -7,88 +8,57 @@ import java.util.List;
 
 public class MedicalReportMotherController {
 
-    private final MedicalReportDAO medicalReportDAO;
-
-    // =========================================================
-    // CONSTRUCTOR
-    // =========================================================
+    private final MedicalReportDAO dao;
 
     public MedicalReportMotherController() {
 
-        medicalReportDAO =
-                new MedicalReportDAO();
+        dao = new MedicalReportDAO();
     }
-
-    // =========================================================
-    // GET ALL REPORTS
-    // =========================================================
 
     public List<MedicalReportMother> getAllReports() {
 
-        return medicalReportDAO
-                .getAllReports();
+        return dao.getAllReports();
     }
-
-    // =========================================================
-    // GET REPORTS BY MOTHER ID
-    // =========================================================
 
     public List<MedicalReportMother> getReportsByMotherId(
             String motherId) {
 
-        return medicalReportDAO
-                .getReportsByMotherId(motherId);
+        return dao.getReportsByMotherId(
+                motherId);
     }
-
-    // =========================================================
-    // GET REPORT BY ID
-    // =========================================================
 
     public MedicalReportMother getReportById(
             String reportId) {
 
-        return medicalReportDAO
-                .getReportById(reportId);
+        return dao.getReportById(
+                reportId);
     }
-
-    // =========================================================
-    // SAVE REPORT
-    // =========================================================
 
     public boolean saveReport(
             MedicalReportMother report) {
 
-        if (report == null) {
-            return false;
-        }
-
-        return medicalReportDAO
-                .saveReport(report);
+        return dao.saveReport(report);
     }
-
-    // =========================================================
-    // UPDATE REPORT
-    // =========================================================
 
     public boolean updateReport(
             MedicalReportMother report) {
 
-        if (report == null) {
-            return false;
-        }
-
-        return medicalReportDAO
-                .updateReport(report);
+        return dao.updateReport(report);
     }
-
-    // =========================================================
-    // DELETE REPORT
-    // =========================================================
 
     public boolean deleteReport(
             String reportId) {
 
-        return medicalReportDAO
-                .deleteReport(reportId);
+        return dao.deleteReport(
+                reportId);
+    }
+
+    public ListenerRegistration listenReportsByMotherId(
+            String motherId,
+            MedicalReportDAO.OnReportsChangedListener listener) {
+
+        return dao.listenReportsByMotherId(
+                motherId,
+                listener);
     }
 }

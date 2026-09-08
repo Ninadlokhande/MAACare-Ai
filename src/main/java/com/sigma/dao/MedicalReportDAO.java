@@ -1,12 +1,8 @@
 package com.sigma.dao;
 
 import com.google.api.core.ApiFuture;
-import com.google.cloud.firestore.DocumentSnapshot;
-import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.QueryDocumentSnapshot;
-import com.google.cloud.firestore.QuerySnapshot;
-import com.google.cloud.firestore.SetOptions;
-import com.google.firebase.cloud.FirestoreClient;
+import com.google.cloud.firestore.*;
+
 import com.sigma.model.MedicalReportMother;
 
 import java.util.ArrayList;
@@ -16,389 +12,391 @@ import java.util.Map;
 
 public class MedicalReportDAO {
 
-    // =====================================================
-    // FIRESTORE
-    // =====================================================
+        private final Firestore db;
 
-    private final Firestore db;
+        private static final String COLLECTION = "medicalReports";
 
-    private static final String COLLECTION =
-            "medicalReports";
+        public MedicalReportDAO() {
 
-    // =====================================================
-    // CONSTRUCTOR
-    // =====================================================
+                db = com.google.firebase.cloud.FirestoreClient
+                                .getFirestore();
 
-    public MedicalReportDAO() {
+                System.out.println(
+                                "MedicalReportDAO connected to Firebase");
+        }
 
-        db = FirestoreClient.getFirestore();
+        // =====================================================
+        // GET ALL
+        // =====================================================
 
-        System.out.println(
-                "MedicalReportDAO connected to Firebase"
-        );
-    }
+        public List<MedicalReportMother> getAllReports() {
 
-    // =====================================================
-    // GET ALL REPORTS
-    // =====================================================
+                List<MedicalReportMother> reports = new ArrayList<>();
 
-    public List<MedicalReportMother> getAllReports() {
+                try {
 
-        List<MedicalReportMother> reports =
-                new ArrayList<>();
+                        ApiFuture<QuerySnapshot> future = db.collection(COLLECTION).get();
 
-        try {
+                        QuerySnapshot snapshot = future.get();
 
-            ApiFuture<QuerySnapshot> future =
-                    db.collection(COLLECTION)
-                      .get();
+                        for (QueryDocumentSnapshot document : snapshot.getDocuments()) {
 
-            QuerySnapshot snapshot =
-                    future.get();
+                                MedicalReportMother report = documentToReport(document);
 
-            for (QueryDocumentSnapshot document :
-                    snapshot.getDocuments()) {
+                                if (report != null) {
+                                        reports.add(report);
+                                }
+                        }
 
-                MedicalReportMother report =
-                        documentToReport(document);
+                } catch (Exception e) {
 
-                if (report != null) {
-                    reports.add(report);
+                        e.printStackTrace();
                 }
-            }
 
-        } catch (Exception e) {
-
-            System.out.println(
-                    "Error fetching medical reports"
-            );
-
-            e.printStackTrace();
+                return reports;
         }
 
-        return reports;
-    }
+        // =====================================================
+        // GET BY MOTHER ID
+        // =====================================================
 
-    // =====================================================
-    // GET REPORTS BY MOTHER ID
-    // =====================================================
+        public List<MedicalReportMother> getReportsByMotherId(String motherId) {
 
-    public List<MedicalReportMother> getReportsByMotherId(
-            String motherId) {
+                List<MedicalReportMother> reports = new ArrayList<>();
 
-        List<MedicalReportMother> reports =
-                new ArrayList<>();
+                if (motherId == null ||
+                                motherId.trim().isEmpty()) {
 
-        if (motherId == null ||
-            motherId.trim().isEmpty()) {
-
-            return reports;
-        }
-
-        try {
-
-            ApiFuture<QuerySnapshot> future =
-                    db.collection(COLLECTION)
-                      .whereEqualTo(
-                              "motherId",
-                              motherId
-                      )
-                      .get();
-
-            QuerySnapshot snapshot =
-                    future.get();
-
-            for (QueryDocumentSnapshot document :
-                    snapshot.getDocuments()) {
-
-                MedicalReportMother report =
-                        documentToReport(document);
-
-                if (report != null) {
-                    reports.add(report);
+                        return reports;
                 }
-            }
 
-        } catch (Exception e) {
+                try {
 
-            System.out.println(
-                    "Error fetching reports for mother: "
-                            + motherId
-            );
+                        QuerySnapshot snapshot = db.collection(COLLECTION)
+                                        .whereEqualTo(
+                                                        "motherId",
+                                                        motherId.trim())
+                                        .get()
+                                        .get();
 
-            e.printStackTrace();
+                        for (QueryDocumentSnapshot document : snapshot.getDocuments()) {
+
+                                MedicalReportMother report = documentToReport(document);
+
+                                if (report != null) {
+                                        reports.add(report);
+                                }
+                        }
+
+                } catch (Exception e) {
+
+                        e.printStackTrace();
+                }
+
+                return reports;
         }
 
-        return reports;
-    }
+        // =====================================================
+        // REALTIME LISTENER
+        // =====================================================
 
-    // =====================================================
-    // GET REPORT BY ID
-    // =====================================================
+        public ListenerRegistration listenReportsByMotherId(
+                        String motherId,
+                        OnReportsChangedListener listener) {
 
-    public MedicalReportMother getReportById(
-            String reportId) {
+                if (motherId == null ||
+                                motherId.trim().isEmpty()) {
 
-        if (reportId == null ||
-            reportId.trim().isEmpty()) {
+                        return null;
+                }
 
-            return null;
+                return db.collection(COLLECTION)
+                                .whereEqualTo(
+                                                "motherId",
+                                                motherId.trim())
+                                .addSnapshotListener(
+                                                (snapshots, error) -> {
+
+                                                        if (error != null) {
+
+                                                                System.out.println(
+                                                                                "Medical report listener error");
+
+                                                                error.printStackTrace();
+
+                                                                return;
+                                                        }
+
+                                                        List<MedicalReportMother> reports = new ArrayList<>();
+
+                                                        if (snapshots != null) {
+
+                                                                for (DocumentSnapshot document : snapshots
+                                                                                .getDocuments()) {
+
+                                                                        MedicalReportMother report = documentToReport(
+                                                                                        document);
+
+                                                                        if (report != null) {
+                                                                                reports.add(report);
+                                                                        }
+                                                                }
+                                                        }
+
+                                                        if (listener != null) {
+
+                                                                listener.onChanged(
+                                                                                reports);
+                                                        }
+                                                });
         }
 
-        try {
+        // =====================================================
+        // LISTENER
+        // =====================================================
 
-            DocumentSnapshot document =
-                    db.collection(COLLECTION)
-                      .document(reportId)
-                      .get()
-                      .get();
+        public interface OnReportsChangedListener {
 
-            if (!document.exists()) {
-                return null;
-            }
-
-            return documentToReport(document);
-
-        } catch (Exception e) {
-
-            System.out.println(
-                    "Error fetching report: "
-                            + reportId
-            );
-
-            e.printStackTrace();
-
-            return null;
-        }
-    }
-
-    // =====================================================
-    // SAVE REPORT
-    // =====================================================
-
-    public boolean saveReport(
-            MedicalReportMother report) {
-
-        if (report == null ||
-            report.getReportId() == null ||
-            report.getReportId().trim().isEmpty()) {
-
-            return false;
+                void onChanged(
+                                List<MedicalReportMother> reports);
         }
 
-        try {
+        // =====================================================
+        // GET ONE
+        // =====================================================
 
-            Map<String, Object> data =
-                    reportToMap(report);
+        public MedicalReportMother getReportById(
+                        String reportId) {
 
-            db.collection(COLLECTION)
-              .document(report.getReportId())
-              .set(data)
-              .get();
+                if (reportId == null ||
+                                reportId.trim().isEmpty()) {
 
-            System.out.println(
-                    "Medical report saved successfully: "
-                            + report.getReportId()
-            );
+                        return null;
+                }
 
-            return true;
+                try {
 
-        } catch (Exception e) {
+                        DocumentSnapshot document = db.collection(COLLECTION)
+                                        .document(reportId)
+                                        .get()
+                                        .get();
 
-            System.out.println(
-                    "Error saving medical report"
-            );
+                        if (!document.exists()) {
+                                return null;
+                        }
 
-            e.printStackTrace();
+                        return documentToReport(
+                                        document);
 
-            return false;
-        }
-    }
+                } catch (Exception e) {
 
-    // =====================================================
-    // UPDATE REPORT
-    // =====================================================
+                        e.printStackTrace();
 
-    public boolean updateReport(
-            MedicalReportMother report) {
-
-        if (report == null ||
-            report.getReportId() == null ||
-            report.getReportId().trim().isEmpty()) {
-
-            return false;
+                        return null;
+                }
         }
 
-        try {
+        // =====================================================
+        // SAVE
+        // =====================================================
 
-            Map<String, Object> data =
-                    reportToMap(report);
+        public boolean saveReport(
+                        MedicalReportMother report) {
 
-            db.collection(COLLECTION)
-              .document(report.getReportId())
-              .set(
-                      data,
-                      SetOptions.merge()
-              )
-              .get();
+                if (report == null ||
+                                report.getReportId() == null ||
+                                report.getReportId()
+                                                .trim()
+                                                .isEmpty()) {
 
-            System.out.println(
-                    "Medical report updated successfully: "
-                            + report.getReportId()
-            );
+                        return false;
+                }
 
-            return true;
+                try {
 
-        } catch (Exception e) {
+                        Map<String, Object> data = reportToMap(report);
 
-            System.out.println(
-                    "Error updating medical report"
-            );
+                        db.collection(COLLECTION)
+                                        .document(
+                                                        report.getReportId())
+                                        .set(data)
+                                        .get();
 
-            e.printStackTrace();
+                        System.out.println(
+                                        "Medical report saved: "
+                                                        + report.getReportId());
 
-            return false;
-        }
-    }
+                        return true;
 
-    // =====================================================
-    // DELETE REPORT
-    // =====================================================
+                } catch (Exception e) {
 
-    public boolean deleteReport(
-            String reportId) {
+                        e.printStackTrace();
 
-        if (reportId == null ||
-            reportId.trim().isEmpty()) {
-
-            return false;
+                        return false;
+                }
         }
 
-        try {
+        // =====================================================
+        // UPDATE
+        // =====================================================
 
-            db.collection(COLLECTION)
-              .document(reportId)
-              .delete()
-              .get();
+        public boolean updateReport(
+                        MedicalReportMother report) {
 
-            System.out.println(
-                    "Medical report deleted successfully: "
-                            + reportId
-            );
+                if (report == null ||
+                                report.getReportId() == null ||
+                                report.getReportId()
+                                                .trim()
+                                                .isEmpty()) {
 
-            return true;
+                        return false;
+                }
 
-        } catch (Exception e) {
+                try {
 
-            System.out.println(
-                    "Error deleting medical report"
-            );
+                        Map<String, Object> data = reportToMap(report);
 
-            e.printStackTrace();
+                        db.collection(COLLECTION)
+                                        .document(
+                                                        report.getReportId())
+                                        .set(
+                                                        data,
+                                                        SetOptions.merge())
+                                        .get();
 
-            return false;
+                        return true;
+
+                } catch (Exception e) {
+
+                        e.printStackTrace();
+
+                        return false;
+                }
         }
-    }
 
-    // =====================================================
-    // MODEL → FIRESTORE MAP
-    // =====================================================
+        // =====================================================
+        // DELETE
+        // =====================================================
 
-    private Map<String, Object> reportToMap(
-            MedicalReportMother report) {
+        public boolean deleteReport(
+                        String reportId) {
 
-        Map<String, Object> data =
-                new HashMap<>();
+                if (reportId == null ||
+                                reportId.trim().isEmpty()) {
 
-        data.put(
-                "reportId",
-                report.getReportId()
-        );
+                        return false;
+                }
 
-        // data.put(
-        //         "motherId",
-        //         report.getMotherId()
-        // );
+                try {
 
-        data.put(
-                "reportName",
-                report.getReportName()
-        );
+                        db.collection(COLLECTION)
+                                        .document(reportId)
+                                        .delete()
+                                        .get();
 
-        data.put(
-                "reportDate",
-                report.getReportDate()
-        );
+                        return true;
 
-        data.put(
-                "hospitalName",
-                report.getHospitalName()
-        );
+                } catch (Exception e) {
 
-        data.put(
-                "doctorName",
-                report.getDoctorName()
-        );
+                        e.printStackTrace();
 
-        data.put(
-                "fileUrl",
-                report.getFileUrl()
-        );
-
-        return data;
-    }
-
-    // =====================================================
-    // FIRESTORE → MODEL
-    // =====================================================
-
-    private MedicalReportMother documentToReport(
-            DocumentSnapshot document) {
-
-        try {
-
-            MedicalReportMother report =
-                    new MedicalReportMother();
-
-            report.setReportId(
-                    document.getString("reportId")
-            );
-
-        //     report.setMotherId(
-        //             document.getString("motherId")
-        //     );
-
-            report.setReportName(
-                    document.getString("reportName")
-            );
-
-            report.setReportDate(
-                    document.getString("reportDate")
-            );
-
-            report.setHospitalName(
-                    document.getString("hospitalName")
-            );
-
-            report.setDoctorName(
-                    document.getString("doctorName")
-            );
-
-            report.setFileUrl(
-                    document.getString("fileUrl")
-            );
-
-            return report;
-
-        } catch (Exception e) {
-
-            System.out.println(
-                    "Error converting Firestore document"
-            );
-
-            e.printStackTrace();
-
-            return null;
+                        return false;
+                }
         }
-    }
+
+        // =====================================================
+        // MODEL → FIRESTORE
+        // =====================================================
+
+        private Map<String, Object> reportToMap(
+                        MedicalReportMother report) {
+
+                Map<String, Object> data = new HashMap<>();
+
+                data.put(
+                                "reportId",
+                                report.getReportId());
+
+                data.put(
+                                "motherId",
+                                report.getMotherId());
+
+                data.put(
+                                "reportName",
+                                report.getReportName());
+
+                data.put(
+                                "reportDate",
+                                report.getReportDate());
+
+                data.put(
+                                "hospitalName",
+                                report.getHospitalName());
+
+                data.put(
+                                "doctorName",
+                                report.getDoctorName());
+
+                data.put(
+                                "fileUrl",
+                                report.getFileUrl());
+
+                return data;
+        }
+
+        // =====================================================
+        // FIRESTORE → MODEL
+        // =====================================================
+
+        private MedicalReportMother documentToReport(
+                        DocumentSnapshot document) {
+
+                try {
+
+                        MedicalReportMother report = new MedicalReportMother();
+
+                        String reportId = document.getString(
+                                        "reportId");
+
+                        if (reportId == null ||
+                                        reportId.trim().isEmpty()) {
+
+                                reportId = document.getId();
+                        }
+
+                        report.setReportId(reportId);
+
+                        report.setMotherId(
+                                        document.getString(
+                                                        "motherId"));
+
+                        report.setReportName(
+                                        document.getString(
+                                                        "reportName"));
+
+                        report.setReportDate(
+                                        document.getString(
+                                                        "reportDate"));
+
+                        report.setHospitalName(
+                                        document.getString(
+                                                        "hospitalName"));
+
+                        report.setDoctorName(
+                                        document.getString(
+                                                        "doctorName"));
+
+                        report.setFileUrl(
+                                        document.getString(
+                                                        "fileUrl"));
+
+                        return report;
+
+                } catch (Exception e) {
+
+                        e.printStackTrace();
+
+                        return null;
+                }
+        }
 }
