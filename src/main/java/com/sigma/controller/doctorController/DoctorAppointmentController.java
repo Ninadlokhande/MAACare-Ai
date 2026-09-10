@@ -3,7 +3,7 @@ package com.sigma.controller.doctorController;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
-import com.sigma.config.DoctorModule.FirebaseConfig;
+import com.sigma.config.FirebaseConfig;
 import com.sigma.model.DoctorModel.DoctorAppointment;
 
 import javafx.collections.FXCollections;
@@ -16,922 +16,1273 @@ import java.util.Map;
 
 public class DoctorAppointmentController {
 
-        private static final String COLLECTION = "appointments";
-        private static final String DEFAULT_DOCTOR_ID = "D001";
+    // =========================================================
+    // FIREBASE
+    // =========================================================
 
-        private final ObservableList<DoctorAppointment> appointments;
-        private final Map<DoctorAppointment, String> documentIds;
-        private final Firestore firestore;
+    private static final String COLLECTION = "appointments";
 
-        // ============================================================
-        // CONSTRUCTOR
-        // ============================================================
+    /*
+     * Current Doctor ID
+     *
+     * For now Doctor account = D001
+     */
+    private static final String DEFAULT_DOCTOR_ID = "D001";
 
-        public DoctorAppointmentController() {
+    private final ObservableList<DoctorAppointment> appointments;
 
-                appointments = FXCollections.observableArrayList();
-                documentIds = new HashMap<>();
+    /*
+     * JavaFX Appointment Object -> Firestore Document ID
+     */
+    private final Map<DoctorAppointment, String> documentIds;
 
-                firestore = FirebaseConfig.getFirestore();
+    private final Firestore firestore;
 
-                loadAppointments();
-        }
+    // =========================================================
+    // CONSTRUCTOR
+    // =========================================================
 
-        // ============================================================
-        // LOAD APPOINTMENTS
-        // ============================================================
+    public DoctorAppointmentController() {
 
-        public void loadAppointments() {
+        appointments = FXCollections.observableArrayList();
 
-                try {
+        documentIds = new HashMap<>();
 
-                        if (firestore == null) {
+        firestore = FirebaseConfig.getFirestore();
 
-                                System.out.println(
-                                                "[APPOINTMENT] Firestore is not initialized.");
+        loadAppointments();
+    }
 
-                                return;
-                        }
+    // =========================================================
+    // LOAD DOCTOR APPOINTMENTS
+    // =========================================================
 
-                        appointments.clear();
-                        documentIds.clear();
+    public void loadAppointments() {
 
-                        List<QueryDocumentSnapshot> documents = firestore.collection(COLLECTION)
-                                        .get()
-                                        .get()
-                                        .getDocuments();
+        appointments.clear();
+        documentIds.clear();
 
-                        for (QueryDocumentSnapshot doc : documents) {
+        try {
 
-                                String appointmentId = getString(doc, "appointmentId");
+            List<QueryDocumentSnapshot> documents =
+                    firestore
+                            .collection(COLLECTION)
+                            .whereEqualTo(
+                                    "doctorId",
+                                    DEFAULT_DOCTOR_ID
+                            )
+                            .get()
+                            .get()
+                            .getDocuments();
 
-                                if (appointmentId.isEmpty()) {
-                                        appointmentId = doc.getId();
-                                }
+            for (QueryDocumentSnapshot doc : documents) {
 
-                                String doctorId = getString(doc, "doctorId");
+                DoctorAppointment appointment =
+                        createAppointmentFromDocument(doc);
 
-                                String patientId = getString(doc, "patientId");
+                if (appointment != null) {
 
-                                String date = getString(doc, "date");
+                    appointments.add(appointment);
 
-                                String time = getString(doc, "time");
-
-                                String patient = getString(doc, "patient");
-
-                                String type = getString(doc, "type");
-
-                                String status = getString(doc, "status");
-
-                                String payment = getString(doc, "payment");
-
-                                DoctorAppointment appointment = new DoctorAppointment(
-                                                appointmentId,
-                                                doctorId,
-                                                patientId,
-                                                date,
-                                                time,
-                                                patient,
-                                                type,
-                                                status,
-                                                payment,
-                                                "View");
-
-                                appointments.add(appointment);
-
-                                // VERY IMPORTANT
-                                // Store actual Firestore document ID
-                                documentIds.put(
-                                                appointment,
-                                                doc.getId());
-                        }
-
-                        System.out.println(
-                                        "[APPOINTMENT] Loaded "
-                                                        + appointments.size()
-                                                        + " appointments.");
-
-                } catch (Exception e) {
-
-                        System.out.println(
-                                        "[APPOINTMENT ERROR] Unable to load appointments.");
-
-                        e.printStackTrace();
+                    documentIds.put(
+                            appointment,
+                            doc.getId()
+                    );
                 }
+            }
+
+            System.out.println(
+                    "[FIREBASE] Doctor appointments loaded: "
+                            + appointments.size()
+            );
+
+        } catch (Exception e) {
+
+            System.err.println(
+                    "[FIREBASE ERROR] Error loading doctor appointments"
+            );
+
+            e.printStackTrace();
+        }
+    }
+
+    // =========================================================
+    // CREATE MODEL FROM FIRESTORE DOCUMENT
+    // =========================================================
+
+    private DoctorAppointment createAppointmentFromDocument(
+            QueryDocumentSnapshot doc) {
+
+        try {
+
+            String appointmentId =
+                    getString(doc, "appointmentId");
+
+            String doctorId =
+                    getString(doc, "doctorId");
+
+            String patientId =
+                    getString(doc, "patientId");
+
+            String date =
+                    getString(doc, "date");
+
+            String time =
+                    getString(doc, "time");
+
+            String patient =
+                    getString(doc, "patient");
+
+            String type =
+                    getString(doc, "type");
+
+            String status =
+                    getString(doc, "status");
+
+            String payment =
+                    getString(doc, "payment");
+
+            if (appointmentId == null ||
+                    appointmentId.trim().isEmpty()) {
+
+                appointmentId = doc.getId();
+            }
+
+            return new DoctorAppointment(
+                    appointmentId,
+                    doctorId,
+                    patientId,
+                    date,
+                    time,
+                    patient,
+                    type,
+                    status,
+                    payment,
+                    ""
+            );
+
+        } catch (Exception e) {
+
+            System.err.println(
+                    "[FIREBASE ERROR] Error converting appointment document"
+            );
+
+            e.printStackTrace();
+
+            return null;
+        }
+    }
+
+    // =========================================================
+    // SAFE STRING READER
+    // =========================================================
+
+    private String getString(
+            QueryDocumentSnapshot doc,
+            String field) {
+
+        try {
+
+            String value =
+                    doc.getString(field);
+
+            return value == null
+                    ? ""
+                    : value;
+
+        } catch (Exception e) {
+
+            return "";
+        }
+    }
+
+    // =========================================================
+    // ADD APPOINTMENT
+    // =========================================================
+
+    /*
+     * Mother -> Book Appointment
+     *
+     * Default status = Pending
+     */
+
+    public DoctorAppointment addAppointment(
+            String doctorId,
+            String patientId,
+            String date,
+            String time,
+            String patient,
+            String type,
+            String status,
+            String payment) {
+
+        try {
+
+            // =====================================================
+            // DEFAULT DOCTOR
+            // =====================================================
+
+            if (doctorId == null ||
+                    doctorId.trim().isEmpty()) {
+
+                doctorId =
+                        DEFAULT_DOCTOR_ID;
+            }
+
+            // =====================================================
+            // DEFAULT VALUES
+            // =====================================================
+
+            if (patientId == null) {
+                patientId = "";
+            }
+
+            if (date == null) {
+                date = "";
+            }
+
+            if (time == null) {
+                time = "";
+            }
+
+            if (patient == null ||
+                    patient.trim().isEmpty()) {
+
+                patient =
+                        "Unknown Patient";
+            }
+
+            if (type == null ||
+                    type.trim().isEmpty()) {
+
+                type =
+                        "Consultation";
+            }
+
+            if (status == null ||
+                    status.trim().isEmpty()) {
+
+                status =
+                        "Pending";
+            }
+
+            if (payment == null ||
+                    payment.trim().isEmpty()) {
+
+                payment =
+                        "Unpaid";
+            }
+
+            // =====================================================
+            // GENERATE APPOINTMENT ID
+            // =====================================================
+
+            String appointmentId =
+                    "APT-" + System.currentTimeMillis();
+
+            // =====================================================
+            // FIRESTORE DATA
+            // =====================================================
+
+            Map<String, Object> data =
+                    new HashMap<>();
+
+            data.put(
+                    "appointmentId",
+                    appointmentId
+            );
+
+            data.put(
+                    "doctorId",
+                    doctorId
+            );
+
+            data.put(
+                    "patientId",
+                    patientId
+            );
+
+            data.put(
+                    "date",
+                    date
+            );
+
+            data.put(
+                    "time",
+                    time
+            );
+
+            data.put(
+                    "patient",
+                    patient
+            );
+
+            data.put(
+                    "type",
+                    type
+            );
+
+            data.put(
+                    "status",
+                    status
+            );
+
+            data.put(
+                    "payment",
+                    payment
+            );
+
+            // =====================================================
+            // SAVE TO FIRESTORE
+            // =====================================================
+
+            DocumentReference documentReference =
+                    firestore
+                            .collection(COLLECTION)
+                            .document();
+
+            documentReference
+                    .set(data)
+                    .get();
+
+            // =====================================================
+            // CREATE LOCAL MODEL
+            // =====================================================
+
+            DoctorAppointment appointment =
+                    new DoctorAppointment(
+                            appointmentId,
+                            doctorId,
+                            patientId,
+                            date,
+                            time,
+                            patient,
+                            type,
+                            status,
+                            payment,
+                            ""
+                    );
+
+            // =====================================================
+            // ADD TO DOCTOR LIST
+            // =====================================================
+
+            if (DEFAULT_DOCTOR_ID.equals(doctorId)) {
+
+                appointments.add(
+                        0,
+                        appointment
+                );
+
+                documentIds.put(
+                        appointment,
+                        documentReference.getId()
+                );
+            }
+
+            System.out.println(
+                    "[FIREBASE] Appointment added successfully: "
+                            + appointmentId
+            );
+
+            System.out.println(
+                    "[FIREBASE] Doctor ID: "
+                            + doctorId
+            );
+
+            System.out.println(
+                    "[FIREBASE] Patient ID: "
+                            + patientId
+            );
+
+            System.out.println(
+                    "[FIREBASE] Status: "
+                            + status
+            );
+
+            return appointment;
+
+        } catch (Exception e) {
+
+            System.err.println(
+                    "[FIREBASE ERROR] Error adding appointment"
+            );
+
+            e.printStackTrace();
+
+            return null;
+        }
+    }
+
+    // =========================================================
+    // UPDATE APPOINTMENT
+    // =========================================================
+
+    public boolean updateAppointment(
+            DoctorAppointment appointment) {
+
+        if (appointment == null) {
+            return false;
         }
 
-        // ============================================================
-        // GET STRING SAFELY
-        // ============================================================
+        try {
 
-        private String getString(
-                        QueryDocumentSnapshot doc,
-                        String field) {
+            String documentId =
+                    documentIds.get(appointment);
 
-                try {
+            if (documentId == null ||
+                    documentId.trim().isEmpty()) {
 
-                        Object value = doc.getData().get(field);
+                documentId =
+                        findDocumentIdByAppointmentId(
+                                appointment.getAppointmentId()
+                        );
+            }
 
-                        return value == null
-                                        ? ""
-                                        : String.valueOf(value);
+            if (documentId == null ||
+                    documentId.trim().isEmpty()) {
 
-                } catch (Exception e) {
+                return false;
+            }
 
-                        return "";
+            Map<String, Object> updates =
+                    new HashMap<>();
+
+            updates.put(
+                    "patientId",
+                    appointment.getPatientId()
+            );
+
+            updates.put(
+                    "patient",
+                    appointment.getPatient()
+            );
+
+            updates.put(
+                    "date",
+                    appointment.getDate()
+            );
+
+            updates.put(
+                    "time",
+                    appointment.getTime()
+            );
+
+            updates.put(
+                    "type",
+                    appointment.getType()
+            );
+
+            updates.put(
+                    "status",
+                    appointment.getStatus()
+            );
+
+            updates.put(
+                    "payment",
+                    appointment.getPayment()
+            );
+
+            firestore
+                    .collection(COLLECTION)
+                    .document(documentId)
+                    .update(updates)
+                    .get();
+
+            System.out.println(
+                    "[FIREBASE] Appointment updated: "
+                            + appointment.getAppointmentId()
+            );
+
+            return true;
+
+        } catch (Exception e) {
+
+            System.err.println(
+                    "[FIREBASE ERROR] Error updating appointment"
+            );
+
+            e.printStackTrace();
+
+            return false;
+        }
+    }
+
+    // =========================================================
+    // UPDATE APPOINTMENT USING ID
+    // =========================================================
+
+    public boolean updateAppointment(
+            String appointmentId,
+            String patientId,
+            String date,
+            String time,
+            String patient,
+            String type,
+            String status,
+            String payment) {
+
+        if (appointmentId == null ||
+                appointmentId.trim().isEmpty()) {
+
+            return false;
+        }
+
+        try {
+
+            Map<String, Object> updates =
+                    new HashMap<>();
+
+            updates.put(
+                    "patientId",
+                    patientId == null ? "" : patientId
+            );
+
+            updates.put(
+                    "patient",
+                    patient == null ? "" : patient
+            );
+
+            updates.put(
+                    "date",
+                    date == null ? "" : date
+            );
+
+            updates.put(
+                    "time",
+                    time == null ? "" : time
+            );
+
+            updates.put(
+                    "type",
+                    type == null ? "" : type
+            );
+
+            updates.put(
+                    "status",
+                    status == null ? "" : status
+            );
+
+            updates.put(
+                    "payment",
+                    payment == null ? "" : payment
+            );
+
+            String documentId =
+                    findDocumentIdByAppointmentId(
+                            appointmentId
+                    );
+
+            if (documentId == null) {
+
+                System.err.println(
+                        "[FIREBASE] Appointment not found: "
+                                + appointmentId
+                );
+
+                return false;
+            }
+
+            firestore
+                    .collection(COLLECTION)
+                    .document(documentId)
+                    .update(updates)
+                    .get();
+
+            // =====================================================
+            // UPDATE LOCAL MODEL
+            // =====================================================
+
+            for (DoctorAppointment appointment :
+                    appointments) {
+
+                if (appointmentId.equals(
+                        appointment.getAppointmentId())) {
+
+                    appointment.setPatientId(
+                            patientId
+                    );
+
+                    appointment.setPatient(
+                            patient
+                    );
+
+                    appointment.setDate(
+                            date
+                    );
+
+                    appointment.setTime(
+                            time
+                    );
+
+                    appointment.setType(
+                            type
+                    );
+
+                    appointment.setStatus(
+                            status
+                    );
+
+                    appointment.setPayment(
+                            payment
+                    );
+
+                    break;
                 }
+            }
+
+            System.out.println(
+                    "[FIREBASE] Appointment updated: "
+                            + appointmentId
+            );
+
+            return true;
+
+        } catch (Exception e) {
+
+            System.err.println(
+                    "[FIREBASE ERROR] Error updating appointment"
+            );
+
+            e.printStackTrace();
+
+            return false;
+        }
+    }
+
+    // =========================================================
+    // UPDATE STATUS
+    // =========================================================
+
+    public boolean updateAppointmentStatus(
+            String appointmentId,
+            String status) {
+
+        if (appointmentId == null ||
+                appointmentId.trim().isEmpty()) {
+
+            return false;
         }
 
-        // ============================================================
-        // REFRESH
-        // ============================================================
+        if (status == null ||
+                status.trim().isEmpty()) {
 
-        public void refreshAppointments() {
-
-                loadAppointments();
+            return false;
         }
 
-        // ============================================================
-        // GET ALL APPOINTMENTS
-        // ============================================================
+        try {
 
-        public ObservableList<DoctorAppointment> getAppointments() {
+            String documentId =
+                    findDocumentIdByAppointmentId(
+                            appointmentId
+                    );
 
-                return appointments;
-        }
+            if (documentId == null) {
 
-        // ============================================================
-        // TODAY DATE
-        // ============================================================
+                System.err.println(
+                        "[FIREBASE] Appointment not found: "
+                                + appointmentId
+                );
 
-        public String getTodayDate() {
+                return false;
+            }
 
-                return LocalDate.now().toString();
-        }
+            firestore
+                    .collection(COLLECTION)
+                    .document(documentId)
+                    .update(
+                            "status",
+                            status
+                    )
+                    .get();
 
-        // ============================================================
-        // TODAY APPOINTMENT COUNT
-        // ============================================================
+            // =====================================================
+            // UPDATE LOCAL MODEL
+            // =====================================================
 
-        public int getTodayAppointmentCount() {
+            for (DoctorAppointment appointment :
+                    appointments) {
 
-                String today = LocalDate.now().toString();
+                if (appointmentId.equals(
+                        appointment.getAppointmentId())) {
 
-                int count = 0;
+                    appointment.setStatus(
+                            status
+                    );
 
-                for (DoctorAppointment appointment : appointments) {
-
-                        if (today.equals(
-                                        appointment.getDate())) {
-
-                                count++;
-                        }
+                    break;
                 }
+            }
 
-                return count;
+            System.out.println(
+                    "[FIREBASE] Appointment status updated: "
+                            + appointmentId
+                            + " -> "
+                            + status
+            );
+
+            return true;
+
+        } catch (Exception e) {
+
+            System.err.println(
+                    "[FIREBASE ERROR] Error updating appointment status"
+            );
+
+            e.printStackTrace();
+
+            return false;
+        }
+    }
+
+    // =========================================================
+    // CONFIRM APPOINTMENT
+    // =========================================================
+
+    public boolean confirmAppointment(
+            DoctorAppointment appointment) {
+
+        if (appointment == null) {
+            return false;
         }
 
-        // ============================================================
-        // TODAY APPOINTMENTS
-        // ============================================================
+        return updateAppointmentStatus(
+                appointment.getAppointmentId(),
+                "Confirmed"
+        );
+    }
 
-        public ObservableList<DoctorAppointment> getTodayAppointments() {
+    // =========================================================
+    // CANCEL / REJECT APPOINTMENT
+    // =========================================================
 
-                String today = LocalDate.now().toString();
+    public boolean cancelAppointment(
+            DoctorAppointment appointment) {
 
-                ObservableList<DoctorAppointment> todayAppointments = FXCollections.observableArrayList();
-
-                for (DoctorAppointment appointment : appointments) {
-
-                        if (today.equals(
-                                        appointment.getDate())) {
-
-                                todayAppointments.add(
-                                                appointment);
-                        }
-                }
-
-                todayAppointments.sort(
-                                (a, b) -> a.getTime()
-                                                .compareToIgnoreCase(
-                                                                b.getTime()));
-
-                return todayAppointments;
+        if (appointment == null) {
+            return false;
         }
 
-        // ============================================================
-        // TOTAL COUNT
-        // ============================================================
+        return updateAppointmentStatus(
+                appointment.getAppointmentId(),
+                "Cancelled"
+        );
+    }
 
-        public int getAppointmentCount() {
+    // =========================================================
+    // DELETE APPOINTMENT
+    // =========================================================
 
-                return appointments.size();
+    public boolean deleteAppointment(
+            DoctorAppointment appointment) {
+
+        if (appointment == null) {
+            return false;
         }
 
-        // ============================================================
-        // CONFIRMED COUNT
-        // ============================================================
+        try {
 
-        public int getConfirmedCount() {
+            String documentId =
+                    documentIds.get(appointment);
 
-                int count = 0;
+            if (documentId == null ||
+                    documentId.trim().isEmpty()) {
 
-                for (DoctorAppointment appointment : appointments) {
+                documentId =
+                        findDocumentIdByAppointmentId(
+                                appointment.getAppointmentId()
+                        );
+            }
 
-                        if ("Confirmed".equalsIgnoreCase(
-                                        appointment.getStatus())) {
+            if (documentId == null ||
+                    documentId.trim().isEmpty()) {
 
-                                count++;
-                        }
-                }
+                return false;
+            }
 
-                return count;
+            firestore
+                    .collection(COLLECTION)
+                    .document(documentId)
+                    .delete()
+                    .get();
+
+            appointments.remove(
+                    appointment
+            );
+
+            documentIds.remove(
+                    appointment
+            );
+
+            System.out.println(
+                    "[FIREBASE] Appointment deleted: "
+                            + appointment.getAppointmentId()
+            );
+
+            return true;
+
+        } catch (Exception e) {
+
+            System.err.println(
+                    "[FIREBASE ERROR] Error deleting appointment"
+            );
+
+            e.printStackTrace();
+
+            return false;
+        }
+    }
+
+    // =========================================================
+    // GET ALL APPOINTMENTS
+    // =========================================================
+
+    public ObservableList<DoctorAppointment>
+    getAppointments() {
+
+        return appointments;
+    }
+
+    // =========================================================
+    // TODAY'S APPOINTMENTS
+    // =========================================================
+
+    /*
+     * DoctorDashboard uses:
+     *
+     * appointmentController.getTodayAppointments();
+     *
+     * Firestore date format:
+     *
+     * yyyy-MM-dd
+     *
+     * Example:
+     * 2026-09-07
+     */
+
+    public ObservableList<DoctorAppointment>
+    getTodayAppointments() {
+
+        ObservableList<DoctorAppointment>
+                todayAppointments =
+                FXCollections.observableArrayList();
+
+        String today =
+                LocalDate.now().toString();
+
+        for (DoctorAppointment appointment :
+                appointments) {
+
+            if (appointment == null) {
+                continue;
+            }
+
+            String appointmentDate =
+                    appointment.getDate();
+
+            if (appointmentDate == null ||
+                    appointmentDate.trim().isEmpty()) {
+
+                continue;
+            }
+
+            if (today.equals(
+                    appointmentDate.trim())) {
+
+                todayAppointments.add(
+                        appointment
+                );
+            }
         }
 
-        // ============================================================
-        // PENDING COUNT
-        // ============================================================
+        return todayAppointments;
+    }
 
-        public int getPendingCount() {
+    // =========================================================
+    // TODAY'S APPOINTMENT COUNT
+    // =========================================================
 
-                int count = 0;
+    /*
+     * DoctorDashboard uses:
+     *
+     * appointmentController.getTodayAppointmentCount();
+     */
 
-                for (DoctorAppointment appointment : appointments) {
+    public int getTodayAppointmentCount() {
 
-                        if ("Pending".equalsIgnoreCase(
-                                        appointment.getStatus())) {
+        return getTodayAppointments().size();
+    }
 
-                                count++;
-                        }
-                }
+    // =========================================================
+    // REFRESH
+    // =========================================================
 
-                return count;
+    public void refreshAppointments() {
+
+        loadAppointments();
+    }
+
+    // =========================================================
+    // SEARCH
+    // =========================================================
+
+    public ObservableList<DoctorAppointment>
+    searchAppointments(
+            String keyword) {
+
+        ObservableList<DoctorAppointment>
+                result =
+                FXCollections.observableArrayList();
+
+        if (keyword == null ||
+                keyword.trim().isEmpty()) {
+
+            result.addAll(
+                    appointments
+            );
+
+            return result;
         }
 
-        // ============================================================
-        // TODAY CONFIRMED COUNT
-        // ============================================================
+        String search =
+                keyword
+                        .toLowerCase()
+                        .trim();
 
-        public int getTodayConfirmedCount() {
+        for (DoctorAppointment appointment :
+                appointments) {
 
-                String today = LocalDate.now().toString();
+            if (appointment == null) {
+                continue;
+            }
 
-                int count = 0;
+            String patient =
+                    safeLower(
+                            appointment.getPatient()
+                    );
 
-                for (DoctorAppointment appointment : appointments) {
+            String patientId =
+                    safeLower(
+                            appointment.getPatientId()
+                    );
 
-                        if (today.equals(
-                                        appointment.getDate())
-                                        &&
-                                        "Confirmed".equalsIgnoreCase(
-                                                        appointment.getStatus())) {
+            String appointmentId =
+                    safeLower(
+                            appointment.getAppointmentId()
+                    );
 
-                                count++;
-                        }
-                }
+            String date =
+                    safeLower(
+                            appointment.getDate()
+                    );
 
-                return count;
+            String type =
+                    safeLower(
+                            appointment.getType()
+                    );
+
+            String status =
+                    safeLower(
+                            appointment.getStatus()
+                    );
+
+            String time =
+                    safeLower(
+                            appointment.getTime()
+                    );
+
+            if (
+                    patient.contains(search)
+                            ||
+                    patientId.contains(search)
+                            ||
+                    appointmentId.contains(search)
+                            ||
+                    date.contains(search)
+                            ||
+                    time.contains(search)
+                            ||
+                    type.contains(search)
+                            ||
+                    status.contains(search)
+            ) {
+
+                result.add(
+                        appointment
+                );
+            }
         }
 
-        // ============================================================
-        // TODAY PENDING COUNT
-        // ============================================================
+        return result;
+    }
 
-        public int getTodayPendingCount() {
+    // =========================================================
+    // FILTER BY STATUS
+    // =========================================================
 
-                String today = LocalDate.now().toString();
+    public ObservableList<DoctorAppointment>
+    filterByStatus(
+            String status) {
 
-                int count = 0;
+        ObservableList<DoctorAppointment>
+                result =
+                FXCollections.observableArrayList();
 
-                for (DoctorAppointment appointment : appointments) {
+        if (status == null ||
+                status.trim().isEmpty() ||
+                status.equalsIgnoreCase("All")) {
 
-                        if (today.equals(
-                                        appointment.getDate())
-                                        &&
-                                        "Pending".equalsIgnoreCase(
-                                                        appointment.getStatus())) {
+            result.addAll(
+                    appointments
+            );
 
-                                count++;
-                        }
-                }
-
-                return count;
+            return result;
         }
 
-        // ============================================================
-        // ADD APPOINTMENT
-        // ============================================================
+        for (DoctorAppointment appointment :
+                appointments) {
 
-        public DoctorAppointment addAppointment(
-                        String doctorId,
-                        String patientId,
-                        String date,
-                        String time,
-                        String patient,
-                        String type,
-                        String status,
-                        String payment) {
+            if (appointment == null) {
+                continue;
+            }
 
-                try {
+            if (status.equalsIgnoreCase(
+                    appointment.getStatus())) {
 
-                        if (firestore == null) {
-
-                                System.out.println(
-                                                "[APPOINTMENT] Firestore unavailable.");
-
-                                return null;
-                        }
-
-                        if (doctorId == null ||
-                                        doctorId.trim().isEmpty()) {
-
-                                doctorId = DEFAULT_DOCTOR_ID;
-                        }
-
-                        if (patientId == null) {
-                                patientId = "";
-                        }
-
-                        if (date == null) {
-                                date = "";
-                        }
-
-                        if (time == null) {
-                                time = "";
-                        }
-
-                        if (patient == null) {
-                                patient = "";
-                        }
-
-                        if (type == null ||
-                                        type.trim().isEmpty()) {
-
-                                type = "Consultation";
-                        }
-
-                        if (status == null ||
-                                        status.trim().isEmpty()) {
-
-                                status = "Pending";
-                        }
-
-                        if (payment == null ||
-                                        payment.trim().isEmpty()) {
-
-                                payment = "Unpaid";
-                        }
-
-                        if (patient.trim().isEmpty()) {
-
-                                System.out.println(
-                                                "[APPOINTMENT] Patient name required.");
-
-                                return null;
-                        }
-
-                        if (date.trim().isEmpty()) {
-
-                                System.out.println(
-                                                "[APPOINTMENT] Date required.");
-
-                                return null;
-                        }
-
-                        if (time.trim().isEmpty()) {
-
-                                System.out.println(
-                                                "[APPOINTMENT] Time required.");
-
-                                return null;
-                        }
-
-                        // ----------------------------------------------------
-                        // CREATE NEW FIRESTORE DOCUMENT
-                        // ----------------------------------------------------
-
-                        DocumentReference docRef = firestore.collection(COLLECTION)
-                                        .document();
-
-                        String appointmentId = docRef.getId();
-
-                        Map<String, Object> data = new HashMap<>();
-
-                        data.put(
-                                        "appointmentId",
-                                        appointmentId);
-
-                        data.put(
-                                        "doctorId",
-                                        doctorId);
-
-                        data.put(
-                                        "patientId",
-                                        patientId);
-
-                        data.put(
-                                        "date",
-                                        date);
-
-                        data.put(
-                                        "time",
-                                        time);
-
-                        data.put(
-                                        "patient",
-                                        patient);
-
-                        data.put(
-                                        "type",
-                                        type);
-
-                        data.put(
-                                        "status",
-                                        status);
-
-                        data.put(
-                                        "payment",
-                                        payment);
-
-                        docRef.set(data).get();
-
-                        // ----------------------------------------------------
-                        // CREATE LOCAL OBJECT
-                        // ----------------------------------------------------
-
-                        DoctorAppointment appointment = new DoctorAppointment(
-                                        appointmentId,
-                                        doctorId,
-                                        patientId,
-                                        date,
-                                        time,
-                                        patient,
-                                        type,
-                                        status,
-                                        payment,
-                                        "View");
-
-                        appointments.add(
-                                        appointment);
-
-                        documentIds.put(
-                                        appointment,
-                                        appointmentId);
-
-                        System.out.println(
-                                        "[APPOINTMENT] Added successfully: "
-                                                        + appointmentId);
-
-                        return appointment;
-
-                } catch (Exception e) {
-
-                        System.out.println(
-                                        "[APPOINTMENT ERROR] Unable to add.");
-
-                        e.printStackTrace();
-
-                        return null;
-                }
+                result.add(
+                        appointment
+                );
+            }
         }
 
-        // ============================================================
-        // UPDATE APPOINTMENT
-        // ============================================================
-        // THIS METHOD FIXES THE EDIT ERROR
-        // ============================================================
-
-        public boolean updateAppointment(
-                        String appointmentId,
-                        String patientId,
-                        String date,
-                        String time,
-                        String patient,
-                        String type,
-                        String status,
-                        String payment) {
-
-                try {
-
-                        // ----------------------------------------------------
-                        // FIRESTORE CHECK
-                        // ----------------------------------------------------
-
-                        if (firestore == null) {
-
-                                System.out.println(
-                                                "[APPOINTMENT UPDATE] Firestore unavailable.");
-
-                                return false;
-                        }
-
-                        // ----------------------------------------------------
-                        // APPOINTMENT ID CHECK
-                        // ----------------------------------------------------
-
-                        if (appointmentId == null ||
-                                        appointmentId.trim().isEmpty()) {
-
-                                System.out.println(
-                                                "[APPOINTMENT UPDATE] Appointment ID missing.");
-
-                                return false;
-                        }
-
-                        // ----------------------------------------------------
-                        // VALIDATION
-                        // ----------------------------------------------------
-
-                        if (patient == null ||
-                                        patient.trim().isEmpty()) {
-
-                                System.out.println(
-                                                "[APPOINTMENT UPDATE] Patient name required.");
-
-                                return false;
-                        }
-
-                        if (date == null ||
-                                        date.trim().isEmpty()) {
-
-                                System.out.println(
-                                                "[APPOINTMENT UPDATE] Date required.");
-
-                                return false;
-                        }
-
-                        if (time == null ||
-                                        time.trim().isEmpty()) {
-
-                                System.out.println(
-                                                "[APPOINTMENT UPDATE] Time required.");
-
-                                return false;
-                        }
-
-                        if (patientId == null) {
-                                patientId = "";
-                        }
-
-                        if (type == null ||
-                                        type.trim().isEmpty()) {
-
-                                type = "Consultation";
-                        }
-
-                        if (status == null ||
-                                        status.trim().isEmpty()) {
-
-                                status = "Pending";
-                        }
-
-                        if (payment == null ||
-                                        payment.trim().isEmpty()) {
-
-                                payment = "Unpaid";
-                        }
-
-                        // ----------------------------------------------------
-                        // FIND FIRESTORE DOCUMENT ID
-                        // ----------------------------------------------------
-
-                        String documentId = null;
-
-                        for (Map.Entry<DoctorAppointment, String> entry : documentIds.entrySet()) {
-
-                                DoctorAppointment appointment = entry.getKey();
-
-                                if (appointment != null
-                                                &&
-                                                appointmentId.equals(
-                                                                appointment.getAppointmentId())) {
-
-                                        documentId = entry.getValue();
-
-                                        break;
-                                }
-                        }
-
-                        // ----------------------------------------------------
-                        // FALLBACK
-                        // ----------------------------------------------------
-
-                        if (documentId == null ||
-                                        documentId.trim().isEmpty()) {
-
-                                documentId = appointmentId;
-                        }
-
-                        // ----------------------------------------------------
-                        // DEBUG
-                        // ----------------------------------------------------
-
-                        System.out.println(
-                                        "====================================");
-
-                        System.out.println(
-                                        "[APPOINTMENT UPDATE] Updating Firestore");
-
-                        System.out.println(
-                                        "Document ID : "
-                                                        + documentId);
-
-                        System.out.println(
-                                        "Appointment ID : "
-                                                        + appointmentId);
-
-                        System.out.println(
-                                        "Patient ID : "
-                                                        + patientId);
-
-                        System.out.println(
-                                        "Patient : "
-                                                        + patient);
-
-                        System.out.println(
-                                        "Date : "
-                                                        + date);
-
-                        System.out.println(
-                                        "Time : "
-                                                        + time);
-
-                        System.out.println(
-                                        "Type : "
-                                                        + type);
-
-                        System.out.println(
-                                        "Status : "
-                                                        + status);
-
-                        System.out.println(
-                                        "Payment : "
-                                                        + payment);
-
-                        System.out.println(
-                                        "====================================");
-
-                        // ----------------------------------------------------
-                        // CREATE UPDATED DATA
-                        // ----------------------------------------------------
-
-                        Map<String, Object> data = new HashMap<>();
-
-                        data.put(
-                                        "patientId",
-                                        patientId.trim());
-
-                        data.put(
-                                        "patient",
-                                        patient.trim());
-
-                        data.put(
-                                        "date",
-                                        date.trim());
-
-                        data.put(
-                                        "time",
-                                        time.trim());
-
-                        data.put(
-                                        "type",
-                                        type.trim());
-
-                        data.put(
-                                        "status",
-                                        status.trim());
-
-                        data.put(
-                                        "payment",
-                                        payment.trim());
-
-                        // ----------------------------------------------------
-                        // UPDATE FIRESTORE
-                        // ----------------------------------------------------
-
-                        firestore.collection(COLLECTION)
-                                        .document(documentId)
-                                        .update(data)
-                                        .get();
-
-                        System.out.println(
-                                        "[APPOINTMENT UPDATE] Firestore updated successfully.");
-
-                        return true;
-
-                } catch (Exception e) {
-
-                        System.out.println(
-                                        "[APPOINTMENT UPDATE ERROR] Unable to update appointment.");
-
-                        e.printStackTrace();
-
-                        return false;
-                }
+        return result;
+    }
+
+    // =========================================================
+    // PENDING
+    // =========================================================
+
+    public ObservableList<DoctorAppointment>
+    getPendingAppointments() {
+
+        return filterByStatus(
+                "Pending"
+        );
+    }
+
+    // =========================================================
+    // CONFIRMED
+    // =========================================================
+
+    public ObservableList<DoctorAppointment>
+    getConfirmedAppointments() {
+
+        return filterByStatus(
+                "Confirmed"
+        );
+    }
+
+    // =========================================================
+    // CANCELLED
+    // =========================================================
+
+    public ObservableList<DoctorAppointment>
+    getCancelledAppointments() {
+
+        return filterByStatus(
+                "Cancelled"
+        );
+    }
+
+    // =========================================================
+    // COMPLETED
+    // =========================================================
+
+    public ObservableList<DoctorAppointment>
+    getCompletedAppointments() {
+
+        return filterByStatus(
+                "Completed"
+        );
+    }
+
+    // =========================================================
+    // GET APPOINTMENTS FOR MOTHER / PATIENT
+    // =========================================================
+
+    /*
+     * Mother side can use:
+     *
+     * controller.getAppointmentsForPatient(motherUid);
+     *
+     * Same Firestore collection is used.
+     */
+
+    public ObservableList<DoctorAppointment>
+    getAppointmentsForPatient(
+            String patientId) {
+
+        ObservableList<DoctorAppointment>
+                result =
+                FXCollections.observableArrayList();
+
+        if (patientId == null ||
+                patientId.trim().isEmpty()) {
+
+            return result;
         }
 
-        // ============================================================
-        // DELETE APPOINTMENT
-        // ============================================================
+        try {
 
-        public boolean deleteAppointment(
-                        DoctorAppointment appointment) {
+            List<QueryDocumentSnapshot> documents =
+                    firestore
+                            .collection(COLLECTION)
+                            .whereEqualTo(
+                                    "patientId",
+                                    patientId
+                            )
+                            .get()
+                            .get()
+                            .getDocuments();
 
-                try {
+            for (QueryDocumentSnapshot doc :
+                    documents) {
 
-                        if (firestore == null ||
-                                        appointment == null) {
+                DoctorAppointment appointment =
+                        createAppointmentFromDocument(
+                                doc
+                        );
 
-                                return false;
-                        }
+                if (appointment != null) {
 
-                        String documentId = documentIds.get(
-                                        appointment);
-
-                        if (documentId == null ||
-                                        documentId.isEmpty()) {
-
-                                documentId = appointment.getAppointmentId();
-                        }
-
-                        if (documentId == null ||
-                                        documentId.isEmpty()) {
-
-                                return false;
-                        }
-
-                        firestore.collection(COLLECTION)
-                                        .document(documentId)
-                                        .delete()
-                                        .get();
-
-                        appointments.remove(
-                                        appointment);
-
-                        documentIds.remove(
-                                        appointment);
-
-                        System.out.println(
-                                        "[APPOINTMENT] Deleted: "
-                                                        + documentId);
-
-                        return true;
-
-                } catch (Exception e) {
-
-                        System.out.println(
-                                        "[APPOINTMENT ERROR] Unable to delete.");
-
-                        e.printStackTrace();
-
-                        return false;
+                    result.add(
+                            appointment
+                    );
                 }
+            }
+
+            System.out.println(
+                    "[FIREBASE] Patient appointments loaded: "
+                            + result.size()
+            );
+
+        } catch (Exception e) {
+
+            System.err.println(
+                    "[FIREBASE ERROR] Error loading patient appointments"
+            );
+
+            e.printStackTrace();
         }
 
-        // ============================================================
-        // SEARCH
-        // ============================================================
+        return result;
+    }
 
-        public ObservableList<DoctorAppointment> searchAppointments(String keyword) {
+    // =========================================================
+    // GET SINGLE APPOINTMENT BY ID
+    // =========================================================
 
-                ObservableList<DoctorAppointment> result = FXCollections.observableArrayList();
+    public DoctorAppointment getAppointmentById(
+            String appointmentId) {
 
-                if (keyword == null ||
-                                keyword.trim().isEmpty()) {
+        if (appointmentId == null ||
+                appointmentId.trim().isEmpty()) {
 
-                        result.addAll(
-                                        appointments);
-
-                        return result;
-                }
-
-                String search = keyword.toLowerCase().trim();
-
-                for (DoctorAppointment appointment : appointments) {
-
-                        if (safeLower(
-                                        appointment.getPatient())
-                                        .contains(search)
-
-                                        ||
-
-                                        safeLower(
-                                                        appointment.getPatientId())
-                                                        .contains(search)
-
-                                        ||
-
-                                        safeLower(
-                                                        appointment.getType())
-                                                        .contains(search)
-
-                                        ||
-
-                                        safeLower(
-                                                        appointment.getStatus())
-                                                        .contains(search)
-
-                                        ||
-
-                                        safeLower(
-                                                        appointment.getDate())
-                                                        .contains(search)
-
-                                        ||
-
-                                        safeLower(
-                                                        appointment.getTime())
-                                                        .contains(search)) {
-
-                                result.add(
-                                                appointment);
-                        }
-                }
-
-                return result;
+            return null;
         }
 
-        // ============================================================
-        // FILTER STATUS
-        // ============================================================
+        for (DoctorAppointment appointment :
+                appointments) {
 
-        public ObservableList<DoctorAppointment> filterByStatus(String status) {
+            if (appointmentId.equals(
+                    appointment.getAppointmentId())) {
 
-                ObservableList<DoctorAppointment> result = FXCollections.observableArrayList();
-
-                if (status == null ||
-                                status.equalsIgnoreCase("All")) {
-
-                        result.addAll(
-                                        appointments);
-
-                        return result;
-                }
-
-                for (DoctorAppointment appointment : appointments) {
-
-                        if (status.equalsIgnoreCase(
-                                        appointment.getStatus())) {
-
-                                result.add(
-                                                appointment);
-                        }
-                }
-
-                return result;
+                return appointment;
+            }
         }
 
-        // ============================================================
-        // FILTER TYPE
-        // ============================================================
+        return null;
+    }
 
-        public ObservableList<DoctorAppointment> filterByType(String type) {
+    // =========================================================
+    // FIND FIRESTORE DOCUMENT ID
+    // =========================================================
 
-                ObservableList<DoctorAppointment> result = FXCollections.observableArrayList();
+    /*
+     * appointmentId and Firestore document ID
+     * are different.
+     *
+     * Example:
+     *
+     * Firestore document ID:
+     * X7aBc123...
+     *
+     * appointmentId:
+     * APT-175...
+     */
 
-                if (type == null ||
-                                type.equalsIgnoreCase("All")) {
+    private String findDocumentIdByAppointmentId(
+            String appointmentId) {
 
-                        result.addAll(
-                                        appointments);
+        if (appointmentId == null ||
+                appointmentId.trim().isEmpty()) {
 
-                        return result;
-                }
-
-                for (DoctorAppointment appointment : appointments) {
-
-                        if (type.equalsIgnoreCase(
-                                        appointment.getType())) {
-
-                                result.add(
-                                                appointment);
-                        }
-                }
-
-                return result;
+            return null;
         }
 
-        // ============================================================
-        // SAFE LOWERCASE
-        // ============================================================
+        try {
 
-        private String safeLower(String value) {
+            List<QueryDocumentSnapshot> documents =
+                    firestore
+                            .collection(COLLECTION)
+                            .whereEqualTo(
+                                    "appointmentId",
+                                    appointmentId
+                            )
+                            .get()
+                            .get()
+                            .getDocuments();
 
-                if (value == null) {
-                        return "";
-                }
+            if (documents.isEmpty()) {
+                return null;
+            }
 
-                return value
-                                .trim()
-                                .toLowerCase();
+            return documents.get(0).getId();
+
+        } catch (Exception e) {
+
+            System.err.println(
+                    "[FIREBASE ERROR] Error finding appointment document"
+            );
+
+            e.printStackTrace();
+
+            return null;
+        }
+    }
+
+    // =========================================================
+    // DEFAULT DOCTOR ID
+    // =========================================================
+
+    public String getDefaultDoctorId() {
+
+        return DEFAULT_DOCTOR_ID;
+    }
+
+    // =========================================================
+    // SAFE LOWER
+    // =========================================================
+
+    private String safeLower(
+            String value) {
+
+        if (value == null) {
+            return "";
         }
 
-        // ============================================================
-        // DEFAULT DOCTOR ID
-        // ============================================================
-
-        public String getDefaultDoctorId() {
-
-                return DEFAULT_DOCTOR_ID;
-        }
+        return value
+                .trim()
+                .toLowerCase();
+    }
 }

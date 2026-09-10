@@ -20,6 +20,7 @@ import javafx.scene.shape.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.FileChooser;
+import java.util.Comparator;
 
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.ListenerRegistration;
@@ -30,6 +31,10 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+
+import  javafx.scene.paint.Color;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 
 public class Asha_beneficiaries {
 
@@ -251,7 +256,7 @@ public class Asha_beneficiaries {
     // LOAD DATA FROM FIREBASE
     // =========================================================
 
-    private void loadFirebaseData() {
+   /*  private void loadFirebaseData() {
 
         try {
 
@@ -285,7 +290,47 @@ public class Asha_beneficiaries {
                     "Unable to load beneficiaries from Firebase."
             );
         }
+    }*/
+   private void loadFirebaseData() {
+
+    try {
+
+        List<AshaBeneficiary> firebaseData =
+                controller.getAllAshaBeneficiaries();
+
+        if (firebaseData != null) {
+
+            masterData.setAll(firebaseData);
+
+            // Keep beneficiaries in serial/ID order
+            masterData.sort(
+                    Comparator.comparingInt(
+                            AshaBeneficiary::getId
+                    )
+            );
+
+        } else {
+
+            masterData.clear();
+        }
+
+        System.out.println(
+                "Firebase records loaded: "
+                        + masterData.size()
+        );
+
+        updateMetrics();
+
+    } catch (Exception e) {
+
+        e.printStackTrace();
+
+        showAlert(
+                Alert.AlertType.ERROR,
+                "Unable to load beneficiaries from Firebase."
+        );
     }
+}
 
     // =========================================================
     // REAL-TIME FIREBASE LISTENER
@@ -369,14 +414,21 @@ public class Asha_beneficiaries {
                             // UPDATE JAVAFX THREAD
                             // -------------------------------------------------
 
-                            Platform.runLater(() -> {
+                           Platform.runLater(() -> {
 
-                                masterData.setAll(
-                                        updatedData
-                                );
+    // Keep beneficiaries in the same order
+    // in which they were added
+    updatedData.sort(
+            Comparator.comparingInt(
+                    AshaBeneficiary::getId
+            )
+    );
 
-                                applyFilters("");
+    masterData.setAll(
+            updatedData
+    );
 
+    applyFilters("");
                                 updateMetrics();
 
                                 if (beneficiaryTable != null) {
@@ -399,6 +451,20 @@ public class Asha_beneficiaries {
     // =========================================================
     // UPDATE TABLE COUNT
     // =========================================================
+    private StackPane createIcon(FontAwesomeIcon icon, String bgColor, String iconColor) {
+
+    Circle circle = new Circle(38);
+    circle.setFill(Color.web(bgColor));
+
+    FontAwesomeIconView iconView = new FontAwesomeIconView(icon);
+    iconView.setSize("28");
+    iconView.setFill(Color.web(iconColor));
+
+    StackPane iconPane = new StackPane();
+    iconPane.getChildren().addAll(circle, iconView);
+
+    return iconPane;
+}
 
     private void updateBeneficiaryCount() {
 
@@ -657,15 +723,19 @@ public class Asha_beneficiaries {
         filterButton.setPrefWidth(75);
         filterButton.setPrefHeight(34);
 
-        filterButton.setStyle(
-                "-fx-background-color: white;" +
-                "-fx-border-color: #C9B6FF;" +
-                "-fx-border-radius: 6px;" +
-                "-fx-background-radius: 6px;" +
-                "-fx-text-fill: #6C47FF;" +
-                "-fx-font-weight: bold;" +
-                "-fx-cursor: hand;"
-        );
+       
+filterButton.setStyle(
+        "-fx-background-color: linear-gradient(" +
+                "to right, #F54B87, #9B4DCC);" +
+        "-fx-border-color: transparent;" +
+        "-fx-border-radius: 20px;" +
+        "-fx-background-radius: 20px;" +
+        "-fx-text-fill: white;" +
+        "-fx-font-weight: bold;" +
+        "-fx-cursor: hand;"
+);
+
+
 
         filterButton.setOnAction(
                 e -> showFilterDialog()
@@ -684,15 +754,15 @@ public class Asha_beneficiaries {
         addButton.setPrefHeight(34);
 
         addButton.setStyle(
-                "-fx-background-color: " +
-                        COLOR_PRIMARY_PURPLE +
-                        ";" +
-                "-fx-text-fill: white;" +
-                "-fx-border-radius: 6px;" +
-                "-fx-background-radius: 6px;" +
-                "-fx-font-weight: bold;" +
-                "-fx-cursor: hand;"
-        );
+        "-fx-background-color: linear-gradient(" +
+                "to right, #F54B87, #9B4DCC);" +
+        "-fx-text-fill: white;" +
+        "-fx-border-color: transparent;" +
+        "-fx-border-radius: 20px;" +
+        "-fx-background-radius: 20px;" +
+        "-fx-font-weight: bold;" +
+        "-fx-cursor: hand;"
+);
 
         addButton.setOnAction(
                 e -> showAddBeneficiaryDialog()
@@ -2223,6 +2293,7 @@ public class Asha_beneficiaries {
                         COLOR_ICON_PURPLE,
                         totalBeneficiariesValue,
                         LABEL_TOTAL_BENEFICIARIES,
+                
                         "Firebase records",
                         cardWidth,
                         "people"
@@ -2534,7 +2605,7 @@ public class Asha_beneficiaries {
         // =====================================================
 
         TableColumn<AshaBeneficiary, Integer> idCol =
-                new TableColumn<>("#");
+                new TableColumn<>("Number");
 
         idCol.setPrefWidth(45);
 
@@ -3272,185 +3343,128 @@ public class Asha_beneficiaries {
     // ICON CREATOR
     // =========================================================
 
-    private StackPane createIcon(
-            String type,
-            String backgroundColor,
-            String iconColor,
-            double size) {
+    // =========================================================
+// ICON CREATOR
+// =========================================================
 
-        StackPane container =
-                new StackPane();
+private StackPane createIcon(
+        String type,
+        String backgroundColor,
+        String iconColor,
+        double size) {
 
-        container.setPrefSize(
-                size,
-                size
-        );
+    StackPane container =
+            new StackPane();
 
-        container.setMinSize(
-                size,
-                size
-        );
+    container.setPrefSize(
+            size,
+            size
+    );
 
-        container.setMaxSize(
-                size,
-                size
-        );
+    container.setMinSize(
+            size,
+            size
+    );
 
-        Circle background =
-                new Circle(
-                        size / 2,
-                        Color.web(
-                                backgroundColor
-                        )
-                );
+    container.setMaxSize(
+            size,
+            size
+    );
 
-        Region icon = null;
+    // -----------------------------
+    // CIRCLE
+    // -----------------------------
 
-        switch (type) {
+    Circle circle =
+            new Circle(size / 2);
 
-            case "people":
+    circle.setFill(
+            Color.web(backgroundColor)
+    );
 
-                icon =
-                        createPeopleIcon(
-                                iconColor,
-                                size
-                        );
+    // -----------------------------
+    // ICON
+    // -----------------------------
 
-                break;
+    String symbol;
 
-            case "pregnant":
+    switch (type.toLowerCase()) {
 
-                icon =
-                        createPregnantIcon(
-                                iconColor,
-                                size
-                        );
+        case "people":
+            symbol = "👥";
+            break;
 
-                break;
+        case "pregnant":
+            symbol = "🤰";
+            break;
 
-            case "child":
+        case "child":
+            symbol = "👶";
+            break;
 
-                icon =
-                        createChildIcon(
-                                iconColor,
-                                size
-                        );
+        case "visits":
+            symbol = "📋";
+            break;
 
-                break;
+        case "camp":
+            symbol = "⛺";
+            break;
+
+        case "referral":
+            symbol = "↗";
+            break;
+
+        case "ifa":
+            symbol = "💊";
+            break;
+
+        case "nutrition":
+            symbol = "🥗";
+            break;
+
+        default:
+            symbol = "⏳";
+            break;
 
             case "immunized":
+            symbol = "💉";
+              break;
 
-                icon =
-                        createCheckIcon(
-                                iconColor,
-                                size
-                        );
-
-                break;
-
-            case "calendar":
-
-                icon =
-                        createCalendarIcon(
-                                iconColor,
-                                size
-                        );
-
-                break;
-
-            case "visits":
-
-                icon =
-                        createHomeIcon(
-                                iconColor,
-                                size
-                        );
-
-                break;
-
-            case "camp":
-
-                icon =
-                        createMedicalIcon(
-                                iconColor,
-                                size
-                        );
-
-                break;
-
-            case "referral":
-
-                icon =
-                        createReferralIcon(
-                                iconColor,
-                                size
-                        );
-
-                break;
-
-            case "ifa":
-
-                icon =
-                        createMedicineIcon(
-                                iconColor,
-                                size
-                        );
-
-                break;
-
-            case "nutrition":
-
-                icon =
-                        createHeartIcon(
-                                iconColor,
-                                size
-                        );
-
-                break;
-
-            default:
-
-                icon = null;
-
-                break;
-        }
-
-        if (icon != null) {
-
-            container
-                    .getChildren()
-                    .addAll(
-                            background,
-                            icon
-                    );
-
-        } else {
-
-            container
-                    .getChildren()
-                    .add(
-                            background
-                    );
-        }
-
-        return container;
+       case "pending":
+        symbol = "⏳";
+         break;
     }
 
-    // =========================================================
-    // PEOPLE ICON
-    // =========================================================
+    Label iconLabel =
+            new Label(symbol);
+            iconLabel.setStyle("-fx-font-size:25");
 
-    private Region createPeopleIcon(
-            String color,
-            double size) {
+    iconLabel.setFont(
+            Font.font(
+                    "System",
+                    FontWeight.BOLD,
+                    size * 0.55
+            )
+    );
 
-        Pane pane =
-                new Pane();
+    iconLabel.setTextFill(
+            Color.web(iconColor)
+    );
 
-        double c =
-                size * 0.18;
+    // -----------------------------
+    // ADD CIRCLE + ICON
+    // -----------------------------
 
-        Circle head1 =
+    container.getChildren().addAll(
+            circle,
+            iconLabel
+    );
+    return container;
+}
+
+    
+
+       /*  Circle head1 =
                 new Circle(
                         size * 0.30,
                         size * 0.34,
@@ -3533,7 +3547,7 @@ public class Asha_beneficiaries {
     // PREGNANT ICON
     // =========================================================
 
-    private Region createPregnantIcon(
+   /*  private Region createPregnantIcon(
             String color,
             double size) {
 
@@ -3632,13 +3646,13 @@ public class Asha_beneficiaries {
         );
 
         return pane;
-    }
+    }*/
 
     // =========================================================
     // CHILD ICON
     // =========================================================
 
-    private Region createChildIcon(
+    /*private Region createChildIcon(
             String color,
             double size) {
 
@@ -3685,10 +3699,10 @@ public class Asha_beneficiaries {
         pane.setPrefSize(
                 size,
                 size
-        );
+        );      
 
         return pane;
-    }
+    }*/
 
     // =========================================================
     // CHECK ICON

@@ -14,6 +14,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
+import javafx.application.Platform;
 
 public class EmergencyPage {
 
@@ -22,7 +23,7 @@ public class EmergencyPage {
     // =========================================================
 
     //private static final String BG = "#F7E6F3";
-    private static final String BG="#F8F7FC";
+    /*private static final String BG="#F8F7FC";
    
 
 
@@ -35,13 +36,37 @@ public class EmergencyPage {
     private static final String PURPLE = "#8056C5";
     private static final String GREEN = "#67C98F";
     private static final String BLUE = "#5578D6";
-    private static final String ORANGE = "#F2A33A";
+    private static final String ORANGE = "#F2A33A";*/
 
     //private static final String BORDER = "#E9E6EF";
-        private static final String BORDER="#E8DEFA";
+      //  private static final String BORDER="#E8DEFA";
 
   
-  private static final String GREY="#777775";
+  //private static final String GREY="#777775"; 
+
+
+// =========================================================
+// COLORS
+// =========================================================
+
+private static final String BG = "#FFFFFF";
+private static final String WHITE = "#FFFFFF";
+
+private static final String NAVY = "#24234F";
+
+private static final String PINK = "#E84A87";
+private static final String LIGHT_PINK = "#FFEAF3";
+
+private static final String PURPLE = "#9B4DCC";
+private static final String LIGHT_PURPLE = "#F3ECFF";
+
+private static final String GREEN = "#67C98F";
+private static final String BLUE = "#5578D6";
+private static final String ORANGE = "#F2A33A";
+
+private static final String BORDER = "#E7DCE8";
+private static final String GREY = "#77778D";
+
 
     private BorderPane root;
 public EmergencyPage(){ 
@@ -64,9 +89,17 @@ public BorderPane getView(){
 
       //  BorderPane root = new BorderPane();
 root=new BorderPane();
-        root.setStyle(
+      /*   root.setStyle(
                 "-fx-background-color: " + BG + ";"
-        );
+        );*/ 
+
+        root.setStyle(
+        "-fx-background-color: linear-gradient(" +
+        "to bottom right, " +
+        "#FFFFFF 0%, " +
+        "#FFF6FA 55%, " +
+        "#F3ECFF 100%);"
+);
 
 
         // =====================================================
@@ -192,12 +225,29 @@ root=new BorderPane();
 
         ambulanceBox.setMinHeight(190);
 
-        ambulanceBox.setStyle(
+        /*ambulanceBox.setStyle(
                 "-fx-background-color: " + WHITE + ";" +
                 "-fx-background-radius: 15;" +
                 "-fx-border-color: " + BORDER + ";" +
                 "-fx-border-radius: 15;"
-        );
+        );*/
+
+      /*   ambulanceBox.setStyle(
+        "-fx-background-color: white;" +
+        "-fx-background-radius: 18;" +
+        "-fx-border-color: " + BORDER + ";" +
+        "-fx-border-radius: 18;" +
+        "-fx-border-width: 1;"
+);*/ 
+
+ambulanceBox.setStyle(
+        "-fx-background-color: linear-gradient(" +
+        "to right, #FFFFFF 0%, #FFF6FA 55%, #F3ECFF 100%);" +
+        "-fx-background-radius: 18;" +
+        "-fx-border-color: " + BORDER + ";" +
+        "-fx-border-radius: 18;" +
+        "-fx-border-width: 1;"
+);
 
 
         // Left text
@@ -300,10 +350,18 @@ ambulanceSpacer.setMinWidth(60);
         );
 
 
-        hotline.setStyle(
+       /*  hotline.setStyle(
                 "-fx-background-color: " + PINK + ";" +
                 "-fx-background-radius: 15;"
-        ); 
+
+        ); */
+
+hotline.setStyle(
+        "-fx-background-color: linear-gradient(" +
+        "to right, #F54B87, #9B4DCC);" +
+        "-fx-background-radius: 18;"
+);
+
       //  hotline.setPrefWidth(400);
        // hotline.setMaxWidth(400);
 
@@ -518,6 +576,10 @@ VBox emergencyTeamCard =
                 "Immediate Assistance",
                 GREEN
         ); 
+        
+        HBox.setHgrow(ambulanceCard, Priority.ALWAYS);
+HBox.setHgrow(emergencyCareCard, Priority.ALWAYS);
+HBox.setHgrow(emergencyTeamCard, Priority.ALWAYS);
 
         stats.getChildren().addAll(
         ambulanceCard,
@@ -759,12 +821,21 @@ VBox emergencyTeamCard =
 
 
 
-        bottom.setStyle(
+     /*   bottom.setStyle(
                 "-fx-background-color: " + LIGHT_PINK + ";" +
                 "-fx-background-radius: 15;" +
                 "-fx-border-color: " + BORDER + ";" +
                 "-fx-border-radius: 15;"
-        );
+        );*/
+
+        bottom.setStyle(
+        "-fx-background-color: linear-gradient(" +
+        "to right, #FFEAF3, #F3ECFF);" +
+        "-fx-background-radius: 18;" +
+        "-fx-border-color: " + BORDER + ";" +
+        "-fx-border-radius: 18;" +
+        "-fx-border-width: 1;"
+);
 
 
         // =====================================================
@@ -896,7 +967,7 @@ VBox emergencyTeamCard =
         // SCROLL PANE
         // =====================================================
 
-        ScrollPane scrollPane =
+      /*   ScrollPane scrollPane =
                 new ScrollPane(content);
 
 
@@ -909,7 +980,51 @@ VBox emergencyTeamCard =
 
         root.setCenter(
                 scrollPane
-        ); 
+        ); */ 
+
+/*ScrollPane scrollPane =
+        new ScrollPane(content);
+
+scrollPane.setFitToWidth(true);
+
+scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+
+scrollPane.setStyle(
+        "-fx-background-color: transparent;" +
+        "-fx-background: transparent;" +
+        "-fx-control-inner-background: transparent;"
+);
+
+// Content background transparent
+content.setStyle(
+        "-fx-background-color: transparent;"
+);
+
+root.setCenter(scrollPane);*/ 
+
+ScrollPane scrollPane =
+        new ScrollPane(content);
+
+scrollPane.setFitToWidth(true);
+
+scrollPane.setStyle(
+        "-fx-background-color: transparent;"
+);
+
+root.setCenter(scrollPane);
+// ScrollPane viewport transparent करणे
+/*Platform.runLater(() -> {
+
+    javafx.scene.Node viewport =
+            scrollPane.lookup(".viewport");
+
+    if (viewport != null) {
+        viewport.setStyle(
+                "-fx-background-color: transparent;"
+        );
+    }
+});*/
+
 }
 
 
@@ -937,16 +1052,29 @@ VBox emergencyTeamCard =
         );
 
 
-        card.setPrefWidth(220);
-        card.setPrefHeight(135);
+      //  card.setPrefWidth(220);
+      //  card.setPrefHeight(135);
+
+      card.setPrefWidth(300);
+card.setMaxWidth(Double.MAX_VALUE);
+card.setPrefHeight(135);
 
 
-        card.setStyle(
+       /*  card.setStyle(
                 "-fx-background-color: white;" +
                 "-fx-border-color: " + BORDER + ";" +
                 "-fx-border-radius: 15;" +
                 "-fx-background-radius: 15;"
-        );
+        );*/ 
+
+
+        card.setStyle(
+        "-fx-background-color: white;" +
+        "-fx-border-color: " + BORDER + ";" +
+        "-fx-border-radius: 16;" +
+        "-fx-background-radius: 16;" +
+        "-fx-border-width: 1;"
+);
 
 
         HBox top =

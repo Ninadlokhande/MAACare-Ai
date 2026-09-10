@@ -3,7 +3,7 @@ package com.sigma.controller.doctorController;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
-import com.sigma.config.DoctorModule.FirebaseConfig;
+import com.sigma.config.FirebaseConfig;
 import com.sigma.model.DoctorModel.Patient;
 
 import javafx.collections.FXCollections;

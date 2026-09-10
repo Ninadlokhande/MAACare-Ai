@@ -8,7 +8,7 @@ import java.net.http.HttpResponse;
 
 import org.json.JSONObject;
 
-import com.sigma.config.DoctorModule.FirebaseConfig;
+import com.sigma.config.FirebaseConfig;
 
 public class Controller {
 
@@ -16,7 +16,7 @@ public class Controller {
         // FIREBASE WEB API KEY
         // =============================================================
 
-        private static final String API_KEY = "AIzaSyAhkH0AhllTx10IFjFA3VzbKvZSxIMA5bQ";
+        private static final String API_KEY = "AIzaSyDGseSX-w2j5L7HYmHH-sw9qXT558RaTeU";
 
         // =============================================================
         // STATUS CODE
@@ -196,28 +196,39 @@ public class Controller {
                         // SUCCESS
                         // -------------------------------------------------
 
-                        if (status_code == 200) {
+                       if (status_code == 200) {
+        JSONObject result = new JSONObject(
+                        response.body());
 
-                                JSONObject result = new JSONObject(
-                                                response.body());
+        String localId = result.optString(
+                        "localId",
+                        "");
 
-                                String localId = result.optString(
-                                                "localId",
-                                                "");
+        if (localId == null ||
+                        localId.trim().isEmpty()) {
 
-                                System.out.println(
-                                                "[FIREBASE SIGNUP] "
-                                                                + "Account created successfully.");
+                lastError = "Firebase UID was not returned.";
 
-                                System.out.println(
-                                                "[FIREBASE SIGNUP] Firebase UID: "
-                                                                + localId);
+                System.out.println(
+                                "[FIREBASE SIGNUP] ERROR: "
+                                                + lastError);
 
-                                lastError = "";
+                return false;
+        }
 
-                                return true;
-                        }
+        setFirebaseUid(localId);
 
+        System.out.println(
+                        "[FIREBASE SIGNUP] "
+                                        + "Account created successfully.");
+
+        System.out.println(
+                        "[FIREBASE SIGNUP] Firebase UID stored: "
+                                        + getFirebaseUid());
+
+        lastError = "";
+        return true;
+}
                         // -------------------------------------------------
                         // ERROR
                         // -------------------------------------------------

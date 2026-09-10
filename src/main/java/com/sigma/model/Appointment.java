@@ -1,40 +1,84 @@
+
 package com.sigma.model;
 
+public class Appointment {
 
-//import javafx.beans.property.SimpleStringProperty;
-//import javafx.beans.property.StringProperty;
-
-public class Appointment { 
     private String number;
     private String patient;
-    private  String doctor;
-    private  String date;
-    private  String time;
+    private String doctor;
+    private String date;
+    private String time;
     private String department;
-    private  String status;
+    private String status;
 
-    //Constructor  
+    // =========================================================
+    // NEW FIELDS FOR HOSPITAL APPOINTMENT
+    // =========================================================
+    private String hospital;
+    private String motherUid;
+    private String appointmentType;
 
-
-    public Appointment(){ 
-        
+    // =========================================================
+    // DEFAULT CONSTRUCTOR
+    // Required by Firebase Firestore
+    // =========================================================
+    public Appointment() {
     }
 
-    public Appointment(String number,
-        String patient,
-        String doctor,
-        String date,
-        String time,
-        String department,
-        String status){ 
-            this.number=number;
-            this.patient=patient;
-            this.doctor=doctor;
-            this.date=date;
-            this.time=time;
-            this.department=department;
-            this.status=status;
-        }
+    // =========================================================
+    // EXISTING CONSTRUCTOR
+    // DO NOT REMOVE
+    // Existing Doctor/Hospital appointment code can still use it
+    // =========================================================
+    public Appointment(
+            String number,
+            String patient,
+            String doctor,
+            String date,
+            String time,
+            String department,
+            String status) {
+
+        this.number = number;
+        this.patient = patient;
+        this.doctor = doctor;
+        this.date = date;
+        this.time = time;
+        this.department = department;
+        this.status = status;
+    }
+
+    // =========================================================
+    // NEW CONSTRUCTOR
+    // FOR HOSPITAL APPOINTMENTS
+    // =========================================================
+    public Appointment(
+            String number,
+            String patient,
+            String doctor,
+            String date,
+            String time,
+            String department,
+            String status,
+            String hospital,
+            String motherUid,
+            String appointmentType) {
+
+        this.number = number;
+        this.patient = patient;
+        this.doctor = doctor;
+        this.date = date;
+        this.time = time;
+        this.department = department;
+        this.status = status;
+        this.hospital = hospital;
+        this.motherUid = motherUid;
+        this.appointmentType = appointmentType;
+    }
+
+    // =========================================================
+    // GETTERS / SETTERS
+    // =========================================================
 
     public String getNumber() {
         return number;
@@ -92,6 +136,32 @@ public class Appointment {
         this.status = status;
     }
 
-    
+    // =========================================================
+    // NEW HOSPITAL FIELDS
+    // =========================================================
+
+    public String getHospital() {
+        return hospital;
+    }
+
+    public void setHospital(String hospital) {
+        this.hospital = hospital;
+    }
+
+    public String getMotherUid() {
+        return motherUid;
+    }
+
+    public void setMotherUid(String motherUid) {
+        this.motherUid = motherUid;
+    }
+
+    public String getAppointmentType() {
+        return appointmentType;
+    }
+
+    public void setAppointmentType(String appointmentType) {
+        this.appointmentType = appointmentType;
+    }
 }
 

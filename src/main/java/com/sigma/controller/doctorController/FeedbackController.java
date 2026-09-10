@@ -3,7 +3,7 @@ package com.sigma.controller.doctorController;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.ListenerRegistration;
-import com.sigma.config.DoctorModule.FirebaseConfig;
+import com.sigma.config.FirebaseConfig;
 import com.sigma.dao.doctorDao.FeedbackDAO;
 import com.sigma.model.DoctorModel.FeedbackModel;
 

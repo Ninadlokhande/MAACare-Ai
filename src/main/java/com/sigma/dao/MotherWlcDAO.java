@@ -6,7 +6,6 @@ import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
-
 import com.sigma.config.FirebaseConfig;
 import com.sigma.model.MotherWlcModel;
 
