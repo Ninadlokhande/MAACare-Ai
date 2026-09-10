@@ -196,28 +196,39 @@ public class Controller {
                         // SUCCESS
                         // -------------------------------------------------
 
-                        if (status_code == 200) {
+                       if (status_code == 200) {
+        JSONObject result = new JSONObject(
+                        response.body());
 
-                                JSONObject result = new JSONObject(
-                                                response.body());
+        String localId = result.optString(
+                        "localId",
+                        "");
 
-                                String localId = result.optString(
-                                                "localId",
-                                                "");
+        if (localId == null ||
+                        localId.trim().isEmpty()) {
 
-                                System.out.println(
-                                                "[FIREBASE SIGNUP] "
-                                                                + "Account created successfully.");
+                lastError = "Firebase UID was not returned.";
 
-                                System.out.println(
-                                                "[FIREBASE SIGNUP] Firebase UID: "
-                                                                + localId);
+                System.out.println(
+                                "[FIREBASE SIGNUP] ERROR: "
+                                                + lastError);
 
-                                lastError = "";
+                return false;
+        }
 
-                                return true;
-                        }
+        setFirebaseUid(localId);
 
+        System.out.println(
+                        "[FIREBASE SIGNUP] "
+                                        + "Account created successfully.");
+
+        System.out.println(
+                        "[FIREBASE SIGNUP] Firebase UID stored: "
+                                        + getFirebaseUid());
+
+        lastError = "";
+        return true;
+}
                         // -------------------------------------------------
                         // ERROR
                         // -------------------------------------------------

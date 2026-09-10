@@ -785,8 +785,13 @@ public class MotherDashBoard {
 
         profileBox.setSpacing(9);
 
-        String firstLetter =
-                motherName.substring(0, 1).toUpperCase();
+       String firstLetter =
+        (motherName == null ||
+         motherName.trim().isEmpty())
+                ? "M"
+                : motherName.trim()
+                        .substring(0, 1)
+                        .toUpperCase();
 
 
         Label profileCircle =

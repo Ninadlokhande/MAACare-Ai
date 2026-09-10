@@ -173,6 +173,8 @@
                     <mainClass>
                         com.sigma.Main
                     </mainClass>
+
+                  <!-- <mainClass>com.sigma.view.FontAwesomeTest</mainClass> -->
                 </configuration>
 
             </plugin>

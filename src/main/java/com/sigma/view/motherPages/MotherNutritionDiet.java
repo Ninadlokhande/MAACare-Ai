@@ -98,7 +98,7 @@ public class MotherNutritionDiet {
         titleBox.setSpacing(3);
 
         Label title =
-            new Label("🥗 Nutrition & Diet");
+        new Label("Nutrition & Diet");
 
         title.setStyle(
             "-fx-font-size: 27px;" +

@@ -795,12 +795,15 @@ public class MotherVaccination {
         );
 
 
-        Label icon =
-                new Label(
-                        "Mother".equalsIgnoreCase(person)
-                                ? "🤰"
-                                : "👶"
-                );
+       FontAwesomeIconView icon =
+        new FontAwesomeIconView(
+                "Mother".equalsIgnoreCase(person)
+                        ? FontAwesomeIcon.USER
+                        : FontAwesomeIcon.CHILD
+        );
+
+icon.setSize("25");
+icon.setFill(Color.web(color));
 
         icon.setStyle(
                 "-fx-font-size: 25px;"
@@ -1295,9 +1298,16 @@ public class MotherVaccination {
         );
 
 
-        Label icon =
-                new Label("💉");
+        FontAwesomeIconView icon =
+        new FontAwesomeIconView(
+                FontAwesomeIcon.MEDKIT);
 
+icon.setSize("25");
+icon.setFill(Color.web(PURPLE));
+
+icon.setStyle(
+        "-fx-font-size: 25px;"
+);
 
         icon.setStyle(
                 "-fx-font-size: 25px;"
@@ -1408,10 +1418,17 @@ public class MotherVaccination {
                 "-fx-background-radius: 12;"
         );
 
+FontAwesomeIconView icon =
+        new FontAwesomeIconView(
+                FontAwesomeIcon.MEDKIT
+);
 
-        Label icon =
-                new Label("💉");
+icon.setSize("22");
+icon.setFill(Color.web(PURPLE));
 
+icon.setStyle(
+        "-fx-font-size: 22px;"
+);
 
         icon.setStyle(
                 "-fx-font-size: 22px;"
@@ -1571,9 +1588,13 @@ public class MotherVaccination {
         );
 
 
-        Label icon =
-                new Label("🔔");
+        FontAwesomeIconView icon =
+        new FontAwesomeIconView(
+                FontAwesomeIcon.BELL
+        );
 
+icon.setSize("30");
+icon.setFill(Color.web("#C7821B"));
 
         icon.setStyle(
                 "-fx-font-size: 30px;"
@@ -1675,10 +1696,13 @@ public class MotherVaccination {
                 Pos.CENTER_LEFT
         );
 
+FontAwesomeIconView icon =
+        new FontAwesomeIconView(
+                FontAwesomeIcon.USER_MD
+        );
 
-        Label icon =
-                new Label("👩‍⚕️");
-
+icon.setSize("38");
+icon.setFill(Color.web(PURPLE));
 
         icon.setStyle(
                 "-fx-font-size: 38px;"
