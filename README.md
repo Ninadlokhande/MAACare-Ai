@@ -263,7 +263,7 @@ The AI system can provide information related to:
 - Healthy snacks
 
 The implemented AI prompt explicitly instructs the system to generate
-five practical pregnancy nutrition tips in a structured format. :contentReference[oaicite:2]{index=2}
+five practical pregnancy nutrition tips in a structured format. :
 
 ### Structured AI Output
 
