@@ -4,7 +4,7 @@ package com.sigma.dao.doctorDao;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.SetOptions;
-import com.sigma.config.DoctorModule.FirebaseConfig;
+import com.sigma.config.FirebaseConfig;
 import com.sigma.model.DoctorModel.Settings;
 
 import java.util.HashMap;

@@ -123,7 +123,7 @@ public class AdminSettings {
         );
 
         root.setStyle(
-            "-fx-background-color: #F9F7FC;"
+            "-fx-background-color: #FFF8FC;"
         );
 
 
@@ -133,7 +133,7 @@ public class AdminSettings {
 
         Label title =
             new Label(
-                "Settings"
+                "⚙  Settings"
             );
 
         title.setStyle(
@@ -232,7 +232,7 @@ public class AdminSettings {
 
         Label title =
             new Label(
-                "Administrator Profile"
+                "👤  Administrator Profile"
             );
 
         title.setStyle(
@@ -318,9 +318,9 @@ public class AdminSettings {
 
         roleField.setStyle(
             "-fx-background-color: #F1EEF5;" +
-            "-fx-background-radius: 8px;" +
+            "-fx-background-radius: 11px;" +
             "-fx-border-color: #DDD7E6;" +
-            "-fx-border-radius: 8px;" +
+            "-fx-border-radius: 11px;" +
             "-fx-padding: 10px;"
         );
 
@@ -429,7 +429,7 @@ public class AdminSettings {
 
         Button saveButton =
             new Button(
-                "Save Changes"
+                "✓  Save Changes"
             );
 
         saveButton.setPrefHeight(
@@ -441,11 +441,11 @@ public class AdminSettings {
         );
 
         saveButton.setStyle(
-            "-fx-background-color: #713CC3;" +
+            "-fx-background-color: #9C49C8;" +
             "-fx-text-fill: white;" +
             "-fx-font-size: 13px;" +
             "-fx-font-weight: bold;" +
-            "-fx-background-radius: 8px;" +
+            "-fx-background-radius: 11px;" +
             "-fx-cursor: hand;"
         );
 
@@ -493,7 +493,7 @@ public class AdminSettings {
 
         Label title =
             new Label(
-                "Security"
+                "🔒  Security"
             );
 
         title.setStyle(
@@ -636,7 +636,7 @@ public class AdminSettings {
 
         Button changePasswordButton =
             new Button(
-                "Change Password"
+                "🔐  Change Password"
             );
 
 
@@ -652,10 +652,10 @@ public class AdminSettings {
 
         changePasswordButton.setStyle(
             "-fx-background-color: #EDE4FA;" +
-            "-fx-text-fill: #713CC3;" +
+            "-fx-text-fill: #9C49C8;" +
             "-fx-font-size: 13px;" +
             "-fx-font-weight: bold;" +
-            "-fx-background-radius: 8px;" +
+            "-fx-background-radius: 11px;" +
             "-fx-cursor: hand;"
         );
 
@@ -903,8 +903,8 @@ public class AdminSettings {
 
         card.setStyle(
             "-fx-background-color: white;" +
-            "-fx-background-radius: 15px;" +
-            "-fx-border-color: #E7E1EF;" +
+            "-fx-background-radius: 16px;" +
+            "-fx-border-color: #F0DCE8;" +
             "-fx-border-radius: 15px;"
         );
 
@@ -1016,8 +1016,8 @@ public class AdminSettings {
         field.setStyle(
             "-fx-background-color: #FFFFFF;" +
             "-fx-border-color: #DDD7E6;" +
-            "-fx-border-radius: 8px;" +
-            "-fx-background-radius: 8px;" +
+            "-fx-border-radius: 11px;" +
+            "-fx-background-radius: 11px;" +
             "-fx-padding: 10px;" +
             "-fx-text-fill: #24234F;" +
             "-fx-font-size: 12px;"

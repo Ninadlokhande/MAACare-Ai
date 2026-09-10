@@ -16,24 +16,22 @@ import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-
 import javafx.scene.Node;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
-
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ScrollPane;
-
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-
 import javafx.scene.paint.Color;
 
 
@@ -95,13 +93,20 @@ public class PregnancyTracker {
 
     private LineChart<String, Number> babyDevelopmentChart;
 
-    // Dynamic UI elements
+
+    // =========================================================
+    // DYNAMIC UI ELEMENTS
+    // =========================================================
+
     private Label journeySubtitleLabel;
     private Label trimesterLabel;
     private Label trimesterDescriptionLabel;
+
     private ProgressBar pregnancyProgressBar;
+
     private Label motherWeekHint;
     private Label babyWeekHint;
+
     private Label milestoneWeekLabel;
     private Label milestoneLabel;
     private Label milestoneDevelopmentLabel;
@@ -177,13 +182,20 @@ public class PregnancyTracker {
 
                 weekData.clear();
 
-                for (PregnancyWeekModel week : weeks) {
+                if (weeks != null) {
 
-                    weekData.put(
-                            week.getWeek(),
-                            week
-                    );
+                    for (PregnancyWeekModel week : weeks) {
+
+                        if (week != null) {
+
+                            weekData.put(
+                                    week.getWeek(),
+                                    week
+                            );
+                        }
+                    }
                 }
+
 
                 Platform.runLater(() -> {
 
@@ -212,6 +224,8 @@ public class PregnancyTracker {
                                         "Unable to load pregnancy data."
                                 );
 
+                        errorLabel.setWrapText(true);
+
                         errorLabel.setStyle(
                                 "-fx-font-size: 14px;" +
                                 "-fx-text-fill: #E84A87;"
@@ -223,8 +237,35 @@ public class PregnancyTracker {
                                         errorLabel
                                 );
                     }
+
+
+                    if (babyDetailsBox != null) {
+
+                        babyDetailsBox
+                                .getChildren()
+                                .clear();
+
+                        Label errorLabel =
+                                new Label(
+                                        "Unable to load baby development data."
+                                );
+
+                        errorLabel.setWrapText(true);
+
+                        errorLabel.setStyle(
+                                "-fx-font-size: 14px;" +
+                                "-fx-text-fill: #9B4DCC;"
+                        );
+
+                        babyDetailsBox
+                                .getChildren()
+                                .add(
+                                        errorLabel
+                                );
+                    }
                 });
             }
+
         }).start();
     }
 
@@ -676,7 +717,9 @@ public class PregnancyTracker {
         journeySubtitleLabel =
                 new Label(
                         getTrimesterName(currentWeek) +
-                        " • Week " + currentWeek + " of 40"
+                        " • Week " +
+                        currentWeek +
+                        " of 40"
                 );
 
         journeySubtitleLabel.setStyle(
@@ -997,6 +1040,8 @@ public class PregnancyTracker {
                 );
 
 
+        motherWeekHint.setWrapText(true);
+
         motherWeekHint.setStyle(
                 "-fx-font-size: 14px;" +
                 "-fx-text-fill: #77778D;"
@@ -1018,7 +1063,8 @@ public class PregnancyTracker {
         motherDetailsBox.setSpacing(12);
 
 
-        updateMotherDetails();
+        // Show loading initially
+        showMotherLoading();
 
 
         card.getChildren().addAll(
@@ -1030,6 +1076,43 @@ public class PregnancyTracker {
 
 
         return card;
+    }
+
+
+    // =========================================================
+    // MOTHER LOADING
+    // =========================================================
+
+    private void showMotherLoading() {
+
+        if (motherDetailsBox == null) {
+
+            return;
+        }
+
+
+        motherDetailsBox
+                .getChildren()
+                .clear();
+
+
+        Label loading =
+                new Label(
+                        "Loading mother changes..."
+                );
+
+
+        loading.setStyle(
+                "-fx-font-size: 14px;" +
+                "-fx-text-fill: #77778D;"
+        );
+
+
+        motherDetailsBox
+                .getChildren()
+                .add(
+                        loading
+                );
     }
 
 
@@ -1058,10 +1141,20 @@ public class PregnancyTracker {
                 );
 
 
+        babyWeekHint.setWrapText(true);
+
         babyWeekHint.setStyle(
                 "-fx-font-size: 14px;" +
                 "-fx-text-fill: #77778D;"
         );
+
+
+        babyImageBox =
+                createWeekImage(
+                        currentWeek,
+                        250,
+                        150
+                );
 
 
         babyDevelopmentChart =
@@ -1077,18 +1170,56 @@ public class PregnancyTracker {
         babyDetailsBox.setSpacing(12);
 
 
-        updateBabyDetails();
+        showBabyLoading();
 
 
         card.getChildren().addAll(
                 heading,
                 babyWeekHint,
+                babyImageBox,
                 babyDevelopmentChart,
                 babyDetailsBox
         );
 
 
         return card;
+    }
+
+
+    // =========================================================
+    // BABY LOADING
+    // =========================================================
+
+    private void showBabyLoading() {
+
+        if (babyDetailsBox == null) {
+
+            return;
+        }
+
+
+        babyDetailsBox
+                .getChildren()
+                .clear();
+
+
+        Label loading =
+                new Label(
+                        "Loading baby development..."
+                );
+
+
+        loading.setStyle(
+                "-fx-font-size: 14px;" +
+                "-fx-text-fill: #77778D;"
+        );
+
+
+        babyDetailsBox
+                .getChildren()
+                .add(
+                        loading
+                );
     }
 
 
@@ -1199,7 +1330,6 @@ public class PregnancyTracker {
                 i++
         ) {
 
-
             double progress =
                     (i / 40.0) * 100.0;
 
@@ -1220,39 +1350,9 @@ public class PregnancyTracker {
         );
 
 
-        Platform.runLater(() -> {
-
-            Node line =
-                    progressSeries.getNode();
-
-            if (line != null) {
-
-                line.setStyle(
-                        "-fx-stroke: #F3A6C2;" +
-                        "-fx-stroke-width: 3px;"
-                );
-            }
-
-
-            for (
-                    XYChart.Data<String, Number> data :
-                    progressSeries.getData()
-            ) {
-
-                Node symbol =
-                        data.getNode();
-
-                if (symbol != null) {
-
-                    symbol.setStyle(
-                            "-fx-background-color: #F3A6C2, white;" +
-                            "-fx-background-insets: 0, 2;" +
-                            "-fx-background-radius: 7px;" +
-                            "-fx-padding: 5px;"
-                    );
-                }
-            }
-        });
+        applyChartStyle(
+                progressSeries
+        );
 
 
         return chart;
@@ -1292,7 +1392,6 @@ public class PregnancyTracker {
                 i++
         ) {
 
-
             double progress =
                     (i / 40.0) * 100.0;
 
@@ -1315,10 +1414,23 @@ public class PregnancyTracker {
                 );
 
 
+        applyChartStyle(
+                progressSeries
+        );
+    }
+
+
+    // =========================================================
+    // APPLY CHART STYLE
+    // =========================================================
+
+    private void applyChartStyle(
+            XYChart.Series<String, Number> series) {
+
         Platform.runLater(() -> {
 
             Node line =
-                    progressSeries.getNode();
+                    series.getNode();
 
             if (line != null) {
 
@@ -1331,7 +1443,7 @@ public class PregnancyTracker {
 
             for (
                     XYChart.Data<String, Number> data :
-                    progressSeries.getData()
+                    series.getData()
             ) {
 
                 Node symbol =
@@ -1369,6 +1481,8 @@ public class PregnancyTracker {
 
         if (data == null) {
 
+            showMotherLoading();
+
             return;
         }
 
@@ -1384,19 +1498,34 @@ public class PregnancyTracker {
 
                         createInfoBox(
                                 "Body Changes",
-                                data.getMotherChanges(),
+                                getSafeText(
+                                        data.getMotherChanges(),
+                                        getTrimesterMotherChanges(
+                                                currentWeek
+                                        )
+                                ),
                                 PINK
                         ),
 
                         createInfoBox(
                                 "Common Feelings",
-                                data.getSymptoms(),
+                                getSafeText(
+                                        data.getSymptoms(),
+                                        getTrimesterSymptoms(
+                                                currentWeek
+                                        )
+                                ),
                                 PURPLE
                         ),
 
                         createInfoBox(
                                 "Care Focus",
-                                data.getTips(),
+                                getSafeText(
+                                        data.getTips(),
+                                        getTrimesterCareTips(
+                                                currentWeek
+                                        )
+                                ),
                                 GREEN
                         )
                 );
@@ -1421,6 +1550,8 @@ public class PregnancyTracker {
 
         if (data == null) {
 
+            showBabyLoading();
+
             return;
         }
 
@@ -1436,22 +1567,243 @@ public class PregnancyTracker {
 
                         createInfoBox(
                                 "Development",
-                                data.getBabyDevelopment(),
+                                getSafeText(
+                                        data.getBabyDevelopment(),
+                                        getTrimesterBabyDevelopment(
+                                                currentWeek
+                                        )
+                                ),
                                 PURPLE
                         ),
 
                         createInfoBox(
                                 "Baby Size",
-                                data.getBabySize(),
+                                getSafeText(
+                                        data.getBabySize(),
+                                        getTrimesterBabySize(
+                                                currentWeek
+                                        )
+                                ),
                                 PINK
                         ),
 
                         createInfoBox(
                                 "This Week's Milestone",
-                                data.getMilestone(),
+                                getSafeText(
+                                        data.getMilestone(),
+                                        getTrimesterMilestone(
+                                                currentWeek
+                                        )
+                                ),
                                 GREEN
                         )
                 );
+    }
+
+
+    // =========================================================
+    // SAFE TEXT
+    // =========================================================
+
+    private String getSafeText(
+            String firebaseText,
+            String fallbackText) {
+
+        if (firebaseText == null) {
+
+            return fallbackText;
+        }
+
+
+        if (firebaseText.trim().isEmpty()) {
+
+            return fallbackText;
+        }
+
+
+        return firebaseText;
+    }
+
+
+    // =========================================================
+    // TRIMESTER MOTHER CHANGES
+    // =========================================================
+
+    private String getTrimesterMotherChanges(
+            int week) {
+
+        if (week <= 13) {
+
+            return
+                    "During the first trimester, your body " +
+                    "adjusts to pregnancy. You may notice " +
+                    "tiredness, breast changes, nausea, " +
+                    "and increased sensitivity to smells.";
+
+        } else if (week <= 27) {
+
+            return
+                    "During the second trimester, your belly " +
+                    "gradually grows. You may notice increased " +
+                    "energy, changes in appetite, skin changes, " +
+                    "and growing awareness of your baby's movement.";
+
+        } else {
+
+            return
+                    "During the third trimester, your baby grows " +
+                    "rapidly and your body prepares for birth. " +
+                    "You may experience increased tiredness, " +
+                    "back discomfort, and more frequent urination.";
+        }
+    }
+
+
+    // =========================================================
+    // TRIMESTER SYMPTOMS
+    // =========================================================
+
+    private String getTrimesterSymptoms(
+            int week) {
+
+        if (week <= 13) {
+
+            return
+                    "Nausea, tiredness, mild cramps, breast " +
+                    "tenderness, and mood changes can occur.";
+
+        } else if (week <= 27) {
+
+            return
+                    "You may experience occasional backache, " +
+                    "leg cramps, increased appetite, and " +
+                    "noticeable baby movements.";
+
+        } else {
+
+            return
+                    "You may feel more tired, have difficulty " +
+                    "sleeping, experience back discomfort, " +
+                    "and notice increased pressure as the baby grows.";
+        }
+    }
+
+
+    // =========================================================
+    // TRIMESTER CARE TIPS
+    // =========================================================
+
+    private String getTrimesterCareTips(
+            int week) {
+
+        if (week <= 13) {
+
+            return
+                    "Focus on balanced meals, hydration, " +
+                    "adequate rest, prescribed prenatal vitamins, " +
+                    "and regular healthcare visits.";
+
+        } else if (week <= 27) {
+
+            return
+                    "Continue nutritious meals, stay hydrated, " +
+                    "remain physically active as advised, " +
+                    "and attend your scheduled checkups.";
+
+        } else {
+
+            return
+                    "Prioritize rest, hydration, nutritious food, " +
+                    "gentle activity as advised, and preparation " +
+                    "for delivery and newborn care.";
+        }
+    }
+
+
+    // =========================================================
+    // TRIMESTER BABY DEVELOPMENT
+    // =========================================================
+
+    private String getTrimesterBabyDevelopment(
+            int week) {
+
+        if (week <= 13) {
+
+            return
+                    "Your baby's major organs and basic body " +
+                    "structures are developing rapidly. " +
+                    "The heart and nervous system continue developing.";
+
+        } else if (week <= 27) {
+
+            return
+                    "Your baby continues growing and becoming " +
+                    "more active. Hearing, movement, brain " +
+                    "development, and other body systems continue maturing.";
+
+        } else {
+
+            return
+                    "Your baby continues gaining weight and " +
+                    "strength. The brain and lungs continue " +
+                    "maturing as the body prepares for birth.";
+        }
+    }
+
+
+    // =========================================================
+    // TRIMESTER BABY SIZE
+    // =========================================================
+
+    private String getTrimesterBabySize(
+            int week) {
+
+        if (week <= 13) {
+
+            return
+                    "Your baby is still very small and is " +
+                    "growing rapidly during these early weeks.";
+
+        } else if (week <= 27) {
+
+            return
+                    "Your baby is growing steadily in length " +
+                    "and weight throughout the second trimester.";
+
+        } else {
+
+            return
+                    "Your baby is gaining weight and becoming " +
+                    "stronger as the due date approaches.";
+        }
+    }
+
+
+    // =========================================================
+    // TRIMESTER MILESTONE
+    // =========================================================
+
+    private String getTrimesterMilestone(
+            int week) {
+
+        if (week <= 13) {
+
+            return
+                    "First trimester development is progressing " +
+                    "rapidly as your baby's basic structures form.";
+
+        } else if (week <= 27) {
+
+            return
+                    "Second trimester growth includes increasing " +
+                    "movement and continued development of the senses.";
+
+        } else {
+
+            return
+                    "Your baby is entering the final stage of " +
+                    "growth and preparing for life after birth.";
+        }
     }
 
 
@@ -1487,6 +1839,9 @@ public class PregnancyTracker {
 
         Label titleLabel =
                 new Label(title);
+
+
+        titleLabel.setWrapText(true);
 
 
         titleLabel.setStyle(
@@ -1574,9 +1929,13 @@ public class PregnancyTracker {
 
         milestoneWeekLabel =
                 new Label(
-                        "Week " + currentWeek +
+                        "Week " +
+                        currentWeek +
                         " Development"
                 );
+
+
+        milestoneWeekLabel.setWrapText(true);
 
 
         milestoneWeekLabel.setStyle(
@@ -1593,7 +1952,12 @@ public class PregnancyTracker {
         milestoneLabel =
                 new Label(
                         data != null
-                                ? data.getMilestone()
+                                ? getSafeText(
+                                        data.getMilestone(),
+                                        getTrimesterMilestone(
+                                                currentWeek
+                                        )
+                                )
                                 : "Loading..."
                 );
 
@@ -1611,7 +1975,13 @@ public class PregnancyTracker {
         milestoneDevelopmentLabel =
                 new Label(
                         data != null
-                                ? "👶 " + data.getBabyDevelopment()
+                                ? "👶 " +
+                                  getSafeText(
+                                          data.getBabyDevelopment(),
+                                          getTrimesterBabyDevelopment(
+                                                  currentWeek
+                                          )
+                                  )
                                 : "👶 Loading..."
                 );
 
@@ -1888,6 +2258,9 @@ public class PregnancyTracker {
 
     private void updateWeekContent() {
 
+        // =====================================================
+        // CURRENT WEEK TITLE
+        // =====================================================
 
         if (weekTitle != null) {
 
@@ -1897,6 +2270,10 @@ public class PregnancyTracker {
         }
 
 
+        // =====================================================
+        // CURRENT WEEK SUBTITLE
+        // =====================================================
+
         if (weekSubtitle != null) {
 
             weekSubtitle.setText(
@@ -1904,6 +2281,10 @@ public class PregnancyTracker {
             );
         }
 
+
+        // =====================================================
+        // PROGRESS
+        // =====================================================
 
         if (progressWeekLabel != null) {
 
@@ -1917,10 +2298,16 @@ public class PregnancyTracker {
 
             journeySubtitleLabel.setText(
                     getTrimesterName(currentWeek) +
-                    " • Week " + currentWeek + " of 40"
+                    " • Week " +
+                    currentWeek +
+                    " of 40"
             );
         }
 
+
+        // =====================================================
+        // TRIMESTER
+        // =====================================================
 
         if (trimesterLabel != null) {
 
@@ -1938,6 +2325,10 @@ public class PregnancyTracker {
         }
 
 
+        // =====================================================
+        // PROGRESS BAR
+        // =====================================================
+
         if (pregnancyProgressBar != null) {
 
             pregnancyProgressBar.setProgress(
@@ -1946,103 +2337,184 @@ public class PregnancyTracker {
         }
 
 
+        // =====================================================
+        // MOTHER WEEK
+        // =====================================================
+
         if (motherWeekHint != null) {
 
             motherWeekHint.setText(
                     "How your body may change during Week " +
-                    currentWeek
+                    currentWeek +
+                    " • " +
+                    getTrimesterName(currentWeek)
             );
         }
 
+
+        // =====================================================
+        // BABY WEEK
+        // =====================================================
 
         if (babyWeekHint != null) {
 
             babyWeekHint.setText(
                     "Your baby's growth during Week " +
-                    currentWeek
+                    currentWeek +
+                    " • " +
+                    getTrimesterName(currentWeek)
             );
         }
 
+
+        // =====================================================
+        // CURRENT DATA
+        // =====================================================
 
         PregnancyWeekModel currentData =
                 weekData.get(currentWeek);
 
 
-        if (currentData != null) {
+        // =====================================================
+        // WEEKLY MILESTONE
+        // =====================================================
 
-            if (milestoneWeekLabel != null) {
+        if (milestoneWeekLabel != null) {
 
-                milestoneWeekLabel.setText(
-                        "Week " +
-                        currentWeek +
-                        " Development"
-                );
-            }
+            milestoneWeekLabel.setText(
+                    "Week " +
+                    currentWeek +
+                    " Development"
+            );
+        }
 
 
-            if (milestoneLabel != null) {
+        if (milestoneLabel != null) {
+
+            if (currentData != null) {
 
                 milestoneLabel.setText(
-                        currentData.getMilestone()
+                        getSafeText(
+                                currentData.getMilestone(),
+                                getTrimesterMilestone(
+                                        currentWeek
+                                )
+                        )
                 );
-            }
 
+            } else {
 
-            if (milestoneDevelopmentLabel != null) {
-
-                milestoneDevelopmentLabel.setText(
-                        "👶 " +
-                        currentData.getBabyDevelopment()
+                milestoneLabel.setText(
+                        getTrimesterMilestone(
+                                currentWeek
+                        )
                 );
             }
         }
 
+
+        if (milestoneDevelopmentLabel != null) {
+
+            if (currentData != null) {
+
+                milestoneDevelopmentLabel.setText(
+                        "👶 " +
+                        getSafeText(
+                                currentData.getBabyDevelopment(),
+                                getTrimesterBabyDevelopment(
+                                        currentWeek
+                                )
+                        )
+                );
+
+            } else {
+
+                milestoneDevelopmentLabel.setText(
+                        "👶 " +
+                        getTrimesterBabyDevelopment(
+                                currentWeek
+                        )
+                );
+            }
+        }
+
+
+        // =====================================================
+        // JOURNEY IMAGE
+        // =====================================================
 
         if (journeyImageBox != null) {
 
             updateImageBox(
                     journeyImageBox,
-                    getTrimesterImage(currentWeek),
-                    "🤰"
+                    getTrimesterImage(
+                            currentWeek
+                    ),
+                    "🌸"
             );
         }
 
+
+        // =====================================================
+        // MOTHER IMAGE
+        // =====================================================
 
         if (motherImageBox != null) {
 
             updateImageBox(
                     motherImageBox,
-                    getTrimesterImage(currentWeek),
-                    "🤰"
+                    getTrimesterImage(
+                            currentWeek
+                    ),
+                    "🌸"
             );
         }
 
+
+        // =====================================================
+        // BABY IMAGE
+        // =====================================================
 
         if (babyImageBox != null) {
 
             updateImageBox(
                     babyImageBox,
-                    getWeekImagePath(currentWeek),
+                    getWeekImagePath(
+                            currentWeek
+                    ),
                     "👶"
             );
         }
 
+
+        // =====================================================
+        // MILESTONE IMAGE
+        // =====================================================
 
         if (milestoneImageBox != null) {
 
             updateImageBox(
                     milestoneImageBox,
-                    getWeekImagePath(currentWeek),
+                    getWeekImagePath(
+                            currentWeek
+                    ),
                     "👶"
             );
         }
 
 
+        // =====================================================
+        // UPDATE CHART
+        // =====================================================
+
         updateBabyDevelopmentChart();
 
 
-        updateMotherDetails();
+        // =====================================================
+        // UPDATE DETAILS
+        // =====================================================
 
+        updateMotherDetails();
 
         updateBabyDetails();
     }
@@ -2096,7 +2568,7 @@ public class PregnancyTracker {
         updateImageBox(
                 box,
                 getTrimesterImage(week),
-                "🤰"
+                "🌸"
         );
 
 
@@ -2170,62 +2642,129 @@ public class PregnancyTracker {
             String emoji) {
 
 
+        if (box == null) {
+
+            return;
+        }
+
+
         box.getChildren().clear();
 
 
         if (imagePath != null) {
 
+            try {
 
-            var resource =
-                    getClass().getResource(
-                            imagePath
-                    );
-
-
-            if (resource != null) {
+                java.net.URL resource =
+                        getClass().getResource(
+                                imagePath
+                        );
 
 
-                javafx.scene.image.Image image =
-                        new javafx.scene.image.Image(
+                System.out.println(
+                        "Trying image: " +
+                        imagePath
+                );
+
+
+                if (resource != null) {
+
+                    Image image =
+                            new Image(
+                                    resource.toExternalForm(),
+                                    true
+                            );
+
+
+                    if (!image.isError()) {
+
+                        ImageView imageView =
+                                new ImageView(
+                                        image
+                                );
+
+
+                        double imageWidth =
+                                box.getPrefWidth() > 0
+                                        ? box.getPrefWidth() - 10
+                                        : 200;
+
+
+                        double imageHeight =
+                                box.getPrefHeight() > 0
+                                        ? box.getPrefHeight() - 10
+                                        : 140;
+
+
+                        imageView.setFitWidth(
+                                imageWidth
+                        );
+
+
+                        imageView.setFitHeight(
+                                imageHeight
+                        );
+
+
+                        imageView.setPreserveRatio(
+                                true
+                        );
+
+
+                        imageView.setSmooth(
+                                true
+                        );
+
+
+                        imageView.setCache(
+                                true
+                        );
+
+
+                        box.getChildren().add(
+                                imageView
+                        );
+
+
+                        System.out.println(
+                                "IMAGE LOADED: " +
                                 resource.toExternalForm()
                         );
 
 
-                javafx.scene.image.ImageView imageView =
-                        new javafx.scene.image.ImageView(
-                                image
+                        return;
+
+                    } else {
+
+                        System.out.println(
+                                "IMAGE ERROR: " +
+                                imagePath
                         );
+                    }
 
+                } else {
 
-                imageView.setFitWidth(
-                        box.getPrefWidth() - 8
+                    System.out.println(
+                            "IMAGE NOT FOUND: " +
+                            imagePath
+                    );
+                }
+
+            } catch (Exception e) {
+
+                System.out.println(
+                        "IMAGE LOAD ERROR: " +
+                        imagePath
                 );
 
-
-                imageView.setFitHeight(
-                        box.getPrefHeight() - 8
-                );
-
-
-                imageView.setPreserveRatio(
-                        true
-                );
-
-
-                imageView.setSmooth(
-                        true
-                );
-
-
-                box.getChildren().add(
-                        imageView
-                );
-
-
-                return;
+                e.printStackTrace();
             }
         }
 
+
+        // =====================================================
+        // FALLBACK
+        // =====================================================
 
         Label fallback =
                 new Label(emoji);
@@ -2252,15 +2791,18 @@ public class PregnancyTracker {
 
         if (week <= 13) {
 
-            return "/assets/images/mother/first_trimester.png";
+            return "/assets/images/logo/first_trimester.png";
 
         } else if (week <= 27) {
 
-            return "/assets/images/mother/second_trimester.png";
+            return "/assets/images/logo/second_trimester.png";
 
         } else {
 
-            return "/assets/images/mother/third_trimester.png";
+            // Third trimester image उपलब्ध नाही.
+            // PregnantMother.png वापरायची नाही.
+            // त्यामुळे available second trimester image ठेवली आहे.
+            return "/assets/images/logo/second_trimester.png";
         }
     }
 
@@ -2272,10 +2814,7 @@ public class PregnancyTracker {
     private String getWeekImagePath(
             int week) {
 
-
-        return "/assets/images/week" +
-                week +
-                ".png";
+        return "/assets/images/logo/BabyImage.png";
     }
 
 

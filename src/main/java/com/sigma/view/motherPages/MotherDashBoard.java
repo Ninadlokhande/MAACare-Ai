@@ -3,18 +3,34 @@ package com.sigma.view.motherPages;
 import com.sigma.model.MotherWlcModel;
 import com.sigma.view.scenesettings;
 
+import com.sigma.controller.HospitalController.AppointmentController;
+import com.sigma.controller.HospitalController.BedBookingController;
+import com.sigma.controller.doctorController.DoctorAppointmentController;
+
+import com.sigma.model.Appointment;
+import com.sigma.model.BedBooking;
+import com.sigma.model.DoctorModel.DoctorAppointment;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.util.prefs.Preferences;
 
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
@@ -34,6 +50,11 @@ public class MotherDashBoard {
      */
     private MotherWlcModel motherModel;
 
+    /*
+     * Logged-in Mother चा Firebase Authentication UID
+     */
+    private String motherUid;
+
     private VBox mainContent;
 
     private final String PINK = "#E84A87";
@@ -42,11 +63,89 @@ public class MotherDashBoard {
 
 
     // =========================================================
+    // NOTIFICATION
+    // =========================================================
+
+    /*
+     * Notification badge label
+     *
+     * आधी hardcoded "3" होता.
+     * आता Firebase मधून actual count येईल.
+     */
+    private Label notificationLabel;
+
+    /*
+     * Current notifications
+     */
+    private final List<String> currentNotifications =
+            new ArrayList<>();
+
+    /*
+     * Persistent read/unread state.
+     *
+     * Read state is stored locally for the logged-in Mother.
+     * The key contains the notification type + message, so when an
+     * appointment status changes, a new notification becomes unread.
+     */
+    private final Preferences notificationPreferences =
+            Preferences.userNodeForPackage(MotherDashBoard.class);
+
+    private static class NotificationItem {
+        private final String key;
+        private final String message;
+
+        NotificationItem(String key, String message) {
+            this.key = key;
+            this.message = message;
+        }
+    }
+
+
+    // =========================================================
+    // CONTROLLERS
+    // =========================================================
+
+    /*
+     * Existing controllers वापरले आहेत.
+     *
+     * नवीन Notification DAO / Model / Controller
+     * तयार करण्याची गरज नाही.
+     */
+    private final DoctorAppointmentController doctorAppointmentController =
+            new DoctorAppointmentController();
+
+    private final AppointmentController hospitalAppointmentController =
+            new AppointmentController();
+
+    private final BedBookingController bedBookingController =
+            new BedBookingController();
+
+
+    // =========================================================
     // CONSTRUCTOR
     // =========================================================
 
-    public MotherDashBoard(MotherWlcModel motherModel) {
+    public MotherDashBoard(
+            MotherWlcModel motherModel,
+            String motherUid) {
+
         this.motherModel = motherModel;
+        this.motherUid = motherUid;
+
+        System.out.println(
+                "[MOTHER DASHBOARD] Mother UID = "
+                        + motherUid
+        );
+    }
+
+
+    /*
+     * Old constructor
+     *
+     * Existing code break होऊ नये म्हणून ठेवला आहे.
+     */
+    public MotherDashBoard(MotherWlcModel motherModel) {
+        this(motherModel, null);
     }
 
 
@@ -80,7 +179,7 @@ public class MotherDashBoard {
                 new Insets(18, 16, 18, 16)
         );
 
-        sidebar.setSpacing(8);
+        sidebar.setSpacing(2);
 
         sidebar.setStyle(
             "-fx-background-color: white;" +
@@ -162,6 +261,12 @@ public class MotherDashBoard {
                     FontAwesomeIcon.APPLE
                 );
 
+        Button videoLibraryButton =
+                createMenuButton(
+                    "Video Library",
+                    FontAwesomeIcon.FILM
+                );
+
         Button babyButton =
                 createMenuButton(
                     "Baby Care",
@@ -197,6 +302,7 @@ public class MotherDashBoard {
                     "AI Assistant",
                     FontAwesomeIcon.COG
                 );
+
 
         // =====================================================
         // SETTINGS BUTTON
@@ -253,10 +359,14 @@ public class MotherDashBoard {
         });
 
 
+        // =====================================================
+        // APPOINTMENTS
+        // =====================================================
+
         appointmentButton.setOnAction(e -> {
 
             MotherAppoinments appointments =
-                    new MotherAppoinments();
+                    new MotherAppoinments(motherUid);
 
             mainContent.getChildren().clear();
 
@@ -269,13 +379,13 @@ public class MotherDashBoard {
 
         medicineButton.setOnAction(e -> {
 
-                MotherMedicineReminder medicinePage =
-                new MotherMedicineReminder(motherModel);
-            
+            MotherMedicineReminder medicinePage =
+                    new MotherMedicineReminder(motherModel);
+
             mainContent.getChildren().clear();
-            
+
             mainContent.getChildren().add(
-                medicinePage.createMedicineReminderPage()
+                    medicinePage.createMedicineReminderPage()
             );
         });
 
@@ -289,6 +399,20 @@ public class MotherDashBoard {
 
             mainContent.getChildren().add(
                     nutritionDiet.createDietNutritionPage()
+            );
+
+        });
+
+
+        videoLibraryButton.setOnAction(e -> {
+
+            MotherVideos videoLibrary =
+                    new MotherVideos();
+
+            mainContent.getChildren().clear();
+
+            mainContent.getChildren().add(
+                    videoLibrary.createVideoPage()
             );
 
         });
@@ -324,14 +448,14 @@ public class MotherDashBoard {
 
         reportsButton.setOnAction(e -> {
 
-                MotherReports reports =
-                new MotherReports(motherModel);
-        
-        mainContent.getChildren().clear();
-        
-        mainContent.getChildren().add(
-            reports.createReportsPage()
-        );
+            MotherReports reports =
+                    new MotherReports(motherModel);
+
+            mainContent.getChildren().clear();
+
+            mainContent.getChildren().add(
+                    reports.createReportsPage()
+            );
 
         });
 
@@ -409,6 +533,7 @@ public class MotherDashBoard {
                 appointmentButton,
                 medicineButton,
                 nutritionButton,
+                videoLibraryButton,
                 babyButton,
                 vaccinationButton,
                 reportsButton,
@@ -446,10 +571,6 @@ public class MotherDashBoard {
 
         welcomeBox.setSpacing(5);
 
-
-        /*
-         * Firebase मधून आलेले actual mother name
-         */
         String motherName = getMotherName();
 
 
@@ -610,10 +731,19 @@ public class MotherDashBoard {
                 Color.web(PINK)
         );
 
-        Label notification =
-                new Label("3");
 
-        notification.setStyle(
+        /*
+         * BEFORE:
+         *
+         * Label notification = new Label("3");
+         *
+         * NOW:
+         * Firebase मधून actual count येईल.
+         */
+        notificationLabel =
+                new Label("0");
+
+        notificationLabel.setStyle(
             "-fx-background-color: #E84A87;" +
             "-fx-text-fill: white;" +
             "-fx-font-size: 11px;" +
@@ -622,14 +752,25 @@ public class MotherDashBoard {
             "-fx-padding: 3px 6px;"
         );
 
+
         notificationBox.getChildren().addAll(
                 notificationIcon,
-                notification
+                notificationLabel
         );
 
-        notificationBox.setOnMouseClicked(e ->
-                showMessage("Notifications")
-        );
+
+        /*
+         * Bell click
+         */
+        notificationBox.setOnMouseClicked(e -> {
+
+            /*
+             * Click केल्यावर latest Firebase data
+             * पुन्हा load होईल.
+             */
+            loadNotifications(true);
+
+        });
 
 
         // =====================================================
@@ -644,10 +785,6 @@ public class MotherDashBoard {
 
         profileBox.setSpacing(9);
 
-
-        /*
-         * Actual mother name चा first letter
-         */
         String firstLetter =
                 motherName.substring(0, 1).toUpperCase();
 
@@ -769,6 +906,13 @@ public class MotherDashBoard {
         showDashboard();
 
 
+        /*
+         * Dashboard तयार झाल्यावर notifications
+         * Firebase मधून load करा.
+         */
+        loadNotifications(false);
+
+
         // =====================================================
         // SCENE
         // =====================================================
@@ -781,6 +925,822 @@ public class MotherDashBoard {
                 );
 
         return MotherdashboardScene;
+    }
+
+
+    // =========================================================
+    // LOAD NOTIFICATIONS
+    // =========================================================
+
+    private void loadNotifications(
+            boolean showPopup) {
+
+        /*
+         * UID नसल्यास Firebase query करू नका.
+         */
+        if (motherUid == null
+                || motherUid.trim().isEmpty()) {
+
+            System.out.println(
+                    "[NOTIFICATION] Mother UID is empty."
+            );
+
+            if (notificationLabel != null) {
+                notificationLabel.setText("0");
+            }
+
+            if (showPopup) {
+                showNotificationPopup(
+                        new ArrayList<NotificationItem>()
+                );
+            }
+
+            return;
+        }
+
+        CompletableFuture
+                .supplyAsync(() -> {
+
+                    List<NotificationItem> notifications =
+                            new ArrayList<>();
+
+                    try {
+
+                        String uid =
+                                motherUid.trim();
+
+                        // =====================================
+                        // DOCTOR APPOINTMENTS
+                        // =====================================
+
+                        List<DoctorAppointment>
+                                doctorAppointments =
+                                doctorAppointmentController
+                                        .getAppointmentsForPatient(uid);
+
+                        if (doctorAppointments != null) {
+
+                            for (DoctorAppointment appointment :
+                                    doctorAppointments) {
+
+                                if (appointment == null) {
+                                    continue;
+                                }
+
+                                String status =
+                                        appointment.getStatus();
+
+                                String message =
+                                        createDoctorNotification(
+                                                appointment,
+                                                status
+                                        );
+
+                                if (message != null
+                                        && !message.trim().isEmpty()) {
+
+                                    String doctorId =
+                                            appointment.getDoctorId();
+
+                                    String key =
+                                            createNotificationKey(
+                                                    "DOCTOR",
+                                                    safeKeyPart(doctorId)
+                                                            + "|"
+                                                            + message
+                                            );
+
+                                    if (!isNotificationRead(key)) {
+                                        notifications.add(
+                                                new NotificationItem(
+                                                        key,
+                                                        message
+                                                )
+                                        );
+                                    }
+                                }
+                            }
+                        }
+
+
+                        // =====================================
+                        // HOSPITAL APPOINTMENTS
+                        // =====================================
+
+                        List<Appointment>
+                                hospitalAppointments =
+                                hospitalAppointmentController
+                                        .getAppointmentsByMother(uid);
+
+                        if (hospitalAppointments != null) {
+
+                            for (Appointment appointment :
+                                    hospitalAppointments) {
+
+                                if (appointment == null) {
+                                    continue;
+                                }
+
+                                String type =
+                                        appointment
+                                                .getAppointmentType();
+
+                                if (type == null
+                                        || !"HOSPITAL"
+                                                .equalsIgnoreCase(
+                                                        type.trim())) {
+                                    continue;
+                                }
+
+                                String status =
+                                        appointment.getStatus();
+
+                                String message =
+                                        createHospitalNotification(
+                                                appointment,
+                                                status
+                                        );
+
+                                if (message != null
+                                        && !message.trim().isEmpty()) {
+
+                                    String patient =
+                                            appointment.getPatient();
+
+                                    String key =
+                                            createNotificationKey(
+                                                    "HOSPITAL",
+                                                    safeKeyPart(patient)
+                                                            + "|"
+                                                            + message
+                                            );
+
+                                    if (!isNotificationRead(key)) {
+                                        notifications.add(
+                                                new NotificationItem(
+                                                        key,
+                                                        message
+                                                )
+                                        );
+                                    }
+                                }
+                            }
+                        }
+
+
+                        // =====================================
+                        // BED BOOKINGS
+                        // =====================================
+
+                        List<BedBooking>
+                                bedBookings =
+                                bedBookingController
+                                        .getAllBedBookings();
+
+                        if (bedBookings != null) {
+
+                            for (BedBooking booking :
+                                    bedBookings) {
+
+                                if (booking == null) {
+                                    continue;
+                                }
+
+                                String bookingMotherUid =
+                                        booking.getMotherUid();
+
+                                if (bookingMotherUid == null
+                                        || !uid.equals(
+                                                bookingMotherUid.trim())) {
+                                    continue;
+                                }
+
+                                String status =
+                                        booking.getStatus();
+
+                                String message =
+                                        createBedNotification(
+                                                booking,
+                                                status
+                                        );
+
+                                if (message != null
+                                        && !message.trim().isEmpty()) {
+
+                                    String bookingId =
+                                            booking.getBookingID();
+
+                                    String key =
+                                            createNotificationKey(
+                                                    "BED",
+                                                    safeKeyPart(bookingId)
+                                                            + "|"
+                                                            + message
+                                            );
+
+                                    if (!isNotificationRead(key)) {
+                                        notifications.add(
+                                                new NotificationItem(
+                                                        key,
+                                                        message
+                                                )
+                                        );
+                                    }
+                                }
+                            }
+                        }
+
+                        System.out.println(
+                                "[NOTIFICATION] Unread Total = "
+                                        + notifications.size()
+                        );
+
+                    } catch (Exception e) {
+
+                        System.out.println(
+                                "[NOTIFICATION] Error loading notifications"
+                        );
+
+                        e.printStackTrace();
+                    }
+
+                    return notifications;
+                })
+
+                // =============================================
+                // JAVA FX THREAD
+                // =============================================
+
+                .thenAccept(notifications -> {
+
+                    Platform.runLater(() -> {
+
+                        currentNotifications.clear();
+
+                        for (NotificationItem item : notifications) {
+                            currentNotifications.add(item.message);
+                        }
+
+                        if (notificationLabel != null) {
+                            notificationLabel.setText(
+                                    String.valueOf(
+                                            notifications.size()
+                                    )
+                            );
+                        }
+
+                        if (showPopup) {
+                            showNotificationPopup(
+                                    notifications
+                            );
+                        }
+                    });
+                });
+    }
+
+
+    // =========================================================
+    // NOTIFICATION READ STATE
+    // =========================================================
+
+    private String createNotificationKey(
+            String type,
+            String value) {
+
+        String raw =
+                safeKeyPart(motherUid)
+                        + "|"
+                        + safeKeyPart(type)
+                        + "|"
+                        + safeKeyPart(value);
+
+        try {
+            MessageDigest digest =
+                    MessageDigest.getInstance("SHA-256");
+
+            byte[] hash = digest.digest(
+                    raw.getBytes(StandardCharsets.UTF_8)
+            );
+
+            StringBuilder result =
+                    new StringBuilder();
+
+            for (byte b : hash) {
+                result.append(
+                        String.format("%02x", b)
+                );
+            }
+
+            return "notification_" + result;
+
+        } catch (Exception e) {
+            return "notification_"
+                    + Integer.toHexString(raw.hashCode());
+        }
+    }
+
+
+    private boolean isNotificationRead(
+            String key) {
+
+        return notificationPreferences
+                .getBoolean(key, false);
+    }
+
+
+    private void markNotificationRead(
+            String key) {
+
+        notificationPreferences
+                .putBoolean(key, true);
+
+        try {
+            notificationPreferences.flush();
+        } catch (Exception e) {
+            System.out.println(
+                    "[NOTIFICATION] Unable to save read state"
+            );
+        }
+    }
+
+
+    private String safeKeyPart(
+            String value) {
+
+        if (value == null) {
+            return "";
+        }
+
+        return value.trim();
+    }
+
+
+    // =========================================================
+    // DOCTOR NOTIFICATION
+    // =========================================================
+
+    private String createDoctorNotification(
+            DoctorAppointment appointment,
+            String status) {
+
+        if (status == null
+                || status.trim().isEmpty()) {
+
+            status = "Pending";
+        }
+
+
+        String doctorId =
+                appointment.getDoctorId();
+
+
+        if (doctorId == null
+                || doctorId.trim().isEmpty()) {
+
+            doctorId = "Doctor";
+        }
+
+
+        if ("Confirmed".equalsIgnoreCase(status)) {
+
+            return "👨‍⚕️ Doctor Appointment\n"
+                    + "Your doctor appointment has been confirmed."
+                    + "\nDoctor: "
+                    + doctorId;
+
+        }
+
+
+        if ("Rejected".equalsIgnoreCase(status)) {
+
+            return "👨‍⚕️ Doctor Appointment\n"
+                    + "Your doctor appointment request was rejected."
+                    + "\nDoctor: "
+                    + doctorId;
+
+        }
+
+
+        if ("Cancelled".equalsIgnoreCase(status)) {
+
+            return "👨‍⚕️ Doctor Appointment\n"
+                    + "Your doctor appointment has been cancelled."
+                    + "\nDoctor: "
+                    + doctorId;
+
+        }
+
+
+        if ("Completed".equalsIgnoreCase(status)) {
+
+            return "👨‍⚕️ Doctor Appointment\n"
+                    + "Your doctor appointment has been completed."
+                    + "\nDoctor: "
+                    + doctorId;
+
+        }
+
+
+        return "👨‍⚕️ Doctor Appointment\n"
+                + "Your doctor appointment is "
+                + status + "."
+                + "\nDoctor: "
+                + doctorId;
+    }
+
+
+    // =========================================================
+    // HOSPITAL NOTIFICATION
+    // =========================================================
+
+    private String createHospitalNotification(
+            Appointment appointment,
+            String status) {
+
+        if (status == null
+                || status.trim().isEmpty()) {
+
+            status = "Pending";
+        }
+
+
+        String hospital =
+                appointment.getHospital();
+
+
+        if (hospital == null
+                || hospital.trim().isEmpty()) {
+
+            /*
+             * Hospital appointment मध्ये
+             * doctor field मध्येही hospital value आहे.
+             */
+            hospital =
+                    appointment.getDoctor();
+        }
+
+
+        if (hospital == null
+                || hospital.trim().isEmpty()) {
+
+            hospital = "Hospital";
+        }
+
+
+        // =====================================
+        // CONFIRMED
+        // =====================================
+
+        if ("Confirmed".equalsIgnoreCase(status)) {
+
+            return "🏥 Hospital Appointment\n"
+                    + "Your hospital appointment has been confirmed."
+                    + "\nHospital: "
+                    + hospital;
+
+        }
+
+
+        // =====================================
+        // REJECTED
+        // =====================================
+
+        if ("Rejected".equalsIgnoreCase(status)) {
+
+            return "🏥 Hospital Appointment\n"
+                    + "Your hospital appointment request was rejected."
+                    + "\nHospital: "
+                    + hospital;
+
+        }
+
+
+        // =====================================
+        // CANCELLED
+        // =====================================
+
+        if ("Cancelled".equalsIgnoreCase(status)) {
+
+            return "🏥 Hospital Appointment\n"
+                    + "Your hospital appointment has been cancelled."
+                    + "\nHospital: "
+                    + hospital;
+
+        }
+
+
+        // =====================================
+        // COMPLETED
+        // =====================================
+
+        if ("Completed".equalsIgnoreCase(status)) {
+
+            return "🏥 Hospital Appointment\n"
+                    + "Your hospital appointment has been completed."
+                    + "\nHospital: "
+                    + hospital;
+
+        }
+
+
+        // =====================================
+        // PENDING / OTHER
+        // =====================================
+
+        return "🏥 Hospital Appointment\n"
+                + "Your hospital appointment is "
+                + status + "."
+                + "\nHospital: "
+                + hospital;
+    }
+
+
+    // =========================================================
+    // BED BOOKING NOTIFICATION
+    // =========================================================
+
+    private String createBedNotification(
+            BedBooking booking,
+            String status) {
+
+        if (status == null
+                || status.trim().isEmpty()) {
+
+            status = "Pending";
+        }
+
+
+        String hospital =
+                booking.getHospitalName();
+
+
+        if (hospital == null
+                || hospital.trim().isEmpty()) {
+
+            hospital = "Hospital";
+        }
+
+
+        // =====================================
+        // CONFIRMED
+        // =====================================
+
+        if ("Confirmed".equalsIgnoreCase(status)) {
+
+            return "🛏️ Bed Booking\n"
+                    + "Your bed booking has been confirmed."
+                    + "\nHospital: "
+                    + hospital;
+
+        }
+
+
+        // =====================================
+        // REJECTED
+        // =====================================
+
+        if ("Rejected".equalsIgnoreCase(status)) {
+
+            return "🛏️ Bed Booking\n"
+                    + "Your bed booking request was rejected."
+                    + "\nHospital: "
+                    + hospital;
+
+        }
+
+
+        // =====================================
+        // CANCELLED
+        // =====================================
+
+        if ("Cancelled".equalsIgnoreCase(status)) {
+
+            return "🛏️ Bed Booking\n"
+                    + "Your bed booking has been cancelled."
+                    + "\nHospital: "
+                    + hospital;
+
+        }
+
+
+        // =====================================
+        // COMPLETED
+        // =====================================
+
+        if ("Completed".equalsIgnoreCase(status)) {
+
+            return "🛏️ Bed Booking\n"
+                    + "Your bed booking has been completed."
+                    + "\nHospital: "
+                    + hospital;
+
+        }
+
+
+        // =====================================
+        // PENDING / OTHER
+        // =====================================
+
+        return "🛏️ Bed Booking\n"
+                + "Your bed booking is "
+                + status + "."
+                + "\nHospital: "
+                + hospital;
+    }
+
+
+    // =========================================================
+    // SHOW NOTIFICATION POPUP
+    // =========================================================
+
+    private void showNotificationPopup(
+            List<NotificationItem> notifications) {
+
+        Dialog<Void> dialog =
+                new Dialog<>();
+
+        dialog.setTitle("Notifications");
+        dialog.setHeaderText("Your Notifications");
+
+        VBox notificationContainer =
+                new VBox();
+
+        notificationContainer.setSpacing(10);
+        notificationContainer.setPadding(
+                new Insets(5)
+        );
+
+        if (notifications == null
+                || notifications.isEmpty()) {
+
+            Label emptyLabel =
+                    new Label("No new notifications.");
+
+            emptyLabel.setWrapText(true);
+            emptyLabel.setStyle(
+                    "-fx-font-size: 13px;" +
+                    "-fx-text-fill: #77778D;" +
+                    "-fx-padding: 20px;"
+            );
+
+            notificationContainer
+                    .getChildren()
+                    .add(emptyLabel);
+
+        } else {
+
+            for (NotificationItem item : notifications) {
+
+                HBox row = new HBox();
+
+                row.setAlignment(
+                        Pos.CENTER_LEFT
+                );
+                row.setSpacing(5);
+                row.setPadding(
+                        new Insets(10)
+                );
+
+                row.setStyle(
+                        "-fx-background-color: #FFF8FB;" +
+                        "-fx-background-radius: 10;" +
+                        "-fx-border-color: #F2DCE7;" +
+                        "-fx-border-radius: 10;"
+                );
+
+                Label messageLabel =
+                        new Label(item.message);
+
+                messageLabel.setWrapText(true);
+                messageLabel.setMaxWidth(360);
+                messageLabel.setStyle(
+                        "-fx-font-size: 12px;" +
+                        "-fx-text-fill: #24234F;"
+                );
+
+                Button readButton =
+                        new Button("Mark as Read");
+
+                readButton.setStyle(
+                        "-fx-background-color: #E84A87;" +
+                        "-fx-text-fill: white;" +
+                        "-fx-font-size: 11px;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-background-radius: 15;" +
+                        "-fx-padding: 7px 12px;"
+                );
+
+                HBox.setHgrow(
+                        messageLabel,
+                        Priority.ALWAYS
+                );
+
+                readButton.setOnAction(e -> {
+
+                    markNotificationRead(
+                            item.key
+                    );
+
+                    notificationContainer
+                            .getChildren()
+                            .remove(row);
+
+                    updateNotificationBadge(
+                            notificationContainer
+                    );
+                });
+
+                row.getChildren().addAll(
+                        messageLabel,
+                        readButton
+                );
+
+                notificationContainer
+                        .getChildren()
+                        .add(row);
+            }
+        }
+
+        ScrollPane scrollPane =
+                new ScrollPane(
+                        notificationContainer
+                );
+
+        scrollPane.setFitToWidth(true);
+        scrollPane.setPrefViewportWidth(520);
+        scrollPane.setPrefViewportHeight(430);
+        scrollPane.setStyle(
+                "-fx-background-color: transparent;"
+        );
+
+        dialog.getDialogPane()
+                .setContent(scrollPane);
+
+        dialog.getDialogPane()
+                .getButtonTypes()
+                .add(
+                        javafx.scene.control.ButtonType.CLOSE
+                );
+
+        javafx.scene.Node defaultCloseButton =
+                dialog.getDialogPane()
+                        .lookupButton(
+                                javafx.scene.control.ButtonType.CLOSE
+                        );
+
+        if (defaultCloseButton != null) {
+            defaultCloseButton
+                    .setStyle(
+                            "-fx-background-color: #9B4DCC;" +
+                            "-fx-text-fill: white;" +
+                            "-fx-font-size: 12px;" +
+                            "-fx-font-weight: bold;" +
+                            "-fx-background-radius: 15;" +
+                            "-fx-padding: 7px 18px;"
+                    );
+        }
+
+        dialog.showAndWait();
+    }
+
+
+    private void updateNotificationBadge(
+            VBox notificationContainer) {
+
+        long unreadCount =
+                notificationContainer
+                        .getChildren()
+                        .stream()
+                        .filter(node ->
+                                node instanceof HBox
+                        )
+                        .count();
+
+        if (notificationLabel != null) {
+            notificationLabel.setText(
+                    String.valueOf(unreadCount)
+            );
+        }
+
+        currentNotifications.clear();
+
+        for (javafx.scene.Node node :
+                notificationContainer.getChildren()) {
+
+            if (node instanceof HBox) {
+                HBox row = (HBox) node;
+
+                if (!row.getChildren().isEmpty()
+                        && row.getChildren().get(0)
+                                instanceof Label) {
+
+                    currentNotifications.add(
+                            ((Label) row.getChildren()
+                                    .get(0)).getText()
+                    );
+                }
+            }
+        }
     }
 
 
@@ -893,25 +1853,36 @@ public class MotherDashBoard {
     }
 
 
+    // =========================================================
+    // WEEK TEXT
+    // =========================================================
+
     private String getWeekText(int week) {
 
-        if (week == 0) {
-            return "Pregnancy Not Started";
+        if (week <= 0) {
+            return "Current Pregnancy Week";
         }
 
-        if (week == 1) {
-            return "1st Week of Pregnancy";
+        if (week % 100 >= 11 &&
+                week % 100 <= 13) {
+
+            return week + "th Week of Pregnancy";
         }
 
-        if (week == 2) {
-            return "2nd Week of Pregnancy";
-        }
+        switch (week % 10) {
 
-        if (week == 3) {
-            return "3rd Week of Pregnancy";
-        }
+            case 1:
+                return week + "st Week of Pregnancy";
 
-        return week + "th Week of Pregnancy";
+            case 2:
+                return week + "nd Week of Pregnancy";
+
+            case 3:
+                return week + "rd Week of Pregnancy";
+
+            default:
+                return week + "th Week of Pregnancy";
+        }
     }
 
 
@@ -1010,40 +1981,41 @@ public class MotherDashBoard {
 
         bookButton.setOnAction(e -> {
 
-            MotherAppoinments appointments =
-                    new MotherAppoinments();
+                MotherAppoinments appointments =
+                        new MotherAppoinments(motherUid);
+            
+                mainContent.getChildren().clear();
+            
+                mainContent.getChildren().add(
+                        appointments.createAppointmentPage()
+                );
+            
+            });
+
+
+        reportButton.setOnAction(e -> {
+
+            MotherReports reports =
+                    new MotherReports(motherModel);
 
             mainContent.getChildren().clear();
 
             mainContent.getChildren().add(
-                    appointments.createAppointmentPage()
+                    reports.createReportsPage()
             );
 
         });
 
 
-        reportButton.setOnAction(e -> {
-
-                MotherReports reports =
-                new MotherReports(motherModel);
-        
-        mainContent.getChildren().clear();
-        
-        mainContent.getChildren().add(
-            reports.createReportsPage()
-        );
-
-        });
-
-
         medicineAction.setOnAction(e -> {
-                MotherMedicineReminder medicinePage =
-                new MotherMedicineReminder(motherModel);
-            
+
+            MotherMedicineReminder medicinePage =
+                    new MotherMedicineReminder(motherModel);
+
             mainContent.getChildren().clear();
-            
+
             mainContent.getChildren().add(
-                medicinePage.createMedicineReminderPage()
+                    medicinePage.createMedicineReminderPage()
             );
 
         });
@@ -1168,11 +2140,16 @@ public class MotherDashBoard {
         );
 
 
+        // =====================================================
+        // YOU ARE IN
+        // =====================================================
+
         Label smallText =
                 new Label("You are in");
 
         smallText.setStyle(
             "-fx-font-size: 17px;" +
+            "-fx-font-weight: bold;" +
             "-fx-text-fill: #24234F;"
         );
 
@@ -1312,14 +2289,18 @@ public class MotherDashBoard {
         // MOTHER IMAGE
         // =====================================================
 
-        ImageView motherImage =
-                new ImageView();
+        ImageView motherImage = new ImageView();
+
+        String imagePath =
+                "/assets/images/logo/PregnantMother.png";
 
         var motherResource =
-                getClass().getResource(
-                    "/assets/images/logo/ChatGPT Image Aug 15, 2026, 01_33_52 PM.png"
-                );
+                getClass().getResource(imagePath);
 
+        System.out.println(
+                "Mother image resource = "
+                        + motherResource
+        );
 
         if (motherResource != null) {
 
@@ -1328,42 +2309,40 @@ public class MotherDashBoard {
                         motherResource.toExternalForm()
                     );
 
-            motherImage.setImage(image);
-
-            motherImage.setViewport(
-                new Rectangle2D(
-                    700,
-                    60,
-                    836,
-                    900
-                )
+            System.out.println(
+                    "Mother image loaded = "
+                            + !image.isError()
             );
 
-            motherImage.setFitWidth(210);
+            motherImage.setImage(image);
 
-            motherImage.setFitHeight(245);
+            motherImage.setFitWidth(350);
+            motherImage.setFitHeight(350);
 
             motherImage.setPreserveRatio(true);
+            motherImage.setSmooth(true);
+
+        } else {
+
+            System.out.println(
+                    "❌ Mother image NOT FOUND: "
+                            + imagePath
+            );
         }
 
-
-        VBox imageBox =
-                new VBox();
+        VBox imageBox = new VBox();
 
         imageBox.setAlignment(
-                Pos.CENTER
+                Pos.CENTER_RIGHT
         );
 
-        imageBox.setPrefWidth(230);
-
-        imageBox.setMinWidth(210);
-
+        imageBox.setPrefWidth(270);
+        imageBox.setMinWidth(230);
         imageBox.setPrefHeight(250);
 
         imageBox.getChildren().add(
                 motherImage
         );
-
 
         card.getChildren().addAll(
                 details,
@@ -1441,22 +2420,13 @@ public class MotherDashBoard {
         );
 
 
-        Label babySize =
-                new Label(
-                    "Baby is the size of Corn 🌽"
-                );
-
-        babySize.setStyle(
-            "-fx-font-size: 14px;" +
-            "-fx-text-fill: #24234F;" +
-            "-fx-font-weight: bold;"
-        );
+        
 
 
         pregnancyDetails.getChildren().addAll(
                 week,
-                trimester,
-                babySize
+                trimester
+                
         );
 
 
@@ -1474,106 +2444,18 @@ public class MotherDashBoard {
         );
 
 
-        HBox stats =
-                new HBox();
-
-        stats.setSpacing(12);
-
-        stats.setAlignment(
-                Pos.CENTER
-        );
-
-
-        /*
-         * Existing dashboard stats unchanged
-         */
-        stats.getChildren().addAll(
-
-                createStat(
-                    "30.1 cm",
-                    "Baby Length"
-                ),
-
-                createStat(
-                    "600 g",
-                    "Baby Weight"
-                ),
-
-                createStat(
-                    "8-10 /day",
-                    "Kick Count"
-                ),
-
-                createStat(
-                    "+6.2 kg",
-                    "Your Weight"
-                )
-        );
-
-
+        
         card.getChildren().addAll(
                 heading,
                 pregnancyInfo,
-                separator,
-                stats
+                separator
         );
 
         return card;
     }
 
 
-    // =========================================================
-    // STAT
-    // =========================================================
-
-    private VBox createStat(
-            String value,
-            String title) {
-
-        VBox box =
-                new VBox();
-
-        box.setAlignment(
-                Pos.CENTER
-        );
-
-        box.setSpacing(4);
-
-        box.setPrefWidth(75);
-
-
-        Label valueLabel =
-                new Label(value);
-
-        valueLabel.setStyle(
-            "-fx-font-size: 13px;" +
-            "-fx-font-weight: bold;" +
-            "-fx-text-fill: #24234F;"
-        );
-
-
-        Label titleLabel =
-                new Label(title);
-
-        titleLabel.setWrapText(true);
-
-        titleLabel.setAlignment(
-                Pos.CENTER
-        );
-
-        titleLabel.setStyle(
-            "-fx-font-size: 11px;" +
-            "-fx-text-fill: #77778D;"
-        );
-
-
-        box.getChildren().addAll(
-                valueLabel,
-                titleLabel
-        );
-
-        return box;
-    }
+    
 
 
     // =========================================================
@@ -1632,7 +2514,7 @@ public class MotherDashBoard {
         view.setOnAction(e -> {
 
             MotherAppoinments appointments =
-                    new MotherAppoinments();
+                    new MotherAppoinments(motherUid);
 
             mainContent.getChildren().clear();
 

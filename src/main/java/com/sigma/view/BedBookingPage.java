@@ -1,34 +1,33 @@
 package com.sigma.view;
 
-import com.sigma.model.BedBooking;
-//import com.google.api.services.storage.Storage.BucketAccessControls.List;
+import com.google.cloud.firestore.ListenerRegistration;
 import com.sigma.controller.HospitalController.BedBookingController;
+import com.sigma.model.BedBooking;
+
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import javafx.stage.Stage;
-import java.util.List;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 public class BedBookingPage {
 
     // =========================================================
-    // COLOUR PALETTE - SAME AS MAACARE AI
+    // COLOUR PALETTE
     // =========================================================
 
-
-       private static final String BG="#F7EAF5";
-
-
+    private static final String BG = "#F7EAF5";
     private static final String WHITE = "#FFFFFF";
     private static final String NAVY = "#17184F";
 
@@ -41,35 +40,57 @@ public class BedBookingPage {
     private static final String ORANGE = "#F2A33A";
 
     private static final String BORDER = "#E9E6EF";
-    private static final String GREY = "#77758A"; 
-
-
-    private BedBookingController controller=new BedBookingController();
-    private Label totalBedsLabel;
-private Label availableBedsLabel;
-private Label occupiedBedsLabel;
-private Label pendingBedsLabel;
-private ObservableList<BedBooking> data =
-        FXCollections.observableArrayList();
-
-private BorderPane root;
-
-
+    private static final String GREY = "#77758A";
 
     // =========================================================
-    // SHOW PAGE
+    // CONTROLLER
     // =========================================================
 
-  
-public BedBookingPage(){ 
+    private final BedBookingController controller =
+            new BedBookingController();
+
+    // =========================================================
+    // DATA
+    // =========================================================
+
+    private final ObservableList<BedBooking> data =
+            FXCollections.observableArrayList();
+
+    private ListenerRegistration bookingListener;
+
+    // =========================================================
+    // STAT LABELS
+    // =========================================================
+
+    private Label totalBookingsLabel;
+    private Label pendingBookingsLabel;
+    private Label bookedBookingsLabel;
+    private Label rejectedBookingsLabel;
+
+    // =========================================================
+    // ROOT
+    // =========================================================
+
+    private BorderPane root;
+
+    // =========================================================
+    // CONSTRUCTOR
+    // =========================================================
+
+    public BedBookingPage() {
+
         createView();
-        
-}
 
+        startRealtimeListener();
+    }
 
+    // =========================================================
+    // CREATE VIEW
+    // =========================================================
 
-private void createView(){
-root=new BorderPane();
+    private void createView() {
+
+        root = new BorderPane();
 
         root.setStyle(
                 "-fx-background-color: " + BG + ";"
@@ -94,10 +115,6 @@ root=new BorderPane();
         header.setPadding(
                 new Insets(0, 0, 8, 0)
         );
-
-        // -----------------------------------------------------
-        // TITLE
-        // -----------------------------------------------------
 
         VBox titleBox = new VBox(5);
 
@@ -132,40 +149,7 @@ root=new BorderPane();
                 subtitle
         );
 
-        
-// =====================================================
-// ADD BED BOOKING BUTTON
-// =====================================================
-
-Button addBedButton =
-        new Button("+ Add Bed Booking");
-
-addBedButton.setFont(
-        Font.font(
-                "Arial",
-                FontWeight.BOLD,
-                13
-        )
-);
-
-addBedButton.setCursor(Cursor.HAND);
-
-addBedButton.setStyle(
-        "-fx-background-color: " + PINK + ";" +
-        "-fx-text-fill: white;" +
-        "-fx-background-radius: 8;" +
-        "-fx-border-radius: 8;" +
-        "-fx-padding: 10 16;"
-);
-
-
-
-
-
-
-
         header.setLeft(titleBox);
-       
 
         // =====================================================
         // SUMMARY CARDS
@@ -175,71 +159,91 @@ addBedButton.setStyle(
 
         cards.setAlignment(Pos.CENTER);
 
-        VBox totalBeds =
-                createStatCard(
-                        "100",
-                         "🛌",
-                         "Total Beds",
-                        "All Hospital Beds",
-                        BLUE
-                );
-
-        VBox availableBeds =
-                createStatCard(
-                        "0",
-                        "✅",
-                       "Available Beds",
-                        "Ready for Booking",
-                        GREEN
-                );
-
-        VBox occupiedBeds =
+        VBox totalBookings =
                 createStatCard(
                         "0",
                         "🛌",
-                        "Occupied Beds",
-                        "Currently Occupied",
-                        PINK
+                        "Total Bookings",
+                        "All Bed Requests",
+                        BLUE
                 );
 
-        VBox pendingBeds =
+        VBox pendingBookings =
                 createStatCard(
                         "0",
-                         "⏳",
-                     "Pending Booking",
+                        "⏳",
+                        "Pending",
                         "Awaiting Confirmation",
                         ORANGE
                 );
 
+        VBox bookedBookings =
+                createStatCard(
+                        "0",
+                        "✅",
+                        "Booked",
+                        "Confirmed Bookings",
+                        GREEN
+                );
+
+        VBox rejectedBookings =
+                createStatCard(
+                        "0",
+                        "✕",
+                        "Rejected",
+                        "Rejected Requests",
+                        PINK
+                );
+
         cards.getChildren().addAll(
-                totalBeds,
-                availableBeds,
-                occupiedBeds,
-                pendingBeds
-        );   
+                totalBookings,
+                pendingBookings,
+                bookedBookings,
+                rejectedBookings
+        );
 
+        // =====================================================
+        // ADD BUTTON
+        // =====================================================
 
-// =====================================================
-// ADD BED BOOKING BUTTON BOX
-// =====================================================
+        Button addBedButton =
+                new Button("+ Add Bed Booking");
 
-HBox addButtonBox = new HBox();
+        addBedButton.setFont(
+                Font.font(
+                        "Arial",
+                        FontWeight.BOLD,
+                        13
+                )
+        );
 
-addButtonBox.setAlignment(
-        Pos.CENTER_RIGHT
-);
+        addBedButton.setCursor(Cursor.HAND);
 
-addButtonBox.getChildren().add(
-        addBedButton
-);
+        addBedButton.setStyle(
+                "-fx-background-color: " + PINK + ";" +
+                "-fx-text-fill: white;" +
+                "-fx-background-radius: 8;" +
+                "-fx-border-radius: 8;" +
+                "-fx-padding: 10 16;"
+        );
 
+        HBox addButtonBox =
+                new HBox();
 
+        addButtonBox.setAlignment(
+                Pos.CENTER_RIGHT
+        );
+
+        addButtonBox.getChildren().add(
+                addBedButton
+        );
 
         // =====================================================
         // SEARCH + FILTER
         // =====================================================
 
-        HBox filterBox = new HBox(18);
+        HBox filterBox =
+                new HBox(18);
 
         filterBox.setPadding(
                 new Insets(18)
@@ -255,10 +259,6 @@ addButtonBox.getChildren().add(
                 "-fx-border-radius: 12;" +
                 "-fx-background-radius: 12;"
         );
-
-        // =====================================================
-        // SEARCH
-        // =====================================================
 
         TextField searchField =
                 new TextField();
@@ -299,7 +299,7 @@ addButtonBox.getChildren().add(
                 "All Departments"
         );
 
-        departmentBox.setPrefWidth(200);
+        departmentBox.setPrefWidth(190);
         departmentBox.setPrefHeight(45);
 
         // =====================================================
@@ -321,7 +321,7 @@ addButtonBox.getChildren().add(
                 "All Bed Types"
         );
 
-        bedTypeBox.setPrefWidth(200);
+        bedTypeBox.setPrefWidth(180);
         bedTypeBox.setPrefHeight(45);
 
         // =====================================================
@@ -333,17 +333,16 @@ addButtonBox.getChildren().add(
 
         statusBox.getItems().addAll(
                 "All Status",
-         "Booked",
-              
-                "Available",
-                "Pending"
+                "Pending",
+                "Booked",
+                "Rejected"
         );
 
         statusBox.setValue(
                 "All Status"
         );
 
-        statusBox.setPrefWidth(170);
+        statusBox.setPrefWidth(160);
         statusBox.setPrefHeight(45);
 
         filterBox.getChildren().addAll(
@@ -360,7 +359,7 @@ addButtonBox.getChildren().add(
         TableView<BedBooking> table =
                 new TableView<>();
 
-        table.setPrefHeight(420);
+        table.setPrefHeight(450);
 
         table.setColumnResizePolicy(
                 TableView.CONSTRAINED_RESIZE_POLICY
@@ -374,7 +373,7 @@ addButtonBox.getChildren().add(
         );
 
         // =====================================================
-        // TABLE COLUMNS
+        // COLUMNS
         // =====================================================
 
         TableColumn<BedBooking, String> numberColumn =
@@ -384,25 +383,12 @@ addButtonBox.getChildren().add(
                 new PropertyValueFactory<>("number")
         );
 
-        // -----------------------------------------------------
-
-        TableColumn<BedBooking, String> departmentColumn =
-                new TableColumn<>("Department");
-
-        departmentColumn.setCellValueFactory(
-                new PropertyValueFactory<>("department")
-        );
-
-        // -----------------------------------------------------
-
         TableColumn<BedBooking, String> bookingIdColumn =
-                new TableColumn<>("bookingID");
+                new TableColumn<>("Booking ID");
 
         bookingIdColumn.setCellValueFactory(
                 new PropertyValueFactory<>("bookingID")
         );
-
-        // -----------------------------------------------------
 
         TableColumn<BedBooking, String> patientColumn =
                 new TableColumn<>("Patient Name");
@@ -411,7 +397,19 @@ addButtonBox.getChildren().add(
                 new PropertyValueFactory<>("patientName")
         );
 
-        // -----------------------------------------------------
+        TableColumn<BedBooking, String> hospitalColumn =
+                new TableColumn<>("Hospital");
+
+        hospitalColumn.setCellValueFactory(
+                new PropertyValueFactory<>("hospitalName")
+        );
+
+        TableColumn<BedBooking, String> departmentColumn =
+                new TableColumn<>("Department");
+
+        departmentColumn.setCellValueFactory(
+                new PropertyValueFactory<>("department")
+        );
 
         TableColumn<BedBooking, String> bedNoColumn =
                 new TableColumn<>("Bed No.");
@@ -420,16 +418,12 @@ addButtonBox.getChildren().add(
                 new PropertyValueFactory<>("bedNo")
         );
 
-        // -----------------------------------------------------
-
         TableColumn<BedBooking, String> bedTypeColumn =
                 new TableColumn<>("Bed Type");
 
         bedTypeColumn.setCellValueFactory(
                 new PropertyValueFactory<>("bedType")
         );
-
-        // -----------------------------------------------------
 
         TableColumn<BedBooking, String> checkInColumn =
                 new TableColumn<>("Check-in Date");
@@ -438,8 +432,6 @@ addButtonBox.getChildren().add(
                 new PropertyValueFactory<>("checkinDate")
         );
 
-        // -----------------------------------------------------
-
         TableColumn<BedBooking, String> checkOutColumn =
                 new TableColumn<>("Expected Check-out");
 
@@ -447,580 +439,306 @@ addButtonBox.getChildren().add(
                 new PropertyValueFactory<>("expectedCheckout")
         );
 
-        // -----------------------------------------------------
-
         TableColumn<BedBooking, String> statusColumn =
                 new TableColumn<>("Status");
 
         statusColumn.setCellValueFactory(
                 new PropertyValueFactory<>("status")
-        );  
+        );
 
-//Action Column 
-// =====================================================
-// ACTION COLUMN
-// =====================================================
+        // =====================================================
+        // ACTION COLUMN
+        // =====================================================
 
-TableColumn<BedBooking, Void> actionColumn =
-        new TableColumn<>("Action");
+        TableColumn<BedBooking, Void> actionColumn =
+                new TableColumn<>("Action");
 
-actionColumn.setCellFactory(column ->
-        new TableCell<BedBooking, Void>() {
+        actionColumn.setCellFactory(column ->
+                new TableCell<BedBooking, Void>() {
 
-            private final Button view =
-                    new Button("◉");
+                    private final Button view =
+                            new Button("View");
 
-            private final Button edit =
-                    new Button("✎");
+                    private final Button accept =
+                            new Button("Accept");
 
-            private final Button delete =
-                    new Button("▢");
+                    private final Button reject =
+                            new Button("Reject");
 
-            private final HBox box =
-                    new HBox(5, view, edit, delete);
+                    private final Button edit =
+                            new Button("Edit");
 
-            {
-                box.setAlignment(Pos.CENTER);
+                    private final Button delete =
+                            new Button("Delete");
 
-                view.setCursor(Cursor.HAND);
-                edit.setCursor(Cursor.HAND);
-                delete.setCursor(Cursor.HAND);
-
-                // =================================================
-                // VIEW STYLE
-                // =================================================
-
-                view.setStyle(
-                        "-fx-background-color: #FFF0F7;" +
-                        "-fx-text-fill: " + PINK + ";" +
-                        "-fx-border-color: " + BORDER + ";" +
-                        "-fx-border-radius: 5;" +
-                        "-fx-background-radius: 5;"
-                );
-
-                // =================================================
-                // EDIT STYLE
-                // =================================================
-
-                edit.setStyle(
-                        "-fx-background-color: #EEF5FF;" +
-                        "-fx-text-fill: #3274C6;" +
-                        "-fx-border-color: " + BORDER + ";" +
-                        "-fx-border-radius: 5;" +
-                        "-fx-background-radius: 5;"
-                );
-
-                // =================================================
-                // DELETE STYLE
-                // =================================================
-
-                delete.setStyle(
-                        "-fx-background-color: #FFF0F0;" +
-                        "-fx-text-fill: #D94A5A;" +
-                        "-fx-border-color: " + BORDER + ";" +
-                        "-fx-border-radius: 5;" +
-                        "-fx-background-radius: 5;"
-                );
-
-                // =================================================
-                // VIEW
-                // =================================================
-
-                view.setOnAction(e -> {
-
-                    BedBooking record =
-                            getTableView()
-                                    .getItems()
-                                    .get(getIndex());
-
-                    Alert alert =
-                            new Alert(
-                                    Alert.AlertType.INFORMATION
+                    private final HBox box =
+                            new HBox(
+                                    5,
+                                    view,
+                                    accept,
+                                    reject,
+                                    edit,
+                                    delete
                             );
 
-                    alert.setTitle(
-                            "Bed Booking Details"
-                    );
+                    {
+                        box.setAlignment(
+                                Pos.CENTER
+                        );
 
-                    alert.setHeaderText(
-                            "Bed Booking Information"
-                    );
+                        view.setCursor(
+                                Cursor.HAND
+                        );
 
-                    alert.setContentText(
-                            "Booking ID: "
-                            + record.getBookingID()
+                        accept.setCursor(
+                                Cursor.HAND
+                        );
 
-                            + "\n\nPatient: "
-                            + record.getPatientName()
+                        reject.setCursor(
+                                Cursor.HAND
+                        );
 
-                            + "\n\nDepartment: "
-                            + record.getDepartment()
+                        edit.setCursor(
+                                Cursor.HAND
+                        );
 
-                            + "\n\nBed No.: "
-                            + record.getBedNo()
+                        delete.setCursor(
+                                Cursor.HAND
+                        );
 
-                            + "\n\nBed Type: "
-                            + record.getBedType()
+                        view.setStyle(
+                                "-fx-background-color: #FFF0F7;" +
+                                "-fx-text-fill: " + PINK + ";" +
+                                "-fx-border-color: " + BORDER + ";" +
+                                "-fx-border-radius: 5;" +
+                                "-fx-background-radius: 5;"
+                        );
 
-                            + "\n\nCheck-in Date: "
-                            + record.getCheckinDate()
+                        accept.setStyle(
+                                "-fx-background-color: #E8F8F0;" +
+                                "-fx-text-fill: #35A56B;" +
+                                "-fx-border-color: " + BORDER + ";" +
+                                "-fx-border-radius: 5;" +
+                                "-fx-background-radius: 5;"
+                        );
 
-                            + "\n\nExpected Check-out: "
-                            + record.getExpectedCheckout()
+                        reject.setStyle(
+                                "-fx-background-color: #FFF0F0;" +
+                                "-fx-text-fill: #D94A5A;" +
+                                "-fx-border-color: " + BORDER + ";" +
+                                "-fx-border-radius: 5;" +
+                                "-fx-background-radius: 5;"
+                        );
 
-                            + "\n\nStatus: "
-                            + record.getStatus()
-                    );
+                        edit.setStyle(
+                                "-fx-background-color: #EEF5FF;" +
+                                "-fx-text-fill: #3274C6;" +
+                                "-fx-border-color: " + BORDER + ";" +
+                                "-fx-border-radius: 5;" +
+                                "-fx-background-radius: 5;"
+                        );
 
-                    alert.showAndWait();
-                });
+                        delete.setStyle(
+                                "-fx-background-color: #FFF0F0;" +
+                                "-fx-text-fill: #D94A5A;" +
+                                "-fx-border-color: " + BORDER + ";" +
+                                "-fx-border-radius: 5;" +
+                                "-fx-background-radius: 5;"
+                        );
 
-                // =================================================
-                // EDIT
-                // =================================================
+                        // =============================================
+                        // VIEW
+                        // =============================================
 
-                edit.setOnAction(e -> {
+                        view.setOnAction(e -> {
 
-                    BedBooking record =
-                            getTableView()
-                                    .getItems()
-                                    .get(getIndex());
+                            BedBooking record =
+                                    getSelectedRecord();
 
-                    ChoiceDialog<String> dialog =
-                            new ChoiceDialog<>(
-                                    record.getStatus(),
-                                    "Booked",
-                                    "Available",
-                                    "Pending"
+                            if (record == null) {
+                                return;
+                            }
+
+                            showBookingDetails(
+                                    record
                             );
+                        });
 
-                    dialog.setTitle(
-                            "Edit Bed Booking"
-                    );
+                        // =============================================
+                        // ACCEPT
+                        // =============================================
 
-                    dialog.setHeaderText(
-                            "Change Booking Status"
-                    );
+                        accept.setOnAction(e -> {
 
-                    dialog.setContentText(
-                            "Select Status:"
-                    );
+                            BedBooking record =
+                                    getSelectedRecord();
 
-                    dialog.showAndWait()
-                            .ifPresent(newStatus -> {
+                            if (record == null) {
+                                return;
+                            }
 
-                              
-
-record.setStatus(
-        newStatus
-);
-
-// Firebase madhe update
-controller.updateBedBooking(
-        record.getNumber(),
-        record.getBookingID(),
-        record.getPatientName(),
-        record.getDepartment(),
-        record.getBedNo(),
-        record.getBedType(),
-        record.getCheckinDate(),
-        record.getExpectedCheckout(),
-        record.getStatus()
-);
-
-getTableView().refresh();
-
-updateStatCards();
-
-
-
-
-                            });
-                });
-
-                // =================================================
-                // DELETE
-                // =================================================
-
-                delete.setOnAction(e -> {
-
-                    BedBooking record =
-                            getTableView()
-                                    .getItems()
-                                    .get(getIndex());
-
-                    Alert confirmation =
-                            new Alert(
-                                    Alert.AlertType.CONFIRMATION
+                            acceptBooking(
+                                    record
                             );
+                        });
 
-                    confirmation.setTitle(
-                            "Delete Bed Booking"
-                    );
+                        // =============================================
+                        // REJECT
+                        // =============================================
 
-                    confirmation.setHeaderText(
-                            "Delete Bed Booking?"
-                    );
+                        reject.setOnAction(e -> {
 
-                    confirmation.setContentText(
-                            "Are you sure you want to delete the booking of "
-                            + record.getPatientName()
-                            + "?"
-                    );
+                            BedBooking record =
+                                    getSelectedRecord();
 
-                    confirmation.showAndWait()
-                            .ifPresent(response -> {
+                            if (record == null) {
+                                return;
+                            }
 
-                            
+                            rejectBooking(
+                                    record
+                            );
+                        });
 
-if (response == ButtonType.OK) {
+                        // =============================================
+                        // EDIT
+                        // =============================================
 
-    // Firebase madhun delete
-    controller.deleteBedBooking(
-            record.getBookingID()
-    );
+                        edit.setOnAction(e -> {
 
-data.remove(record);
+                            BedBooking record =
+                                    getSelectedRecord();
 
-table.setItems(data);
-table.refresh();
+                            if (record == null) {
+                                return;
+                            }
 
-updateStatCards();
+                            editBooking(
+                                    record
+                            );
+                        });
 
+                        // =============================================
+                        // DELETE
+                        // =============================================
 
-    // Table madhun delete
-    getTableView()
-            .getItems()
-            .remove(record);
+                        delete.setOnAction(e -> {
 
-            
+                            BedBooking record =
+                                    getSelectedRecord();
 
-}
+                            if (record == null) {
+                                return;
+                            }
 
-                            });
-                });
-            }
+                            deleteBooking(
+                                    record
+                            );
+                        });
+                    }
 
-            @Override
-            protected void updateItem(
-                    Void item,
-                    boolean empty
-            ) {
+                    private BedBooking getSelectedRecord() {
 
-                super.updateItem(
-                        item,
-                        empty
-                );
+                        if (getIndex() < 0) {
+                            return null;
+                        }
 
-                if (empty) {
+                        if (getIndex() >=
+                                getTableView()
+                                        .getItems()
+                                        .size()) {
 
-                    setGraphic(null);
+                            return null;
+                        }
 
-                } else {
+                        return getTableView()
+                                .getItems()
+                                .get(getIndex());
+                    }
 
-                    setGraphic(box);
+                    @Override
+                    protected void updateItem(
+                            Void item,
+                            boolean empty
+                    ) {
+
+                        super.updateItem(
+                                item,
+                                empty
+                        );
+
+                        if (empty) {
+
+                            setGraphic(null);
+
+                            return;
+                        }
+
+                        BedBooking record =
+                                getSelectedRecord();
+
+                        if (record == null) {
+
+                            setGraphic(null);
+
+                            return;
+                        }
+
+                        String status =
+                                record.getStatus();
+
+                        boolean pending =
+                                status != null
+                                        &&
+                                        status.equalsIgnoreCase(
+                                                "Pending"
+                                        );
+
+                        accept.setDisable(
+                                !pending
+                        );
+
+                        reject.setDisable(
+                                !pending
+                        );
+
+                        setGraphic(box);
+                    }
                 }
-            }
-        }
-);
-
-
-
-
+        );
 
         // =====================================================
         // ADD COLUMNS
         // =====================================================
 
-       table.getColumns().addAll(
-              numberColumn,
-              
-              departmentColumn,
+        table.getColumns().addAll(
+                numberColumn,
                 bookingIdColumn,
-               patientColumn,
-               bedNoColumn,
-              bedTypeColumn,
-               checkInColumn,
-               checkOutColumn,
-               statusColumn,
-               actionColumn
-       );
+                patientColumn,
+                hospitalColumn,
+                departmentColumn,
+                bedNoColumn,
+                bedTypeColumn,
+                checkInColumn,
+                checkOutColumn,
+                statusColumn,
+                actionColumn
+        );
+
+        table.setItems(
+                data
+        );
 
         // =====================================================
-        // DATA
+        // ADD BOOKING
         // =====================================================
 
-      
-
-
-      
-List<BedBooking> firebaseData =
-        controller.getAllBedBookings();
-
-data.clear();
-data.addAll(firebaseData);
-
-table.setItems(data);
-
-updateStatCards();
-
-        
-// =====================================================
-// ADD BED BOOKING ACTION
-// =====================================================
-
-addBedButton.setOnAction(e -> {
-
-    Dialog<ButtonType> dialog =
-            new Dialog<>();
-
-    dialog.setTitle("Add Bed Booking");
-    dialog.setHeaderText("Enter Bed Booking Details");
-
-    GridPane form =
-            new GridPane();
-
-    form.setHgap(12);
-    form.setVgap(12);
-    form.setPadding(new Insets(20));
-
-    TextField bookingIdField = new TextField();
-    bookingIdField.setPromptText("Booking ID");
-
-    TextField patientField = new TextField();
-    patientField.setPromptText("Patient Name");
-
-    ComboBox<String> departmentField =
-            new ComboBox<>();
-
-    departmentField.getItems().addAll(
-            "General Ward",
-            "ICU",
-            "Emergency",
-            "Pediatric",
-            "Maternity"
-    );
-
-    departmentField.setPromptText("Select Department");
-
-    TextField bedNoField = new TextField();
-    bedNoField.setPromptText("Bed No.");
-
-    ComboBox<String> bedTypeField =
-            new ComboBox<>();
-
-    bedTypeField.getItems().addAll(
-            "General",
-            "ICU",
-            "Private",
-            "Semi-Private"
-    );
-
-    bedTypeField.setPromptText("Select Bed Type");
-
-    TextField checkInField = new TextField();
-    checkInField.setPromptText("e.g. 25 Aug 2026");
-
-    TextField checkOutField = new TextField();
-    checkOutField.setPromptText("e.g. 30 Aug 2026");
-
-    ComboBox<String> statusField =
-            new ComboBox<>();
-
-    statusField.getItems().addAll(
-            "Booked",
-           //"Occupied",
-            "Available",
-            "Pending"
-    );
-
-   statusField.setValue("Pending");
-   //statusField.setValue("Occupied");
-
-    form.add(new Label("Booking ID:"), 0, 0);
-    form.add(bookingIdField, 1, 0);
-
-    form.add(new Label("Patient Name:"), 0, 1);
-    form.add(patientField, 1, 1);
-
-    form.add(new Label("Department:"), 0, 2);
-    form.add(departmentField, 1, 2);
-
-    form.add(new Label("Bed No.:"), 0, 3);
-    form.add(bedNoField, 1, 3);
-
-    form.add(new Label("Bed Type:"), 0, 4);
-    form.add(bedTypeField, 1, 4);
-
-    form.add(new Label("Check-in Date:"), 0, 5);
-    form.add(checkInField, 1, 5);
-
-    form.add(new Label("Expected Check-out:"), 0, 6);
-    form.add(checkOutField, 1, 6);
-
-    form.add(new Label("Status:"), 0, 7);
-    form.add(statusField, 1, 7);
-
-    dialog.getDialogPane()
-            .setContent(form);
-
-    ButtonType addButton =
-            new ButtonType(
-                    "Add Booking",
-                    ButtonBar.ButtonData.OK_DONE
-            );
-
-    dialog.getDialogPane()
-            .getButtonTypes()
-            .addAll(
-                    addButton,
-                    ButtonType.CANCEL
-            );
-
-    dialog.setResultConverter(button -> {
-
-        if (button == addButton) {
-
-            if (
-                    bookingIdField.getText().trim().isEmpty()
-                    ||
-                    patientField.getText().trim().isEmpty()
-                    ||
-                    departmentField.getValue() == null
-                    ||
-                    bedNoField.getText().trim().isEmpty()
-                    ||
-                    bedTypeField.getValue() == null
-                    ||
-                    checkInField.getText().trim().isEmpty()
-                    ||
-                    checkOutField.getText().trim().isEmpty()
-            ) {
-
-                Alert warning =
-                        new Alert(
-                                Alert.AlertType.WARNING
-                        );
-
-                warning.setTitle(
-                        "Missing Information"
-                );
-
-                warning.setHeaderText(
-                        "Please fill all fields"
-                );
-
-                warning.showAndWait();
-
-                return null;
-            }
-
-          /*  String newNumber =
-                    String.valueOf(
-                            data.size() + 1
-                    );*/ 
-/*String newNumber = String.valueOf(
-        controller.getAllBedBookings().size() + 1
-);*/
-
-int maxNumber = 0;
-
-for (BedBooking booking : data) {
-    try {
-        int currentNumber = Integer.parseInt(booking.getNumber());
-
-        if (currentNumber > maxNumber) {
-            maxNumber = currentNumber;
-        }
-    } catch (NumberFormatException ex) {
-
-    }
-}
-
-String newNumber = String.valueOf(maxNumber + 1);
-
-            // IMPORTANT:
-            // Constructor order same as your existing data
-
-            BedBooking newBooking =
-                    new BedBooking(
-
-                            newNumber,
-
-                           // departmentField.getValue(),
-
-                            bookingIdField
-                                    .getText()
-                                    .trim(),
-                                    
-
-                            patientField
-                                    .getText()
-                                    .trim(),
-
-                                    departmentField.getValue(),
-
-                            bedNoField
-                                    .getText()
-                                    .trim(),
-
-                            bedTypeField
-                                    .getValue(),
-
-                            checkInField
-                                    .getText()
-                                    .trim(),
-
-                            checkOutField
-                                    .getText()
-                                    .trim(),
-
-                            statusField
-                                    .getValue()
-                    );
-
-            // ADD NEW DATA
-           // data.add(newBooking);
-
-            // REFRESH TABLE
-          //  table.setItems(data);
-          //  table.refresh();  
-
-controller.addBedBooking(
-        newBooking.getNumber(),
-        newBooking.getBookingID(),
-        newBooking.getPatientName(),
-        newBooking.getDepartment(),
-        newBooking.getBedNo(),
-        newBooking.getBedType(),
-        newBooking.getCheckinDate(),
-        newBooking.getExpectedCheckout(),
-        newBooking.getStatus()
-);
-
-data.add(newBooking);
-//data.clear();
-//data.addAll(controller.getAllBedBookings());
-table.setItems(data);
-table.refresh(); 
-updateStatCards();
-
-
-
-
-
-
-            return button;
-        }
-
-        return null;
-    });
-
-    dialog.showAndWait();
-});
-
-       // =====================================================
-        // STATUS CELL STYLE
+        addBedButton.setOnAction(
+                e -> showAddBedBookingDialog()
+        );
+
+        // =====================================================
+        // STATUS CELL
         // =====================================================
 
         statusColumn.setCellFactory(
@@ -1053,7 +771,8 @@ updateStatCards();
                                         Pos.CENTER
                                 );
 
-                                if (item.equals("Booked")) {
+                                if (item.equalsIgnoreCase(
+                                        "Booked")) {
 
                                     setStyle(
                                             "-fx-background-color: #E8F8F0;" +
@@ -1062,12 +781,27 @@ updateStatCards();
                                     );
 
                                 } else if (
-                                        item.equals("Pending")) {
+                                        item.equalsIgnoreCase(
+                                                "Pending"
+                                        )
+                                ) {
 
                                     setStyle(
                                             "-fx-background-color: #FFF4E5;" +
                                             "-fx-text-fill: " +
                                             ORANGE + ";" +
+                                            "-fx-font-weight: bold;"
+                                    );
+
+                                } else if (
+                                        item.equalsIgnoreCase(
+                                                "Rejected"
+                                        )
+                                ) {
+
+                                    setStyle(
+                                            "-fx-background-color: #FFF0F0;" +
+                                            "-fx-text-fill: #D94A5A;" +
                                             "-fx-font-weight: bold;"
                                     );
 
@@ -1113,7 +847,7 @@ updateStatCards();
         });
 
         // =====================================================
-        // SEARCH FILTER
+        // SEARCH
         // =====================================================
 
         searchField.textProperty().addListener(
@@ -1121,7 +855,6 @@ updateStatCards();
 
                     applyFilter(
                             table,
-                            data,
                             newValue,
                             departmentBox.getValue(),
                             bedTypeBox.getValue(),
@@ -1131,14 +864,13 @@ updateStatCards();
         );
 
         // =====================================================
-        // DEPARTMENT FILTER
+        // DEPARTMENT
         // =====================================================
 
         departmentBox.setOnAction(e -> {
 
             applyFilter(
                     table,
-                    data,
                     searchField.getText(),
                     departmentBox.getValue(),
                     bedTypeBox.getValue(),
@@ -1147,14 +879,13 @@ updateStatCards();
         });
 
         // =====================================================
-        // BED TYPE FILTER
+        // BED TYPE
         // =====================================================
 
         bedTypeBox.setOnAction(e -> {
 
             applyFilter(
                     table,
-                    data,
                     searchField.getText(),
                     departmentBox.getValue(),
                     bedTypeBox.getValue(),
@@ -1163,14 +894,13 @@ updateStatCards();
         });
 
         // =====================================================
-        // STATUS FILTER
+        // STATUS
         // =====================================================
 
         statusBox.setOnAction(e -> {
 
             applyFilter(
                     table,
-                    data,
                     searchField.getText(),
                     departmentBox.getValue(),
                     bedTypeBox.getValue(),
@@ -1179,7 +909,7 @@ updateStatCards();
         });
 
         // =====================================================
-        // ADD CONTENT
+        // ADD TO ROOT
         // =====================================================
 
         mainContent.getChildren().addAll(
@@ -1190,22 +920,999 @@ updateStatCards();
                 table
         );
 
-        root.setCenter(mainContent);
-
-        // =====================================================
-        // SCENE
-        // =====================================================
-
-       
+        root.setCenter(
+                mainContent
+        );
     }
 
     // =========================================================
-    // FILTER METHOD
+    // REALTIME LISTENER
+    // =========================================================
+
+    private void startRealtimeListener() {
+
+        bookingListener =
+                controller.listenToBedBookings(
+                        firebaseBookings -> {
+
+                            Platform.runLater(() -> {
+
+                                data.clear();
+
+                                if (firebaseBookings != null) {
+
+                                    data.addAll(
+                                            firebaseBookings
+                                    );
+                                }
+
+                                updateStatCards();
+                            });
+                        }
+                );
+    }
+
+    // =========================================================
+    // VIEW BOOKING
+    // =========================================================
+
+    private void showBookingDetails(
+            BedBooking record
+    ) {
+
+        Alert alert =
+                new Alert(
+                        Alert.AlertType.INFORMATION
+                );
+
+        alert.setTitle(
+                "Bed Booking Details"
+        );
+
+        alert.setHeaderText(
+                "Bed Booking Information"
+        );
+
+        alert.setContentText(
+
+                "Booking ID: "
+                        + safe(
+                                record.getBookingID()
+                        )
+
+                        + "\n\nPatient: "
+                        + safe(
+                                record.getPatientName()
+                        )
+
+                        + "\n\nHospital: "
+                        + safe(
+                                record.getHospitalName()
+                        )
+
+                        + "\n\nDepartment: "
+                        + safe(
+                                record.getDepartment()
+                        )
+
+                        + "\n\nBed No.: "
+                        + safe(
+                                record.getBedNo()
+                        )
+
+                        + "\n\nBed Type: "
+                        + safe(
+                                record.getBedType()
+                        )
+
+                        + "\n\nCheck-in Date: "
+                        + safe(
+                                record.getCheckinDate()
+                        )
+
+                        + "\n\nExpected Check-out: "
+                        + safe(
+                                record.getExpectedCheckout()
+                        )
+
+                        + "\n\nStatus: "
+                        + safe(
+                                record.getStatus()
+                        )
+        );
+
+        alert.showAndWait();
+    }
+
+    // =========================================================
+    // ACCEPT BOOKING
+    // =========================================================
+
+    private void acceptBooking(
+            BedBooking booking
+    ) {
+
+        if (booking == null) {
+            return;
+        }
+
+        if (booking.getStatus() != null
+                &&
+                booking.getStatus().equalsIgnoreCase(
+                        "Booked"
+                )) {
+
+            showInformation(
+                    "Already Booked",
+                    "This booking is already confirmed."
+            );
+
+            return;
+        }
+
+        Alert confirmation =
+                new Alert(
+                        Alert.AlertType.CONFIRMATION
+                );
+
+        confirmation.setTitle(
+                "Confirm Bed Booking"
+        );
+
+        confirmation.setHeaderText(
+                "Accept this bed request?"
+        );
+
+        String currentBed =
+                booking.getBedNo();
+
+        if (currentBed == null ||
+                currentBed.trim().isEmpty() ||
+                currentBed.equalsIgnoreCase(
+                        "Not Assigned"
+                )) {
+
+            currentBed =
+                    "Assigned";
+        }
+
+        confirmation.setContentText(
+
+                "Patient: "
+                        + safe(
+                                booking.getPatientName()
+                        )
+
+                        + "\nHospital: "
+                        + safe(
+                                booking.getHospitalName()
+                        )
+
+                        + "\nDepartment: "
+                        + safe(
+                                booking.getDepartment()
+                        )
+
+                        + "\nBed Type: "
+                        + safe(
+                                booking.getBedType()
+                        )
+
+                        + "\n\nConfirm booking?"
+        );
+
+        Optional<ButtonType> response =
+                confirmation.showAndWait();
+
+        if (!response.isPresent()
+                ||
+                response.get() != ButtonType.OK) {
+
+            return;
+        }
+
+        // =====================================================
+        // UPDATE STATUS
+        // =====================================================
+
+        booking.setStatus(
+                "Booked"
+        );
+
+        if (booking.getBedNo() == null ||
+                booking.getBedNo().trim().isEmpty() ||
+                booking.getBedNo().equalsIgnoreCase(
+                        "Not Assigned"
+                )) {
+
+            booking.setBedNo(
+                    currentBed
+            );
+        }
+
+        controller.updateBedBooking(
+
+                booking.getNumber(),
+
+                booking.getBookingID(),
+
+                booking.getPatientName(),
+
+                booking.getHospitalName(),
+
+                booking.getDepartment(),
+
+                booking.getBedNo(),
+
+                booking.getBedType(),
+
+                booking.getCheckinDate(),
+
+                booking.getExpectedCheckout(),
+
+                booking.getStatus()
+        );
+
+        showInformation(
+                "Booking Accepted",
+                "The bed booking request has been confirmed."
+        );
+    }
+
+    // =========================================================
+    // REJECT BOOKING
+    // =========================================================
+
+    private void rejectBooking(
+            BedBooking booking
+    ) {
+
+        if (booking == null) {
+            return;
+        }
+
+        if (booking.getStatus() != null
+                &&
+                booking.getStatus().equalsIgnoreCase(
+                        "Booked"
+                )) {
+
+            showWarning(
+                    "Cannot Reject",
+                    "A booked request cannot be rejected."
+            );
+
+            return;
+        }
+
+        Alert confirmation =
+                new Alert(
+                        Alert.AlertType.CONFIRMATION
+                );
+
+        confirmation.setTitle(
+                "Reject Bed Booking"
+        );
+
+        confirmation.setHeaderText(
+                "Reject this bed request?"
+        );
+
+        confirmation.setContentText(
+                "Patient: "
+                        + safe(
+                                booking.getPatientName()
+                        )
+        );
+
+        Optional<ButtonType> response =
+                confirmation.showAndWait();
+
+        if (!response.isPresent()
+                ||
+                response.get() != ButtonType.OK) {
+
+            return;
+        }
+
+        booking.setStatus(
+                "Rejected"
+        );
+
+        booking.setBedNo(
+                "Not Assigned"
+        );
+
+        controller.updateBedBooking(
+
+                booking.getNumber(),
+
+                booking.getBookingID(),
+
+                booking.getPatientName(),
+
+                booking.getHospitalName(),
+
+                booking.getDepartment(),
+
+                booking.getBedNo(),
+
+                booking.getBedType(),
+
+                booking.getCheckinDate(),
+
+                booking.getExpectedCheckout(),
+
+                booking.getStatus()
+        );
+
+        showInformation(
+                "Booking Rejected",
+                "The bed booking request has been rejected."
+        );
+    }
+
+    // =========================================================
+    // EDIT BOOKING
+    // =========================================================
+
+    private void editBooking(
+            BedBooking record
+    ) {
+
+        if (record == null) {
+            return;
+        }
+
+        String currentStatus =
+                record.getStatus();
+
+        if (currentStatus == null ||
+                currentStatus.trim().isEmpty()) {
+
+            currentStatus =
+                    "Pending";
+        }
+
+        ChoiceDialog<String> dialog =
+                new ChoiceDialog<>(
+                        currentStatus,
+                        "Pending",
+                        "Booked",
+                        "Rejected"
+                );
+
+        dialog.setTitle(
+                "Edit Bed Booking"
+        );
+
+        dialog.setHeaderText(
+                "Change Booking Status"
+        );
+
+        dialog.setContentText(
+                "Select Status:"
+        );
+
+        dialog.showAndWait()
+                .ifPresent(newStatus -> {
+
+                    // =============================================
+                    // BOOKED
+                    // =============================================
+
+                    if (newStatus.equalsIgnoreCase(
+                            "Booked"
+                    )) {
+
+                        acceptBooking(
+                                record
+                        );
+
+                        return;
+                    }
+
+                    // =============================================
+                    // REJECTED
+                    // =============================================
+
+                    if (newStatus.equalsIgnoreCase(
+                            "Rejected"
+                    )) {
+
+                        record.setStatus(
+                                "Rejected"
+                        );
+
+                        record.setBedNo(
+                                "Not Assigned"
+                        );
+
+                    } else {
+
+                        // =========================================
+                        // PENDING
+                        // =========================================
+
+                        record.setStatus(
+                                "Pending"
+                        );
+
+                        if (record.getBedNo() == null ||
+                                record.getBedNo()
+                                        .trim()
+                                        .isEmpty() ||
+                                record.getBedNo()
+                                        .equalsIgnoreCase(
+                                                "Assigned"
+                                        )) {
+
+                            record.setBedNo(
+                                    "Not Assigned"
+                            );
+                        }
+                    }
+
+                    controller.updateBedBooking(
+
+                            record.getNumber(),
+
+                            record.getBookingID(),
+
+                            record.getPatientName(),
+
+                            record.getHospitalName(),
+
+                            record.getDepartment(),
+
+                            record.getBedNo(),
+
+                            record.getBedType(),
+
+                            record.getCheckinDate(),
+
+                            record.getExpectedCheckout(),
+
+                            record.getStatus()
+                    );
+                });
+    }
+
+    // =========================================================
+    // DELETE BOOKING
+    // =========================================================
+
+    private void deleteBooking(
+            BedBooking record
+    ) {
+
+        if (record == null) {
+            return;
+        }
+
+        Alert confirmation =
+                new Alert(
+                        Alert.AlertType.CONFIRMATION
+                );
+
+        confirmation.setTitle(
+                "Delete Bed Booking"
+        );
+
+        confirmation.setHeaderText(
+                "Delete Bed Booking?"
+        );
+
+        confirmation.setContentText(
+
+                "Are you sure you want to delete the booking of "
+                        + safe(
+                                record.getPatientName()
+                        )
+                        + "?"
+        );
+
+        Optional<ButtonType> response =
+                confirmation.showAndWait();
+
+        if (!response.isPresent()
+                ||
+                response.get() != ButtonType.OK) {
+
+            return;
+        }
+
+        controller.deleteBedBooking(
+                record.getBookingID()
+        );
+
+        data.remove(
+                record
+        );
+    }
+
+    // =========================================================
+    // ADD BED BOOKING DIALOG
+    // =========================================================
+
+    private void showAddBedBookingDialog() {
+
+        Dialog<ButtonType> dialog =
+                new Dialog<>();
+
+        dialog.setTitle(
+                "Add Bed Booking"
+        );
+
+        dialog.setHeaderText(
+                "Enter Bed Booking Details"
+        );
+
+        GridPane form =
+                new GridPane();
+
+        form.setHgap(12);
+        form.setVgap(12);
+        form.setPadding(
+                new Insets(20)
+        );
+
+        // =====================================================
+        // BOOKING ID
+        // =====================================================
+
+        TextField bookingIdField =
+                new TextField();
+
+        bookingIdField.setPromptText(
+                "Booking ID"
+        );
+
+        // =====================================================
+        // PATIENT
+        // =====================================================
+
+        TextField patientField =
+                new TextField();
+
+        patientField.setPromptText(
+                "Patient Name"
+        );
+
+        // =====================================================
+        // HOSPITAL
+        // =====================================================
+
+        ComboBox<String> hospitalField =
+                new ComboBox<>();
+
+        hospitalField.getItems().addAll(
+                "CarePlus Women Hospital",
+                "MotherCare Multispeciality",
+                "LifeSpring Women & Child"
+        );
+
+        hospitalField.setPromptText(
+                "Select Hospital"
+        );
+
+        hospitalField.setPrefWidth(
+                250
+        );
+
+        // =====================================================
+        // DEPARTMENT
+        // =====================================================
+
+        ComboBox<String> departmentField =
+                new ComboBox<>();
+
+        departmentField.getItems().addAll(
+                "General Ward",
+                "ICU",
+                "Emergency",
+                "Pediatric",
+                "Maternity"
+        );
+
+        departmentField.setPromptText(
+                "Select Department"
+        );
+
+        departmentField.setPrefWidth(
+                250
+        );
+
+        // =====================================================
+        // BED TYPE
+        // =====================================================
+
+        ComboBox<String> bedTypeField =
+                new ComboBox<>();
+
+        bedTypeField.getItems().addAll(
+                "General",
+                "ICU",
+                "Private",
+                "Semi-Private"
+        );
+
+        bedTypeField.setPromptText(
+                "Select Bed Type"
+        );
+
+        bedTypeField.setPrefWidth(
+                250
+        );
+
+        // =====================================================
+        // BED NUMBER
+        // =====================================================
+
+        TextField bedNoField =
+                new TextField();
+
+        bedNoField.setPromptText(
+                "Optional - e.g. B-101"
+        );
+
+        // =====================================================
+        // CHECK-IN
+        // =====================================================
+
+        TextField checkInField =
+                new TextField();
+
+        checkInField.setPromptText(
+                "e.g. 25 Aug 2026"
+        );
+
+        // =====================================================
+        // CHECK-OUT
+        // =====================================================
+
+        TextField checkOutField =
+                new TextField();
+
+        checkOutField.setPromptText(
+                "e.g. 30 Aug 2026"
+        );
+
+        // =====================================================
+        // FORM
+        // =====================================================
+
+        form.add(
+                new Label("Booking ID:"),
+                0,
+                0
+        );
+
+        form.add(
+                bookingIdField,
+                1,
+                0
+        );
+
+        form.add(
+                new Label("Patient Name:"),
+                0,
+                1
+        );
+
+        form.add(
+                patientField,
+                1,
+                1
+        );
+
+        form.add(
+                new Label("Hospital:"),
+                0,
+                2
+        );
+
+        form.add(
+                hospitalField,
+                1,
+                2
+        );
+
+        form.add(
+                new Label("Department:"),
+                0,
+                3
+        );
+
+        form.add(
+                departmentField,
+                1,
+                3
+        );
+
+        form.add(
+                new Label("Bed Type:"),
+                0,
+                4
+        );
+
+        form.add(
+                bedTypeField,
+                1,
+                4
+        );
+
+        form.add(
+                new Label("Bed No.:"),
+                0,
+                5
+        );
+
+        form.add(
+                bedNoField,
+                1,
+                5
+        );
+
+        form.add(
+                new Label("Check-in Date:"),
+                0,
+                6
+        );
+
+        form.add(
+                checkInField,
+                1,
+                6
+        );
+
+        form.add(
+                new Label("Expected Check-out:"),
+                0,
+                7
+        );
+
+        form.add(
+                checkOutField,
+                1,
+                7
+        );
+
+        dialog.getDialogPane()
+                .setContent(
+                        form
+                );
+
+        ButtonType addButton =
+                new ButtonType(
+                        "Add Booking",
+                        ButtonBar.ButtonData.OK_DONE
+                );
+
+        dialog.getDialogPane()
+                .getButtonTypes()
+                .addAll(
+                        addButton,
+                        ButtonType.CANCEL
+                );
+
+        // =====================================================
+        // RESULT
+        // =====================================================
+
+        dialog.setResultConverter(button -> {
+
+            if (button != addButton) {
+                return null;
+            }
+
+            // =================================================
+            // VALIDATION
+            // =================================================
+
+            if (
+                    bookingIdField.getText()
+                            .trim()
+                            .isEmpty()
+
+                            ||
+
+                    patientField.getText()
+                            .trim()
+                            .isEmpty()
+
+                            ||
+
+                    hospitalField.getValue()
+                            == null
+
+                            ||
+
+                    departmentField.getValue()
+                            == null
+
+                            ||
+
+                    bedTypeField.getValue()
+                            == null
+
+                            ||
+
+                    checkInField.getText()
+                            .trim()
+                            .isEmpty()
+
+                            ||
+
+                    checkOutField.getText()
+                            .trim()
+                            .isEmpty()
+            ) {
+
+                showWarning(
+                        "Missing Information",
+                        "Please fill all required fields."
+                );
+
+                return null;
+            }
+
+            // =================================================
+            // DUPLICATE BOOKING ID
+            // =================================================
+
+            BedBooking existing =
+                    controller.getBedBooking(
+                            bookingIdField
+                                    .getText()
+                                    .trim()
+                    );
+
+            if (existing != null) {
+
+                showWarning(
+                        "Duplicate Booking ID",
+                        "This Booking ID already exists."
+                );
+
+                return null;
+            }
+
+            // =================================================
+            // GENERATE NUMBER
+            // =================================================
+
+            int maxNumber = 0;
+
+            for (BedBooking booking : data) {
+
+                if (booking == null) {
+                    continue;
+                }
+
+                try {
+
+                    int currentNumber =
+                            Integer.parseInt(
+                                    booking.getNumber()
+                            );
+
+                    if (currentNumber >
+                            maxNumber) {
+
+                        maxNumber =
+                                currentNumber;
+                    }
+
+                } catch (
+                        NumberFormatException ignored
+                ) {
+                }
+            }
+
+            String newNumber =
+                    String.valueOf(
+                            maxNumber + 1
+                    );
+
+            // =================================================
+            // BED NUMBER
+            // =================================================
+
+            String bedNo =
+                    bedNoField
+                            .getText()
+                            .trim();
+
+            if (bedNo.isEmpty()) {
+
+                bedNo =
+                        "Not Assigned";
+            }
+
+            // =================================================
+            // CREATE BOOKING
+            // =================================================
+
+            BedBooking newBooking =
+                    new BedBooking(
+
+                            newNumber,
+
+                            bookingIdField
+                                    .getText()
+                                    .trim(),
+
+                            patientField
+                                    .getText()
+                                    .trim(),
+
+                            hospitalField
+                                    .getValue(),
+
+                            departmentField
+                                    .getValue(),
+
+                            bedNo,
+
+                            bedTypeField
+                                    .getValue(),
+
+                            checkInField
+                                    .getText()
+                                    .trim(),
+
+                            checkOutField
+                                    .getText()
+                                    .trim(),
+
+                            "Pending"
+                    );
+
+            // =================================================
+            // SAVE FIREBASE
+            // =================================================
+
+            controller.addBedBooking(
+
+                    newBooking.getNumber(),
+
+                    newBooking.getBookingID(),
+
+                    newBooking.getPatientName(),
+
+                    newBooking.getHospitalName(),
+
+                    newBooking.getDepartment(),
+
+                    newBooking.getBedNo(),
+
+                    newBooking.getBedType(),
+
+                    newBooking.getCheckinDate(),
+
+                    newBooking.getExpectedCheckout(),
+
+                    newBooking.getStatus()
+            );
+
+            showInformation(
+                    "Booking Added",
+                    "Bed booking request added successfully."
+            );
+
+            return button;
+        });
+
+        dialog.showAndWait();
+    }
+
+    // =========================================================
+    // FILTER
     // =========================================================
 
     private void applyFilter(
             TableView<BedBooking> table,
-            ObservableList<BedBooking> data,
             String searchText,
             String selectedDepartment,
             String selectedBedType,
@@ -1215,257 +1922,425 @@ updateStatCards();
         String search =
                 searchText == null
                         ? ""
-                        : searchText.toLowerCase();
+                        : searchText
+                                .trim()
+                                .toLowerCase();
 
         ObservableList<BedBooking> filtered =
                 FXCollections.observableArrayList();
 
         for (BedBooking record : data) {
 
+            if (record == null) {
+                continue;
+            }
+
+            String patientName =
+                    record.getPatientName() == null
+                            ? ""
+                            : record.getPatientName();
+
+            String bookingId =
+                    record.getBookingID() == null
+                            ? ""
+                            : record.getBookingID();
+
+            String department =
+                    record.getDepartment() == null
+                            ? ""
+                            : record.getDepartment();
+
+            String bedType =
+                    record.getBedType() == null
+                            ? ""
+                            : record.getBedType();
+
+            String status =
+                    record.getStatus() == null
+                            ? ""
+                            : record.getStatus();
+
             boolean searchMatch =
-                    record.getPatientName()
+                    patientName
                             .toLowerCase()
                             .contains(search)
-                    ||
-                    record.getBookingID()
+
+                            ||
+
+                    bookingId
                             .toLowerCase()
                             .contains(search);
 
             boolean departmentMatch =
-                    selectedDepartment.equals(
-                            "All Departments"
+                    selectedDepartment == null
+                            ||
+                    "All Departments".equals(
+                            selectedDepartment
                     )
-                    ||
-                    record.getDepartment()
-                            .equals(selectedDepartment);
+                            ||
+                    department.equalsIgnoreCase(
+                            selectedDepartment
+                    );
 
             boolean bedTypeMatch =
-                    selectedBedType.equals(
-                            "All Bed Types"
+                    selectedBedType == null
+                            ||
+                    "All Bed Types".equals(
+                            selectedBedType
                     )
-                    ||
-                    record.getBedType()
-                            .equals(selectedBedType);
+                            ||
+                    bedType.equalsIgnoreCase(
+                            selectedBedType
+                    );
 
             boolean statusMatch =
-                    selectedStatus.equals(
-                            "All Status"
+                    selectedStatus == null
+                            ||
+                    "All Status".equals(
+                            selectedStatus
                     )
-                    ||
-                    record.getStatus()
-                            .equals(selectedStatus);
+                            ||
+                    status.equalsIgnoreCase(
+                            selectedStatus
+                    );
 
             if (
-                    searchMatch &&
-                    departmentMatch &&
-                    bedTypeMatch &&
+                    searchMatch
+                            &&
+                    departmentMatch
+                            &&
+                    bedTypeMatch
+                            &&
                     statusMatch
             ) {
 
-                filtered.add(record);
+                filtered.add(
+                        record
+                );
             }
         }
 
-        table.setItems(filtered);
-    }   
+        table.setItems(
+                filtered
+        );
+    }
 
-// =========================================================
-// UPDATE BED BOOKING STAT CARDS
-// =========================================================
+    // =========================================================
+    // UPDATE STAT CARDS
+    // =========================================================
 
-private void updateStatCards() {
+    private void updateStatCards() {
 
-    // Total beds hardcoded
-    int totalBeds = 100;
+        int total = data.size();
 
-    // Firebase
-    List<BedBooking> bookings =
-            controller.getAllBedBookings();
+        int pending = 0;
+        int booked = 0;
+        int rejected = 0;
 
-    int booked = 0;
-    int pending = 0;
+        for (BedBooking booking : data) {
 
-    for (BedBooking booking : bookings) {
+            if (booking == null ||
+                    booking.getStatus() == null) {
 
-        if (booking.getStatus() != null) {
-
-            if (booking.getStatus()
-                    .equalsIgnoreCase("Booked")) {
-
-                booked++;
+                continue;
             }
 
-            else if (booking.getStatus()
-                    .equalsIgnoreCase("Pending")) {
+            String status =
+                    booking.getStatus();
+
+            if (status.equalsIgnoreCase(
+                    "Pending"
+            )) {
 
                 pending++;
+
+            } else if (
+                    status.equalsIgnoreCase(
+                            "Booked"
+                    )
+            ) {
+
+                booked++;
+
+            } else if (
+                    status.equalsIgnoreCase(
+                            "Rejected"
+                    )
+            ) {
+
+                rejected++;
             }
         }
+
+        if (totalBookingsLabel != null) {
+
+            totalBookingsLabel.setText(
+                    String.valueOf(total)
+            );
+        }
+
+        if (pendingBookingsLabel != null) {
+
+            pendingBookingsLabel.setText(
+                    String.valueOf(pending)
+            );
+        }
+
+        if (bookedBookingsLabel != null) {
+
+            bookedBookingsLabel.setText(
+                    String.valueOf(booked)
+            );
+        }
+
+        if (rejectedBookingsLabel != null) {
+
+            rejectedBookingsLabel.setText(
+                    String.valueOf(rejected)
+            );
+        }
     }
-
-    // Available = Total - Booked
-    int available = totalBeds - booked;
-
-    // Safety
-    if (available < 0) {
-        available = 0;
-    }
-
-    // =====================================================
-    // UPDATE UI
-    // =====================================================
-
-    totalBedsLabel.setText(
-            String.valueOf(totalBeds)
-    );
-
-    availableBedsLabel.setText(
-            String.valueOf(available)
-    );
-
-    occupiedBedsLabel.setText(
-            String.valueOf(booked)
-    );
-
-    pendingBedsLabel.setText(
-            String.valueOf(pending)
-    );
-}
-
-
-
 
     // =========================================================
     // STAT CARD
     // =========================================================
 
-   
-private VBox createStatCard(
-        String number,
-        String symbol,
-        String title,
-        String bottomText,
-        String color
-) {
+    private VBox createStatCard(
+            String number,
+            String symbol,
+            String title,
+            String bottomText,
+            String color
+    ) {
 
-    VBox card =
-            new VBox(8);
+        VBox card =
+                new VBox(8);
 
-    card.setPadding(
-            new Insets(20)
-    );
+        card.setPadding(
+                new Insets(20)
+        );
 
-    card.setAlignment(
-            Pos.CENTER_LEFT
-    );
+        card.setAlignment(
+                Pos.CENTER_LEFT
+        );
 
-    card.setPrefHeight(145);
-    card.setPrefWidth(260);
+        card.setPrefHeight(
+                145
+        );
 
-    card.setStyle(
-            "-fx-background-color: " + WHITE + ";" +
-            "-fx-border-color: " + BORDER + ";" +
-            "-fx-border-radius: 14;" +
-            "-fx-background-radius: 14;"
-    );
+        card.setPrefWidth(
+                260
+        );
 
-    // =====================================================
-    // SYMBOL
-    // =====================================================
+        card.setStyle(
+                "-fx-background-color: " + WHITE + ";" +
+                "-fx-border-color: " + BORDER + ";" +
+                "-fx-border-radius: 14;" +
+                "-fx-background-radius: 14;"
+        );
 
-    Label symbolLabel =
-            new Label(symbol);
+        // =====================================================
+        // SYMBOL
+        // =====================================================
 
-    symbolLabel.setFont(
-            Font.font(
-                    "Arial",
-                    FontWeight.BOLD,
-                    25
-            )
-    );
+        Label symbolLabel =
+                new Label(symbol);
 
-    // =====================================================
-    // NUMBER
-    // =====================================================
+        symbolLabel.setFont(
+                Font.font(
+                        "Arial",
+                        FontWeight.BOLD,
+                        25
+                )
+        );
 
-    Label numberLabel =
-            new Label(number);
-            if (title.equals("Total Beds")) {
-    totalBedsLabel = numberLabel;
-}
-else if (title.equals("Available Beds")) {
-    availableBedsLabel = numberLabel;
-}
-else if (title.equals("Occupied Beds")) {
-    occupiedBedsLabel = numberLabel;
-}
-else if (title.equals("Pending Booking")) {
-    pendingBedsLabel = numberLabel;
-}
+        // =====================================================
+        // NUMBER
+        // =====================================================
 
-    numberLabel.setFont(
-            Font.font(
-                    "Arial",
-                    FontWeight.BOLD,
-                    30
-            )
-    );
+        Label numberLabel =
+                new Label(number);
 
-    numberLabel.setTextFill(
-            Color.web(NAVY)
-    );
+        if (title.equals(
+                "Total Bookings"
+        )) {
 
-    // =====================================================
-    // TITLE
-    // =====================================================
+            totalBookingsLabel =
+                    numberLabel;
 
-    Label titleLabel =
-            new Label(title);
+        } else if (title.equals(
+                "Pending"
+        )) {
 
-    titleLabel.setFont(
-            Font.font(
-                    "Arial",
-                    FontWeight.BOLD,
-                    15
-            )
-    );
+            pendingBookingsLabel =
+                    numberLabel;
 
-    titleLabel.setTextFill(
-            Color.web(NAVY)
-    );
+        } else if (title.equals(
+                "Booked"
+        )) {
 
-    // =====================================================
-    // BOTTOM TEXT
-    // =====================================================
+            bookedBookingsLabel =
+                    numberLabel;
 
-    Label bottomLabel =
-            new Label(bottomText);
+        } else if (title.equals(
+                "Rejected"
+        )) {
 
-    bottomLabel.setFont(
-            Font.font(
-                    "Arial",
-                    FontWeight.BOLD,
-                    12
-            )
-    );
+            rejectedBookingsLabel =
+                    numberLabel;
+        }
 
-    bottomLabel.setTextFill(
-            Color.web(color)
-    );
+        numberLabel.setFont(
+                Font.font(
+                        "Arial",
+                        FontWeight.BOLD,
+                        30
+                )
+        );
 
-    card.getChildren().addAll(
-            symbolLabel,
-            numberLabel,
-            titleLabel,
-            bottomLabel
-    );
+        numberLabel.setTextFill(
+                Color.web(NAVY)
+        );
 
-    return card;
-}
+        // =====================================================
+        // TITLE
+        // =====================================================
 
-public BorderPane getView(){ 
+        Label titleLabel =
+                new Label(title);
+
+        titleLabel.setFont(
+                Font.font(
+                        "Arial",
+                        FontWeight.BOLD,
+                        15
+                )
+        );
+
+        titleLabel.setTextFill(
+                Color.web(NAVY)
+        );
+
+        // =====================================================
+        // BOTTOM TEXT
+        // =====================================================
+
+        Label bottomLabel =
+                new Label(bottomText);
+
+        bottomLabel.setFont(
+                Font.font(
+                        "Arial",
+                        FontWeight.BOLD,
+                        12
+                )
+        );
+
+        bottomLabel.setTextFill(
+                Color.web(color)
+        );
+
+        card.getChildren().addAll(
+                symbolLabel,
+                numberLabel,
+                titleLabel,
+                bottomLabel
+        );
+
+        return card;
+    }
+
+    // =========================================================
+    // INFORMATION
+    // =========================================================
+
+    private void showInformation(
+            String title,
+            String message
+    ) {
+
+        Alert alert =
+                new Alert(
+                        Alert.AlertType.INFORMATION
+                );
+
+        alert.setTitle(
+                title
+        );
+
+        alert.setHeaderText(
+                null
+        );
+
+        alert.setContentText(
+                message
+        );
+
+        alert.showAndWait();
+    }
+
+    // =========================================================
+    // WARNING
+    // =========================================================
+
+    private void showWarning(
+            String title,
+            String message
+    ) {
+
+        Alert alert =
+                new Alert(
+                        Alert.AlertType.WARNING
+                );
+
+        alert.setTitle(
+                title
+        );
+
+        alert.setHeaderText(
+                null
+        );
+
+        alert.setContentText(
+                message
+        );
+
+        alert.showAndWait();
+    }
+
+    // =========================================================
+    // SAFE STRING
+    // =========================================================
+
+    private String safe(
+            String value
+    ) {
+
+        return value == null
+                ? "N/A"
+                : value;
+    }
+
+    // =========================================================
+    // DISPOSE LISTENER
+    // =========================================================
+
+    public void dispose() {
+
+        if (bookingListener != null) {
+
+            bookingListener.remove();
+
+            bookingListener = null;
+        }
+    }
+
+    // =========================================================
+    // GET VIEW
+    // =========================================================
+
+    public BorderPane getView() {
+
         return root;
-}
-
-
+    }
 }

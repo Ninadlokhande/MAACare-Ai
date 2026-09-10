@@ -1,7 +1,7 @@
 package com.sigma.view.doctorpages;
 
 import com.google.cloud.firestore.Firestore;
-import com.sigma.config.DoctorModule.FirebaseConfig;
+import com.sigma.config.FirebaseConfig;
 import com.sigma.controller.doctorController.FeedbackController;
 
 import javafx.application.Platform;

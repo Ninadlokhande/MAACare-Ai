@@ -47,7 +47,7 @@ public class AdminProfile {
         );
 
         content.setStyle(
-            "-fx-background-color: #F9F7FC;"
+            "-fx-background-color: #FFF8FC;"
         );
 
 
@@ -56,7 +56,7 @@ public class AdminProfile {
         // =====================================================
 
         Label title =
-            new Label("Admin Profile");
+            new Label("👤  Admin Profile");
 
         title.setStyle(
             "-fx-font-size: 28px;" +
@@ -101,8 +101,8 @@ public class AdminProfile {
 
         profileCard.setStyle(
             "-fx-background-color: white;" +
-            "-fx-background-radius: 15px;" +
-            "-fx-border-color: #E7E1EF;" +
+            "-fx-background-radius: 16px;" +
+            "-fx-border-color: #F0DCE8;" +
             "-fx-border-radius: 15px;"
         );
 
@@ -136,7 +136,7 @@ public class AdminProfile {
             new Circle(45);
 
         avatarBackground.setFill(
-            Color.web("#6C63A8")
+            Color.web("#9C49C8")
         );
 
 
@@ -183,10 +183,10 @@ public class AdminProfile {
 
 
         Button changePhoto =
-            new Button("Change Photo");
+            new Button("📷  Change Photo");
 
         changePhoto.setStyle(
-            "-fx-background-color: #6C63A8;" +
+            "-fx-background-color: #9C49C8;" +
             "-fx-text-fill: white;" +
             "-fx-font-size: 12px;" +
             "-fx-font-weight: bold;" +
@@ -345,7 +345,7 @@ public class AdminProfile {
 
                     uploadStatus.setStyle(
                         "-fx-font-size: 11px;" +
-                        "-fx-text-fill: #D82F82;"
+                        "-fx-text-fill: #E64286;"
                     );
                 }
             });
@@ -362,7 +362,7 @@ public class AdminProfile {
 
                 uploadStatus.setStyle(
                     "-fx-font-size: 11px;" +
-                    "-fx-text-fill: #D82F82;"
+                    "-fx-text-fill: #E64286;"
                 );
 
                 if (uploadTask.getException() != null) {
@@ -429,7 +429,7 @@ public class AdminProfile {
 
         role.setStyle(
             "-fx-font-size: 14px;" +
-            "-fx-text-fill: #6C63A8;" +
+            "-fx-text-fill: #9C49C8;" +
             "-fx-font-weight: bold;"
         );
 
@@ -489,7 +489,7 @@ public class AdminProfile {
 
         VBox personalCard =
             createCard(
-                "Personal Information"
+                "📝  Personal Information"
             );
 
 
@@ -690,11 +690,11 @@ public class AdminProfile {
 
         Button changePassword =
             new Button(
-                "Change Password"
+                "🔒  Change Password"
             );
 
         changePassword.setStyle(
-            "-fx-background-color: #6C63A8;" +
+            "-fx-background-color: #9C49C8;" +
             "-fx-text-fill: white;" +
             "-fx-font-size: 13px;" +
             "-fx-font-weight: bold;" +
@@ -754,11 +754,11 @@ public class AdminProfile {
 
         Button save =
             new Button(
-                "Save Changes"
+                "✓  Save Changes"
             );
 
         save.setStyle(
-            "-fx-background-color: #6C63A8;" +
+            "-fx-background-color: #9C49C8;" +
             "-fx-text-fill: white;" +
             "-fx-font-size: 13px;" +
             "-fx-font-weight: bold;" +
@@ -847,7 +847,7 @@ public class AdminProfile {
 
         scrollPane.setStyle(
             "-fx-background-color: transparent;" +
-            "-fx-background: #F9F7FC;"
+            "-fx-background: #FFF8FC;"
         );
 
 
@@ -871,8 +871,8 @@ public class AdminProfile {
 
         card.setStyle(
             "-fx-background-color: white;" +
-            "-fx-background-radius: 15px;" +
-            "-fx-border-color: #E7E1EF;" +
+            "-fx-background-radius: 16px;" +
+            "-fx-border-color: #F0DCE8;" +
             "-fx-border-radius: 15px;"
         );
 

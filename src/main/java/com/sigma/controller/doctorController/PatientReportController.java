@@ -11,11 +11,8 @@ import javafx.collections.ObservableList;
 public class PatientReportController {
 
     private final PatientReportDAO patientReportDAO;
-    private final ObservableList<PatientReport> reports;
 
-    // =========================================================
-    // CONSTRUCTOR
-    // =========================================================
+    private final ObservableList<PatientReport> reports;
 
     public PatientReportController() {
 
@@ -27,7 +24,7 @@ public class PatientReportController {
     }
 
     // =========================================================
-    // LOAD REPORTS
+    // LOAD
     // =========================================================
 
     private void loadReports() {
@@ -39,18 +36,17 @@ public class PatientReportController {
             List<PatientReport> loadedReports = patientReportDAO.getAllReports();
 
             if (loadedReports != null) {
-                reports.addAll(loadedReports);
+
+                reports.addAll(
+                        loadedReports);
             }
 
             System.out.println(
                     "[REPORT] Loaded "
                             + reports.size()
-                            + " reports from Firestore.");
+                            + " reports.");
 
         } catch (Exception e) {
-
-            System.out.println(
-                    "[REPORT ERROR] Unable to load reports.");
 
             e.printStackTrace();
         }
@@ -61,59 +57,44 @@ public class PatientReportController {
     // =========================================================
 
     public ObservableList<PatientReport> getReports() {
+
         return reports;
     }
 
     // =========================================================
-    // GET REPORT COUNT
+    // COUNT
     // =========================================================
 
     public int getReportCount() {
+
         return reports.size();
     }
 
     // =========================================================
-    // ADD REPORT
+    // ADD
     // =========================================================
 
-    public void addReport(PatientReport report) {
+    public void addReport(
+            PatientReport report) {
 
         if (report == null) {
-
-            System.out.println(
-                    "[REPORT ERROR] Report is null.");
-
             return;
         }
 
         try {
 
-            patientReportDAO.addReport(report);
+            patientReportDAO.addReport(
+                    report);
 
-            /*
-             * Add to local ObservableList only after
-             * Firestore operation is successful.
-             */
             reports.add(report);
 
             System.out.println(
-                    "[REPORT] Report added successfully.");
+                    "[REPORT] Added successfully.");
 
         } catch (Exception e) {
 
-            System.out.println(
-                    "[REPORT ERROR] Unable to add report.");
-
             e.printStackTrace();
 
-            /*
-             * IMPORTANT:
-             * Do NOT use: throw e;
-             *
-             * Exception is converted into RuntimeException,
-             * so PatientReportsPage can handle it without
-             * checked-exception compilation errors.
-             */
             throw new RuntimeException(
                     "Unable to add patient report.",
                     e);
@@ -121,42 +102,27 @@ public class PatientReportController {
     }
 
     // =========================================================
-    // DELETE REPORT
+    // DELETE
     // =========================================================
 
-    public void deleteReport(PatientReport report) {
+    public void deleteReport(
+            PatientReport report) {
 
         if (report == null) {
-
-            System.out.println(
-                    "[REPORT ERROR] Report is null.");
-
             return;
         }
 
         try {
 
-            patientReportDAO.deleteReport(report);
+            patientReportDAO.deleteReport(
+                    report);
 
-            /*
-             * Remove from local list only after
-             * successful Firestore deletion.
-             */
             reports.remove(report);
-
-            System.out.println(
-                    "[REPORT] Report deleted successfully.");
 
         } catch (Exception e) {
 
-            System.out.println(
-                    "[REPORT ERROR] Unable to delete report.");
-
             e.printStackTrace();
 
-            /*
-             * FIX for "throw e" compilation error.
-             */
             throw new RuntimeException(
                     "Unable to delete patient report.",
                     e);
@@ -164,7 +130,7 @@ public class PatientReportController {
     }
 
     // =========================================================
-    // SEARCH REPORTS
+    // SEARCH
     // =========================================================
 
     public ObservableList<PatientReport> searchReports(
@@ -172,33 +138,31 @@ public class PatientReportController {
 
         ObservableList<PatientReport> filtered = FXCollections.observableArrayList();
 
-        if (searchText == null
-                || searchText.trim().isEmpty()) {
+        if (searchText == null ||
+                searchText.trim().isEmpty()) {
 
             filtered.addAll(reports);
 
             return filtered;
         }
 
-        String search = searchText.trim().toLowerCase();
+        String search = searchText.trim()
+                .toLowerCase();
 
         for (PatientReport report : reports) {
 
-            String reportName = report.getReportName() == null
-                    ? ""
-                    : report.getReportName().toLowerCase();
+            String reportName = report.getReportName()
+                    .toLowerCase();
 
-            String patientName = report.getPatientName() == null
-                    ? ""
-                    : report.getPatientName().toLowerCase();
+            String patientName = report.getPatientName()
+                    .toLowerCase();
 
-            String reportType = report.getReportType() == null
-                    ? ""
-                    : report.getReportType().toLowerCase();
+            String reportType = report.getReportType()
+                    .toLowerCase();
 
-            if (reportName.contains(search)
-                    || patientName.contains(search)
-                    || reportType.contains(search)) {
+            if (reportName.contains(search) ||
+                    patientName.contains(search) ||
+                    reportType.contains(search)) {
 
                 filtered.add(report);
             }
@@ -208,7 +172,7 @@ public class PatientReportController {
     }
 
     // =========================================================
-    // FILTER BY STATUS
+    // FILTER STATUS
     // =========================================================
 
     public ObservableList<PatientReport> filterByStatus(
@@ -216,9 +180,10 @@ public class PatientReportController {
 
         ObservableList<PatientReport> filtered = FXCollections.observableArrayList();
 
-        if (selectedStatus == null
-                || selectedStatus.trim().isEmpty()
-                || selectedStatus.equalsIgnoreCase("All Status")) {
+        if (selectedStatus == null ||
+                selectedStatus.trim().isEmpty() ||
+                selectedStatus.equalsIgnoreCase(
+                        "All Status")) {
 
             filtered.addAll(reports);
 
@@ -227,11 +192,8 @@ public class PatientReportController {
 
         for (PatientReport report : reports) {
 
-            String status = report.getStatus() == null
-                    ? ""
-                    : report.getStatus();
-
-            if (selectedStatus.equalsIgnoreCase(status)) {
+            if (selectedStatus.equalsIgnoreCase(
+                    report.getStatus())) {
 
                 filtered.add(report);
             }
@@ -241,7 +203,7 @@ public class PatientReportController {
     }
 
     // =========================================================
-    // SEARCH + STATUS FILTER TOGETHER
+    // SEARCH + STATUS
     // =========================================================
 
     public ObservableList<PatientReport> filterReports(
@@ -252,40 +214,34 @@ public class PatientReportController {
 
         String search = searchText == null
                 ? ""
-                : searchText.trim().toLowerCase();
+                : searchText
+                        .trim()
+                        .toLowerCase();
 
-        boolean allStatus = selectedStatus == null
-                || selectedStatus.trim().isEmpty()
-                || selectedStatus.equalsIgnoreCase("All Status");
+        boolean allStatus = selectedStatus == null ||
+                selectedStatus.trim().isEmpty() ||
+                selectedStatus.equalsIgnoreCase(
+                        "All Status");
 
         for (PatientReport report : reports) {
 
-            String reportName = report.getReportName() == null
-                    ? ""
-                    : report.getReportName().toLowerCase();
-
-            String patientName = report.getPatientName() == null
-                    ? ""
-                    : report.getPatientName().toLowerCase();
-
-            String reportType = report.getReportType() == null
-                    ? ""
-                    : report.getReportType().toLowerCase();
-
-            String status = report.getStatus() == null
-                    ? ""
-                    : report.getStatus();
-
             boolean matchesSearch = search.isEmpty()
-                    || reportName.contains(search)
-                    || patientName.contains(search)
-                    || reportType.contains(search);
+                    || report.getReportName()
+                            .toLowerCase()
+                            .contains(search)
+                    || report.getPatientName()
+                            .toLowerCase()
+                            .contains(search)
+                    || report.getReportType()
+                            .toLowerCase()
+                            .contains(search);
 
-                boolean matchesStatus = allStatus
-                    || selectedStatus != null
-                        && selectedStatus.equalsIgnoreCase(status);
+            boolean matchesStatus = allStatus
+                    || selectedStatus.equalsIgnoreCase(
+                            report.getStatus());
 
-            if (matchesSearch && matchesStatus) {
+            if (matchesSearch &&
+                    matchesStatus) {
 
                 filtered.add(report);
             }
@@ -295,53 +251,45 @@ public class PatientReportController {
     }
 
     // =========================================================
-    // CLEAR FILTERS
+    // CLEAR
     // =========================================================
 
     public ObservableList<PatientReport> clearFilters() {
 
-        return FXCollections.observableArrayList(reports);
+        return FXCollections.observableArrayList(
+                reports);
     }
 
     // =========================================================
-    // REFRESH REPORTS
+    // REFRESH
     // =========================================================
 
     public void refreshReports() {
 
         loadReports();
-
-        System.out.println(
-                "[REPORT] Reports refreshed from Firestore.");
     }
 
     // =========================================================
-    // REPORT COUNT THIS WEEK
+    // COUNT THIS WEEK
     // =========================================================
 
     public int getReportCountThisWeek() {
 
-        /*
-         * Current implementation returns total reports.
-         * Date-based filtering can be added later if required.
-         */
         return reports.size();
     }
 
     // =========================================================
-    // UPDATE REPORT STATUS
+    // UPDATE STATUS
     // =========================================================
 
     public void updateReportStatus(
             PatientReport report,
             String newStatus) {
 
-        if (report == null) {
-            return;
-        }
+        if (report == null ||
+                newStatus == null ||
+                newStatus.trim().isEmpty()) {
 
-        if (newStatus == null
-                || newStatus.trim().isEmpty()) {
             return;
         }
 
@@ -351,24 +299,15 @@ public class PatientReportController {
                     report,
                     newStatus);
 
-            /*
-             * Update local ObservableList model also.
-             */
-            report.setStatus(newStatus);
-
-            System.out.println(
-                    "[REPORT] Report status updated: "
-                            + newStatus);
+            report.setStatus(
+                    newStatus);
 
         } catch (Exception e) {
-
-            System.out.println(
-                    "[REPORT ERROR] Unable to update report status.");
 
             e.printStackTrace();
 
             throw new RuntimeException(
-                    "Unable to update patient report status.",
+                    "Unable to update report status.",
                     e);
         }
     }

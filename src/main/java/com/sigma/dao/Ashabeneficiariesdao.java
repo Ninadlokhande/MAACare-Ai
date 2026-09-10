@@ -9,7 +9,6 @@ import com.google.cloud.firestore.EventListener;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.ListenerRegistration;
 import com.google.cloud.firestore.QuerySnapshot;
-
 import com.sigma.config.FirebaseConfig;
 import com.sigma.model.AshaBeneficiary;
 //import com.sigma.controller.Controller;

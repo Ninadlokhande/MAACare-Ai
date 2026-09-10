@@ -18,7 +18,5 @@ target/
 .DS_Store
 Thumbs.db
 
-# Firebase service account credentials - never commit
-serviceAccountkey.json
+
 src/main/resources/serviceAccountKey.json
-src/main/resources/ServiceAccountKey.json
